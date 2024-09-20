@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import array_api_strict as xp
+import array_api_strict as xp  # type: ignore[import-untyped]
 from numpy.testing import assert_array_equal
 
-from array_api_extra import atleast_nd
+from array_api_extra import atleast_nd  # type: ignore[import-not-found]
 
 
 class TestAtLeastND:
