@@ -70,7 +70,7 @@ jobs:
         run: python -m pip install .[test]
 
       - name: Test package
-        run: pixi run test-ci -e dev
+        run: pixi run -e test test-ci
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v4.5.0
