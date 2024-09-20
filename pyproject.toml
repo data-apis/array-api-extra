@@ -26,16 +26,20 @@ classifiers = [
     "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+    "array-api-compat",
+]
 
 [project.optional-dependencies]
 test = [
     "pytest >=6",
     "pytest-cov >=3",
+    "array-api-strict",
 ]
 dev = [
     "pytest >=6",
     "pytest-cov >=3",
+    "array-api-strict",
     "pylint",
 ]
 docs = [
@@ -81,6 +85,7 @@ lint = { depends-on = ["pre-commit", "pylint"] }
 [tool.pixi.feature.test.dependencies]
 pytest = ">=6"
 pytest-cov = ">=3"
+array-api-strict = "*"
 
 [tool.pixi.feature.test.tasks]
 test = { cmd = "pytest" }
