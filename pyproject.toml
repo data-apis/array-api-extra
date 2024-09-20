@@ -108,6 +108,9 @@ myst_parser = ">=0.13"
 sphinx_copybutton = "*"
 sphinx_autodoc_typehints = "*"
 
+[tool.pixi.feature.docs.tasks]
+docs = { cmd = ["sphinx-build", ".", "build/"], cwd = "docs" }
+
 [tool.pixi.feature.py309.dependencies]
 python = "~=3.9.0"
 

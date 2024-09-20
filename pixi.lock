@@ -1087,7 +1087,7 @@ packages:
   name: array-api-extra
   version: 0.1.dev0
   path: .
-  sha256: 3015369d39b509279df91f3537e0e3ddb8cce9065ce1361d4ba7877fdbe46642
+  sha256: eeb8b17664bcac8b72ef6fcdf1d5bc507fc5c573ef0780d2f4b639e763c54362
   requires_dist:
   - array-api-strict ; extra == 'dev'
   - numpy ; extra == 'dev'
