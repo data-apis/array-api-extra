@@ -79,7 +79,7 @@ docs = { features = ["docs"], solve-group = "default" }
 test = { features = ["test"], solve-group = "default" }
 
 [tool.pixi.feature.test.tasks]
-test = { cmd = "pytest", cwd = "." }
+test = { cmd = "pytest" }
 test-ci = { cmd = "pytest -ra --cov --cov-report=xml --cov-report=term --durations=20" }
 
 [tool.pixi.feature.dev.tasks]
