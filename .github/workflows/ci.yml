@@ -56,6 +56,7 @@ jobs:
         with:
           pixi-version: v0.30.0
           cache: true
+          environments: ${{ matrix.environment }}
 
       - name: Test package
         run: pixi run test-ci
