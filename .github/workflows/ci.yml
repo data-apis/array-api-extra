@@ -38,7 +38,7 @@ jobs:
         run: pixi run -e lint pylint
 
   checks:
-    name: Check Python ${{ matrix.python-version }} on ${{ matrix.runs-on }}
+    name: Check ${{ matrix.environment }}
     runs-on: ${{ matrix.runs-on }}
     needs: [pre-commit-and-lint]
     strategy:
