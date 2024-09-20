@@ -1087,9 +1087,10 @@ packages:
   name: array-api-extra
   version: 0.1.dev0
   path: .
-  sha256: b79e0b890218ce3c82ff4ec54dc50e24ee416de2900ec3976c99c938fbfcb9b0
+  sha256: 3015369d39b509279df91f3537e0e3ddb8cce9065ce1361d4ba7877fdbe46642
   requires_dist:
   - array-api-strict ; extra == 'dev'
+  - numpy ; extra == 'dev'
   - pylint ; extra == 'dev'
   - pytest-cov>=3 ; extra == 'dev'
   - pytest>=6 ; extra == 'dev'
@@ -1099,6 +1100,7 @@ packages:
   - sphinx-copybutton ; extra == 'docs'
   - sphinx>=7.0 ; extra == 'docs'
   - array-api-strict ; extra == 'test'
+  - numpy ; extra == 'test'
   - pytest-cov>=3 ; extra == 'test'
   - pytest>=6 ; extra == 'test'
   requires_python: '>=3.9'
