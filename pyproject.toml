@@ -62,7 +62,6 @@ version.path = "src/array_api_extra/__init__.py"
 # Pixi
 
 [tool.pixi.project]
-name = "array-api-extra"
 channels = ["conda-forge"]
 platforms = ["linux-64", "osx-arm64", "win-64"]
 

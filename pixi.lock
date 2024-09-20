@@ -960,7 +960,7 @@ packages:
   name: array-api-extra
   version: 0.1.dev0
   path: .
-  sha256: 7b5e19aff380e5dfe69577c72692d6c4a9c03c32d1e5eaa362a16e2f601504a3
+  sha256: 997ff2680730720a11350a92728648fa6121ffa230bec3629f922819c1142e39
   requires_dist:
   - pylint ; extra == 'dev'
   - pytest-cov>=3 ; extra == 'dev'
