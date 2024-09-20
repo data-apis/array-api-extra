@@ -26,9 +26,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = [
-    "array-api-compat",
-]
+dependencies = []
 
 [project.optional-dependencies]
 test = [
