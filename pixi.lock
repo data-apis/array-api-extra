@@ -449,7 +449,7 @@ packages:
   name: array-api-extra
   version: 0.1.dev0
   path: .
-  sha256: 29c9e3fa9c4962be48e702a64c37b2ec5f7800d3571d94e18853ef1061c6f629
+  sha256: 94e22ec717b398167eae9a99f214d41e0b4a8b5ffd79b27468f6632dcdc3ad4d
   requires_dist:
   - pylint ; extra == 'dev'
   - pytest-cov>=3 ; extra == 'dev'
