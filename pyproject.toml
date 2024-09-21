@@ -35,13 +35,6 @@ test = [
     "array-api-strict",
     "numpy",
 ]
-dev = [
-    "pytest >=6",
-    "pytest-cov >=3",
-    "array-api-strict",
-    "numpy",
-    "pylint",
-]
 docs = [
     "sphinx>=7.0",
     "myst_parser>=0.13",
@@ -77,10 +70,15 @@ pre-commit = { cmd = "pre-commit install && pre-commit run -v --all-files --show
 
 [tool.pixi.feature.lint.dependencies]
 pylint = "*"
+mypy = "*"
+# import dependencies for mypy:
+array-api-strict = "*"
+numpy = "*"
 
 [tool.pixi.feature.lint.tasks]
+mypy = { cmd = "mypy", cwd = "." }
 pylint = { cmd = ["pylint", "array_api_extra"], cwd = "src" }
-lint = { depends-on = ["pre-commit", "pylint"] }
+lint = { depends-on = ["pre-commit", "pylint", "mypy"] }
 
 [tool.pixi.feature.test.dependencies]
 pytest = ">=6"
@@ -91,13 +89,6 @@ numpy = "*"
 [tool.pixi.feature.test.tasks]
 test = { cmd = "pytest" }
 test-ci = { cmd = "pytest -ra --cov --cov-report=xml --cov-report=term --durations=20" }
-
-[tool.pixi.feature.dev.dependencies]
-pytest = ">=6"
-pytest-cov = ">=3"
-array-api-strict = "*"
-numpy = "*"
-pylint = "*"
 
 [tool.pixi.feature.docs.dependencies]
 sphinx = ">=7.0"
@@ -120,9 +111,9 @@ python = "~=3.12.0"
 [tool.pixi.environments]
 default = { solve-group = "default" }
 lint = { features = ["lint"], solve-group = "default" }
-docs = { features = ["docs"], solve-group = "default" }
 test = { features = ["test"], solve-group = "default" }
-dev = { features = ["dev", "docs"], solve-group = "default" }
+docs = { features = ["docs"], solve-group = "default" }
+dev = { features = ["lint", "test", "docs"], solve-group = "default" }
 ci-py309 = ["py309", "test"]
 ci-py312 = ["py312", "test"]
 
@@ -163,7 +154,6 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
-# ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "array_api_extra.*"
