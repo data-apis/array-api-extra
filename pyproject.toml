@@ -65,17 +65,16 @@ platforms = ["linux-64", "osx-arm64", "win-64"]
 [tool.pixi.pypi-dependencies]
 array-api-extra = { path = ".", editable = true }
 
-[tool.pixi.tasks]
-pre-commit = { cmd = "pre-commit install && pre-commit run -v --all-files --show-diff-on-failure" }
-
 [tool.pixi.feature.lint.dependencies]
-pylint = "*"
+pre-commit = "*"
 mypy = "*"
+pylint = "*"
 # import dependencies for mypy:
 array-api-strict = "*"
 numpy = "*"
 
 [tool.pixi.feature.lint.tasks]
+pre-commit = { cmd = "pre-commit install && pre-commit run -v --all-files --show-diff-on-failure" }
 mypy = { cmd = "mypy", cwd = "." }
 pylint = { cmd = ["pylint", "array_api_extra"], cwd = "src" }
 lint = { depends-on = ["pre-commit", "pylint", "mypy"] }
