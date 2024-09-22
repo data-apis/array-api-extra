@@ -102,6 +102,12 @@ sphinx_autodoc_typehints = "*"
 [tool.pixi.feature.docs.tasks]
 docs = { cmd = ["sphinx-build", ".", "build/"], cwd = "docs" }
 
+[tool.pixi.feature.dev.dependencies]
+ipython = "*"
+
+[tool.pixi.feature.dev.tasks]
+ipython = { cmd = "ipython" }
+
 [tool.pixi.feature.py309.dependencies]
 python = "~=3.9.0"
 
@@ -113,7 +119,7 @@ default = { solve-group = "default" }
 lint = { features = ["lint"], solve-group = "default" }
 test = { features = ["test"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
-dev = { features = ["lint", "test", "docs"], solve-group = "default" }
+dev = { features = ["lint", "test", "docs", "dev"], solve-group = "default" }
 ci-py309 = ["py309", "test"]
 ci-py312 = ["py312", "test"]
 

@@ -27,6 +27,20 @@ def atleast_nd(x: Array, *, ndim: int, xp: ModuleType) -> Array:
         If ``x.ndim`` >= `ndim`, `x` is returned.
         If ``x.ndim`` < `ndim`, `x` is expanded by prepending new axes
         until ``res.ndim`` equals `ndim`.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> x = xp.asarray([1])
+    >>> xpx.atleast_nd(x, ndim=3, xp=xp)
+    Array([[[1]]], dtype=array_api_strict.int64)
+
+    >>> x = xp.asarray([[[1, 2],
+    ...                  [3, 4]]])
+    >>> xpx.atleast_nd(x, ndim=1, xp=xp) is x
+    True
+
     """
     if x.ndim < ndim:
         x = xp.expand_dims(x, axis=0)
