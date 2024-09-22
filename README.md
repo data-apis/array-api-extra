@@ -2,12 +2,11 @@
 
 [![Actions Status][actions-badge]][actions-link]
 [![Documentation Status][rtd-badge]][rtd-link]
+[![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
 
 [![PyPI version][pypi-version]][pypi-link]
 [![Conda-Forge][conda-badge]][conda-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
-
-[![GitHub Discussion][github-discussions-badge]][github-discussions-link]
 
 <!-- SPHINX-START -->
 
@@ -26,5 +25,4 @@
 
 <!-- prettier-ignore-end -->
 
-Extra array functions that aren't in the array API standard, implemented in
-terms of the standard.
+Extra array functions built on top of the array API standard.
