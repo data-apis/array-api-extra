@@ -14,15 +14,15 @@ def atleast_nd(x: Array, *, ndim: int, xp: ModuleType) -> Array:
 
     Parameters
     ----------
-    x: array
-    ndim: int
+    x : array
+    ndim : int
         The minimum number of dimensions for the result.
-    xp: array_namespace
+    xp : array_namespace
         The standard-compatible namespace for `x`.
 
     Returns
     -------
-    res: array
+    res : array
         An array with ``res.ndim`` >= `ndim`.
         If ``x.ndim`` >= `ndim`, `x` is returned.
         If ``x.ndim`` < `ndim`, `x` is expanded by prepending new axes
