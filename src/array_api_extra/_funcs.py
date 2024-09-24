@@ -65,7 +65,7 @@ def expand_dims(
     a : array
     axis : int or tuple of ints
         Position(s) in the expanded axes where the new axis (or axes) is/are placed.
-        If multiple positions are provided, they should be unique and increasing.
+        If multiple positions are provided, they should be unique.
         Default: ``(0,)``.
     xp : array_namespace
         The standard-compatible namespace for `a`.
