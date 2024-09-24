@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 __all__ = ["atleast_nd"]
 
 
-def atleast_nd(x: Array, *, ndim: int, xp: ModuleType) -> Array:
+def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
     """
     Recursively expand the dimension of an array to at least `ndim`.
 
@@ -48,14 +48,16 @@ def atleast_nd(x: Array, *, ndim: int, xp: ModuleType) -> Array:
     return x
 
 
-def expand_dims(a: Array, *, axis: tuple[int] = (0,), xp: ModuleType):
+def expand_dims(
+    a: Array, /, *, axis: int | tuple[int, ...] = (0,), xp: ModuleType
+) -> Array:
     """
     Expand the shape of an array.
 
-    Insert a new axis that will appear at the `axis` position in the expanded
-    array shape.
+    Insert (a) new axis/axes that will appear at the position(s) specified by
+    `axis` in the expanded array shape.
 
-    This is ``xp.expand_dims`` for ``axis`` an int *or a tuple of ints*.
+    This is ``xp.expand_dims`` for `axis` an int *or a tuple of ints*.
     Equivalent to ``numpy.expand_dims`` for NumPy arrays.
 
     Parameters
@@ -63,6 +65,7 @@ def expand_dims(a: Array, *, axis: tuple[int] = (0,), xp: ModuleType):
     a : array
     axis : int or tuple of ints
         Position(s) in the expanded axes where the new axis (or axes) is/are placed.
+        Default: ``(0,)``.
     xp : array_namespace
         The standard-compatible namespace for `a`.
 
@@ -120,7 +123,7 @@ def expand_dims(a: Array, *, axis: tuple[int] = (0,), xp: ModuleType):
     return a
 
 
-def kron(a: Array, b: Array, *, xp: ModuleType):
+def kron(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     """
     Kronecker product of two arrays.
 
