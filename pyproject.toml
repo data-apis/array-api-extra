@@ -32,11 +32,8 @@ dependencies = []
 test = [
     "pytest >=6",
     "pytest-cov >=3",
-]
-dev = [
-    "pytest >=6",
-    "pytest-cov >=3",
-    "pylint",
+    "array-api-strict",
+    "numpy",
 ]
 docs = [
     "sphinx>=7.0",
@@ -68,28 +65,29 @@ platforms = ["linux-64", "osx-arm64", "win-64"]
 [tool.pixi.pypi-dependencies]
 array-api-extra = { path = ".", editable = true }
 
-[tool.pixi.tasks]
-pre-commit = { cmd = "pre-commit install && pre-commit run -v --all-files --show-diff-on-failure" }
-
 [tool.pixi.feature.lint.dependencies]
+pre-commit = "*"
+mypy = "*"
 pylint = "*"
+# import dependencies for mypy:
+array-api-strict = "*"
+numpy = "*"
 
 [tool.pixi.feature.lint.tasks]
+pre-commit = { cmd = "pre-commit install && pre-commit run -v --all-files --show-diff-on-failure" }
+mypy = { cmd = "mypy", cwd = "." }
 pylint = { cmd = ["pylint", "array_api_extra"], cwd = "src" }
-lint = { depends-on = ["pre-commit", "pylint"] }
+lint = { depends-on = ["pre-commit", "pylint", "mypy"] }
 
 [tool.pixi.feature.test.dependencies]
 pytest = ">=6"
 pytest-cov = ">=3"
+array-api-strict = "*"
+numpy = "*"
 
 [tool.pixi.feature.test.tasks]
 test = { cmd = "pytest" }
 test-ci = { cmd = "pytest -ra --cov --cov-report=xml --cov-report=term --durations=20" }
-
-[tool.pixi.feature.dev.dependencies]
-pytest = ">=6"
-pytest-cov = ">=3"
-pylint = "*"
 
 [tool.pixi.feature.docs.dependencies]
 sphinx = ">=7.0"
@@ -100,6 +98,15 @@ myst_parser = ">=0.13"
 sphinx_copybutton = "*"
 sphinx_autodoc_typehints = "*"
 
+[tool.pixi.feature.docs.tasks]
+docs = { cmd = ["sphinx-build", ".", "build/"], cwd = "docs" }
+
+[tool.pixi.feature.dev.dependencies]
+ipython = "*"
+
+[tool.pixi.feature.dev.tasks]
+ipython = { cmd = "ipython" }
+
 [tool.pixi.feature.py309.dependencies]
 python = "~=3.9.0"
 
@@ -109,9 +116,9 @@ python = "~=3.12.0"
 [tool.pixi.environments]
 default = { solve-group = "default" }
 lint = { features = ["lint"], solve-group = "default" }
-docs = { features = ["docs"], solve-group = "default" }
 test = { features = ["test"], solve-group = "default" }
-dev = { features = ["dev", "docs"], solve-group = "default" }
+docs = { features = ["docs"], solve-group = "default" }
+dev = { features = ["lint", "test", "docs", "dev"], solve-group = "default" }
 ci-py309 = ["py309", "test"]
 ci-py312 = ["py312", "test"]
 

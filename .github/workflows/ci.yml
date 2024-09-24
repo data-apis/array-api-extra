@@ -34,8 +34,10 @@ jobs:
         with:
           pixi-version: v0.30.0
           cache: true
-      - name: Run Pylint
-        run: pixi run -e lint pylint
+      - name: Run Pylint & Mypy
+        run: |
+          pixi run -e lint pylint
+          pixi run -e lint mypy
 
   checks:
     name: Check ${{ matrix.environment }}
