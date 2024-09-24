@@ -7,4 +7,6 @@
     :toctree: generated
 
     atleast_nd
+    expand_dims
+    kron
 ```

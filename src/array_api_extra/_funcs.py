@@ -58,14 +58,14 @@ def expand_dims(
     `axis` in the expanded array shape.
 
     This is ``xp.expand_dims`` for `axis` an int *or a tuple of ints*.
-    Equivalent to ``numpy.expand_dims`` for NumPy arrays.
+    Roughly equivalent to ``numpy.expand_dims`` for NumPy arrays.
 
     Parameters
     ----------
     a : array
     axis : int or tuple of ints
         Position(s) in the expanded axes where the new axis (or axes) is/are placed.
-        If multiple positions are provided, they should be unique.
+        If multiple positions are provided, they should be unique and increasing.
         Default: ``(0,)``.
     xp : array_namespace
         The standard-compatible namespace for `a`.
@@ -77,44 +77,39 @@ def expand_dims(
 
     Examples
     --------
-    # >>> import numpy as np
-    # >>> x = np.array([1, 2])
-    # >>> x.shape
-    # (2,)
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> x = xp.asarray([1, 2])
+    >>> x.shape
+    (2,)
 
-    # The following is equivalent to ``x[np.newaxis, :]`` or ``x[np.newaxis]``:
+    The following is equivalent to ``x[xp.newaxis, :]`` or ``x[xp.newaxis]``:
 
-    # >>> y = np.expand_dims(x, axis=0)
-    # >>> y
-    # array([[1, 2]])
-    # >>> y.shape
-    # (1, 2)
+    >>> y = xpx.expand_dims(x, axis=0, xp=xp)
+    >>> y
+    Array([[1, 2]], dtype=array_api_strict.int64)
+    >>> y.shape
+    (1, 2)
 
-    # The following is equivalent to ``x[:, np.newaxis]``:
+    The following is equivalent to ``x[:, xp.newaxis]``:
 
-    # >>> y = np.expand_dims(x, axis=1)
-    # >>> y
-    # array([[1],
-    #        [2]])
-    # >>> y.shape
-    # (2, 1)
+    >>> y = xpx.expand_dims(x, axis=1, xp=xp)
+    >>> y
+    Array([[1],
+           [2]], dtype=array_api_strict.int64)
+    >>> y.shape
+    (2, 1)
 
-    # ``axis`` may also be a tuple:
+    ``axis`` may also be a tuple:
 
-    # >>> y = np.expand_dims(x, axis=(0, 1))
-    # >>> y
-    # array([[[1, 2]]])
+    >>> y = xpx.expand_dims(x, axis=(0, 1), xp=xp)
+    >>> y
+    Array([[[1, 2]]], dtype=array_api_strict.int64)
 
-    # >>> y = np.expand_dims(x, axis=(2, 0))
-    # >>> y
-    # array([[[1],
-    #         [2]]])
-
-    # Note that some examples may use ``None`` instead of ``np.newaxis``.  These
-    # are the same objects:
-
-    # >>> np.newaxis is None
-    # True
+    >>> y = xpx.expand_dims(x, axis=(2, 0), xp=xp)
+    >>> y
+    Array([[[1],
+            [2]]], dtype=array_api_strict.int64)
 
     """
     if not isinstance(axis, tuple):
@@ -122,7 +117,14 @@ def expand_dims(
     if len(set(axis)) != len(axis):
         err_msg = "Duplicate dimensions specified in `axis`."
         raise ValueError(err_msg)
-    for i in axis:
+    ndim = a.ndim + len(axis)
+    if axis != () and (min(axis) < -ndim or max(axis) >= ndim):
+        err_msg = (
+            f"a provided axis position is out of bounds for array of dimension {a.ndim}"
+        )
+        raise IndexError(err_msg)
+    axis = tuple(dim % ndim for dim in axis)
+    for i in sorted(axis):
         a = xp.expand_dims(a, axis=i)
     return a
 
@@ -145,6 +147,7 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     Returns
     -------
     res : array
+        The Kronecker product of `a` and `b`.
 
     Notes
     -----
@@ -170,30 +173,35 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
 
     Examples
     --------
-    # >>> import numpy as np
-    # >>> np.kron([1,10,100], [5,6,7])
-    # array([  5,   6,   7, ..., 500, 600, 700])
-    # >>> np.kron([5,6,7], [1,10,100])
-    # array([  5,  50, 500, ...,   7,  70, 700])
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.kron(xp.asarray([1, 10, 100]), xp.asarray([5, 6, 7]), xp=xp)
+    Array([  5,   6,   7,  50,  60,  70, 500,
+           600, 700], dtype=array_api_strict.int64)
 
-    # >>> np.kron(np.eye(2), np.ones((2,2)))
-    # array([[1.,  1.,  0.,  0.],
-    #        [1.,  1.,  0.,  0.],
-    #        [0.,  0.,  1.,  1.],
-    #        [0.,  0.,  1.,  1.]])
+    >>> xpx.kron(xp.asarray([5, 6, 7]), xp.asarray([1, 10, 100]), xp=xp)
+    Array([  5,  50, 500,   6,  60, 600,   7,
+            70, 700], dtype=array_api_strict.int64)
 
-    # >>> a = np.arange(100).reshape((2,5,2,5))
-    # >>> b = np.arange(24).reshape((2,3,4))
-    # >>> c = np.kron(a,b)
-    # >>> c.shape
-    # (2, 10, 6, 20)
-    # >>> I = (1,3,0,2)
-    # >>> J = (0,2,1)
-    # >>> J1 = (0,) + J             # extend to ndim=4
-    # >>> S1 = (1,) + b.shape
-    # >>> K = tuple(np.array(I) * np.array(S1) + np.array(J1))
-    # >>> c[K] == a[I]*b[J]
-    # True
+    >>> xpx.kron(xp.eye(2), xp.ones((2, 2)), xp=xp)
+    Array([[1., 1., 0., 0.],
+           [1., 1., 0., 0.],
+           [0., 0., 1., 1.],
+           [0., 0., 1., 1.]], dtype=array_api_strict.float64)
+
+
+    >>> a = xp.reshape(xp.arange(100), (2, 5, 2, 5))
+    >>> b = xp.reshape(xp.arange(24), (2, 3, 4))
+    >>> c = xpx.kron(a, b, xp=xp)
+    >>> c.shape
+    (2, 10, 6, 20)
+    >>> I = (1, 3, 0, 2)
+    >>> J = (0, 2, 1)
+    >>> J1 = (0,) + J             # extend to ndim=4
+    >>> S1 = (1,) + b.shape
+    >>> K = tuple(xp.asarray(I) * xp.asarray(S1) + xp.asarray(J1))
+    >>> c[K] == a[I]*b[J]
+    Array(True, dtype=array_api_strict.bool)
 
     """
 
