@@ -72,6 +72,7 @@ pylint = "*"
 # import dependencies for mypy:
 array-api-strict = "*"
 numpy = "*"
+pytest = "*"
 
 [tool.pixi.feature.lint.tasks]
 pre-commit = { cmd = "pre-commit install && pre-commit run -v --all-files --show-diff-on-failure" }
