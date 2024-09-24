@@ -8,7 +8,7 @@ authors = [
     { name = "Lucas Colley", email = "lucas.colley8@gmail.com" },
     { name = "Open Source Contributors" },
 ]
-description = "Extra array functions that aren't in the array API standard, implemented in terms of the standard."
+description = "Extra array functions built on top of the array API standard."
 readme = "README.md"
 license.file = "LICENSE"
 requires-python = ">=3.9"

@@ -1347,7 +1347,7 @@ packages:
   name: array-api-extra
   version: 0.1.0
   path: .
-  sha256: fbaf78eb4808426a275080543349d1d643b96eaf692ceac2e381ba479486c73a
+  sha256: 0e62b613bb0f2f3e58b3e7a9eb1efdce089984791cbcd93caac78ca675dda472
   requires_dist:
   - furo>=2023.8.17 ; extra == 'docs'
   - myst-parser>=0.13 ; extra == 'docs'
