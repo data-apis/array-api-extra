@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._typing import Array, ModuleType
 
-__all__ = ["atleast_nd"]
+__all__ = ["atleast_nd", "expand_dims", "kron"]
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
@@ -65,6 +65,7 @@ def expand_dims(
     a : array
     axis : int or tuple of ints
         Position(s) in the expanded axes where the new axis (or axes) is/are placed.
+        If multiple positions are provided, they should be unique.
         Default: ``(0,)``.
     xp : array_namespace
         The standard-compatible namespace for `a`.
@@ -118,8 +119,11 @@ def expand_dims(
     """
     if not isinstance(axis, tuple):
         axis = (axis,)
+    if len(set(axis)) != len(axis):
+        err_msg = "Duplicate dimensions specified in `axis`."
+        raise ValueError(err_msg)
     for i in axis:
-        a = xp.expand_dims(a, axis=i, xp=xp)
+        a = xp.expand_dims(a, axis=i)
     return a
 
 
