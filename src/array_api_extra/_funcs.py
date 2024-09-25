@@ -65,7 +65,9 @@ def expand_dims(
     a : array
     axis : int or tuple of ints
         Position(s) in the expanded axes where the new axis (or axes) is/are placed.
-        If multiple positions are provided, they should be unique.
+        If multiple positions are provided, they should be unique (note that a position
+        given by a positive index could also be referred to by a negative index -
+        that will also result in an error).
         Default: ``(0,)``.
     xp : array_namespace
         The standard-compatible namespace for `a`.
@@ -114,9 +116,6 @@ def expand_dims(
     """
     if not isinstance(axis, tuple):
         axis = (axis,)
-    if len(set(axis)) != len(axis):
-        err_msg = "Duplicate dimensions specified in `axis`."
-        raise ValueError(err_msg)
     ndim = a.ndim + len(axis)
     if axis != () and (min(axis) < -ndim or max(axis) >= ndim):
         err_msg = (
@@ -124,6 +123,12 @@ def expand_dims(
         )
         raise IndexError(err_msg)
     axis = tuple(dim % ndim for dim in axis)
+    if len(set(axis)) != len(axis):
+        err_msg = "Duplicate dimensions specified in `axis`."
+        raise ValueError(err_msg)
+    if len(set(axis)) != len(axis):
+        err_msg = "Duplicate dimensions specified in `axis`."
+        raise ValueError(err_msg)
     for i in sorted(axis):
         a = xp.expand_dims(a, axis=i)
     return a

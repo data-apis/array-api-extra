@@ -182,3 +182,9 @@ class TestExpandDims:
         a = xp.empty((3, 3, 3))
         with pytest.raises(ValueError, match="Duplicate dimensions"):
             expand_dims(a, axis=(1, 1), xp=xp)
+
+    def test_positive_negative_repeated(self):
+        # https://github.com/data-apis/array-api/issues/760#issuecomment-1989449817
+        a = xp.empty((2, 3, 4, 5))
+        with pytest.raises(ValueError, match="Duplicate dimensions"):
+            expand_dims(a, axis=(3, -3), xp=xp)
