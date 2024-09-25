@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ._typing import Array, ModuleType
 
-__all__ = ["atleast_nd"]
+__all__ = ["atleast_nd", "cov"]
 
 
 def atleast_nd(x: Array, *, ndim: int, xp: ModuleType) -> Array:
@@ -46,3 +47,48 @@ def atleast_nd(x: Array, *, ndim: int, xp: ModuleType) -> Array:
         x = xp.expand_dims(x, axis=0)
         x = atleast_nd(x, ndim=ndim, xp=xp)
     return x
+
+
+def cov(x: Array, *, xp: ModuleType) -> Array:
+    """..."""
+    x = xp.asarray(x, copy=True)
+    dtype = (
+        xp.float64 if xp.isdtype(x.dtype, "integral") else xp.result_type(x, xp.float64)
+    )
+
+    x = atleast_nd(x, ndim=2, xp=xp)
+    x = xp.astype(x, dtype)
+
+    avg = mean(x, axis=1, xp=xp)
+    fact = x.shape[1] - 1
+
+    if fact <= 0:
+        warnings.warn("Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2)
+        fact = 0.0
+
+    x -= avg[:, None]
+    y_transpose = x.T
+    if xp.isdtype(y_transpose.dtype, "complex floating"):
+        y_transpose = xp.conj(y_transpose)
+    c = x @ y_transpose
+    c /= fact
+    axes = tuple(axis for axis, length in enumerate(c.shape) if length == 1)
+    return xp.squeeze(c, axis=axes)
+
+
+def mean(
+    x: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    keepdims: bool = False,
+    xp: ModuleType,
+) -> Array:
+    """..."""
+    if xp.isdtype(x.dtype, "complex floating"):
+        x_real = xp.real(x)
+        x_imag = xp.imag(x)
+        mean_real = xp.mean(x_real, axis=axis, keepdims=keepdims)
+        mean_imag = xp.mean(x_imag, axis=axis, keepdims=keepdims)
+        return mean_real + (mean_imag * xp.asarray(1j))
+    return xp.mean(x, axis=axis, keepdims=keepdims)
