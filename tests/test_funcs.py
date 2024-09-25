@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import contextlib
+import warnings
 from typing import TYPE_CHECKING, Any
 
 # array-api-strict#6
 import array_api_strict as xp  # type: ignore[import-untyped]
 import pytest
-from numpy.testing import assert_array_equal, assert_equal
+from numpy.testing import assert_allclose, assert_array_equal, assert_equal
 
-from array_api_extra import atleast_nd, expand_dims, kron
+from array_api_extra import atleast_nd, cov, expand_dims, kron
 
 if TYPE_CHECKING:
     Array = Any  # To be changed to a Protocol later (see array-api#589)
@@ -74,6 +75,41 @@ class TestAtLeastND:
 
         y = atleast_nd(x, ndim=9, xp=xp)
         assert_array_equal(y, xp.ones((1, 1, 1, 1, 1, 1, 1, 1, 1)))
+
+
+class TestCov:
+    def test_basic(self):
+        assert_allclose(
+            cov(xp.asarray([[0, 2], [1, 1], [2, 0]]).T, xp=xp),
+            xp.asarray([[1.0, -1.0], [-1.0, 1.0]]),
+        )
+
+    def test_complex(self):
+        x = xp.asarray([[1, 2, 3], [1j, 2j, 3j]])
+        res = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]])
+        assert_allclose(cov(x, xp=xp), res)
+
+    def test_empty(self):
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always", RuntimeWarning)
+            assert_array_equal(cov(xp.asarray([]), xp=xp), xp.nan)
+            assert_array_equal(
+                cov(xp.reshape(xp.asarray([]), (0, 2)), xp=xp),
+                xp.reshape(xp.asarray([]), (0, 0)),
+            )
+            assert_array_equal(
+                cov(xp.reshape(xp.asarray([]), (2, 0)), xp=xp),
+                xp.asarray([[xp.nan, xp.nan], [xp.nan, xp.nan]]),
+            )
+
+    def test_combination(self):
+        x = xp.asarray([-2.1, -1, 4.3])
+        y = xp.asarray([3, 1.1, 0.12])
+        X = xp.stack((x, y), axis=0)
+        desired = xp.asarray([[11.71, -4.286], [-4.286, 2.144133]])
+        assert_allclose(cov(X, xp=xp), desired, rtol=1e-6)
+        assert_allclose(cov(x, xp=xp), xp.asarray(11.71))
+        assert_allclose(cov(y, xp=xp), xp.asarray(2.144133), rtol=1e-6)
 
 
 class TestKron:
