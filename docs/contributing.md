@@ -44,6 +44,12 @@ pixi run test
 pixi run docs
 ```
 
+- To open and preview the locally-built docs:
+
+```
+pixi run open-docs
+```
+
 - To install a [pre-commit](https://pre-commit.com) hook and run the lint suite:
 
 ```
