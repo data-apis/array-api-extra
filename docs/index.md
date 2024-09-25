@@ -86,7 +86,7 @@ Functions that are in-scope for this library will:
   libraries.
 - Be implemented purely in terms of the array API standard.
 - Be implemented with type annotations and
-  [numpydoc-style docstrings](https://numpydoc.readthedocs.io/en/latest/format.html)
+  [numpydoc-style docstrings](https://numpydoc.readthedocs.io/en/latest/format.html).
 - Be tested against `array-api-strict`.
 
 In particular, the following kinds of function are also in-scope:
