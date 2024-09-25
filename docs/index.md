@@ -4,6 +4,7 @@
 :maxdepth: 2
 :hidden:
 api-reference.md
+contributing.md
 ```
 
 This is a library housing "array-agnostic" implementations of functions built on
