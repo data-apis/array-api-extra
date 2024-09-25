@@ -63,7 +63,7 @@ def expand_dims(
     Parameters
     ----------
     a : array
-    axis : int or tuple of ints
+    axis : int or tuple of ints, optional
         Position(s) in the expanded axes where the new axis (or axes) is/are placed.
         If multiple positions are provided, they should be unique (note that a position
         given by a positive index could also be referred to by a negative index -
