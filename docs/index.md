@@ -42,7 +42,7 @@ To vendor the library, clone
 `array_api_extra` into the appropriate place in your library, like:
 
 ```
-cp -R array_api_extra/ mylib/vendored/array_api_extra
+cp -R array-api-extra/ mylib/vendored/array_api_extra
 ```
 
 (usage)=
