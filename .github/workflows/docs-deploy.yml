@@ -25,6 +25,6 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: docs/_build/html
+          folder: docs/build/
           ssh-key: ${{ secrets.DEPLOY_KEY }}
           force: no
