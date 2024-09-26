@@ -12,7 +12,7 @@ jobs:
           pixi-version: v0.30.0
           cache: true
       - name: Build Docs
-        run: pixi run docs
+        run: pixi run -e docs docs
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
