@@ -1,6 +1,7 @@
 # array-api-extra
 
 [![Actions Status][actions-badge]][actions-link]
+[![docs - here!][docs-badge]][docs-link]
 [![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
 
 [![PyPI version][pypi-version]][pypi-link]
@@ -19,6 +20,8 @@
 [pypi-link]:                https://pypi.org/project/array-api-extra/
 [pypi-platforms]:           https://img.shields.io/pypi/pyversions/array-api-extra
 [pypi-version]:             https://img.shields.io/pypi/v/array-api-extra
+[docs-badge]:               https://img.shields.io/badge/docs-here!-2ea44f
+[docs-link]:                https://data-apis.org/array-api-extra/index.html
 
 <!-- prettier-ignore-end -->
 
