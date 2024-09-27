@@ -27,4 +27,4 @@ jobs:
         with:
           folder: docs/build/
           ssh-key: ${{ secrets.DEPLOY_KEY }}
-          force: no
+          force: yes
