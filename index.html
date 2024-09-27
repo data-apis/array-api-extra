@@ -268,14 +268,22 @@ themselves.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>array-api-extra
 </pre></div>
 </div>
-</section>
-<section id="vendoring">
-<span id="id2"></span><h2>Vendoring<a class="headerlink" href="#vendoring" title="Link to this heading">¶</a></h2>
+<p>And
+<a class="reference external" href="https://prefix.dev/channels/conda-forge/packages/array-api-extra">on conda-forge</a>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>micromamba<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>https://repo.prefix.dev/conda-forge<span class="w"> </span>array-api-extra
+<span class="c1"># or</span>
+pixi<span class="w"> </span>add<span class="w"> </span>array-api-extra
+</pre></div>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This library currently provides no backwards-compatibility guarantees!
-If you require stability, it is recommended to vendor this library inside your own.</p>
+If you require stability, it is recommended to pin <code class="docutils literal notranslate"><span class="pre">array-api-extra</span></code> to
+a specific version, or vendor the library inside your own.</p>
 </div>
+</section>
+<section id="vendoring">
+<span id="id2"></span><h2>Vendoring<a class="headerlink" href="#vendoring" title="Link to this heading">¶</a></h2>
 <p>To vendor the library, clone
 <a class="reference external" href="https://github.com/data-apis/array-api-extra">the repository</a> and copy
 <code class="docutils literal notranslate"><span class="pre">array_api_extra</span></code> into the appropriate place in your library, like:</p>
@@ -286,7 +294,7 @@ If you require stability, it is recommended to vendor this library inside your o
 <section id="usage">
 <span id="id3"></span><h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
 <p>Typical usage of this library looks like:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">array_api_strict</span> <span class="k">as</span> <span class="nn">xpx</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">array_api_extra</span> <span class="k">as</span> <span class="nn">xpx</span>
 
 <span class="o">...</span>
 <span class="n">xp</span> <span class="o">=</span> <span class="n">array_namespace</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>

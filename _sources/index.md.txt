@@ -28,14 +28,24 @@ themselves.
 python -m pip install array-api-extra
 ```
 
-(vendoring)=
+And
+[on conda-forge](https://prefix.dev/channels/conda-forge/packages/array-api-extra):
 
-## Vendoring
+```shell
+micromamba install -c https://repo.prefix.dev/conda-forge array-api-extra
+# or
+pixi add array-api-extra
+```
 
 ```{warning}
 This library currently provides no backwards-compatibility guarantees!
-If you require stability, it is recommended to vendor this library inside your own.
+If you require stability, it is recommended to pin `array-api-extra` to
+a specific version, or vendor the library inside your own.
 ```
+
+(vendoring)=
+
+## Vendoring
 
 To vendor the library, clone
 [the repository](https://github.com/data-apis/array-api-extra) and copy
@@ -52,7 +62,7 @@ cp -R array-api-extra/ mylib/vendored/array_api_extra
 Typical usage of this library looks like:
 
 ```python
-import array_api_strict as xpx
+import array_api_extra as xpx
 
 ...
 xp = array_namespace(x)
