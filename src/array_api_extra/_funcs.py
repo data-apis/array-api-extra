@@ -49,8 +49,65 @@ def atleast_nd(x: Array, *, ndim: int, xp: ModuleType) -> Array:
     return x
 
 
-def cov(m: Array, *, xp: ModuleType) -> Array:
-    """..."""
+def cov(m: Array, /, *, xp: ModuleType) -> Array:
+    """
+    Estimate a covariance matrix, given data and weights.
+
+    Covariance indicates the level to which two variables vary together.
+    If we examine N-dimensional samples, :math:`X = [x_1, x_2, ... x_N]^T`,
+    then the covariance matrix element :math:`C_{ij}` is the covariance of
+    :math:`x_i` and :math:`x_j`. The element :math:`C_{ii}` is the variance
+    of :math:`x_i`.
+
+    This provides a subset of the functionality of ``numpy.cov``.
+
+    Parameters
+    ----------
+    m : array
+        A 1-D or 2-D array containing multiple variables and observations.
+        Each row of `m` represents a variable, and each column a single
+        observation of all those variables.
+
+    Returns
+    -------
+    res : array
+        The covariance matrix of the variables.
+
+    Examples
+    --------
+    >>> import numpy as np
+
+    Consider two variables, :math:`x_0` and :math:`x_1`, which
+    correlate perfectly, but in opposite directions:
+
+    >>> x = np.array([[0, 2], [1, 1], [2, 0]]).T
+    >>> x
+    array([[0, 1, 2],
+           [2, 1, 0]])
+
+    Note how :math:`x_0` increases while :math:`x_1` decreases. The covariance
+    matrix shows this clearly:
+
+    >>> np.cov(x)
+    array([[ 1., -1.],
+           [-1.,  1.]])
+
+    Note that element :math:`C_{0,1}`, which shows the correlation between
+    :math:`x_0` and :math:`x_1`, is negative.
+
+    Further, note how `x` and `y` are combined:
+
+    >>> x = [-2.1, -1,  4.3]
+    >>> y = [3,  1.1,  0.12]
+    >>> X = np.stack((x, y), axis=0)
+    >>> np.cov(X)
+    array([[11.71      , -4.286     ], # may vary
+           [-4.286     ,  2.144133]])
+    >>> np.cov(x)
+    array(11.71)
+    >>> xp.cov(y)
+
+    """
     m = xp.asarray(m, copy=True)
     dtype = (
         xp.float64 if xp.isdtype(m.dtype, "integral") else xp.result_type(m, xp.float64)
@@ -84,7 +141,46 @@ def mean(
     keepdims: bool = False,
     xp: ModuleType,
 ) -> Array:
-    """..."""
+    """
+    Calculates the arithmetic mean of the input array ``x``.
+
+    In addition to the standard ``mean``, this function supports complex-valued input.
+
+    Parameters
+    ----------
+    x: array
+        input array. Should have a floating-point data type.
+    axis: int or tuple of ints, optional
+        axis or axes along which arithmetic means must be computed.
+        By default, the mean must be computed over the entire array.
+        If a tuple of integers, arithmetic means must be computed over multiple axes.
+        Default: ``None``.
+    keepdims: bool, optional
+        if ``True``, the reduced axes (dimensions) must be included in the result as
+        singleton dimensions, and, accordingly, the result must be compatible with
+        the input array (see :ref:`broadcasting`).
+        Otherwise, if ``False``, the reduced axes (dimensions) must not be included
+        in the result. Default: ``False``.
+
+    Returns
+    -------
+    out: array
+        if the arithmetic mean was computed over the entire array,
+        a zero-dimensional array containing the arithmetic mean;
+        otherwise, a non-zero-dimensional array containing the arithmetic means.
+        The returned array must have the same data type as ``x``.
+
+    Notes
+    -----
+
+    **Special Cases**
+
+    Let ``N`` equal the number of elements over which to compute the arithmetic mean.
+
+    -   If ``N`` is ``0``, the arithmetic mean is ``NaN``.
+    -   If ``x_i`` is ``NaN``, the arithmetic mean is ``NaN``
+        (i.e., ``NaN`` values propagate).
+    """
     if xp.isdtype(x.dtype, "complex floating"):
         x_real = xp.real(x)
         x_imag = xp.imag(x)
