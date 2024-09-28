@@ -126,9 +126,6 @@ def expand_dims(
     if len(set(axis)) != len(axis):
         err_msg = "Duplicate dimensions specified in `axis`."
         raise ValueError(err_msg)
-    if len(set(axis)) != len(axis):
-        err_msg = "Duplicate dimensions specified in `axis`."
-        raise ValueError(err_msg)
     for i in sorted(axis):
         a = xp.expand_dims(a, axis=i)
     return a
