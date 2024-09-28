@@ -95,3 +95,12 @@ class TestCov:
                 cov(xp.reshape(xp.asarray([]), (2, 0)), xp=xp),
                 xp.asarray([[xp.nan, xp.nan], [xp.nan, xp.nan]]),
             )
+
+    def test_combination(self):
+        x = xp.asarray([-2.1, -1, 4.3])
+        y = xp.asarray([3, 1.1, 0.12])
+        X = xp.stack((x, y), axis=0)
+        desired = xp.asarray([[11.71, -4.286], [-4.286, 2.144133]])
+        assert_allclose(cov(X, xp=xp), desired, rtol=1e-6)
+        assert_allclose(cov(x, xp=xp), xp.asarray(11.71))
+        assert_allclose(cov(y, xp=xp), xp.asarray(2.144133), rtol=1e-6)

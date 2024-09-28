@@ -49,28 +49,28 @@ def atleast_nd(x: Array, *, ndim: int, xp: ModuleType) -> Array:
     return x
 
 
-def cov(x: Array, *, xp: ModuleType) -> Array:
+def cov(m: Array, *, xp: ModuleType) -> Array:
     """..."""
-    x = xp.asarray(x, copy=True)
+    m = xp.asarray(m, copy=True)
     dtype = (
-        xp.float64 if xp.isdtype(x.dtype, "integral") else xp.result_type(x, xp.float64)
+        xp.float64 if xp.isdtype(m.dtype, "integral") else xp.result_type(m, xp.float64)
     )
 
-    x = atleast_nd(x, ndim=2, xp=xp)
-    x = xp.astype(x, dtype)
+    m = atleast_nd(m, ndim=2, xp=xp)
+    m = xp.astype(m, dtype)
 
-    avg = mean(x, axis=1, xp=xp)
-    fact = x.shape[1] - 1
+    avg = mean(m, axis=1, xp=xp)
+    fact = m.shape[1] - 1
 
     if fact <= 0:
         warnings.warn("Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2)
         fact = 0.0
 
-    x -= avg[:, None]
-    y_transpose = x.T
-    if xp.isdtype(y_transpose.dtype, "complex floating"):
-        y_transpose = xp.conj(y_transpose)
-    c = x @ y_transpose
+    m -= avg[:, None]
+    m_transpose = m.T
+    if xp.isdtype(m_transpose.dtype, "complex floating"):
+        m_transpose = xp.conj(m_transpose)
+    c = m @ m_transpose
     c /= fact
     axes = tuple(axis for axis, length in enumerate(c.shape) if length == 1)
     return xp.squeeze(c, axis=axes)
