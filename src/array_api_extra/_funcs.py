@@ -51,7 +51,7 @@ def atleast_nd(x: Array, *, ndim: int, xp: ModuleType) -> Array:
 
 def cov(m: Array, /, *, xp: ModuleType) -> Array:
     """
-    Estimate a covariance matrix, given data and weights.
+    Estimate a covariance matrix.
 
     Covariance indicates the level to which two variables vary together.
     If we examine N-dimensional samples, :math:`X = [x_1, x_2, ... x_N]^T`,
@@ -67,6 +67,8 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:
         A 1-D or 2-D array containing multiple variables and observations.
         Each row of `m` represents a variable, and each column a single
         observation of all those variables.
+    xp : array_namespace
+        The standard-compatible namespace for `m`.
 
     Returns
     -------
@@ -75,37 +77,42 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:
 
     Examples
     --------
-    >>> import numpy as np
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
 
     Consider two variables, :math:`x_0` and :math:`x_1`, which
     correlate perfectly, but in opposite directions:
 
-    >>> x = np.array([[0, 2], [1, 1], [2, 0]]).T
+    >>> x = xp.asarray([[0, 2], [1, 1], [2, 0]]).T
     >>> x
-    array([[0, 1, 2],
-           [2, 1, 0]])
+    Array([[0, 1, 2],
+           [2, 1, 0]], dtype=array_api_strict.int64)
 
     Note how :math:`x_0` increases while :math:`x_1` decreases. The covariance
     matrix shows this clearly:
 
-    >>> np.cov(x)
-    array([[ 1., -1.],
-           [-1.,  1.]])
+    >>> xpx.cov(x, xp=xp)
+    Array([[ 1., -1.],
+           [-1.,  1.]], dtype=array_api_strict.float64)
+
 
     Note that element :math:`C_{0,1}`, which shows the correlation between
     :math:`x_0` and :math:`x_1`, is negative.
 
     Further, note how `x` and `y` are combined:
 
-    >>> x = [-2.1, -1,  4.3]
-    >>> y = [3,  1.1,  0.12]
-    >>> X = np.stack((x, y), axis=0)
-    >>> np.cov(X)
-    array([[11.71      , -4.286     ], # may vary
-           [-4.286     ,  2.144133]])
-    >>> np.cov(x)
-    array(11.71)
-    >>> xp.cov(y)
+    >>> x = xp.asarray([-2.1, -1,  4.3])
+    >>> y = xp.asarray([3,  1.1,  0.12])
+    >>> X = xp.stack((x, y), axis=0)
+    >>> xpx.cov(X, xp=xp)
+    Array([[11.71      , -4.286     ],
+           [-4.286     ,  2.14413333]], dtype=array_api_strict.float64)
+
+    >>> xpx.cov(x, xp=xp)
+    Array(11.71, dtype=array_api_strict.float64)
+
+    >>> xpx.cov(y, xp=xp)
+    Array(2.14413333, dtype=array_api_strict.float64)
 
     """
     m = xp.asarray(m, copy=True)

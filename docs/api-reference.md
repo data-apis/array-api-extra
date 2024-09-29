@@ -7,4 +7,5 @@
     :toctree: generated
 
     atleast_nd
+    cov
 ```
