@@ -48,8 +48,8 @@ a specific version, or vendor the library inside your own.
 ## Vendoring
 
 To vendor the library, clone
-[the repository](https://github.com/data-apis/array-api-extra) and copy
-`array_api_extra` into the appropriate place in your library, like:
+[the repository](https://github.com/data-apis/array-api-extra) and copy it into
+the appropriate place in your library, like:
 
 ```
 cp -R array-api-extra/ mylib/vendored/array_api_extra
