@@ -1,13 +1,16 @@
 name: Docs Deploy
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Docs Build"]
+    types: [completed]
     branches:
-      - main
+      - "main"
 
 jobs:
   docs-deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.event == 'push' }}
     environment:
       name: docs-deploy
     steps:
@@ -27,4 +30,3 @@ jobs:
         with:
           folder: docs/build/
           ssh-key: ${{ secrets.DEPLOY_KEY }}
-          force: yes
