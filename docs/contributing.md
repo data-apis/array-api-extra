@@ -13,6 +13,7 @@ converting code to consume the standard!
 - Import your function to `src/array_api_extra/__init__.py` and add it to
   `__all__` there.
 - Add a test class for your function in `tests/test_funcs.py`.
+- Add your function to `docs/api-reference.md`.
 - [Make a PR!](https://github.com/data-apis/array-api-extra/pulls)
 
 ## Development workflow
