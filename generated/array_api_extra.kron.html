@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="array_api_extra.expand_dims" href="array_api_extra.expand_dims.html" /><link rel="prev" title="API Reference" href="../api-reference.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Contributing" href="../contributing.html" /><link rel="prev" title="array_api_extra.expand_dims" href="array_api_extra.expand_dims.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>array_api_extra.atleast_nd - array-api-extra 0.1.2.dev0 documentation</title>
+        <title>array_api_extra.kron - array-api-extra 0.1.2.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -201,9 +201,9 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api-reference.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.atleast_nd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.atleast_nd.html">array_api_extra.atleast_nd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.expand_dims.html">array_api_extra.expand_dims</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.kron.html">array_api_extra.kron</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.kron</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
@@ -227,12 +227,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.atleast_nd.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.kron.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.atleast_nd.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.kron.rst" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -251,42 +251,82 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="array-api-extra-atleast-nd">
-<h1>array_api_extra.atleast_nd<a class="headerlink" href="#array-api-extra-atleast-nd" title="Link to this heading">¶</a></h1>
+          <section id="array-api-extra-kron">
+<h1>array_api_extra.kron<a class="headerlink" href="#array-api-extra-kron" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.atleast_nd">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">atleast_nd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.atleast_nd" title="Link to this definition">¶</a></dt>
-<dd><p>Recursively expand the dimension of an array to at least <cite>ndim</cite>.</p>
+<dt class="sig sig-object py" id="array_api_extra.kron">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">kron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.kron" title="Link to this definition">¶</a></dt>
+<dd><p>Kronecker product of two arrays.</p>
+<p>Computes the Kronecker product, a composite array made of blocks of the
+second array scaled by the first.</p>
+<p>Equivalent to <code class="docutils literal notranslate"><span class="pre">numpy.kron</span></code> for NumPy arrays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>array</em>)</p></li>
-<li><p><strong>ndim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The minimum number of dimensions for the result.</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em>) – The standard-compatible namespace for <cite>x</cite>.</p></li>
+<li><p><strong>a</strong> (<em>array</em>)</p></li>
+<li><p><strong>b</strong> (<em>array</em>)</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em>) – The standard-compatible namespace for <cite>a</cite> and <cite>b</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>res</strong> – An array with <code class="docutils literal notranslate"><span class="pre">res.ndim</span></code> &gt;= <cite>ndim</cite>.
-If <code class="docutils literal notranslate"><span class="pre">x.ndim</span></code> &gt;= <cite>ndim</cite>, <cite>x</cite> is returned.
-If <code class="docutils literal notranslate"><span class="pre">x.ndim</span></code> &lt; <cite>ndim</cite>, <cite>x</cite> is expanded by prepending new axes
-until <code class="docutils literal notranslate"><span class="pre">res.ndim</span></code> equals <cite>ndim</cite>.</p>
+<dd class="field-even"><p><strong>res</strong> – The Kronecker product of <cite>a</cite> and <cite>b</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The function assumes that the number of dimensions of <cite>a</cite> and <cite>b</cite>
+are the same, if necessary prepending the smallest with ones.
+If <code class="docutils literal notranslate"><span class="pre">a.shape</span> <span class="pre">=</span> <span class="pre">(r0,r1,..,rN)</span></code> and <code class="docutils literal notranslate"><span class="pre">b.shape</span> <span class="pre">=</span> <span class="pre">(s0,s1,...,sN)</span></code>,
+the Kronecker product has shape <code class="docutils literal notranslate"><span class="pre">(r0*s0,</span> <span class="pre">r1*s1,</span> <span class="pre">...,</span> <span class="pre">rN*SN)</span></code>.
+The elements are products of elements from <cite>a</cite> and <cite>b</cite>, organized
+explicitly by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kron</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)[</span><span class="n">k0</span><span class="p">,</span><span class="n">k1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">kN</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">i0</span><span class="p">,</span><span class="n">i1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">iN</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="n">j0</span><span class="p">,</span><span class="n">j1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">jN</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>where:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kt</span> <span class="o">=</span> <span class="n">it</span> <span class="o">*</span> <span class="n">st</span> <span class="o">+</span> <span class="n">jt</span><span class="p">,</span>  <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">N</span>
+</pre></div>
+</div>
+<p>In the common 2-D case (N=1), the block structure can be visualized:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">b</span><span class="p">,</span>   <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">b</span><span class="p">,</span>  <span class="o">...</span> <span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">b</span>  <span class="p">],</span>
+ <span class="p">[</span>  <span class="o">...</span>                              <span class="o">...</span>   <span class="p">],</span>
+ <span class="p">[</span> <span class="n">a</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">b</span><span class="p">,</span>  <span class="n">a</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">b</span><span class="p">,</span> <span class="o">...</span> <span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">b</span> <span class="p">]]</span>
+</pre></div>
+</div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">array_api_strict</span> <span class="k">as</span> <span class="nn">xp</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">array_api_extra</span> <span class="k">as</span> <span class="nn">xpx</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">atleast_nd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
-<span class="go">Array([[[1]]], dtype=array_api_strict.int64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">]),</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">]),</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array([  5,   6,   7,  50,  60,  70, 500,</span>
+<span class="go">       600, 700], dtype=array_api_strict.int64)</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-<span class="gp">... </span>                 <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">atleast_nd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span> <span class="ow">is</span> <span class="n">x</span>
-<span class="go">True</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">]),</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">]),</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array([  5,  50, 500,   6,  60, 600,   7,</span>
+<span class="go">        70, 700], dtype=array_api_strict.int64)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">xp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array([[1., 1., 0., 0.],</span>
+<span class="go">       [1., 1., 0., 0.],</span>
+<span class="go">       [0., 0., 1., 1.],</span>
+<span class="go">       [0., 0., 1., 1.]], dtype=array_api_strict.float64)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">xpx</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(2, 10, 6, 20)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">I</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">J</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">J1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span> <span class="o">+</span> <span class="n">J</span>             <span class="c1"># extend to ndim=4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">S1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">*</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">S1</span><span class="p">)</span> <span class="o">+</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">J1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="p">[</span><span class="n">K</span><span class="p">]</span> <span class="o">==</span> <span class="n">a</span><span class="p">[</span><span class="n">I</span><span class="p">]</span><span class="o">*</span><span class="n">b</span><span class="p">[</span><span class="n">J</span><span class="p">]</span>
+<span class="go">Array(True, dtype=array_api_strict.bool)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -298,23 +338,23 @@ until <code class="docutils literal notranslate"><span class="pre">res.ndim</spa
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="array_api_extra.expand_dims.html">
+          <a class="next-page" href="../contributing.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">array_api_extra.expand_dims</div>
+                <div class="title">Contributing</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../api-reference.html">
+          <a class="prev-page" href="array_api_extra.expand_dims.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">API Reference</div>
+                <div class="title">array_api_extra.expand_dims</div>
                 
               </div>
             </a>
@@ -355,8 +395,8 @@ until <code class="docutils literal notranslate"><span class="pre">res.ndim</spa
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">array_api_extra.atleast_nd</a><ul>
-<li><a class="reference internal" href="#array_api_extra.atleast_nd"><code class="docutils literal notranslate"><span class="pre">atleast_nd()</span></code></a></li>
+<li><a class="reference internal" href="#">array_api_extra.kron</a><ul>
+<li><a class="reference internal" href="#array_api_extra.kron"><code class="docutils literal notranslate"><span class="pre">kron()</span></code></a></li>
 </ul>
 </li>
 </ul>
