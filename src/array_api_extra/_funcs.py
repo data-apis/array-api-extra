@@ -362,7 +362,7 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
 
         Note the normalization factor of ``pi`` used in the definition.
         This is the most commonly used definition in signal processing.
-        Use ``sinc(x / np.pi)`` to obtain the unnormalized sinc function
+        Use ``sinc(x / xp.pi)`` to obtain the unnormalized sinc function
         :math:`\sin(x)/x` that is more common in mathematics.
 
     Parameters
@@ -426,5 +426,6 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
     if not xp.isdtype(x.dtype, "real floating"):
         err_msg = "`x` must have a real floating data type."
         raise ValueError(err_msg)
-    y = xp.pi * xp.where(x, x, xp.finfo(x.dtype).smallest_normal)
+    # no scalars in `where` - array-api#807
+    y = xp.pi * xp.where(x, x, xp.asarray(xp.finfo(x.dtype).smallest_normal))
     return xp.sin(y) / y
