@@ -370,6 +370,8 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
     x : array
         Array (possibly multi-dimensional) of values for which to calculate
         ``sinc(x)``. Must have a real floating point dtype.
+    xp : array_namespace
+        The standard-compatible namespace for `x`.
 
     Returns
     -------
