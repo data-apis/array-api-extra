@@ -8,6 +8,7 @@
 
     atleast_nd
     cov
+    create_diagonal
     expand_dims
     kron
     sinc
