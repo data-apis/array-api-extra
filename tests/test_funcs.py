@@ -237,3 +237,9 @@ class TestSinc:
     def test_dtype(self, x):
         with pytest.raises(ValueError, match="real floating data type"):
             sinc(xp.asarray(x), xp=xp)
+
+    def test_3d(self):
+        x = xp.reshape(xp.arange(18, dtype=xp.float64), (3, 3, 2))
+        expected = xp.zeros((3, 3, 2))
+        expected[0, 0, 0] = 1.0
+        assert_allclose(sinc(x, xp=xp), expected, atol=1e-15)
