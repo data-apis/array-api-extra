@@ -373,7 +373,7 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
 
     Returns
     -------
-    out : ndarray
+    res : array
         ``sinc(x)`` calculated elementwise, which has the same shape as the input.
 
     Notes
