@@ -152,6 +152,8 @@ def create_diagonal(x: Array, /, *, offset: int = 0, xp: ModuleType) -> Array:
         Offset from the leading diagonal (default is ``0``).
         Use positive ints for diagonals above the leading diagonal,
         and negative ints for diagonals below the leading diagonal.
+    xp : array_namespace
+        The standard-compatible namespace for `x`.
 
     Returns
     -------
