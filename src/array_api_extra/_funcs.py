@@ -367,9 +367,9 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
 
     Parameters
     ----------
-    x : array
+    x : array of floats
         Array (possibly multi-dimensional) of values for which to calculate
-        ``sinc(x)``.
+        ``sinc(x)``. Should have a floating point dtype.
 
     Returns
     -------
@@ -423,5 +423,8 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
            -3.89817183e-17], dtype=array_api_strict.float64)
 
     """
+    if not xp.isdtype(x.dtype, "real floating"):
+        err_msg = "`x` must have a real floating data type."
+        raise ValueError(err_msg)
     y = xp.pi * xp.where(x == 0, xp.asarray(1.0e-20), x)
     return xp.sin(y) / y
