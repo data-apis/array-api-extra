@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._typing import Array, ModuleType
 
-__all__ = ["atleast_nd", "cov", "expand_dims", "kron"]
+__all__ = ["atleast_nd", "cov", "expand_dims", "kron", "sinc"]
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
@@ -348,3 +348,80 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     a_shape = xp.asarray(a_shape)
     b_shape = xp.asarray(b_shape)
     return xp.reshape(result, tuple(xp.multiply(a_shape, b_shape)))
+
+
+def sinc(x: Array, /, *, xp: ModuleType) -> Array:
+    r"""
+    Return the normalized sinc function.
+
+    The sinc function is equal to :math:`\sin(\pi x)/(\pi x)` for any argument
+    :math:`x\ne 0`. ``sinc(0)`` takes the limit value 1, making ``sinc`` not
+    only everywhere continuous but also infinitely differentiable.
+
+    .. note::
+
+        Note the normalization factor of ``pi`` used in the definition.
+        This is the most commonly used definition in signal processing.
+        Use ``sinc(x / np.pi)`` to obtain the unnormalized sinc function
+        :math:`\sin(x)/x` that is more common in mathematics.
+
+    Parameters
+    ----------
+    x : array
+        Array (possibly multi-dimensional) of values for which to calculate
+        ``sinc(x)``.
+
+    Returns
+    -------
+    out : ndarray
+        ``sinc(x)`` calculated elementwise, which has the same shape as the input.
+
+    Notes
+    -----
+    The name sinc is short for "sine cardinal" or "sinus cardinalis".
+
+    The sinc function is used in various signal processing applications,
+    including in anti-aliasing, in the construction of a Lanczos resampling
+    filter, and in interpolation.
+
+    For bandlimited interpolation of discrete-time signals, the ideal
+    interpolation kernel is proportional to the sinc function.
+
+    References
+    ----------
+    .. [1] Weisstein, Eric W. "Sinc Function." From MathWorld--A Wolfram Web
+           Resource. https://mathworld.wolfram.com/SincFunction.html
+    .. [2] Wikipedia, "Sinc function",
+           https://en.wikipedia.org/wiki/Sinc_function
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> x = xp.linspace(-4, 4, 41)
+    >>> xpx.sinc(x, xp=xp)
+    Array([-3.89817183e-17, -4.92362781e-02,
+           -8.40918587e-02, -8.90384387e-02,
+           -5.84680802e-02,  3.89817183e-17,
+            6.68206631e-02,  1.16434881e-01,
+            1.26137788e-01,  8.50444803e-02,
+           -3.89817183e-17, -1.03943254e-01,
+           -1.89206682e-01, -2.16236208e-01,
+           -1.55914881e-01,  3.89817183e-17,
+            2.33872321e-01,  5.04551152e-01,
+            7.56826729e-01,  9.35489284e-01,
+            1.00000000e+00,  9.35489284e-01,
+            7.56826729e-01,  5.04551152e-01,
+            2.33872321e-01,  3.89817183e-17,
+           -1.55914881e-01, -2.16236208e-01,
+           -1.89206682e-01, -1.03943254e-01,
+           -3.89817183e-17,  8.50444803e-02,
+            1.26137788e-01,  1.16434881e-01,
+            6.68206631e-02,  3.89817183e-17,
+           -5.84680802e-02, -8.90384387e-02,
+           -8.40918587e-02, -4.92362781e-02,
+           -3.89817183e-17], dtype=array_api_strict.float64)
+
+    """
+    y = xp.pi * xp.where(x == 0, xp.asarray(1.0e-20), x)
+    return xp.sin(y) / y
