@@ -426,5 +426,5 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
     if not xp.isdtype(x.dtype, "real floating"):
         err_msg = "`x` must have a real floating data type."
         raise ValueError(err_msg)
-    y = xp.pi * xp.where(x == 0, xp.asarray(1.0e-20), x)
+    y = xp.pi * xp.where(x, x, xp.finfo(x.dtype).smallest_normal)
     return xp.sin(y) / y
