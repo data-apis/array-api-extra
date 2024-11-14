@@ -141,6 +141,9 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:
 
 
 def create_diagonal(x: Array, /, *, offset: int = 0, xp: ModuleType) -> Array:
+    if x.ndim != 1:
+        err_msg = "`x` must be 1-dimensional."
+        raise ValueError(err_msg)
     n = x.shape[0] + abs(offset)
     diag = xp.zeros(n**2, dtype=x.dtype)
     i = offset if offset >= 0 else abs(offset) * n

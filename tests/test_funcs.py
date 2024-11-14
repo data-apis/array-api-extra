@@ -9,7 +9,7 @@ import array_api_strict as xp  # type: ignore[import-untyped]
 import pytest
 from numpy.testing import assert_allclose, assert_array_equal, assert_equal
 
-from array_api_extra import atleast_nd, cov, expand_dims, kron, sinc
+from array_api_extra import atleast_nd, cov, create_diagonal, expand_dims, kron, sinc
 
 if TYPE_CHECKING:
     Array = Any  # To be changed to a Protocol later (see array-api#589)
@@ -110,6 +110,30 @@ class TestCov:
         assert_allclose(cov(X, xp=xp), desired, rtol=1e-6)
         assert_allclose(cov(x, xp=xp), xp.asarray(11.71))
         assert_allclose(cov(y, xp=xp), xp.asarray(2.144133), rtol=1e-6)
+
+
+class TestCreateDiagonal:
+    def test_1d(self):
+        vals = 100 * xp.arange(5, dtype=xp.float64)
+        b = xp.zeros((5, 5))
+        for k in range(5):
+            b[k, k] = vals[k]
+        assert_array_equal(create_diagonal(vals, xp=xp), b)
+        b = xp.zeros((7, 7))
+        c = xp.asarray(b, copy=True)
+        for k in range(5):
+            b[k, k + 2] = vals[k]
+            c[k + 2, k] = vals[k]
+        assert_array_equal(create_diagonal(vals, offset=2, xp=xp), b)
+        assert_array_equal(create_diagonal(vals, offset=-2, xp=xp), c)
+
+    def test_0d(self):
+        with pytest.raises(ValueError, match="1-dimensional"):
+            print(create_diagonal(xp.asarray(1), xp=xp))
+
+    def test_2d(self):
+        with pytest.raises(ValueError, match="1-dimensional"):
+            print(create_diagonal(xp.asarray([[1]]), xp=xp))
 
 
 class TestKron:
