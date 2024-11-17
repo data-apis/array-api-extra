@@ -10,4 +10,5 @@
     cov
     expand_dims
     kron
+    sinc
 ```

@@ -9,7 +9,7 @@ import array_api_strict as xp  # type: ignore[import-untyped]
 import pytest
 from numpy.testing import assert_allclose, assert_array_equal, assert_equal
 
-from array_api_extra import atleast_nd, cov, expand_dims, kron
+from array_api_extra import atleast_nd, cov, expand_dims, kron, sinc
 
 if TYPE_CHECKING:
     Array = Any  # To be changed to a Protocol later (see array-api#589)
@@ -224,3 +224,22 @@ class TestExpandDims:
         a = xp.empty((2, 3, 4, 5))
         with pytest.raises(ValueError, match="Duplicate dimensions"):
             expand_dims(a, axis=(3, -3), xp=xp)
+
+
+class TestSinc:
+    def test_simple(self):
+        assert_array_equal(sinc(xp.asarray(0.0), xp=xp), xp.asarray(1.0))
+        w = sinc(xp.linspace(-1, 1, 100), xp=xp)
+        # check symmetry
+        assert_allclose(w, xp.flip(w, axis=0))
+
+    @pytest.mark.parametrize("x", [0, 1 + 3j])
+    def test_dtype(self, x):
+        with pytest.raises(ValueError, match="real floating data type"):
+            sinc(xp.asarray(x), xp=xp)
+
+    def test_3d(self):
+        x = xp.reshape(xp.arange(18, dtype=xp.float64), (3, 3, 2))
+        expected = xp.zeros((3, 3, 2))
+        expected[0, 0, 0] = 1.0
+        assert_allclose(sinc(x, xp=xp), expected, atol=1e-15)
