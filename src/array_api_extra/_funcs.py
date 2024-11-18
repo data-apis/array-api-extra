@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._typing import Array, ModuleType
 
-__all__ = ["atleast_nd", "cov", "expand_dims", "kron", "sinc"]
+__all__ = ["atleast_nd", "cov", "create_diagonal", "expand_dims", "kron", "sinc"]
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
@@ -138,6 +138,55 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:
     c /= fact
     axes = tuple(axis for axis, length in enumerate(c.shape) if length == 1)
     return xp.squeeze(c, axis=axes)
+
+
+def create_diagonal(x: Array, /, *, offset: int = 0, xp: ModuleType) -> Array:
+    """
+    Construct a diagonal array.
+
+    Parameters
+    ----------
+    x : array
+        A 1-D array
+    offset : int, optional
+        Offset from the leading diagonal (default is ``0``).
+        Use positive ints for diagonals above the leading diagonal,
+        and negative ints for diagonals below the leading diagonal.
+    xp : array_namespace
+        The standard-compatible namespace for `x`.
+
+    Returns
+    -------
+    res : array
+        A 2-D array with `x` on the diagonal (offset by `offset`).
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> x = xp.asarray([2, 4, 8])
+
+    >>> xpx.create_diagonal(x, xp=xp)
+    Array([[2, 0, 0],
+           [0, 4, 0],
+           [0, 0, 8]], dtype=array_api_strict.int64)
+
+    >>> xpx.create_diagonal(x, offset=-2, xp=xp)
+    Array([[0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0],
+           [2, 0, 0, 0, 0],
+           [0, 4, 0, 0, 0],
+           [0, 0, 8, 0, 0]], dtype=array_api_strict.int64)
+
+    """
+    if x.ndim != 1:
+        err_msg = "`x` must be 1-dimensional."
+        raise ValueError(err_msg)
+    n = x.shape[0] + abs(offset)
+    diag = xp.zeros(n**2, dtype=x.dtype)
+    i = offset if offset >= 0 else abs(offset) * n
+    diag[i : min(n * (n - offset), diag.shape[0]) : n + 1] = x
+    return xp.reshape(diag, (n, n))
 
 
 def _mean(
