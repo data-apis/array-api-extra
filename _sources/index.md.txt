@@ -5,6 +5,7 @@
 :hidden:
 api-reference.md
 contributing.md
+contributors.md
 ```
 
 This is a library housing "array-agnostic" implementations of functions built on
