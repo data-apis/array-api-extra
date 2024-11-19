@@ -3,6 +3,7 @@
 ```{toctree}
 :maxdepth: 2
 :hidden:
+index.md
 api-reference.md
 contributing.md
 contributors.md
