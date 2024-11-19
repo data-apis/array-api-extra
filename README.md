@@ -3,6 +3,7 @@
 [![Actions Status][actions-badge]][actions-link]
 [![docs - here!][docs-badge]][docs-link]
 [![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
+[![All Contributors](https://img.shields.io/github/all-contributors/data-apis/array-api-extra?color=ee8449&style=flat-square)](#contributors)
 
 [![PyPI version][pypi-version]][pypi-link]
 [![Conda-Forge][conda-badge]][conda-link]
@@ -26,3 +27,14 @@
 <!-- prettier-ignore-end -->
 
 Extra array functions built on top of the array API standard.
+
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
