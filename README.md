@@ -37,6 +37,7 @@ Extra array functions built on top of the array API standard.
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://lucascolley.github.io"><img src="https://avatars.githubusercontent.com/u/51488791?v=4?s=100" width="100px;" alt="Lucas Colley"/><br /><sub><b>Lucas Colley</b></sub></a><br /><a href="#code-lucascolley" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tupui"><img src="https://avatars.githubusercontent.com/u/23188539?v=4?s=100" width="100px;" alt="Pamphile Roy"/><br /><sub><b>Pamphile Roy</b></sub></a><br /><a href="#code-tupui" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
