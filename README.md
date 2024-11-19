@@ -36,7 +36,7 @@ Extra array functions built on top of the array API standard.
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://lucascolley.github.io"><img src="https://avatars.githubusercontent.com/u/51488791?v=4?s=100" width="100px;" alt="Lucas Colley"/><br /><sub><b>Lucas Colley</b></sub></a><br /><a href="#code-lucascolley" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://lucascolley.github.io"><img src="https://avatars.githubusercontent.com/u/51488791?v=4?s=100" width="100px;" alt="Lucas Colley"/><br /><sub><b>Lucas Colley</b></sub></a><br /><a href="#code-lucascolley" title="Code">💻</a> <a href="#doc-lucascolley" title="Documentation">📖</a> <a href="#example-lucascolley" title="Examples">💡</a> <a href="#ideas-lucascolley" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-lucascolley" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-lucascolley" title="Maintenance">🚧</a> <a href="#tool-lucascolley" title="Tools">🔧</a> <a href="#test-lucascolley" title="Tests">⚠️</a></td>
     </tr>
   </tbody>
 </table>
