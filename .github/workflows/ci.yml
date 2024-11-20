@@ -61,7 +61,7 @@ jobs:
           environments: ${{ matrix.environment }}
 
       - name: Test package
-        run: pixi run -e ${{ matrix.environment }} test-ci
+        run: pixi run -e ${{ matrix.environment }} tests-ci
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v4.5.0

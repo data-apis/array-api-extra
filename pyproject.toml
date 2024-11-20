@@ -29,7 +29,7 @@ dynamic = ["version"]
 dependencies = []
 
 [project.optional-dependencies]
-test = [
+tests = [
     "pytest >=6",
     "pytest-cov >=3",
     "array-api-strict",
@@ -62,6 +62,9 @@ version.path = "src/array_api_extra/__init__.py"
 channels = ["conda-forge"]
 platforms = ["linux-64", "osx-arm64", "win-64"]
 
+[tool.pixi.dependencies]
+python = ">=3.9.20,<3.14"
+
 [tool.pixi.pypi-dependencies]
 array-api-extra = { path = ".", editable = true }
 
@@ -75,20 +78,21 @@ numpy = "*"
 pytest = "*"
 
 [tool.pixi.feature.lint.tasks]
-pre-commit = { cmd = "pre-commit install && pre-commit run -v --all-files --show-diff-on-failure" }
+pre-commit-install = { cmd = "pre-commit install" }
+pre-commit = { cmd = "pre-commit run -v --all-files --show-diff-on-failure" }
 mypy = { cmd = "mypy", cwd = "." }
 pylint = { cmd = ["pylint", "array_api_extra"], cwd = "src" }
 lint = { depends-on = ["pre-commit", "pylint", "mypy"] }
 
-[tool.pixi.feature.test.dependencies]
+[tool.pixi.feature.tests.dependencies]
 pytest = ">=6"
 pytest-cov = ">=3"
 array-api-strict = "*"
 numpy = "*"
 
-[tool.pixi.feature.test.tasks]
-test = { cmd = "pytest" }
-test-ci = { cmd = "pytest -ra --cov --cov-report=xml --cov-report=term --durations=20" }
+[tool.pixi.feature.tests.tasks]
+tests = { cmd = "pytest" }
+tests-ci = { cmd = "pytest -ra --cov --cov-report=xml --cov-report=term --durations=20" }
 
 [tool.pixi.feature.docs.dependencies]
 sphinx = ">=7.0"
@@ -118,11 +122,11 @@ python = "~=3.12.0"
 [tool.pixi.environments]
 default = { solve-group = "default" }
 lint = { features = ["lint"], solve-group = "default" }
-test = { features = ["test"], solve-group = "default" }
+tests = { features = ["tests"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
-dev = { features = ["lint", "test", "docs", "dev"], solve-group = "default" }
-ci-py309 = ["py309", "test"]
-ci-py312 = ["py312", "test"]
+dev = { features = ["lint", "tests", "docs", "dev"], solve-group = "default" }
+ci-py309 = ["py309", "tests"]
+ci-py312 = ["py312", "tests"]
 
 
 # pytest
