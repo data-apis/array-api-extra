@@ -5,6 +5,7 @@
 [![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
 [![All Contributors](https://img.shields.io/github/all-contributors/data-apis/array-api-extra?color=ee8449&style=flat-square)](#contributors)
 [![Scientific Python Ecosystem Coordination](https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&color=%235CA038)](https://scientific-python.org/specs/)
+[![codecov](https://codecov.io/github/data-apis/array-api-extra/graph/badge.svg)](https://codecov.io/github/data-apis/array-api-extra)
 
 [![PyPI version][pypi-version]][pypi-link]
 [![Conda-Forge][conda-badge]][conda-link]
