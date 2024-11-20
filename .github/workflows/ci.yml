@@ -46,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        environment: [ci-py309, ci-py312]
+        environment: [ci-py310, ci-py313]
         runs-on: [ubuntu-latest]
 
     steps:
