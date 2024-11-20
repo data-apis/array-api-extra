@@ -36,7 +36,7 @@ pixi shell -e dev
 - To run the tests:
 
 ```
-pixi run test
+pixi run tests
 ```
 
 - To build the docs locally:
@@ -51,7 +51,13 @@ pixi run docs
 pixi run open-docs
 ```
 
-- To install a [pre-commit](https://pre-commit.com) hook and run the lint suite:
+- To install a [pre-commit](https://pre-commit.com) hook:
+
+```
+pixi run pre-commit-install
+```
+
+- To run the lint suite:
 
 ```
 pixi run lint
@@ -76,6 +82,6 @@ tasks available in the `dev` environment:
 
 ```
 pixi shell -e docs
-pixi shell -e test
+pixi shell -e tests
 pixi shell -e lint
 ```
