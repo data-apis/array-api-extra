@@ -30,6 +30,11 @@
 
 Extra array functions built on top of the array API standard.
 
+Used by:
+
+- https://github.com/scipy/scipy
+- ...
+
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->

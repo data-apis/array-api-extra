@@ -75,6 +75,7 @@ pixi run ipython
 pixi run pre-commit
 pixi run pylint
 pixi run mypy
+pixi run pyright
 ```
 
 Alternative environments are available with a subset of the dependencies and

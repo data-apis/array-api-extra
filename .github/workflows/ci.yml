@@ -34,7 +34,7 @@ jobs:
         with:
           pixi-version: v0.37.0
           cache: true
-      - name: Run Pylint & Mypy
+      - name: Run Pylint, Mypy & Pyright
         run: |
           pixi run -e lint pylint
           pixi run -e lint mypy
