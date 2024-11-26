@@ -32,7 +32,8 @@ Extra array functions built on top of the array API standard.
 
 Used by:
 
-- [SciPy](https://github.com/scipy/scipy) - Fundamental algorithms for scientific computing.
+- [SciPy](https://github.com/scipy/scipy) - Fundamental algorithms for
+  scientific computing.
 - ...
 
 ## Contributors
