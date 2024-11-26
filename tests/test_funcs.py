@@ -5,7 +5,7 @@ import typing
 import warnings
 
 # array-api-strict#6
-import array_api_strict as xp  # type: ignore[import-untyped]
+import array_api_strict as xp  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_array_equal, assert_equal

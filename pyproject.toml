@@ -180,11 +180,11 @@ disallow_incomplete_defs = true
 
 # pyright
 
-[tool.pyright]
+[tool.basedpyright]
 include = ["src", "tests"]
 pythonVersion = "3.10"
 pythonPlatform = "All"
-typeCheckingMode = "strict"
+typeCheckingMode = "all"
 
 # data-apis/array-api#589
 reportAny = false
