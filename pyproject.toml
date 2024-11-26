@@ -70,19 +70,23 @@ array-api-extra = { path = ".", editable = true }
 
 [tool.pixi.feature.lint.dependencies]
 pre-commit = "*"
-mypy = "*"
 pylint = "*"
 # import dependencies for mypy:
 array-api-strict = "*"
 numpy = "*"
 pytest = "*"
 
+[tool.pixi.feature.lint.pypi-dependencies]
+basedmypy = "*"
+basedpyright = "*"
+
 [tool.pixi.feature.lint.tasks]
 pre-commit-install = { cmd = "pre-commit install" }
 pre-commit = { cmd = "pre-commit run -v --all-files --show-diff-on-failure" }
 mypy = { cmd = "mypy", cwd = "." }
 pylint = { cmd = ["pylint", "array_api_extra"], cwd = "src" }
-lint = { depends-on = ["pre-commit", "pylint", "mypy"] }
+pyright = { cmd = "basedpyright", cwd = "." }
+lint = { depends-on = ["pre-commit", "pylint", "mypy", "pyright"] }
 
 [tool.pixi.feature.tests.dependencies]
 pytest = ">=6"
@@ -165,11 +169,27 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
+# array-api#589
+disallow_any_expr = false
 
 [[tool.mypy.overrides]]
 module = "array_api_extra.*"
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
+
+
+# pyright
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.10"
+pythonPlatform = "All"
+typeCheckingMode = "strict"
+
+# array-api#589
+reportAny = false
+reportExplicitAny = false
+reportUnknownMemberType = false
 
 
 # Ruff

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import typing
 import warnings
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from ._typing import Array, ModuleType
 
 __all__ = ["atleast_nd", "cov", "create_diagonal", "expand_dims", "kron", "sinc"]
