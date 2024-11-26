@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 import contextlib
+import typing
 import warnings
-from typing import TYPE_CHECKING, Any
 
 # array-api-strict#6
-import array_api_strict as xp  # type: ignore[import-untyped]
+import array_api_strict as xp  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_array_equal, assert_equal
 
 from array_api_extra import atleast_nd, cov, create_diagonal, expand_dims, kron, sinc
 
-if TYPE_CHECKING:
-    Array = Any  # To be changed to a Protocol later (see array-api#589)
+if typing.TYPE_CHECKING:
+    from array_api_extra._typing import Array
 
 
 class TestAtLeastND:
@@ -131,7 +131,7 @@ class TestCreateDiagonal:
 
     @pytest.mark.parametrize("n", range(1, 10))
     @pytest.mark.parametrize("offset", range(1, 10))
-    def test_create_diagonal(self, n, offset):
+    def test_create_diagonal(self, n: int, offset: int):
         # from scipy._lib tests
         rng = np.random.default_rng(2347823)
         one = xp.asarray(1.0)
@@ -180,9 +180,9 @@ class TestKron:
         assert_array_equal(kron(a, b, xp=xp), k)
 
     def test_kron_smoke(self):
-        a = xp.ones([3, 3])
-        b = xp.ones([3, 3])
-        k = xp.ones([9, 9])
+        a = xp.ones((3, 3))
+        b = xp.ones((3, 3))
+        k = xp.ones((9, 9))
 
         assert_array_equal(kron(a, b, xp=xp), k)
 
@@ -197,7 +197,7 @@ class TestKron:
             ((2, 0, 0, 2), (2, 0, 2)),
         ],
     )
-    def test_kron_shape(self, shape_a, shape_b):
+    def test_kron_shape(self, shape_a: tuple[int, ...], shape_b: tuple[int, ...]):
         a = xp.ones(shape_a)
         b = xp.ones(shape_b)
         normalised_shape_a = xp.asarray(
@@ -271,7 +271,7 @@ class TestSinc:
         assert_allclose(w, xp.flip(w, axis=0))
 
     @pytest.mark.parametrize("x", [0, 1 + 3j])
-    def test_dtype(self, x):
+    def test_dtype(self, x: int | complex):
         with pytest.raises(ValueError, match="real floating data type"):
             sinc(xp.asarray(x), xp=xp)
 
