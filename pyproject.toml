@@ -77,7 +77,7 @@ numpy = "*"
 pytest = "*"
 
 [tool.pixi.feature.lint.pypi-dependencies]
-basedmypy = "*"
+basedmypy = { version = "*", extras = ["faster-cache"] }
 basedpyright = "*"
 
 [tool.pixi.feature.lint.tasks]

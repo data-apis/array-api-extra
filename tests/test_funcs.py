@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import contextlib
+import typing
 import warnings
-from typing import TYPE_CHECKING, Any
 
 # array-api-strict#6
 import array_api_strict as xp  # type: ignore[import-untyped]
@@ -12,9 +12,8 @@ from numpy.testing import assert_allclose, assert_array_equal, assert_equal
 
 from array_api_extra import atleast_nd, cov, create_diagonal, expand_dims, kron, sinc
 
-if TYPE_CHECKING:
-    # To be changed to a Protocol later (see data-apis/array-api#589)
-    Array = Any  # type: ignore[no-any-explicit]
+if typing.TYPE_CHECKING:
+    from array_api_extra._typing import Array
 
 
 class TestAtLeastND:
@@ -198,7 +197,7 @@ class TestKron:
             ((2, 0, 0, 2), (2, 0, 2)),
         ],
     )
-    def test_kron_shape(self, shape_a: tuple[int], shape_b: tuple[int]):
+    def test_kron_shape(self, shape_a: tuple[int, ...], shape_b: tuple[int, ...]):
         a = xp.ones(shape_a)
         b = xp.ones(shape_b)
         normalised_shape_a = xp.asarray(

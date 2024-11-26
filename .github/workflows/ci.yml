@@ -38,6 +38,7 @@ jobs:
         run: |
           pixi run -e lint pylint
           pixi run -e lint mypy
+          pixi run -e lint pyright
 
   checks:
     name: Check ${{ matrix.environment }}
