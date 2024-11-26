@@ -2285,7 +2285,7 @@ packages:
   - python >=3.9
   license: Apache-2.0 AND MIT
   purls:
-  - pkg:pypi/jedi?source=hash-mapping
+  - pkg:pypi/jedi?source=compressed-mapping
   size: 842916
   timestamp: 1731317305873
 - kind: conda
