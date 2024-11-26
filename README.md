@@ -32,7 +32,7 @@ Extra array functions built on top of the array API standard.
 
 Used by:
 
-- https://github.com/scipy/scipy
+- [SciPy](https://github.com/scipy/scipy) - Fundamental algorithms for scientific computing.
 - ...
 
 ## Contributors
