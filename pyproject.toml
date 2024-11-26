@@ -169,7 +169,7 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
-# array-api#589
+# data-apis/array-api#589
 disallow_any_expr = false
 
 [[tool.mypy.overrides]]
@@ -186,7 +186,7 @@ pythonVersion = "3.10"
 pythonPlatform = "All"
 typeCheckingMode = "strict"
 
-# array-api#589
+# data-apis/array-api#589
 reportAny = false
 reportExplicitAny = false
 reportUnknownMemberType = false

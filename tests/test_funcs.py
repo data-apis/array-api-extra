@@ -13,7 +13,7 @@ from numpy.testing import assert_allclose, assert_array_equal, assert_equal
 from array_api_extra import atleast_nd, cov, create_diagonal, expand_dims, kron, sinc
 
 if TYPE_CHECKING:
-    # To be changed to a Protocol later (see array-api#589)
+    # To be changed to a Protocol later (see data-apis/array-api#589)
     Array = Any  # type: ignore[no-any-explicit]
 
 
