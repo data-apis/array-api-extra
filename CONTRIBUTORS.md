@@ -33,6 +33,6 @@ This project exists thanks to the following contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the
+We follow the
 [all-contributors](https://github.com/all-contributors/all-contributors)
 specification. Contributions of any kind welcome!
