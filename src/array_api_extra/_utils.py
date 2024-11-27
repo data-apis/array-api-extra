@@ -58,6 +58,7 @@ def in1d(
 
     if assume_unique:
         return ret[: x1.shape[0]]
+    # https://github.com/KotlinIsland/basedmypy/issues/826
     # https://github.com/pylint-dev/pylint/issues/10095
     # pylint: disable=possibly-used-before-assignment
-    return xp.take(ret, rev_idx, axis=0)
+    return xp.take(ret, rev_idx, axis=0)  # type: ignore[possibly-undefined]  # pyright: ignore[reportPossiblyUnboundVariable]

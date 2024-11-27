@@ -5,6 +5,6 @@ from typing import Any
 
 # To be changed to a Protocol later (see data-apis/array-api#589)
 Array = Any  # type: ignore[no-any-explicit]
-Device = Any
+Device = Any  # type: ignore[no-any-explicit]
 
 __all__ = ["Array", "Device", "ModuleType"]

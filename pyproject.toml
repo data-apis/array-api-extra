@@ -78,14 +78,16 @@ numpy = "*"
 pytest = "*"
 
 [tool.pixi.feature.lint.pypi-dependencies]
-basedpyright = "*"
+# basedpyright = "*"
+pyright = "*"
 
 [tool.pixi.feature.lint.tasks]
 pre-commit-install = { cmd = "pre-commit install" }
 pre-commit = { cmd = "pre-commit run -v --all-files --show-diff-on-failure" }
 mypy = { cmd = "mypy", cwd = "." }
 pylint = { cmd = ["pylint", "array_api_extra"], cwd = "src" }
-pyright = { cmd = "basedpyright", cwd = "." }
+# pyright = { cmd = "basedpyright", cwd = "." }
+pyright = { cmd = "pyright", cwd = "." }
 lint = { depends-on = ["pre-commit", "pylint", "mypy", "pyright"] }
 
 [tool.pixi.feature.tests.dependencies]
@@ -180,17 +182,25 @@ disallow_incomplete_defs = true
 
 # pyright
 
-[tool.basedpyright]
+# [tool.basedpyright]
+# include = ["src", "tests"]
+# pythonVersion = "3.10"
+# pythonPlatform = "All"
+# typeCheckingMode = "all"
+
+# # data-apis/array-api#589
+# reportAny = false
+# reportExplicitAny = false
+# # data-apis/array-api-strict#6
+# reportUnknownMemberType = false
+
+[tool.pyright]
 include = ["src", "tests"]
 pythonVersion = "3.10"
 pythonPlatform = "All"
-typeCheckingMode = "all"
-
-# data-apis/array-api#589
-reportAny = false
-reportExplicitAny = false
-# data-apis/array-api-strict#6
+typeCheckingMode = "strict"
 reportUnknownMemberType = false
+reportImportCycles = true
 
 
 # Ruff

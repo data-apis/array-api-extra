@@ -6,6 +6,8 @@ import inspect
 import sys
 import typing
 
+from typing_extensions import override
+
 if typing.TYPE_CHECKING:
     from ._typing import Array, Device
 
@@ -16,6 +18,7 @@ __all__ = ["device"]
 # when the array backend is not the CPU.
 # (since it is not easy to tell which device a dask array is on)
 class _dask_device:  # pylint: disable=invalid-name
+    @override
     def __repr__(self) -> str:
         return "DASK_DEVICE"
 
@@ -118,7 +121,7 @@ def _is_dask_array(x: Array) -> bool:
         return False
 
     # pylint: disable=import-error, import-outside-toplevel
-    import dask.array  # type: ignore[import-not-found]
+    import dask.array  # type: ignore[import-not-found]  # pyright: ignore[reportMissingImports]
 
     return isinstance(x, dask.array.Array)
 
@@ -133,10 +136,10 @@ def _is_jax_zero_gradient_array(x: Array) -> bool:
         return False
 
     # pylint: disable=import-error, import-outside-toplevel
-    import jax  # type: ignore[import-not-found]
+    import jax  # type: ignore[import-not-found]  # pyright: ignore[reportMissingImports]
     import numpy as np  # pylint: disable=import-outside-toplevel
 
-    return isinstance(x, np.ndarray) and x.dtype == jax.float0
+    return isinstance(x, np.ndarray) and x.dtype == jax.float0  # pyright: ignore[reportUnknownVariableType]
 
 
 def _is_jax_array(x: Array) -> bool:
@@ -146,7 +149,7 @@ def _is_jax_array(x: Array) -> bool:
         return False
 
     # pylint: disable=import-error, import-outside-toplevel
-    import jax
+    import jax  # pyright: ignore[reportMissingImports]
 
     return isinstance(x, jax.Array) or _is_jax_zero_gradient_array(x)
 
@@ -159,7 +162,7 @@ def _is_pydata_sparse_array(x: Array) -> bool:
         return False
 
     # pylint: disable=import-error, import-outside-toplevel
-    import sparse  # type: ignore[import-not-found]
+    import sparse  # type: ignore[import-not-found]  # pyright: ignore[reportMissingImports]
 
     # TODO: Account for other backends.
     return isinstance(x, sparse.SparseArray)
