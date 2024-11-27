@@ -1,4 +1,4 @@
-## Contributors
+# Contributors
 
 This project exists thanks to the following contributors
 ([emoji key](https://allcontributors.org/docs/en/emoji-key)):

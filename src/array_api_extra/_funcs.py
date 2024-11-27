@@ -440,10 +440,10 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
 
     References
     ----------
-    .. [1] Weisstein, Eric W. "Sinc Function." From MathWorld--A Wolfram Web
-           Resource. https://mathworld.wolfram.com/SincFunction.html
-    .. [2] Wikipedia, "Sinc function",
-           https://en.wikipedia.org/wiki/Sinc_function
+    #. Weisstein, Eric W. "Sinc Function." From MathWorld--A Wolfram Web
+       Resource. https://mathworld.wolfram.com/SincFunction.html
+    #. Wikipedia, "Sinc function",
+       https://en.wikipedia.org/wiki/Sinc_function
 
     Examples
     --------
