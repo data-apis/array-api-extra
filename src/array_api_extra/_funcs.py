@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
 
 import typing
 import warnings
@@ -6,7 +6,17 @@ import warnings
 if typing.TYPE_CHECKING:
     from ._typing import Array, ModuleType
 
-__all__ = ["atleast_nd", "cov", "create_diagonal", "expand_dims", "kron", "sinc"]
+from . import _utils
+
+__all__ = [
+    "atleast_nd",
+    "cov",
+    "create_diagonal",
+    "expand_dims",
+    "kron",
+    "setdiff1d",
+    "sinc",
+]
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
@@ -397,6 +407,22 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     a_shape = xp.asarray(a_shape)
     b_shape = xp.asarray(b_shape)
     return xp.reshape(result, tuple(xp.multiply(a_shape, b_shape)))
+
+
+def setdiff1d(
+    x1: Array, x2: Array, /, *, assume_unique: bool = False, xp: ModuleType
+) -> Array:
+    """Find the set difference of two arrays.
+
+    Return the unique values in `x1` that are not in `x2`.
+    """
+
+    if assume_unique:
+        x1 = xp.reshape(x1, (-1,))
+    else:
+        x1 = xp.unique_values(x1)
+        x2 = xp.unique_values(x2)
+    return x1[_utils.in1d(x1, x2, assume_unique=True, invert=True, xp=xp)]
 
 
 def sinc(x: Array, /, *, xp: ModuleType) -> Array:
