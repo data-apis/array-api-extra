@@ -71,13 +71,13 @@ array-api-extra = { path = ".", editable = true }
 [tool.pixi.feature.lint.dependencies]
 pre-commit = "*"
 pylint = "*"
+basedmypy = "*"
 # import dependencies for mypy:
 array-api-strict = "*"
 numpy = "*"
 pytest = "*"
 
 [tool.pixi.feature.lint.pypi-dependencies]
-basedmypy = { version = "*", extras = ["faster-cache"] }
 basedpyright = "*"
 
 [tool.pixi.feature.lint.tasks]
@@ -189,6 +189,7 @@ typeCheckingMode = "all"
 # data-apis/array-api#589
 reportAny = false
 reportExplicitAny = false
+# data-apis/array-api-strict#6
 reportUnknownMemberType = false
 
 
