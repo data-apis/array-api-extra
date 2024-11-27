@@ -4,7 +4,7 @@ import contextlib
 import typing
 import warnings
 
-# array-api-strict#6
+# data-apis/array-api-strict#6
 import array_api_strict as xp  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
 import numpy as np
 import pytest
