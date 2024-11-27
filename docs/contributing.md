@@ -2,10 +2,14 @@
 
 Contributions are welcome from any "array-consuming" library contributors who
 have found themselves writing private array-agnostic functions in the process of
-converting code to consume the standard!
+converting code to consume the standard.
+
+Thanks to [all contributors](contributors.md) so far!
 
 ## How to contribute a function
 
+- [Open an issue](https://github.com/data-apis/array-api-extra/issues/new) to
+  propose the new function.
 - Add the implementation of your function to `src/array_api_extra/_funcs.py`.
   - Ensure that your function includes type annotations and a
     [numpydoc-style docstring](https://numpydoc.readthedocs.io/en/latest/format.html).
