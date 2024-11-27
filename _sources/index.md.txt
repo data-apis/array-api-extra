@@ -19,6 +19,12 @@ tools which provide _extra_ functionality on top of the array API standard,
 which other array-consuming libraries in a similar position have found useful
 themselves.
 
+It is currently used by:
+
+- [SciPy](https://github.com/scipy/scipy) - Fundamental algorithms for
+  scientific computing.
+- ...
+
 (installation)=
 
 ## Installation
