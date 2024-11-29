@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
 
 import contextlib
 import typing
@@ -291,7 +291,7 @@ class TestSetDiff1D:
         x2 = x1
         assert_equal(setdiff1d(x1, x2, xp=xp).dtype, xp.uint32)
 
-    def test_setdiff1d_unique(self):
+    def test_assume_unique(self):
         x1 = xp.asarray([3, 2, 1])
         x2 = xp.asarray([7, 5, 2])
         expected = xp.asarray([3, 1])
