@@ -4,7 +4,7 @@ import typing
 import warnings
 
 if typing.TYPE_CHECKING:
-    from ._typing import Array, ModuleType
+    from ._lib._typing import Array, ModuleType
 
 from ._lib import _utils
 

@@ -13,7 +13,7 @@ from numpy.testing import assert_allclose, assert_array_equal, assert_equal
 from array_api_extra import atleast_nd, cov, create_diagonal, expand_dims, kron, sinc
 
 if typing.TYPE_CHECKING:
-    from array_api_extra._typing import Array
+    from array_api_extra._lib._typing import Array
 
 
 class TestAtLeastND:

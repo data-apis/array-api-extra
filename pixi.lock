@@ -447,11 +447,12 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/yaml-0.2.5-h7f98852_2.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/zstandard-0.23.0-py313h80202fe_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/zstd-1.5.6-ha6fb4c9_0.conda
+      - pypi: https://files.pythonhosted.org/packages/1b/d2/1783a17c041a48faa1fd056a7dd1029e419a0026ecc2c070b7c7516018d0/basedpyright-1.22.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/42/d7/1ec15b46af6af88f19b8e5ffea08fa375d433c998b8a7639e76935c14f1f/markdown_it_py-3.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a7/f7/7782a043553ee469c1ff49cfa1cdace2d6bf99a1f333cf38676b3ddf30da/mdit_py_plugins-0.4.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ca/b4/b036f8fdb667587bb37df29dc6644681dd78b7a2a6321a34684b79412b28/myst_parser-4.0.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/1b/26/c288cabf8cfc5a27e1aa9e5029b7682c0f920b8074f45d22bf844314d66a/pyright-1.1.389-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/d8/16/e34cf573096e7b25c85829e99f7e47d6cda0a6cdc4bd078d6bcdcb4dc979/nodejs_wheel_binaries-22.11.0-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/ae/322d05bec884977b89eced3af811c228652a9e25f9646ee6236890987214/sphinx_autodoc_typehints-2.5.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9e/48/1ea60e74949eecb12cdd6ac43987f9fd331156388dcc2319b45e2ebb81bf/sphinx_copybutton-0.5.2-py3-none-any.whl
       - pypi: .
@@ -564,11 +565,12 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/yaml-0.2.5-h3422bc3_2.tar.bz2
       - conda: https://prefix.dev/conda-forge/osx-arm64/zstandard-0.23.0-py313hf2da073_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/zstd-1.5.6-hb46c0d2_0.conda
+      - pypi: https://files.pythonhosted.org/packages/1b/d2/1783a17c041a48faa1fd056a7dd1029e419a0026ecc2c070b7c7516018d0/basedpyright-1.22.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/42/d7/1ec15b46af6af88f19b8e5ffea08fa375d433c998b8a7639e76935c14f1f/markdown_it_py-3.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a7/f7/7782a043553ee469c1ff49cfa1cdace2d6bf99a1f333cf38676b3ddf30da/mdit_py_plugins-0.4.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ca/b4/b036f8fdb667587bb37df29dc6644681dd78b7a2a6321a34684b79412b28/myst_parser-4.0.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/1b/26/c288cabf8cfc5a27e1aa9e5029b7682c0f920b8074f45d22bf844314d66a/pyright-1.1.389-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/a5/16/4cd2c0791567ee7b0203c3c6b59341854f0aeecb7315159d634c2b54b6d4/nodejs_wheel_binaries-22.11.0-py2.py3-none-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/ae/322d05bec884977b89eced3af811c228652a9e25f9646ee6236890987214/sphinx_autodoc_typehints-2.5.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9e/48/1ea60e74949eecb12cdd6ac43987f9fd331156388dcc2319b45e2ebb81bf/sphinx_copybutton-0.5.2-py3-none-any.whl
       - pypi: .
@@ -684,11 +686,12 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/yaml-0.2.5-h8ffe710_2.tar.bz2
       - conda: https://prefix.dev/conda-forge/win-64/zstandard-0.23.0-py313h574b89f_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/zstd-1.5.6-h0ea2cb4_0.conda
+      - pypi: https://files.pythonhosted.org/packages/1b/d2/1783a17c041a48faa1fd056a7dd1029e419a0026ecc2c070b7c7516018d0/basedpyright-1.22.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/42/d7/1ec15b46af6af88f19b8e5ffea08fa375d433c998b8a7639e76935c14f1f/markdown_it_py-3.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a7/f7/7782a043553ee469c1ff49cfa1cdace2d6bf99a1f333cf38676b3ddf30da/mdit_py_plugins-0.4.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ca/b4/b036f8fdb667587bb37df29dc6644681dd78b7a2a6321a34684b79412b28/myst_parser-4.0.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/1b/26/c288cabf8cfc5a27e1aa9e5029b7682c0f920b8074f45d22bf844314d66a/pyright-1.1.389-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/68/69/f0dbbf72c8bdd9149ee00427c282d392da7fad9c53bd96f4844c2ab9021c/nodejs_wheel_binaries-22.11.0-py2.py3-none-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/ae/322d05bec884977b89eced3af811c228652a9e25f9646ee6236890987214/sphinx_autodoc_typehints-2.5.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9e/48/1ea60e74949eecb12cdd6ac43987f9fd331156388dcc2319b45e2ebb81bf/sphinx_copybutton-0.5.2-py3-none-any.whl
       - pypi: .
@@ -970,7 +973,8 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/virtualenv-20.28.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/xz-5.2.6-h166bdaf_0.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/yaml-0.2.5-h7f98852_2.tar.bz2
-      - pypi: https://files.pythonhosted.org/packages/1b/26/c288cabf8cfc5a27e1aa9e5029b7682c0f920b8074f45d22bf844314d66a/pyright-1.1.389-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/1b/d2/1783a17c041a48faa1fd056a7dd1029e419a0026ecc2c070b7c7516018d0/basedpyright-1.22.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/d8/16/e34cf573096e7b25c85829e99f7e47d6cda0a6cdc4bd078d6bcdcb4dc979/nodejs_wheel_binaries-22.11.0-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: .
       osx-arm64:
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_0.conda
@@ -1030,7 +1034,8 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/virtualenv-20.28.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/xz-5.2.6-h57fd34a_0.tar.bz2
       - conda: https://prefix.dev/conda-forge/osx-arm64/yaml-0.2.5-h3422bc3_2.tar.bz2
-      - pypi: https://files.pythonhosted.org/packages/1b/26/c288cabf8cfc5a27e1aa9e5029b7682c0f920b8074f45d22bf844314d66a/pyright-1.1.389-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/1b/d2/1783a17c041a48faa1fd056a7dd1029e419a0026ecc2c070b7c7516018d0/basedpyright-1.22.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/a5/16/4cd2c0791567ee7b0203c3c6b59341854f0aeecb7315159d634c2b54b6d4/nodejs_wheel_binaries-22.11.0-py2.py3-none-macosx_11_0_arm64.whl
       - pypi: .
       win-64:
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_0.conda
@@ -1094,7 +1099,8 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/vs2015_runtime-14.42.34433-hdffcdeb_23.conda
       - conda: https://prefix.dev/conda-forge/win-64/xz-5.2.6-h8d14728_0.tar.bz2
       - conda: https://prefix.dev/conda-forge/win-64/yaml-0.2.5-h8ffe710_2.tar.bz2
-      - pypi: https://files.pythonhosted.org/packages/1b/26/c288cabf8cfc5a27e1aa9e5029b7682c0f920b8074f45d22bf844314d66a/pyright-1.1.389-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/1b/d2/1783a17c041a48faa1fd056a7dd1029e419a0026ecc2c070b7c7516018d0/basedpyright-1.22.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/68/69/f0dbbf72c8bdd9149ee00427c282d392da7fad9c53bd96f4844c2ab9021c/nodejs_wheel_binaries-22.11.0-py2.py3-none-win_amd64.whl
       - pypi: .
   tests:
     channels:
@@ -1283,7 +1289,7 @@ packages:
   name: array-api-extra
   version: 0.2.1.dev0
   path: .
-  sha256: 153eb2cfe6d87235358f00f2c229f9cd4a84e3c73f8cb4a3e771087d4a41193b
+  sha256: 9e2749304aa75f47b7108c3d45874ab2e8b0acc9de80c47f8c067fe9b6438ef3
   requires_dist:
   - typing-extensions
   - furo>=2023.8.17 ; extra == 'docs'
@@ -1430,6 +1436,14 @@ packages:
   - pkg:pypi/basedmypy?source=hash-mapping
   size: 1808422
   timestamp: 1732706894788
+- kind: pypi
+  name: basedpyright
+  version: 1.22.0
+  url: https://files.pythonhosted.org/packages/1b/d2/1783a17c041a48faa1fd056a7dd1029e419a0026ecc2c070b7c7516018d0/basedpyright-1.22.0-py3-none-any.whl
+  sha256: 6376107086ad25525429b8a94a2ffdb67c6dd2b1a6be38bf3c6ea9b5c3d1f688
+  requires_dist:
+  - nodejs-wheel-binaries>=20.13.1
+  requires_python: '>=3.8'
 - kind: conda
   name: basedtyping
   version: 0.1.10
@@ -3459,6 +3473,24 @@ packages:
   - pkg:pypi/nodeenv?source=hash-mapping
   size: 34489
   timestamp: 1717585382642
+- kind: pypi
+  name: nodejs-wheel-binaries
+  version: 22.11.0
+  url: https://files.pythonhosted.org/packages/68/69/f0dbbf72c8bdd9149ee00427c282d392da7fad9c53bd96f4844c2ab9021c/nodejs_wheel_binaries-22.11.0-py2.py3-none-win_amd64.whl
+  sha256: 8310ab182ee159141e08c85bc07f11e67ac3044922e6e4958f4a8f3ba6860185
+  requires_python: '>=3.7'
+- kind: pypi
+  name: nodejs-wheel-binaries
+  version: 22.11.0
+  url: https://files.pythonhosted.org/packages/a5/16/4cd2c0791567ee7b0203c3c6b59341854f0aeecb7315159d634c2b54b6d4/nodejs_wheel_binaries-22.11.0-py2.py3-none-macosx_11_0_arm64.whl
+  sha256: 00afada277fd6e945a74f881831aaf1bb7f853a15e15e8c998238ab88d327f6a
+  requires_python: '>=3.7'
+- kind: pypi
+  name: nodejs-wheel-binaries
+  version: 22.11.0
+  url: https://files.pythonhosted.org/packages/d8/16/e34cf573096e7b25c85829e99f7e47d6cda0a6cdc4bd078d6bcdcb4dc979/nodejs_wheel_binaries-22.11.0-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  sha256: a9545cc43f1ba2c9f467f3444e9cd7f8db059933be1a5215135610dee5b38bf3
+  requires_python: '>=3.7'
 - kind: conda
   name: numpy
   version: 2.1.3
@@ -3936,19 +3968,6 @@ packages:
   - pkg:pypi/pylint?source=hash-mapping
   size: 352873
   timestamp: 1727266530261
-- kind: pypi
-  name: pyright
-  version: 1.1.389
-  url: https://files.pythonhosted.org/packages/1b/26/c288cabf8cfc5a27e1aa9e5029b7682c0f920b8074f45d22bf844314d66a/pyright-1.1.389-py3-none-any.whl
-  sha256: 41e9620bba9254406dc1f621a88ceab5a88af4c826feb4f614d95691ed243a60
-  requires_dist:
-  - nodeenv>=1.6.0
-  - typing-extensions>=4.1
-  - twine>=3.4.1 ; extra == 'all'
-  - nodejs-wheel-binaries ; extra == 'all'
-  - twine>=3.4.1 ; extra == 'dev'
-  - nodejs-wheel-binaries ; extra == 'nodejs'
-  requires_python: '>=3.7'
 - kind: conda
   name: pysocks
   version: 1.7.1

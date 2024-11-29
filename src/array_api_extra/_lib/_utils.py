@@ -3,7 +3,7 @@ from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/
 import typing
 
 if typing.TYPE_CHECKING:
-    from .._typing import Array, ModuleType
+    from ._typing import Array, ModuleType
 
 from . import _compat
 
