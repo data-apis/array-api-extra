@@ -6,7 +6,7 @@ import warnings
 if typing.TYPE_CHECKING:
     from ._typing import Array, ModuleType
 
-from . import _utils
+from ._lib import _utils
 
 __all__ = [
     "atleast_nd",

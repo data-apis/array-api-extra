@@ -26,7 +26,9 @@ classifiers = [
     "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+    "typing_extensions",
+]
 
 [project.optional-dependencies]
 tests = [
@@ -64,6 +66,7 @@ platforms = ["linux-64", "osx-arm64", "win-64"]
 
 [tool.pixi.dependencies]
 python = ">=3.10.15,<3.14"
+typing_extensions = "*"
 
 [tool.pixi.pypi-dependencies]
 array-api-extra = { path = ".", editable = true }

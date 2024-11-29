@@ -9,7 +9,7 @@ import typing
 from typing_extensions import override
 
 if typing.TYPE_CHECKING:
-    from ._typing import Array, Device
+    from .._typing import Array, Device
 
 __all__ = ["device"]
 
