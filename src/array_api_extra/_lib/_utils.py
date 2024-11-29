@@ -52,7 +52,10 @@ def in1d(
     order = xp.argsort(ar, stable=True)
     reverse_order = xp.argsort(order, stable=True)
     sar = xp.take(ar, order, axis=0)
-    bool_ar = sar[1:] != sar[:-1] if invert else sar[1:] == sar[:-1]
+    if sar.size >= 1:
+        bool_ar = sar[1:] != sar[:-1] if invert else sar[1:] == sar[:-1]
+    else:
+        bool_ar = xp.asarray([False]) if invert else xp.asarray([True])
     flag = xp.concat((bool_ar, xp.asarray([invert], device=device_)))
     ret = xp.take(flag, reverse_order, axis=0)
 
