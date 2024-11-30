@@ -6,6 +6,10 @@ from typing import Any
 
 if typing.TYPE_CHECKING:
     from typing_extensions import override
+
+    # To be changed to a Protocol later (see data-apis/array-api#589)
+    Array = Any  # type: ignore[no-any-explicit]
+    Device = Any  # type: ignore[no-any-explicit]
 else:
 
     def no_op_decorator(f):  # pyright: ignore[reportUnreachable]
@@ -13,9 +17,6 @@ else:
 
     override = no_op_decorator
 
-__all__ = ["Array", "Device", "ModuleType", "override"]
-
-
-# To be changed to a Protocol later (see data-apis/array-api#589)
-Array = Any  # type: ignore[no-any-explicit]
-Device = Any  # type: ignore[no-any-explicit]
+__all__ = ["ModuleType", "override"]
+if typing.TYPE_CHECKING:
+    __all__ += ["Array", "Device"]
