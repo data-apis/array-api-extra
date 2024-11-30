@@ -7,7 +7,7 @@ if typing.TYPE_CHECKING:
 
 from . import _compat
 
-__all__ = ["in1d"]
+__all__ = ["in1d", "mean"]
 
 
 def in1d(
@@ -63,3 +63,23 @@ def in1d(
     if assume_unique:
         return ret[: x1.shape[0]]
     return xp.take(ret, rev_idx, axis=0)
+
+
+def mean(
+    x: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    keepdims: bool = False,
+    xp: ModuleType,
+) -> Array:
+    """
+    Complex mean, https://github.com/data-apis/array-api/issues/846.
+    """
+    if xp.isdtype(x.dtype, "complex floating"):
+        x_real = xp.real(x)
+        x_imag = xp.imag(x)
+        mean_real = xp.mean(x_real, axis=axis, keepdims=keepdims)
+        mean_imag = xp.mean(x_imag, axis=axis, keepdims=keepdims)
+        return mean_real + (mean_imag * xp.asarray(1j))
+    return xp.mean(x, axis=axis, keepdims=keepdims)
