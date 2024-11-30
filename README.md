@@ -64,6 +64,9 @@ This project exists thanks to the following contributors
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/tupui"><img src="https://avatars.githubusercontent.com/u/23188539?v=4?s=100" width="100px;" alt="Pamphile Roy"/><br /><sub><b>Pamphile Roy</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=tupui" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/OmarManzoor"><img src="https://avatars.githubusercontent.com/u/17495884?v=4?s=100" width="100px;" alt="Omar Salman"/><br /><sub><b>Omar Salman</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=OmarManzoor" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://ogrisel.com"><img src="https://avatars.githubusercontent.com/u/89061?v=4?s=100" width="100px;" alt="Olivier Grisel"/><br /><sub><b>Olivier Grisel</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=ogrisel" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
