@@ -33,11 +33,11 @@ def in1d(
     # This code is run to make the code significantly faster
     if x2.shape[0] < 10 * x1.shape[0] ** 0.145:
         if invert:
-            mask = xp.ones(x1.shape[0], dtype=xp.bool, device=x1.device)
+            mask = xp.ones(x1.shape[0], dtype=xp.bool, device=_compat.device(x1))
             for a in x2:
                 mask &= x1 != a
         else:
-            mask = xp.zeros(x1.shape[0], dtype=xp.bool, device=x1.device)
+            mask = xp.zeros(x1.shape[0], dtype=xp.bool, device=_compat.device(x1))
             for a in x2:
                 mask |= x1 == a
         return mask
