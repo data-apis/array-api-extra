@@ -11,5 +11,6 @@
     create_diagonal
     expand_dims
     kron
+    setdiff1d
     sinc
 ```
