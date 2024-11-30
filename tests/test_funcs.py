@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
 
 import contextlib
 import typing
@@ -10,10 +10,18 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_array_equal, assert_equal
 
-from array_api_extra import atleast_nd, cov, create_diagonal, expand_dims, kron, sinc
+from array_api_extra import (
+    atleast_nd,
+    cov,
+    create_diagonal,
+    expand_dims,
+    kron,
+    setdiff1d,
+    sinc,
+)
 
 if typing.TYPE_CHECKING:
-    from array_api_extra._typing import Array
+    from array_api_extra._lib._typing import Array
 
 
 class TestAtLeastND:
@@ -261,6 +269,34 @@ class TestExpandDims:
         a = xp.empty((2, 3, 4, 5))
         with pytest.raises(ValueError, match="Duplicate dimensions"):
             expand_dims(a, axis=(3, -3), xp=xp)
+
+
+class TestSetDiff1D:
+    def test_setdiff1d(self):
+        x1 = xp.asarray([6, 5, 4, 7, 1, 2, 7, 4])
+        x2 = xp.asarray([2, 4, 3, 3, 2, 1, 5])
+
+        expected = xp.asarray([6, 7])
+        actual = setdiff1d(x1, x2, xp=xp)
+        assert_array_equal(actual, expected)
+
+        x1 = xp.arange(21)
+        x2 = xp.arange(19)
+        expected = xp.asarray([19, 20])
+        actual = setdiff1d(x1, x2, xp=xp)
+        assert_array_equal(actual, expected)
+
+        assert_array_equal(setdiff1d(xp.empty(0), xp.empty(0), xp=xp), xp.empty(0))
+        x1 = xp.empty(0, dtype=xp.uint32)
+        x2 = x1
+        assert_equal(setdiff1d(x1, x2, xp=xp).dtype, xp.uint32)
+
+    def test_assume_unique(self):
+        x1 = xp.asarray([3, 2, 1])
+        x2 = xp.asarray([7, 5, 2])
+        expected = xp.asarray([3, 1])
+        actual = setdiff1d(x1, x2, assume_unique=True, xp=xp)
+        assert_array_equal(actual, expected)
 
 
 class TestSinc:
