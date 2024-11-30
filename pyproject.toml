@@ -73,13 +73,11 @@ array-api-extra = { path = ".", editable = true }
 pre-commit = "*"
 pylint = "*"
 basedmypy = "*"
+basedpyright = "*"
 # import dependencies for mypy:
 array-api-strict = "*"
 numpy = "*"
 pytest = "*"
-
-[tool.pixi.feature.lint.pypi-dependencies]
-basedpyright = "*"
 
 [tool.pixi.feature.lint.tasks]
 pre-commit-install = { cmd = "pre-commit install" }
