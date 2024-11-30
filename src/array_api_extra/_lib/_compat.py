@@ -6,7 +6,7 @@ import inspect
 import sys
 import typing
 
-from typing_extensions import override
+from ._typing import override
 
 if typing.TYPE_CHECKING:
     from ._typing import Array, Device
