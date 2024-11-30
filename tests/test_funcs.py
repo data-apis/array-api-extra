@@ -85,6 +85,11 @@ class TestAtLeastND:
         y = atleast_nd(x, ndim=9, xp=xp)
         assert_array_equal(y, xp.ones((1, 1, 1, 1, 1, 1, 1, 1, 1)))
 
+    def test_device(self):
+        device = xp.Device("device1")
+        x = xp.asarray([1, 2, 3], device=device)
+        assert atleast_nd(x, ndim=2, xp=xp).device == device
+
 
 class TestCov:
     def test_basic(self):
@@ -119,6 +124,11 @@ class TestCov:
         assert_allclose(cov(X, xp=xp), desired, rtol=1e-6)
         assert_allclose(cov(x, xp=xp), xp.asarray(11.71))
         assert_allclose(cov(y, xp=xp), xp.asarray(2.144133), rtol=1e-6)
+
+    def test_device(self):
+        device = xp.Device("device1")
+        x = xp.asarray([1, 2, 3], device=device)
+        assert cov(x, xp=xp).device == device
 
 
 class TestCreateDiagonal:
@@ -155,6 +165,11 @@ class TestCreateDiagonal:
     def test_2d(self):
         with pytest.raises(ValueError, match="1-dimensional"):
             create_diagonal(xp.asarray([[1]]), xp=xp)
+
+    def test_device(self):
+        device = xp.Device("device1")
+        x = xp.asarray([1, 2, 3], device=device)
+        assert create_diagonal(x, xp=xp).device == device
 
 
 class TestExpandDims:
@@ -204,6 +219,11 @@ class TestExpandDims:
         a = xp.empty((2, 3, 4, 5))
         with pytest.raises(ValueError, match="Duplicate dimensions"):
             expand_dims(a, axis=(3, -3), xp=xp)
+
+    def test_device(self):
+        device = xp.Device("device1")
+        x = xp.asarray([1, 2, 3], device=device)
+        assert expand_dims(x, axis=0, xp=xp).device == device
 
 
 class TestKron:
@@ -270,6 +290,12 @@ class TestKron:
         k = kron(a, b, xp=xp)
         assert_equal(k.shape, expected_shape, err_msg="Unexpected shape from kron")
 
+    def test_device(self):
+        device = xp.Device("device1")
+        x1 = xp.asarray([1, 2, 3], device=device)
+        x2 = xp.asarray([4, 5], device=device)
+        assert kron(x1, x2, xp=xp).device == device
+
 
 class TestSetDiff1D:
     def test_setdiff1d(self):
@@ -298,6 +324,12 @@ class TestSetDiff1D:
         actual = setdiff1d(x1, x2, assume_unique=True, xp=xp)
         assert_array_equal(actual, expected)
 
+    def test_device(self):
+        device = xp.Device("device1")
+        x1 = xp.asarray([3, 8, 20], device=device)
+        x2 = xp.asarray([2, 3, 4], device=device)
+        assert setdiff1d(x1, x2, xp=xp).device == device
+
 
 class TestSinc:
     def test_simple(self):
@@ -316,3 +348,8 @@ class TestSinc:
         expected = xp.zeros((3, 3, 2))
         expected[0, 0, 0] = 1.0
         assert_allclose(sinc(x, xp=xp), expected, atol=1e-15)
+
+    def test_device(self):
+        device = xp.Device("device1")
+        x = xp.asarray(0.0, device=device)
+        assert sinc(x, xp=xp).device == device

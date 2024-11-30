@@ -22,3 +22,9 @@ class TestIn1D:
         expected = xp.asarray([True, True, False])
         actual = in1d(x1, x2, xp=xp)
         assert_array_equal(actual, expected)
+
+    def test_device(self):
+        device = xp.Device("device1")
+        x1 = xp.asarray([3, 8, 20], device=device)
+        x2 = xp.asarray([2, 3, 4], device=device)
+        assert in1d(x1, x2, xp=xp).device == device

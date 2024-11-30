@@ -193,7 +193,7 @@ def create_diagonal(x: Array, /, *, offset: int = 0, xp: ModuleType) -> Array:
         err_msg = "`x` must be 1-dimensional."
         raise ValueError(err_msg)
     n = x.shape[0] + abs(offset)
-    diag = xp.zeros(n**2, dtype=x.dtype)
+    diag = xp.zeros(n**2, dtype=x.dtype, device=x.device)
     i = offset if offset >= 0 else abs(offset) * n
     diag[i : min(n * (n - offset), diag.shape[0]) : n + 1] = x
     return xp.reshape(diag, (n, n))
@@ -516,6 +516,6 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
         raise ValueError(err_msg)
     # no scalars in `where` - array-api#807
     y = xp.pi * xp.where(
-        x, x, xp.asarray(xp.finfo(x.dtype).smallest_normal, dtype=x.dtype)
+        x, x, xp.asarray(xp.finfo(x.dtype).eps, dtype=x.dtype, device=x.device)
     )
     return xp.sin(y) / y
