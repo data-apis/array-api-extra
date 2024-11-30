@@ -42,6 +42,7 @@ def in1d(
                 mask |= x1 == a
         return mask
 
+    rev_idx = xp.empty(0)  # placeholder
     if not assume_unique:
         x1, rev_idx = xp.unique_inverse(x1)
         x2 = xp.unique_values(x2)
@@ -61,7 +62,4 @@ def in1d(
 
     if assume_unique:
         return ret[: x1.shape[0]]
-    # https://github.com/KotlinIsland/basedmypy/issues/826
-    # https://github.com/pylint-dev/pylint/issues/10095
-    # pylint: disable=possibly-used-before-assignment
-    return xp.take(ret, rev_idx, axis=0)  # type: ignore[possibly-undefined]  # pyright: ignore[reportPossiblyUnboundVariable]
+    return xp.take(ret, rev_idx, axis=0)
