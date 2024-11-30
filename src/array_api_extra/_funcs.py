@@ -133,7 +133,7 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
-    avg = _mean(m, axis=1, xp=xp)
+    avg = _utils.mean(m, axis=1, xp=xp)
     fact = m.shape[1] - 1
 
     if fact <= 0:
@@ -197,26 +197,6 @@ def create_diagonal(x: Array, /, *, offset: int = 0, xp: ModuleType) -> Array:
     i = offset if offset >= 0 else abs(offset) * n
     diag[i : min(n * (n - offset), diag.shape[0]) : n + 1] = x
     return xp.reshape(diag, (n, n))
-
-
-def _mean(
-    x: Array,
-    /,
-    *,
-    axis: int | tuple[int, ...] | None = None,
-    keepdims: bool = False,
-    xp: ModuleType,
-) -> Array:
-    """
-    Complex mean, https://github.com/data-apis/array-api/issues/846.
-    """
-    if xp.isdtype(x.dtype, "complex floating"):
-        x_real = xp.real(x)
-        x_imag = xp.imag(x)
-        mean_real = xp.mean(x_real, axis=axis, keepdims=keepdims)
-        mean_imag = xp.mean(x_imag, axis=axis, keepdims=keepdims)
-        return mean_real + (mean_imag * xp.asarray(1j))
-    return xp.mean(x, axis=axis, keepdims=keepdims)
 
 
 def expand_dims(

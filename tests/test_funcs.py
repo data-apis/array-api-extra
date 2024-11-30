@@ -157,6 +157,55 @@ class TestCreateDiagonal:
             create_diagonal(xp.asarray([[1]]), xp=xp)
 
 
+class TestExpandDims:
+    def test_functionality(self):
+        def _squeeze_all(b: Array) -> Array:
+            """Mimics `np.squeeze(b)`. `xpx.squeeze`?"""
+            for axis in range(b.ndim):
+                with contextlib.suppress(ValueError):
+                    b = xp.squeeze(b, axis=axis)
+            return b
+
+        s = (2, 3, 4, 5)
+        a = xp.empty(s)
+        for axis in range(-5, 4):
+            b = expand_dims(a, axis=axis, xp=xp)
+            assert b.shape[axis] == 1
+            assert _squeeze_all(b).shape == s
+
+    def test_axis_tuple(self):
+        a = xp.empty((3, 3, 3))
+        assert expand_dims(a, axis=(0, 1, 2), xp=xp).shape == (1, 1, 1, 3, 3, 3)
+        assert expand_dims(a, axis=(0, -1, -2), xp=xp).shape == (1, 3, 3, 3, 1, 1)
+        assert expand_dims(a, axis=(0, 3, 5), xp=xp).shape == (1, 3, 3, 1, 3, 1)
+        assert expand_dims(a, axis=(0, -3, -5), xp=xp).shape == (1, 1, 3, 1, 3, 3)
+
+    def test_axis_out_of_range(self):
+        s = (2, 3, 4, 5)
+        a = xp.empty(s)
+        with pytest.raises(IndexError, match="out of bounds"):
+            expand_dims(a, axis=-6, xp=xp)
+        with pytest.raises(IndexError, match="out of bounds"):
+            expand_dims(a, axis=5, xp=xp)
+
+        a = xp.empty((3, 3, 3))
+        with pytest.raises(IndexError, match="out of bounds"):
+            expand_dims(a, axis=(0, -6), xp=xp)
+        with pytest.raises(IndexError, match="out of bounds"):
+            expand_dims(a, axis=(0, 5), xp=xp)
+
+    def test_repeated_axis(self):
+        a = xp.empty((3, 3, 3))
+        with pytest.raises(ValueError, match="Duplicate dimensions"):
+            expand_dims(a, axis=(1, 1), xp=xp)
+
+    def test_positive_negative_repeated(self):
+        # https://github.com/data-apis/array-api/issues/760#issuecomment-1989449817
+        a = xp.empty((2, 3, 4, 5))
+        with pytest.raises(ValueError, match="Duplicate dimensions"):
+            expand_dims(a, axis=(3, -3), xp=xp)
+
+
 class TestKron:
     def test_basic(self):
         # Using 0-dimensional array
@@ -220,55 +269,6 @@ class TestKron:
 
         k = kron(a, b, xp=xp)
         assert_equal(k.shape, expected_shape, err_msg="Unexpected shape from kron")
-
-
-class TestExpandDims:
-    def test_functionality(self):
-        def _squeeze_all(b: Array) -> Array:
-            """Mimics `np.squeeze(b)`. `xpx.squeeze`?"""
-            for axis in range(b.ndim):
-                with contextlib.suppress(ValueError):
-                    b = xp.squeeze(b, axis=axis)
-            return b
-
-        s = (2, 3, 4, 5)
-        a = xp.empty(s)
-        for axis in range(-5, 4):
-            b = expand_dims(a, axis=axis, xp=xp)
-            assert b.shape[axis] == 1
-            assert _squeeze_all(b).shape == s
-
-    def test_axis_tuple(self):
-        a = xp.empty((3, 3, 3))
-        assert expand_dims(a, axis=(0, 1, 2), xp=xp).shape == (1, 1, 1, 3, 3, 3)
-        assert expand_dims(a, axis=(0, -1, -2), xp=xp).shape == (1, 3, 3, 3, 1, 1)
-        assert expand_dims(a, axis=(0, 3, 5), xp=xp).shape == (1, 3, 3, 1, 3, 1)
-        assert expand_dims(a, axis=(0, -3, -5), xp=xp).shape == (1, 1, 3, 1, 3, 3)
-
-    def test_axis_out_of_range(self):
-        s = (2, 3, 4, 5)
-        a = xp.empty(s)
-        with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=-6, xp=xp)
-        with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=5, xp=xp)
-
-        a = xp.empty((3, 3, 3))
-        with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=(0, -6), xp=xp)
-        with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=(0, 5), xp=xp)
-
-    def test_repeated_axis(self):
-        a = xp.empty((3, 3, 3))
-        with pytest.raises(ValueError, match="Duplicate dimensions"):
-            expand_dims(a, axis=(1, 1), xp=xp)
-
-    def test_positive_negative_repeated(self):
-        # https://github.com/data-apis/array-api/issues/760#issuecomment-1989449817
-        a = xp.empty((2, 3, 4, 5))
-        with pytest.raises(ValueError, match="Duplicate dimensions"):
-            expand_dims(a, axis=(3, -3), xp=xp)
 
 
 class TestSetDiff1D:
