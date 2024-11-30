@@ -412,9 +412,40 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
 def setdiff1d(
     x1: Array, x2: Array, /, *, assume_unique: bool = False, xp: ModuleType
 ) -> Array:
-    """Find the set difference of two arrays.
+    """
+    Find the set difference of two arrays.
 
     Return the unique values in `x1` that are not in `x2`.
+
+    Parameters
+    ----------
+    x1 : array
+        Input array.
+    x2 : array
+        Input comparison array.
+    assume_unique : bool
+        If ``True``, the input arrays are both assumed to be unique, which
+        can speed up the calculation. Default is ``False``.
+    xp : array_namespace
+        The standard-compatible namespace for `x1` and `x2`.
+
+    Returns
+    -------
+    res : array
+        1D array of values in `x1` that are not in `x2`. The result
+        is sorted when `assume_unique` is ``False``, but otherwise only sorted
+        if the input is sorted.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+
+    >>> x1 = xp.asarray([1, 2, 3, 2, 4, 1])
+    >>> x2 = xp.asarray([3, 4, 5, 6])
+    >>> xpx.setdiff1d(x1, x2, xp=xp)
+    Array([1, 2], dtype=array_api_strict.int64)
+
     """
 
     if assume_unique:
