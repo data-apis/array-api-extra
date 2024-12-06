@@ -7,6 +7,7 @@ if typing.TYPE_CHECKING:
     from ._lib._typing import Array, ModuleType
 
 from ._lib import _utils
+from ._lib._compat import array_namespace
 
 __all__ = [
     "atleast_nd",
@@ -19,7 +20,7 @@ __all__ = [
 ]
 
 
-def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
+def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array:
     """
     Recursively expand the dimension of an array to at least `ndim`.
 
@@ -28,8 +29,8 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
     x : array
     ndim : int
         The minimum number of dimensions for the result.
-    xp : array_namespace
-        The standard-compatible namespace for `x`.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer
 
     Returns
     -------
@@ -53,13 +54,16 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
     True
 
     """
+    if xp is None:
+        xp = array_namespace(x)
+
     if x.ndim < ndim:
         x = xp.expand_dims(x, axis=0)
         x = atleast_nd(x, ndim=ndim, xp=xp)
     return x
 
 
-def cov(m: Array, /, *, xp: ModuleType) -> Array:
+def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     """
     Estimate a covariance matrix.
 
@@ -77,8 +81,8 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:
         A 1-D or 2-D array containing multiple variables and observations.
         Each row of `m` represents a variable, and each column a single
         observation of all those variables.
-    xp : array_namespace
-        The standard-compatible namespace for `m`.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `m`. Default: infer
 
     Returns
     -------
@@ -125,6 +129,9 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:
     Array(2.14413333, dtype=array_api_strict.float64)
 
     """
+    if xp is None:
+        xp = array_namespace(m)
+
     m = xp.asarray(m, copy=True)
     dtype = (
         xp.float64 if xp.isdtype(m.dtype, "integral") else xp.result_type(m, xp.float64)
@@ -150,7 +157,9 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:
     return xp.squeeze(c, axis=axes)
 
 
-def create_diagonal(x: Array, /, *, offset: int = 0, xp: ModuleType) -> Array:
+def create_diagonal(
+    x: Array, /, *, offset: int = 0, xp: ModuleType | None = None
+) -> Array:
     """
     Construct a diagonal array.
 
@@ -162,8 +171,8 @@ def create_diagonal(x: Array, /, *, offset: int = 0, xp: ModuleType) -> Array:
         Offset from the leading diagonal (default is ``0``).
         Use positive ints for diagonals above the leading diagonal,
         and negative ints for diagonals below the leading diagonal.
-    xp : array_namespace
-        The standard-compatible namespace for `x`.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer
 
     Returns
     -------
@@ -189,6 +198,9 @@ def create_diagonal(x: Array, /, *, offset: int = 0, xp: ModuleType) -> Array:
            [0, 0, 8, 0, 0]], dtype=array_api_strict.int64)
 
     """
+    if xp is None:
+        xp = array_namespace(x)
+
     if x.ndim != 1:
         err_msg = "`x` must be 1-dimensional."
         raise ValueError(err_msg)
@@ -200,7 +212,7 @@ def create_diagonal(x: Array, /, *, offset: int = 0, xp: ModuleType) -> Array:
 
 
 def expand_dims(
-    a: Array, /, *, axis: int | tuple[int, ...] = (0,), xp: ModuleType
+    a: Array, /, *, axis: int | tuple[int, ...] = (0,), xp: ModuleType | None = None
 ) -> Array:
     """
     Expand the shape of an array.
@@ -220,8 +232,8 @@ def expand_dims(
         given by a positive index could also be referred to by a negative index -
         that will also result in an error).
         Default: ``(0,)``.
-    xp : array_namespace
-        The standard-compatible namespace for `a`.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a`. Default: infer
 
     Returns
     -------
@@ -265,6 +277,9 @@ def expand_dims(
             [2]]], dtype=array_api_strict.int64)
 
     """
+    if xp is None:
+        xp = array_namespace(a)
+
     if not isinstance(axis, tuple):
         axis = (axis,)
     ndim = a.ndim + len(axis)
@@ -282,7 +297,7 @@ def expand_dims(
     return a
 
 
-def kron(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
+def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
     """
     Kronecker product of two arrays.
 
@@ -294,8 +309,8 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     Parameters
     ----------
     a, b : array
-    xp : array_namespace
-        The standard-compatible namespace for `a` and `b`.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a` and `b`. Default: infer
 
     Returns
     -------
@@ -357,6 +372,8 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     Array(True, dtype=array_api_strict.bool)
 
     """
+    if xp is None:
+        xp = array_namespace(a, b)
 
     b = xp.asarray(b)
     singletons = (1,) * (b.ndim - a.ndim)
@@ -390,7 +407,12 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
 
 
 def setdiff1d(
-    x1: Array, x2: Array, /, *, assume_unique: bool = False, xp: ModuleType
+    x1: Array,
+    x2: Array,
+    /,
+    *,
+    assume_unique: bool = False,
+    xp: ModuleType | None = None,
 ) -> Array:
     """
     Find the set difference of two arrays.
@@ -406,8 +428,8 @@ def setdiff1d(
     assume_unique : bool
         If ``True``, the input arrays are both assumed to be unique, which
         can speed up the calculation. Default is ``False``.
-    xp : array_namespace
-        The standard-compatible namespace for `x1` and `x2`.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x1` and `x2`. Default: infer
 
     Returns
     -------
@@ -427,6 +449,8 @@ def setdiff1d(
     Array([1, 2], dtype=array_api_strict.int64)
 
     """
+    if xp is None:
+        xp = array_namespace(x1, x2)
 
     if assume_unique:
         x1 = xp.reshape(x1, (-1,))
@@ -436,7 +460,7 @@ def setdiff1d(
     return x1[_utils.in1d(x1, x2, assume_unique=True, invert=True, xp=xp)]
 
 
-def sinc(x: Array, /, *, xp: ModuleType) -> Array:
+def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
     r"""
     Return the normalized sinc function.
 
@@ -456,8 +480,8 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
     x : array
         Array (possibly multi-dimensional) of values for which to calculate
         ``sinc(x)``. Must have a real floating point dtype.
-    xp : array_namespace
-        The standard-compatible namespace for `x`.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer
 
     Returns
     -------
@@ -511,6 +535,9 @@ def sinc(x: Array, /, *, xp: ModuleType) -> Array:
            -3.89817183e-17], dtype=array_api_strict.float64)
 
     """
+    if xp is None:
+        xp = array_namespace(x)
+
     if not xp.isdtype(x.dtype, "real floating"):
         err_msg = "`x` must have a real floating data type."
         raise ValueError(err_msg)

@@ -26,7 +26,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = []
+dependencies = ["array-api-compat"]
 
 [project.optional-dependencies]
 tests = [
@@ -96,6 +96,7 @@ numpy = "*"
 [tool.pixi.feature.tests.tasks]
 tests = { cmd = "pytest" }
 tests-ci = { cmd = "pytest -ra --cov --cov-report=xml --cov-report=term --durations=20" }
+tests-vendor = { cmd = "pytest vendor_tests" }
 
 [tool.pixi.feature.docs.dependencies]
 sphinx = ">=7.0"
