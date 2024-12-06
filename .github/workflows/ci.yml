@@ -32,7 +32,7 @@ jobs:
           extra_args: --hook-stage manual --all-files
       - uses: prefix-dev/setup-pixi@v0.8.1
         with:
-          pixi-version: v0.37.0
+          pixi-version: v0.39.0
           cache: true
       - name: Run Pylint, Mypy & Pyright
         run: |
@@ -57,7 +57,7 @@ jobs:
 
       - uses: prefix-dev/setup-pixi@v0.8.1
         with:
-          pixi-version: v0.37.0
+          pixi-version: v0.39.0
           cache: true
           environments: ${{ matrix.environment }}
 
