@@ -51,16 +51,57 @@ If you require stability, it is recommended to pin `array-api-extra` to
 a specific version, or vendor the library inside your own.
 ```
 
+```{note}
+This library depends on array-api-compat. We aim for compatibility with
+the latest released version of array-api-compat, and your mileage may vary
+with older or dev versions.
+```
+
 (vendoring)=
 
 ## Vendoring
 
 To vendor the library, clone
-[the repository](https://github.com/data-apis/array-api-extra) and copy it into
-the appropriate place in your library, like:
+[the array-api-extra repository](https://github.com/data-apis/array-api-extra)
+and copy it into the appropriate place in your library, like:
 
 ```
-cp -R array-api-extra/ mylib/vendored/array_api_extra
+cp -a array-api-extra/src/array_api_extra mylib/vendored/
+```
+
+`array-api-extra` depends on `array-api-compat`. You may either add a dependency
+in your own project to `array-api-compat` or vendor it too:
+
+1. Clone
+   [the array-api-compat repository](https://github.com/data-apis/array-api-compat)
+   and copy it next to your vendored array-api-extra:
+
+   ```
+   cp -a array-api-compat/array_api_compat mylib/vendored/
+   ```
+
+2. Create a new hook file which array-api-extra will use instead of the
+   top-level `array-api-compat` if present:
+
+   ```
+   echo 'from mylib.vendored.array_api_compat import *' > mylib/vendored/_array_api_compat_vendor.py
+   ```
+
+This also allows overriding `array-api-compat` functions if you so wish. E.g.
+your `mylib/vendored/_array_api_compat_vendor.py` could look like this:
+
+```python
+from mylib.vendored.array_api_compat import *
+from mylib.vendored.array_api_compat import array_namespace as _array_namespace_orig
+
+
+def array_namespace(*xs, **kwargs):
+    import mylib
+
+    if any(isinstance(x, mylib.MyArray) for x in xs):
+        return mylib
+    else:
+        return _array_namespace_orig(*xs, **kwargs)
 ```
 
 (usage)=

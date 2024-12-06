@@ -20,11 +20,18 @@ class TestIn1D:
     def test_no_invert_assume_unique(self, x2: Array):
         x1 = xp.asarray([3, 8, 20])
         expected = xp.asarray([True, True, False])
-        actual = in1d(x1, x2, xp=xp)
+        actual = in1d(x1, x2)
         assert_array_equal(actual, expected)
 
     def test_device(self):
         device = xp.Device("device1")
         x1 = xp.asarray([3, 8, 20], device=device)
         x2 = xp.asarray([2, 3, 4], device=device)
-        assert in1d(x1, x2, xp=xp).device == device
+        assert in1d(x1, x2).device == device
+
+    def test_xp(self):
+        x1 = xp.asarray([1, 6])
+        x2 = xp.arange(5)
+        expected = xp.asarray([True, False])
+        actual = in1d(x1, x2, xp=xp)
+        assert_array_equal(actual, expected)

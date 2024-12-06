@@ -162,3 +162,7 @@ Thumbs.db
 # pixi environments
 .pixi
 *.egg-info
+
+# Vendor tests
+vendor_tests/array_api_compat/
+vendor_tests/array_api_extra/

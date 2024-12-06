@@ -1,0 +1,55 @@
+name: Test vendoring support
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Many color libraries just need this to be set to any value, but at least
+  # one distinguishes color depth, where "3" -> "256-bit color".
+  FORCE_COLOR: 3
+
+jobs:
+  pre-commit-and-lint:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout array-api-extra
+        uses: actions/checkout@v4
+        with:
+          path: array-api-extra
+
+      - name: Checkout array-api-compat
+        uses: actions/checkout@v4
+        with:
+          repository: data-apis/array-api-compat
+          path: array-api-compat
+
+      - name: Vendor array-api-extra into test package
+        run: |
+          cp -a array-api-compat/array_api_compat array-api-extra/vendor_tests/
+          cp -a array-api-extra/src/array_api_extra array-api-extra/vendor_tests/
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          pixi-version: v0.39.0
+          manifest-path: array-api-extra/pyproject.toml
+          cache: true
+
+      - name: Test package
+        run: |
+          cd array-api-extra/
+          pixi run --environment tests tests-vendor
