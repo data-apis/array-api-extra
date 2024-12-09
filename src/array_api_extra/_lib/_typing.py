@@ -1,10 +1,9 @@
 from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
 
-import typing
 from types import ModuleType
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from typing_extensions import override
 
     # To be changed to a Protocol later (see data-apis/array-api#589)
@@ -18,5 +17,5 @@ else:
     override = no_op_decorator
 
 __all__ = ["ModuleType", "override"]
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     __all__ += ["Array", "Device"]

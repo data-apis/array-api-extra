@@ -1,8 +1,8 @@
 from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
 
-import typing
+from typing import TYPE_CHECKING
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from ._typing import Array, ModuleType
 
 from . import _compat

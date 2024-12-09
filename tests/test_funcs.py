@@ -1,8 +1,8 @@
 from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
 
 import contextlib
-import typing
 import warnings
+from typing import TYPE_CHECKING
 
 # data-apis/array-api-strict#6
 import array_api_strict as xp  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
@@ -20,7 +20,7 @@ from array_api_extra import (
     sinc,
 )
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from array_api_extra._lib._typing import Array
 
 
