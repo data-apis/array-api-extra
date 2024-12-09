@@ -13,7 +13,7 @@ jobs:
           cache: true
           environments: docs
       - name: Build Docs
-        run: pixi run docs
+        run: pixi run -e docs docs
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
