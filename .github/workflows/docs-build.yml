@@ -11,8 +11,9 @@ jobs:
         with:
           pixi-version: v0.39.0
           cache: true
+          environments: docs
       - name: Build Docs
-        run: pixi run -e docs docs
+        run: pixi run docs
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:

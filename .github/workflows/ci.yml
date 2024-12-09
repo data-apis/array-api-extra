@@ -34,11 +34,12 @@ jobs:
         with:
           pixi-version: v0.39.0
           cache: true
+          environments: lint
       - name: Run Pylint, Mypy & Pyright
         run: |
-          pixi run -e lint pylint
-          pixi run -e lint mypy
-          pixi run -e lint pyright
+          pixi run pylint
+          pixi run mypy
+          pixi run pyright
 
   checks:
     name: Check ${{ matrix.environment }}
