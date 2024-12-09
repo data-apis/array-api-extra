@@ -284,7 +284,7 @@ scientific computing.</p></li>
 </div>
 <p>And
 <a class="reference external" href="https://prefix.dev/channels/conda-forge/packages/array-api-extra">on conda-forge</a>:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>micromamba<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>https://repo.prefix.dev/conda-forge<span class="w"> </span>array-api-extra
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mamba<span class="w"> </span>install<span class="w"> </span>array-api-extra
 <span class="c1"># or</span>
 pixi<span class="w"> </span>add<span class="w"> </span>array-api-extra
 </pre></div>
@@ -358,15 +358,19 @@ your <code class="docutils literal notranslate"><span class="pre">mylib/vendored
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Functions in this library assume input arrays <em>are arrays</em> (not “array-likes”) and that
-the namespace passed as <code class="docutils literal notranslate"><span class="pre">xp</span></code> is compatible with the standard. This means that
-the namespace you pass as <code class="docutils literal notranslate"><span class="pre">xp</span></code> should come from array-api-compat’s <code class="docutils literal notranslate"><span class="pre">array_namespace</span></code>,
+the namespace passed as <code class="docutils literal notranslate"><span class="pre">xp</span></code> (if given) is compatible with the standard -
+this means that it should come from array-api-compat’s <code class="docutils literal notranslate"><span class="pre">array_namespace</span></code>,
 or otherwise be compatible with the standard.</p>
+<p>Calling functions without providing an <code class="docutils literal notranslate"><span class="pre">xp</span></code> argument means that <code class="docutils literal notranslate"><span class="pre">array_namespace</span></code>
+is called internally to determine the namespace.</p>
 </div>
 <p>In the examples shown in the docstrings of functions from this library,
 <a class="reference external" href="https://data-apis.org/array-api-strict/"><code class="docutils literal notranslate"><span class="pre">array-api-strict</span></code></a> is used as the
 array namespace <code class="docutils literal notranslate"><span class="pre">xp</span></code>. In reality, code using this library will be written to
 work with any compatible array namespace as <code class="docutils literal notranslate"><span class="pre">xp</span></code>, not any particular
 implementation.</p>
+<p>Some functions may only work with array libraries supported by array-api-compat.
+This will be clearly indicated in the docs.</p>
 </section>
 <section id="scope">
 <span id="id4"></span><h2>Scope<a class="headerlink" href="#scope" title="Link to this heading">¶</a></h2>
@@ -376,11 +380,14 @@ implementation.</p>
 standard.</p></li>
 <li><p>Implement functionality which may be generally useful across various
 libraries.</p></li>
-<li><p>Be implemented purely in terms of the array API standard.</p></li>
 <li><p>Be implemented with type annotations and
 <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">numpydoc-style docstrings</a>.</p></li>
 <li><p>Be tested against <code class="docutils literal notranslate"><span class="pre">array-api-strict</span></code>.</p></li>
 </ul>
+<p>Functions are implemented purely in terms of the array API standard where
+possible. Where functions must use library-specific helpers for libraries
+supported by array-api-compat, this will be clearly marked in their API
+reference page.</p>
 <p>In particular, the following kinds of function are also in-scope:</p>
 <ul class="simple">
 <li><p>Functions which implement
@@ -391,24 +398,19 @@ the standard.</p></li>
 </ul>
 <p>The following features are currently out-of-scope for this library:</p>
 <ul class="simple">
-<li><p>Delegation to known, existing array libraries.</p>
+<li><p>Delegation to known, existing array libraries (unless necessary).</p>
 <ul>
 <li><p>It is quite simple to wrap functions in this library to also use existing
-implementations where possible. Such delegation will not live in this
-library for now, but the array-agnostic functions in this library could form
-an array-agnostic backend for such delegating functions in the future, here
-or elsewhere.</p></li>
+implementations. Such delegation will not live in this library for now, but
+the array-agnostic functions in this library could form an array-agnostic
+backend for such delegating functions in the future, here or elsewhere.</p></li>
 </ul>
 </li>
 <li><p>Functions which accept “array-like” input, or standard-incompatible
 namespaces.</p>
 <ul>
 <li><p>It is possible to prepare input arrays and a standard-compatible namespace
-via <code class="docutils literal notranslate"><span class="pre">array-api-compat</span></code> downstream in consumer libraries. Avoiding use of
-<code class="docutils literal notranslate"><span class="pre">array-api-compat</span></code> in this library makes it easier to vendor and reduces
-potential redundant calls to <code class="docutils literal notranslate"><span class="pre">xp.asarray</span></code> and <code class="docutils literal notranslate"><span class="pre">array_namespace</span></code>.</p></li>
-<li><p>For proposed alternatives to the <code class="docutils literal notranslate"><span class="pre">xp=xp</span></code> interface, see
-<a class="reference external" href="https://github.com/data-apis/array-api-extra/issues/6">this issue</a>.</p></li>
+via <code class="docutils literal notranslate"><span class="pre">array-api-compat</span></code> downstream in consumer libraries.</p></li>
 </ul>
 </li>
 <li><p>Functions which are specific to a particular domain.</p>
