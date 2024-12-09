@@ -29,7 +29,11 @@ jobs:
       - name: Checkout array-api-compat
         uses: actions/checkout@v4
         with:
-          repository: data-apis/array-api-compat
+          # DNM
+          # repository: data-apis/array-api-compat
+          repository: crusaderky/array-api-compat
+          ref: d7ab986843cc9eb20882d7ccbf7248d78fcbd759
+          # /DNM
           path: array-api-compat
 
       - name: Vendor array-api-extra into test package

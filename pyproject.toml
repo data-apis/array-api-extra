@@ -26,7 +26,9 @@ classifiers = [
     "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = ["array-api-compat>=1.1.1"]
+# DNM
+# dependencies = ["array-api-compat>=1.1.1"]
+dependencies = []
 
 [project.optional-dependencies]
 tests = [
@@ -63,9 +65,12 @@ platforms = ["linux-64", "osx-arm64", "win-64"]
 
 [tool.pixi.dependencies]
 python = ">=3.10.15,<3.14"
-array-api-compat = ">=1.1.1"
+# array-api-compat = ">=1.1.1"  # DNM
 
 [tool.pixi.pypi-dependencies]
+# DNM main plus #205, #207, #211
+array-api-compat = { git = "https://github.com/crusaderky/array-api-compat.git", rev = "d7ab986843cc9eb20882d7ccbf7248d78fcbd759" }
+
 array-api-extra = { path = ".", editable = true }
 
 [tool.pixi.feature.lint.dependencies]
