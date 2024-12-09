@@ -40,7 +40,7 @@ And
 [on conda-forge](https://prefix.dev/channels/conda-forge/packages/array-api-extra):
 
 ```shell
-micromamba install -c https://repo.prefix.dev/conda-forge array-api-extra
+mamba install array-api-extra
 # or
 pixi add array-api-extra
 ```
@@ -122,9 +122,12 @@ return xpx.atleast_nd(y, ndim=2, xp=xp)
 
 ```{note}
 Functions in this library assume input arrays *are arrays* (not "array-likes") and that
-the namespace passed as `xp` is compatible with the standard. This means that
-the namespace you pass as `xp` should come from array-api-compat's ``array_namespace``,
+the namespace passed as `xp` (if given) is compatible with the standard -
+this means that it should come from array-api-compat's `array_namespace`,
 or otherwise be compatible with the standard.
+
+Calling functions without providing an `xp` argument means that `array_namespace`
+is called internally to determine the namespace.
 ```
 
 In the examples shown in the docstrings of functions from this library,
@@ -132,6 +135,9 @@ In the examples shown in the docstrings of functions from this library,
 array namespace `xp`. In reality, code using this library will be written to
 work with any compatible array namespace as `xp`, not any particular
 implementation.
+
+Some functions may only work with array libraries supported by array-api-compat.
+This will be clearly indicated in the docs.
 
 (scope)=
 
@@ -143,10 +149,14 @@ Functions that are in-scope for this library will:
   standard.
 - Implement functionality which may be generally useful across various
   libraries.
-- Be implemented purely in terms of the array API standard.
 - Be implemented with type annotations and
   [numpydoc-style docstrings](https://numpydoc.readthedocs.io/en/latest/format.html).
 - Be tested against `array-api-strict`.
+
+Functions are implemented purely in terms of the array API standard where
+possible. Where functions must use library-specific helpers for libraries
+supported by array-api-compat, this will be clearly marked in their API
+reference page.
 
 In particular, the following kinds of function are also in-scope:
 
@@ -158,20 +168,15 @@ In particular, the following kinds of function are also in-scope:
 
 The following features are currently out-of-scope for this library:
 
-- Delegation to known, existing array libraries.
+- Delegation to known, existing array libraries (unless necessary).
   - It is quite simple to wrap functions in this library to also use existing
-    implementations where possible. Such delegation will not live in this
-    library for now, but the array-agnostic functions in this library could form
-    an array-agnostic backend for such delegating functions in the future, here
-    or elsewhere.
+    implementations. Such delegation will not live in this library for now, but
+    the array-agnostic functions in this library could form an array-agnostic
+    backend for such delegating functions in the future, here or elsewhere.
 - Functions which accept "array-like" input, or standard-incompatible
   namespaces.
   - It is possible to prepare input arrays and a standard-compatible namespace
-    via `array-api-compat` downstream in consumer libraries. Avoiding use of
-    `array-api-compat` in this library makes it easier to vendor and reduces
-    potential redundant calls to `xp.asarray` and `array_namespace`.
-  - For proposed alternatives to the `xp=xp` interface, see
-    [this issue](https://github.com/data-apis/array-api-extra/issues/6).
+    via `array-api-compat` downstream in consumer libraries.
 - Functions which are specific to a particular domain.
   - These functions may belong better in an array-consuming library which is
     specific to that domain.
