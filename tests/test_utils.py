@@ -1,6 +1,6 @@
 from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
 
-import typing
+from typing import TYPE_CHECKING
 
 # data-apis/array-api-strict#6
 import array_api_strict as xp  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
@@ -9,7 +9,7 @@ from numpy.testing import assert_array_equal
 
 from array_api_extra._lib._utils import in1d
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from array_api_extra._lib._typing import Array
 
 
