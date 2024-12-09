@@ -261,7 +261,7 @@
 <h1>array_api_extra.cov<a class="headerlink" href="#array-api-extra-cov" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="array_api_extra.cov">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">cov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.cov" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">cov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.cov" title="Link to this definition">¶</a></dt>
 <dd><p>Estimate a covariance matrix.</p>
 <p>Covariance indicates the level to which two variables vary together.
 If we examine N-dimensional samples, <span class="math notranslate nohighlight">\(X = [x_1, x_2, ... x_N]^T\)</span>,
@@ -275,7 +275,7 @@ of <span class="math notranslate nohighlight">\(x_i\)</span>.</p>
 <li><p><strong>m</strong> (<em>array</em>) – A 1-D or 2-D array containing multiple variables and observations.
 Each row of <cite>m</cite> represents a variable, and each column a single
 observation of all those variables.</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em>) – The standard-compatible namespace for <cite>m</cite>.</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>m</cite>. Default: infer</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

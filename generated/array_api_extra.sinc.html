@@ -261,7 +261,7 @@
 <h1>array_api_extra.sinc<a class="headerlink" href="#array-api-extra-sinc" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="array_api_extra.sinc">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">sinc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.sinc" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">sinc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.sinc" title="Link to this definition">¶</a></dt>
 <dd><p>Return the normalized sinc function.</p>
 <p>The sinc function is equal to <span class="math notranslate nohighlight">\(\sin(\pi x)/(\pi x)\)</span> for any argument
 <span class="math notranslate nohighlight">\(x\ne 0\)</span>. <code class="docutils literal notranslate"><span class="pre">sinc(0)</span></code> takes the limit value 1, making <code class="docutils literal notranslate"><span class="pre">sinc</span></code> not
@@ -278,7 +278,7 @@ Use <code class="docutils literal notranslate"><span class="pre">sinc(x</span> <
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>array</em>) – Array (possibly multi-dimensional) of values for which to calculate
 <code class="docutils literal notranslate"><span class="pre">sinc(x)</span></code>. Must have a real floating point dtype.</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em>) – The standard-compatible namespace for <cite>x</cite>.</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>x</cite>. Default: infer</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

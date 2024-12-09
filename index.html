@@ -295,13 +295,51 @@ pixi<span class="w"> </span>add<span class="w"> </span>array-api-extra
 If you require stability, it is recommended to pin <code class="docutils literal notranslate"><span class="pre">array-api-extra</span></code> to
 a specific version, or vendor the library inside your own.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This library depends on array-api-compat. We aim for compatibility with
+the latest released version of array-api-compat, and your mileage may vary
+with older or dev versions.</p>
+</div>
 </section>
 <section id="vendoring">
 <span id="id2"></span><h2>Vendoring<a class="headerlink" href="#vendoring" title="Link to this heading">¶</a></h2>
 <p>To vendor the library, clone
-<a class="reference external" href="https://github.com/data-apis/array-api-extra">the repository</a> and copy it into
-the appropriate place in your library, like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="o">-</span><span class="n">R</span> <span class="n">array</span><span class="o">-</span><span class="n">api</span><span class="o">-</span><span class="n">extra</span><span class="o">/</span> <span class="n">mylib</span><span class="o">/</span><span class="n">vendored</span><span class="o">/</span><span class="n">array_api_extra</span>
+<a class="reference external" href="https://github.com/data-apis/array-api-extra">the array-api-extra repository</a>
+and copy it into the appropriate place in your library, like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="o">-</span><span class="n">a</span> <span class="n">array</span><span class="o">-</span><span class="n">api</span><span class="o">-</span><span class="n">extra</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">array_api_extra</span> <span class="n">mylib</span><span class="o">/</span><span class="n">vendored</span><span class="o">/</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">array-api-extra</span></code> depends on <code class="docutils literal notranslate"><span class="pre">array-api-compat</span></code>. You may either add a dependency
+in your own project to <code class="docutils literal notranslate"><span class="pre">array-api-compat</span></code> or vendor it too:</p>
+<ol class="arabic">
+<li><p>Clone
+<a class="reference external" href="https://github.com/data-apis/array-api-compat">the array-api-compat repository</a>
+and copy it next to your vendored array-api-extra:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="o">-</span><span class="n">a</span> <span class="n">array</span><span class="o">-</span><span class="n">api</span><span class="o">-</span><span class="n">compat</span><span class="o">/</span><span class="n">array_api_compat</span> <span class="n">mylib</span><span class="o">/</span><span class="n">vendored</span><span class="o">/</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create a new hook file which array-api-extra will use instead of the
+top-level <code class="docutils literal notranslate"><span class="pre">array-api-compat</span></code> if present:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="s1">&#39;from mylib.vendored.array_api_compat import *&#39;</span> <span class="o">&gt;</span> <span class="n">mylib</span><span class="o">/</span><span class="n">vendored</span><span class="o">/</span><span class="n">_array_api_compat_vendor</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>This also allows overriding <code class="docutils literal notranslate"><span class="pre">array-api-compat</span></code> functions if you so wish. E.g.
+your <code class="docutils literal notranslate"><span class="pre">mylib/vendored/_array_api_compat_vendor.py</span></code> could look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mylib.vendored.array_api_compat</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">mylib.vendored.array_api_compat</span> <span class="kn">import</span> <span class="n">array_namespace</span> <span class="k">as</span> <span class="n">_array_namespace_orig</span>
+
+
+<span class="k">def</span> <span class="nf">array_namespace</span><span class="p">(</span><span class="o">*</span><span class="n">xs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">mylib</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mylib</span><span class="o">.</span><span class="n">MyArray</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mylib</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_array_namespace_orig</span><span class="p">(</span><span class="o">*</span><span class="n">xs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
