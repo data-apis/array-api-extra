@@ -17,7 +17,7 @@ def in1d(
     *,
     assume_unique: bool = False,
     invert: bool = False,
-    xp: ModuleType,
+    xp: ModuleType | None = None,
 ) -> Array:
     """Checks whether each element of an array is also present in a
     second array.
@@ -29,6 +29,8 @@ def in1d(
     present in numpy:
     https://github.com/numpy/numpy/blob/v1.26.0/numpy/lib/arraysetops.py#L524-L758
     """
+    if xp is None:
+        xp = _compat.array_namespace(x1, x2)
 
     # This code is run to make the code significantly faster
     if x2.shape[0] < 10 * x1.shape[0] ** 0.145:
@@ -71,11 +73,14 @@ def mean(
     *,
     axis: int | tuple[int, ...] | None = None,
     keepdims: bool = False,
-    xp: ModuleType,
+    xp: ModuleType | None = None,
 ) -> Array:
     """
     Complex mean, https://github.com/data-apis/array-api/issues/846.
     """
+    if xp is None:
+        xp = _compat.array_namespace(x)
+
     if xp.isdtype(x.dtype, "complex floating"):
         x_real = xp.real(x)
         x_imag = xp.imag(x)
