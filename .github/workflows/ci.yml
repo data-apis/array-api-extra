@@ -65,6 +65,6 @@ jobs:
         run: pixi run -e ${{ matrix.environment }} tests-ci
 
       - name: Upload coverage report
-        uses: codecov/codecov-action@v5.0.7
+        uses: codecov/codecov-action@v5.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
