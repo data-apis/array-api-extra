@@ -1,6 +1,7 @@
 from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
 
 import operator
+import typing
 import warnings
 
 # https://github.com/pylint-dev/pylint/issues/10112
@@ -14,7 +15,9 @@ from ._lib._compat import (
     is_dask_array,
     is_writeable_array,
 )
-from ._lib._typing import Array, Index, ModuleType, Untyped
+
+if typing.TYPE_CHECKING:
+    from ._lib._typing import Array, Index, ModuleType, Untyped
 
 __all__ = [
     "at",
