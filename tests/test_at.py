@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager, suppress
 from importlib import import_module
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final
 
 import numpy as np
 import pytest
@@ -18,7 +18,7 @@ from array_api_extra import at
 if TYPE_CHECKING:
     from array_api_extra._lib._typing import Array, Untyped
 
-all_libraries = (
+all_libraries: Final = (
     "array_api_strict",
     "numpy",
     "numpy_readonly",

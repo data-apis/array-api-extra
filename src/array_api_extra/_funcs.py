@@ -6,7 +6,7 @@ import warnings
 
 # https://github.com/pylint-dev/pylint/issues/10112
 from collections.abc import Callable  # pylint: disable=import-error
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 from ._lib import _utils
 from ._lib._compat import (
@@ -659,11 +659,11 @@ class at:  # pylint: disable=invalid-name
     idx: Index
     __slots__: ClassVar[tuple[str, str]] = ("idx", "x")
 
-    def __init__(self, x: Array, idx: Index = _undef, /):
+    def __init__(self, x: Array, idx: Index = _undef, /) -> None:
         self.x = x
         self.idx = idx
 
-    def __getitem__(self, idx: Index) -> at:
+    def __getitem__(self, idx: Index, /) -> at:
         """Allow for the alternate syntax ``at(x)[start:stop:step]``,
         which looks prettier than ``at(x, slice(start, stop, step))``
         and feels more intuitive coming from the JAX documentation.
@@ -704,19 +704,16 @@ class at:  # pylint: disable=invalid-name
 
         x = self.x
 
-        if copy is True:
+        if copy is None:
+            writeable = is_writeable_array(x)
+            copy = _is_update and not writeable
+        elif copy:
             writeable = None
-        elif copy is False:
+        else:
             writeable = is_writeable_array(x)
             if not writeable:
                 msg = "Cannot modify parameter in place"
                 raise ValueError(msg)
-        elif copy is None:  # type: ignore[redundant-expr]
-            writeable = is_writeable_array(x)
-            copy = _is_update and not writeable
-        else:
-            msg = f"Invalid value for copy: {copy!r}"  # type: ignore[unreachable]  # pyright: ignore[reportUnreachable]
-            raise ValueError(msg)
 
         if copy:
             try:
@@ -782,7 +779,9 @@ class at:  # pylint: disable=invalid-name
 
     def _iop(
         self,
-        at_op: str,
+        at_op: Literal[
+            "set", "add", "subtract", "multiply", "divide", "power", "min", "max"
+        ],
         elwise_op: Callable[[Array, Array], Array],
         y: Array,
         /,
