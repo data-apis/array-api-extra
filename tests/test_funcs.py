@@ -1,11 +1,10 @@
-from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
+from __future__ import annotations
 
 import contextlib
-import typing
 import warnings
 
 # data-apis/array-api-strict#6
-import array_api_strict as xp  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
+import array_api_strict as xp
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_array_equal, assert_equal
@@ -19,9 +18,7 @@ from array_api_extra import (
     setdiff1d,
     sinc,
 )
-
-if typing.TYPE_CHECKING:
-    from array_api_extra._lib._typing import Array
+from array_api_extra._lib._typing import Array
 
 
 class TestAtLeastND:

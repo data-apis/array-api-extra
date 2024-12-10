@@ -1,4 +1,4 @@
-from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
+from __future__ import annotations
 
 import importlib.metadata
 

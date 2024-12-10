@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 try:
-    from ..._array_api_compat_vendor import (  # pyright: ignore[reportMissingImports]
-        array_namespace,  # pyright: ignore[reportUnknownVariableType]
-        device,  # pyright: ignore[reportUnknownVariableType]
+    from ..._array_api_compat_vendor import (
+        array_namespace,
+        device,
     )
 except ImportError:
-    from array_api_compat import (  # pyright: ignore[reportMissingTypeStubs]
-        array_namespace,  # pyright: ignore[reportUnknownVariableType]
+    from array_api_compat import (
+        array_namespace,
         device,
     )
 
