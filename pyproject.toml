@@ -230,6 +230,9 @@ ignore = [
     "PLR09",   # Too many <...>
     "PLR2004", # Magic value used in comparison
     "ISC001",  # Conflicts with formatter
+    # "N802",    # Function name should be lowercase
+    # "N806",    # Variable in function should be lowercase
+    # "PD008",   # pandas-use-of-dot-at
 ]
 
 [tool.ruff.lint.per-file-ignores]

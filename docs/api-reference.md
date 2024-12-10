@@ -6,6 +6,7 @@
     :nosignatures:
     :toctree: generated
 
+    at
     atleast_nd
     cov
     create_diagonal

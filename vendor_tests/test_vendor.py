@@ -5,10 +5,21 @@ from numpy.testing import assert_array_equal
 
 
 def test_vendor_compat():
-    from ._array_api_compat_vendor import array_namespace
+    from ._array_api_compat_vendor import (  # type: ignore[attr-defined]
+        array_namespace,
+        device,
+        is_array_api_obj,
+        is_dask_array,
+        is_writeable_array,
+    )
 
     x = xp.asarray([1, 2, 3])
-    assert array_namespace(x) is xp
+    assert array_namespace(x) is xp  # type: ignore[no-untyped-call]
+    device(x)
+    assert is_array_api_obj(x)
+    assert not is_array_api_obj(123)
+    assert not is_dask_array(x)
+    assert is_writeable_array(x)
 
 
 def test_vendor_extra():
