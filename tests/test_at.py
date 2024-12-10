@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
-from array_api_compat import (
+from array_api_compat import (  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
     array_namespace,
     is_dask_array,
     is_pydata_sparse_array,
@@ -16,7 +16,7 @@ from array_api_compat import (
 from array_api_extra import at
 
 if TYPE_CHECKING:
-    from array_api_extra._lib._typing import Array
+    from array_api_extra._lib._typing import Array, Untyped
 
 all_libraries = (
     "array_api_strict",
@@ -31,7 +31,7 @@ all_libraries = (
 
 
 @pytest.fixture(params=all_libraries)
-def array(request):
+def array(request: pytest.FixtureRequest) -> Array:
     library = request.param
     if library == "numpy_readonly":
         x = np.asarray([10.0, 20.0, 30.0])
@@ -55,7 +55,7 @@ def assert_array_equal(a: Array, b: Array) -> None:
 
 
 @contextmanager
-def assert_copy(array, copy: bool | None):
+def assert_copy(array: Array, copy: bool | None) -> Untyped:  # type: ignore[no-any-decorated]
     # dask arrays are writeable, but writing to them will hot-swap the
     # dask graph inside the collection so that anything that references
     # the original graph, i.e. the input collection, won't be mutated.
@@ -86,7 +86,9 @@ def assert_copy(array, copy: bool | None):
         ("max", 25.0, [10.0, 25.0, 30.0]),
     ],
 )
-def test_update_ops(array, copy, op, arg, expect):
+def test_update_ops(
+    array: Array, copy: bool | None, op: str, arg: float, expect: list[float]
+):
     if is_pydata_sparse_array(array):
         pytest.skip("at() does not support updates on sparse arrays")
 
@@ -97,7 +99,7 @@ def test_update_ops(array, copy, op, arg, expect):
 
 
 @pytest.mark.parametrize("copy", [True, False, None])
-def test_get(array, copy):
+def test_get(array: Array, copy: bool | None):
     expect_copy = copy
 
     # dask is mutable, but __getitem__ never returns a view
@@ -117,7 +119,7 @@ def test_get(array, copy):
             y[:] = 40
 
 
-def test_get_bool_indices(array):
+def test_get_bool_indices(array: Array):
     """get() with a boolean array index always returns a copy"""
     # sparse violates the array API as it doesn't support
     # a boolean index that is another sparse array.

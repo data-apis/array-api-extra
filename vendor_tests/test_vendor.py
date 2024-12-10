@@ -14,7 +14,7 @@ def test_vendor_compat():
     )
 
     x = xp.asarray([1, 2, 3])
-    assert array_namespace(x) is xp  # type: ignore[no-untyped-call]
+    assert array_namespace(x) is xp
     device(x)
     assert is_array_api_obj(x)
     assert not is_array_api_obj(123)

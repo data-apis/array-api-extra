@@ -2,8 +2,10 @@ from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/
 
 import operator
 import warnings
-from collections.abc import Callable
-from typing import Any
+
+# https://github.com/pylint-dev/pylint/issues/10112
+from collections.abc import Callable  # pylint: disable=import-error
+from typing import ClassVar
 
 from ._lib import _utils
 from ._lib._compat import (
@@ -12,7 +14,7 @@ from ._lib._compat import (
     is_dask_array,
     is_writeable_array,
 )
-from ._lib._typing import Array, ModuleType
+from ._lib._typing import Array, Index, ModuleType, Untyped
 
 __all__ = [
     "at",
@@ -559,7 +561,7 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
 _undef = object()
 
 
-class at:
+class at:  # pylint: disable=invalid-name
     """
     Update operations for read-only arrays.
 
@@ -651,14 +653,14 @@ class at:
     """
 
     x: Array
-    idx: Any
-    __slots__ = ("idx", "x")
+    idx: Index
+    __slots__: ClassVar[tuple[str, str]] = ("idx", "x")
 
-    def __init__(self, x: Array, idx: Any = _undef, /):
+    def __init__(self, x: Array, idx: Index = _undef, /):
         self.x = x
         self.idx = idx
 
-    def __getitem__(self, idx: Any) -> Any:
+    def __getitem__(self, idx: Index) -> at:
         """Allow for the alternate syntax ``at(x)[start:stop:step]``,
         which looks prettier than ``at(x, slice(start, stop, step))``
         and feels more intuitive coming from the JAX documentation.
@@ -677,8 +679,8 @@ class at:
         copy: bool | None = True,
         xp: ModuleType | None = None,
         _is_update: bool = True,
-        **kwargs: Any,
-    ) -> tuple[Any, None] | tuple[None, Array]:
+        **kwargs: Untyped,
+    ) -> tuple[Untyped, None] | tuple[None, Array]:
         """Perform common prepocessing.
 
         Returns
@@ -706,11 +708,11 @@ class at:
             if not writeable:
                 msg = "Cannot modify parameter in place"
                 raise ValueError(msg)
-        elif copy is None:
+        elif copy is None:  # type: ignore[redundant-expr]
             writeable = is_writeable_array(x)
             copy = _is_update and not writeable
         else:
-            msg = f"Invalid value for copy: {copy!r}"  # type: ignore[unreachable]
+            msg = f"Invalid value for copy: {copy!r}"  # type: ignore[unreachable]  # pyright: ignore[reportUnreachable]
             raise ValueError(msg)
 
         if copy:
@@ -741,7 +743,7 @@ class at:
 
         return None, x
 
-    def get(self, **kwargs: Any) -> Any:
+    def get(self, **kwargs: Untyped) -> Untyped:
         """Return ``x[idx]``. In addition to plain ``__getitem__``, this allows ensuring
         that the output is either a copy or a view; it also allows passing
         keyword arguments to the backend.
@@ -766,7 +768,7 @@ class at:
         assert x is not None
         return x[self.idx]
 
-    def set(self, y: Array, /, **kwargs: Any) -> Array:
+    def set(self, y: Array, /, **kwargs: Untyped) -> Array:
         """Apply ``x[idx] = y`` and return the update array"""
         res, x = self._common("set", y, **kwargs)
         if res is not None:
@@ -781,7 +783,7 @@ class at:
         elwise_op: Callable[[Array, Array], Array],
         y: Array,
         /,
-        **kwargs: Any,
+        **kwargs: Untyped,
     ) -> Array:
         """x[idx] += y or equivalent in-place operation on a subset of x
 
@@ -799,33 +801,33 @@ class at:
         x[self.idx] = elwise_op(x[self.idx], y)
         return x
 
-    def add(self, y: Array, /, **kwargs: Any) -> Array:
+    def add(self, y: Array, /, **kwargs: Untyped) -> Array:
         """Apply ``x[idx] += y`` and return the updated array"""
         return self._iop("add", operator.add, y, **kwargs)
 
-    def subtract(self, y: Array, /, **kwargs: Any) -> Array:
+    def subtract(self, y: Array, /, **kwargs: Untyped) -> Array:
         """Apply ``x[idx] -= y`` and return the updated array"""
         return self._iop("subtract", operator.sub, y, **kwargs)
 
-    def multiply(self, y: Array, /, **kwargs: Any) -> Array:
+    def multiply(self, y: Array, /, **kwargs: Untyped) -> Array:
         """Apply ``x[idx] *= y`` and return the updated array"""
         return self._iop("multiply", operator.mul, y, **kwargs)
 
-    def divide(self, y: Array, /, **kwargs: Any) -> Array:
+    def divide(self, y: Array, /, **kwargs: Untyped) -> Array:
         """Apply ``x[idx] /= y`` and return the updated array"""
         return self._iop("divide", operator.truediv, y, **kwargs)
 
-    def power(self, y: Array, /, **kwargs: Any) -> Array:
+    def power(self, y: Array, /, **kwargs: Untyped) -> Array:
         """Apply ``x[idx] **= y`` and return the updated array"""
         return self._iop("power", operator.pow, y, **kwargs)
 
-    def min(self, y: Array, /, **kwargs: Any) -> Array:
+    def min(self, y: Array, /, **kwargs: Untyped) -> Array:
         """Apply ``x[idx] = minimum(x[idx], y)`` and return the updated array"""
         xp = array_namespace(self.x)
         y = xp.asarray(y)
         return self._iop("min", xp.minimum, y, **kwargs)
 
-    def max(self, y: Array, /, **kwargs: Any) -> Array:
+    def max(self, y: Array, /, **kwargs: Untyped) -> Array:
         """Apply ``x[idx] = maximum(x[idx], y)`` and return the updated array"""
         xp = array_namespace(self.x)
         y = xp.asarray(y)
