@@ -1,13 +1,8 @@
-from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
-
-import typing
 import warnings
-
-if typing.TYPE_CHECKING:
-    from ._lib._typing import Array, ModuleType
 
 from ._lib import _utils
 from ._lib._compat import array_namespace
+from ._lib._typing import Array, ModuleType
 
 __all__ = [
     "atleast_nd",

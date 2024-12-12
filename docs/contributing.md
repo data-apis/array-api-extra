@@ -43,13 +43,25 @@ pixi shell -e dev
 pixi run tests
 ```
 
+- To generate the coverage report:
+
+```
+pixi run coverage
+```
+
+- To generate and display the coverage report:
+
+```
+pixi run open-coverage
+```
+
 - To build the docs locally:
 
 ```
 pixi run docs
 ```
 
-- To open and preview the locally-built docs:
+- To build and preview the docs locally:
 
 ```
 pixi run open-docs

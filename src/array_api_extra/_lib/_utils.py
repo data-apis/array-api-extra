@@ -1,11 +1,5 @@
-from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
-
-import typing
-
-if typing.TYPE_CHECKING:
-    from ._typing import Array, ModuleType
-
 from . import _compat
+from ._typing import Array, ModuleType
 
 __all__ = ["in1d", "mean"]
 

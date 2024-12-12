@@ -73,7 +73,6 @@ pre-commit = "*"
 pylint = "*"
 basedmypy = "*"
 basedpyright = "*"
-typing_extensions = ">=4.12.2,<4.13"
 # import dependencies for mypy:
 array-api-strict = "*"
 numpy = "*"
@@ -81,7 +80,7 @@ pytest = "*"
 
 [tool.pixi.feature.lint.tasks]
 pre-commit-install = { cmd = "pre-commit install" }
-pre-commit = { cmd = "pre-commit run -v --all-files --show-diff-on-failure" }
+pre-commit = { cmd = "pre-commit run --all-files" }
 mypy = { cmd = "mypy", cwd = "." }
 pylint = { cmd = ["pylint", "array_api_extra"], cwd = "src" }
 pyright = { cmd = "basedpyright", cwd = "." }
@@ -94,9 +93,11 @@ array-api-strict = "*"
 numpy = "*"
 
 [tool.pixi.feature.tests.tasks]
-tests = { cmd = "pytest" }
-tests-ci = { cmd = "pytest -ra --cov --cov-report=xml --cov-report=term --durations=20" }
+tests = { cmd = "pytest -v" }
+tests-ci = { cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20" }
 tests-vendor = { cmd = "pytest vendor_tests" }
+coverage = { cmd = ["coverage", "html"], depends-on = ["tests-ci"] }
+open-coverage = { cmd = ["open", "htmlcov/index.html"], depends-on = ["coverage"] }
 
 [tool.pixi.feature.docs.dependencies]
 sphinx = ">=7.0"
@@ -104,11 +105,10 @@ furo = ">=2023.08.17"
 myst-parser = ">=0.13"
 sphinx-copybutton = "*"
 sphinx-autodoc-typehints = "*"
-typing_extensions = ">=4.12.2,<4.13"
 
 [tool.pixi.feature.docs.tasks]
 docs = { cmd = ["sphinx-build", ".", "build/"], cwd = "docs" }
-open-docs = { cmd = ["open", "build/index.html"], cwd = "docs" }
+open-docs = { cmd = ["open", "build/index.html"], cwd = "docs", depends-on = ["docs"] }
 
 [tool.pixi.feature.dev.dependencies]
 ipython = "*"
@@ -154,6 +154,7 @@ run.source = ["array_api_extra"]
 report.exclude_also = [
     '\.\.\.',
     'if typing.TYPE_CHECKING:',
+    'if TYPE_CHECKING:',
 ]
 
 
@@ -200,11 +201,16 @@ target-version = "py310"
 [tool.ruff.lint]
 extend-select = [
     "B",   # flake8-bugbear
+    "F",   # Pyflakes
     "I",   # isort
+    "E",   # Pycodestyle
+    "W",   # Pycodestyle
+    "N",   # pep8-naming
     "ARG", # flake8-unused-arguments
     "C4",  # flake8-comprehensions
     "EM",  # flake8-errmsg
     "ICN", # flake8-import-conventions
+    "ISC", # flake8-implicit-str-concat
     "G",   # flake8-logging-format
     "PGH", # pygrep-hooks
     "PIE", # flake8-pie
@@ -220,11 +226,14 @@ extend-select = [
     "EXE", # flake8-executable
     "NPY", # NumPy specific rules
     "PD",  # pandas-vet
+    "UP",  # Pyupgrade
 ]
 ignore = [
     "PLR09",   # Too many <...>
     "PLR2004", # Magic value used in comparison
     "ISC001",  # Conflicts with formatter
+    "N802",    # Function name should be lowercase
+    "N806",    # Variable in function should be lowercase
 ]
 
 [tool.ruff.lint.per-file-ignores]
