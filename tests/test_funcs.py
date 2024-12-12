@@ -1,7 +1,6 @@
-from __future__ import annotations  # https://github.com/pylint-dev/pylint/pull/9990
+from __future__ import annotations
 
 import contextlib
-import typing
 import warnings
 
 # data-apis/array-api-strict#6
@@ -19,9 +18,7 @@ from array_api_extra import (
     setdiff1d,
     sinc,
 )
-
-if typing.TYPE_CHECKING:
-    from array_api_extra._lib._typing import Array
+from array_api_extra._lib._typing import Array
 
 
 class TestAtLeastND:
