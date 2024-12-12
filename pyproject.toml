@@ -73,7 +73,6 @@ pre-commit = "*"
 pylint = "*"
 basedmypy = "*"
 basedpyright = "*"
-typing_extensions = ">=4.12.2,<4.13"
 # import dependencies for mypy:
 array-api-strict = "*"
 numpy = "*"
@@ -106,7 +105,6 @@ furo = ">=2023.08.17"
 myst-parser = ">=0.13"
 sphinx-copybutton = "*"
 sphinx-autodoc-typehints = "*"
-typing_extensions = ">=4.12.2,<4.13"
 
 [tool.pixi.feature.docs.tasks]
 docs = { cmd = ["sphinx-build", ".", "build/"], cwd = "docs" }

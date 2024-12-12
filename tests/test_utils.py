@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 # data-apis/array-api-strict#6
 import array_api_strict as xp  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
 import pytest

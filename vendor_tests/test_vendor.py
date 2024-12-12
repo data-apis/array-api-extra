@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import array_api_strict as xp
 from numpy.testing import assert_array_equal
 

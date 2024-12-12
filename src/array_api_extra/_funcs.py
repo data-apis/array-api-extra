@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import warnings
 
 from ._lib import _utils

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from . import _compat
 from ._typing import Array, ModuleType
 
