@@ -79,11 +79,11 @@ numpy = "*"
 pytest = "*"
 
 [tool.pixi.feature.lint.tasks]
-pre-commit-install = { cmd = "pre-commit install" }
-pre-commit = { cmd = "pre-commit run --all-files" }
-mypy = { cmd = "mypy", cwd = "." }
-pylint = { cmd = ["pylint", "array_api_extra"], cwd = "src" }
-pyright = { cmd = "basedpyright", cwd = "." }
+pre-commit-install = "pre-commit install"
+pre-commit = "pre-commit run --all-files"
+mypy = "mypy"
+pylint = { cmd = "pylint array_api_extra", cwd = "src" }
+pyright = "basedpyright"
 lint = { depends-on = ["pre-commit", "pylint", "mypy", "pyright"] }
 
 [tool.pixi.feature.tests.dependencies]
@@ -93,11 +93,18 @@ array-api-strict = "*"
 numpy = "*"
 
 [tool.pixi.feature.tests.tasks]
-tests = { cmd = "pytest -v" }
-tests-ci = { cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20" }
-tests-vendor = { cmd = "pytest vendor_tests" }
-coverage = { cmd = ["coverage", "html"], depends-on = ["tests-ci"] }
-open-coverage = { cmd = ["open", "htmlcov/index.html"], depends-on = ["coverage"] }
+tests = "pytest -v"
+tests-cov = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20"
+
+clean-vendor-compat = "rm -rf vendor_tests/array_api_compat"
+clean-vendor-extra = "rm -rf vendor_tests/array_api_extra"
+copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/", depends-on = ["clean-vendor-compat"] }
+copy-vendor-extra = { cmd = "cp -r src/array_api_extra vendor_tests/", depends-on = ["clean-vendor-extra"] }
+tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-compat", "copy-vendor-extra"] }
+
+tests-ci = { depends-on = ["tests-cov", "tests-vendor"] }
+coverage = { cmd = "coverage html", depends-on = ["tests-cov"] }
+open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"] }
 
 [tool.pixi.feature.docs.dependencies]
 sphinx = ">=7.0"
@@ -107,8 +114,8 @@ sphinx-copybutton = "*"
 sphinx-autodoc-typehints = "*"
 
 [tool.pixi.feature.docs.tasks]
-docs = { cmd = ["sphinx-build", ".", "build/"], cwd = "docs" }
-open-docs = { cmd = ["open", "build/index.html"], cwd = "docs", depends-on = ["docs"] }
+docs = { cmd = "sphinx-build . build/", cwd = "docs" }
+open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"] }
 
 [tool.pixi.feature.dev.dependencies]
 ipython = "*"
