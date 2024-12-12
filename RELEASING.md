@@ -5,3 +5,4 @@
 5. Update the version to `{next micro version}.dev0`
 6. Update the lockfile
 7. Push your changes
+8. Merge the automated PR to conda-forge/array-api-extra-feedstock
