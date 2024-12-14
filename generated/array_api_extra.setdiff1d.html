@@ -271,11 +271,11 @@
 <li><p><strong>x2</strong> (<em>array</em>) – Input comparison array.</p></li>
 <li><p><strong>assume_unique</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the input arrays are both assumed to be unique, which
 can speed up the calculation. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>x1</cite> and <cite>x2</cite>. Default: infer</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>x1</cite> and <cite>x2</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>res</strong> – 1D array of values in <cite>x1</cite> that are not in <cite>x2</cite>. The result
+<dd class="field-even"><p>1D array of values in <cite>x1</cite> that are not in <cite>x2</cite>. The result
 is sorted when <cite>assume_unique</cite> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, but otherwise only sorted
 if the input is sorted.</p>
 </dd>

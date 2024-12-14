@@ -266,13 +266,13 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>array</em>)</p></li>
+<li><p><strong>x</strong> (<em>array</em>) – Input array.</p></li>
 <li><p><strong>ndim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The minimum number of dimensions for the result.</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>x</cite>. Default: infer</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>x</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>res</strong> – An array with <code class="docutils literal notranslate"><span class="pre">res.ndim</span></code> &gt;= <cite>ndim</cite>.
+<dd class="field-even"><p>An array with <code class="docutils literal notranslate"><span class="pre">res.ndim</span></code> &gt;= <cite>ndim</cite>.
 If <code class="docutils literal notranslate"><span class="pre">x.ndim</span></code> &gt;= <cite>ndim</cite>, <cite>x</cite> is returned.
 If <code class="docutils literal notranslate"><span class="pre">x.ndim</span></code> &lt; <cite>ndim</cite>, <cite>x</cite> is expanded by prepending new axes
 until <code class="docutils literal notranslate"><span class="pre">res.ndim</span></code> equals <cite>ndim</cite>.</p>
