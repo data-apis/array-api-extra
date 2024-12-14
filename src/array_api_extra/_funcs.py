@@ -1,3 +1,5 @@
+"""Public API Functions."""
+
 import warnings
 
 from ._lib import _compat, _utils
@@ -22,14 +24,15 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array
     Parameters
     ----------
     x : array
+        Input array.
     ndim : int
         The minimum number of dimensions for the result.
     xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer
+        The standard-compatible namespace for `x`. Default: infer.
 
     Returns
     -------
-    res : array
+    array
         An array with ``res.ndim`` >= `ndim`.
         If ``x.ndim`` >= `ndim`, `x` is returned.
         If ``x.ndim`` < `ndim`, `x` is expanded by prepending new axes
@@ -47,7 +50,6 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array
     ...                  [3, 4]]])
     >>> xpx.atleast_nd(x, ndim=1, xp=xp) is x
     True
-
     """
     if xp is None:
         xp = array_namespace(x)
@@ -77,11 +79,11 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
         Each row of `m` represents a variable, and each column a single
         observation of all those variables.
     xp : array_namespace, optional
-        The standard-compatible namespace for `m`. Default: infer
+        The standard-compatible namespace for `m`. Default: infer.
 
     Returns
     -------
-    res : array
+    array
         The covariance matrix of the variables.
 
     Examples
@@ -104,7 +106,6 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     Array([[ 1., -1.],
            [-1.,  1.]], dtype=array_api_strict.float64)
 
-
     Note that element :math:`C_{0,1}`, which shows the correlation between
     :math:`x_0` and :math:`x_1`, is negative.
 
@@ -122,7 +123,6 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
 
     >>> xpx.cov(y, xp=xp)
     Array(2.14413333, dtype=array_api_strict.float64)
-
     """
     if xp is None:
         xp = array_namespace(m)
@@ -161,17 +161,17 @@ def create_diagonal(
     Parameters
     ----------
     x : array
-        A 1-D array
+        A 1-D array.
     offset : int, optional
         Offset from the leading diagonal (default is ``0``).
         Use positive ints for diagonals above the leading diagonal,
         and negative ints for diagonals below the leading diagonal.
     xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer
+        The standard-compatible namespace for `x`. Default: infer.
 
     Returns
     -------
-    res : array
+    array
         A 2-D array with `x` on the diagonal (offset by `offset`).
 
     Examples
@@ -191,7 +191,6 @@ def create_diagonal(
            [2, 0, 0, 0, 0],
            [0, 4, 0, 0, 0],
            [0, 0, 8, 0, 0]], dtype=array_api_strict.int64)
-
     """
     if xp is None:
         xp = array_namespace(x)
@@ -221,6 +220,7 @@ def expand_dims(
     Parameters
     ----------
     a : array
+        Array to have its shape expanded.
     axis : int or tuple of ints, optional
         Position(s) in the expanded axes where the new axis (or axes) is/are placed.
         If multiple positions are provided, they should be unique (note that a position
@@ -228,11 +228,11 @@ def expand_dims(
         that will also result in an error).
         Default: ``(0,)``.
     xp : array_namespace, optional
-        The standard-compatible namespace for `a`. Default: infer
+        The standard-compatible namespace for `a`. Default: infer.
 
     Returns
     -------
-    res : array
+    array
         `a` with an expanded shape.
 
     Examples
@@ -270,7 +270,6 @@ def expand_dims(
     >>> y
     Array([[[1],
             [2]]], dtype=array_api_strict.int64)
-
     """
     if xp is None:
         xp = array_namespace(a)
@@ -304,12 +303,13 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
     Parameters
     ----------
     a, b : array
+        Input arrays.
     xp : array_namespace, optional
-        The standard-compatible namespace for `a` and `b`. Default: infer
+        The standard-compatible namespace for `a` and `b`. Default: infer.
 
     Returns
     -------
-    res : array
+    array
         The Kronecker product of `a` and `b`.
 
     Notes
@@ -333,7 +333,6 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
          [  ...                              ...   ],
          [ a[-1,0]*b,  a[-1,1]*b, ... , a[-1,-1]*b ]]
 
-
     Examples
     --------
     >>> import array_api_strict as xp
@@ -352,7 +351,6 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
            [0., 0., 1., 1.],
            [0., 0., 1., 1.]], dtype=array_api_strict.float64)
 
-
     >>> a = xp.reshape(xp.arange(100), (2, 5, 2, 5))
     >>> b = xp.reshape(xp.arange(24), (2, 3, 4))
     >>> c = xpx.kron(a, b, xp=xp)
@@ -365,7 +363,6 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
     >>> K = tuple(xp.asarray(I) * xp.asarray(S1) + xp.asarray(J1))
     >>> c[K] == a[I]*b[J]
     Array(True, dtype=array_api_strict.bool)
-
     """
     if xp is None:
         xp = array_namespace(a, b)
@@ -424,11 +421,11 @@ def setdiff1d(
         If ``True``, the input arrays are both assumed to be unique, which
         can speed up the calculation. Default is ``False``.
     xp : array_namespace, optional
-        The standard-compatible namespace for `x1` and `x2`. Default: infer
+        The standard-compatible namespace for `x1` and `x2`. Default: infer.
 
     Returns
     -------
-    res : array
+    array
         1D array of values in `x1` that are not in `x2`. The result
         is sorted when `assume_unique` is ``False``, but otherwise only sorted
         if the input is sorted.
@@ -442,7 +439,6 @@ def setdiff1d(
     >>> x2 = xp.asarray([3, 4, 5, 6])
     >>> xpx.setdiff1d(x1, x2, xp=xp)
     Array([1, 2], dtype=array_api_strict.int64)
-
     """
     if xp is None:
         xp = array_namespace(x1, x2)
@@ -476,11 +472,11 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
         Array (possibly multi-dimensional) of values for which to calculate
         ``sinc(x)``. Must have a real floating point dtype.
     xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer
+        The standard-compatible namespace for `x`. Default: infer.
 
     Returns
     -------
-    res : array
+    array
         ``sinc(x)`` calculated elementwise, which has the same shape as the input.
 
     Notes
@@ -528,7 +524,6 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
            -5.84680802e-02, -8.90384387e-02,
            -8.40918587e-02, -4.92362781e-02,
            -3.89817183e-17], dtype=array_api_strict.float64)
-
     """
     if xp is None:
         xp = array_namespace(x)
