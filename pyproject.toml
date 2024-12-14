@@ -73,6 +73,7 @@ pre-commit = "*"
 pylint = "*"
 basedmypy = "*"
 basedpyright = "*"
+numpydoc = ">=1.8.0,<2"
 # import dependencies for mypy:
 array-api-strict = "*"
 numpy = "*"
@@ -145,13 +146,9 @@ ci-py313 = ["py313", "tests"]
 minversion = "6.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
-filterwarnings = [
-    "error",
-]
+filterwarnings = ["error"]
 log_cli_level = "INFO"
-testpaths = [
-    "tests",
-]
+testpaths = ["tests"]
 
 
 # Coverage
@@ -261,4 +258,21 @@ messages_control.disable = [
     "missing-module-docstring",
     "missing-function-docstring",
     "wrong-import-position",
+]
+
+
+# numpydoc
+
+[tool.numpydoc_validation]
+checks = [
+    "all",  # report on all checks, except the below
+    "EX01",
+    "SA01",
+    "ES01",
+]
+exclude = [ # don't report on objects that match any of these regex
+    '.*test_funcs.*',
+    '.*test_utils.*',
+    '.*test_version.*',
+    '.*test_vendor.*',
 ]
