@@ -62,8 +62,8 @@ channels = ["https://prefix.dev/conda-forge"]
 platforms = ["linux-64", "osx-arm64", "win-64"]
 
 [tool.pixi.dependencies]
-python = ">=3.10.15,<3.14"
-array-api-compat = ">=1.10.0"
+python = ">=3.10.16,<3.14"
+array-api-compat = ">=1.10.0,<2"
 
 [tool.pixi.pypi-dependencies]
 array-api-extra = { path = ".", editable = true }
