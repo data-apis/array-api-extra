@@ -403,3 +403,8 @@ class TestPad:
         a = xp.reshape(xp.arange(2 * 3 * 4), (2, 3, 4))
         padded = pad(a, 2)
         assert padded.shape == (6, 7, 8)
+
+    def test_mode_not_implemented(self):
+        a = xp.arange(3)
+        with pytest.raises(NotImplementedError, match="Only `'constant'`"):
+            pad(a, 2, mode="edge")

@@ -3,9 +3,7 @@
 import warnings
 
 from ._lib import _compat, _utils
-from ._lib._compat import (
-    array_namespace,
-)
+from ._lib._compat import array_namespace
 from ._lib._typing import Array, ModuleType
 
 __all__ = [
@@ -561,7 +559,8 @@ def pad(
     pad_width : int
         Pad the input array with this many elements from each side.
     mode : str, optional
-        Only "constant" mode is currently supported.
+        Only "constant" mode is currently supported, which pads with
+        the value passed to `constant_values`.
     xp : array_namespace, optional
         The standard-compatible namespace for `x`. Default: infer.
     constant_values : python scalar, optional
@@ -574,7 +573,8 @@ def pad(
         padded with ``pad_width`` elements equal to ``constant_values``.
     """
     if mode != "constant":
-        raise NotImplementedError()
+        msg = "Only `'constant'` mode is currently supported"
+        raise NotImplementedError(msg)
 
     value = constant_values
 
