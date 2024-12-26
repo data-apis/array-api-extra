@@ -11,8 +11,6 @@ except ImportError:
     from array_api_compat import (  # pyright: ignore[reportMissingTypeStubs]
         array_namespace,  # pyright: ignore[reportUnknownVariableType]
         device,
-        is_torch_namespace,
-        is_array_api_strict_namespace,
     )
 
 __all__ = [

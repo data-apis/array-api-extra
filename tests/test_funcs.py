@@ -13,9 +13,9 @@ from array_api_extra import (
     create_diagonal,
     expand_dims,
     kron,
+    pad,
     setdiff1d,
     sinc,
-    pad,
 )
 from array_api_extra._lib._typing import Array
 
@@ -400,10 +400,6 @@ class TestPad:
         assert xp.all(padded == xp.asarray([42, 42, 1, 2, 3, 42, 42]))
 
     def test_ndim(self):
-        a = xp.reshape(xp.arange(2*3*4), (2, 3, 4))
+        a = xp.reshape(xp.arange(2 * 3 * 4), (2, 3, 4))
         padded = pad(a, 2)
         assert padded.shape == (6, 7, 8)
-
-    def test_typo(self):
-        with pytest.raises(ValueError, match="Unknown"):
-            pad(xp.arange(2), pad_width=3, oops=3)

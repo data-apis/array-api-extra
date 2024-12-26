@@ -4,7 +4,7 @@ import warnings
 
 from ._lib import _compat, _utils
 from ._lib._compat import (
-    array_namespace, is_torch_namespace, is_array_api_strict_namespace
+    array_namespace,
 )
 from ._lib._typing import Array, ModuleType
 
@@ -14,9 +14,9 @@ __all__ = [
     "create_diagonal",
     "expand_dims",
     "kron",
+    "pad",
     "setdiff1d",
     "sinc",
-    "pad",
 ]
 
 
@@ -543,52 +543,46 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
     return xp.sin(y) / y
 
 
-def pad(x: Array, pad_width: int, mode: str = 'constant', *, xp: ModuleType = None, **kwargs):
+def pad(
+    x: Array,
+    pad_width: int,
+    mode: str = "constant",
+    *,
+    xp: ModuleType | None = None,
+    constant_values: bool | int | float | complex = 0,
+) -> Array:
     """
     Pad the input array.
 
     Parameters
     ----------
     x : array
-        Input array
-    pad_width: int
-        Pad the input array with this many elements from each side
-    mode: str, optional
+        Input array.
+    pad_width : int
+        Pad the input array with this many elements from each side.
+    mode : str, optional
         Only "constant" mode is currently supported.
     xp : array_namespace, optional
         The standard-compatible namespace for `x`. Default: infer.
-    constant_values: python scalar, optional
+    constant_values : python scalar, optional
         Use this value to pad the input. Default is zero.
 
     Returns
     -------
     array
-        The input array, padded with ``pad_width`` elements equal to ``constant_values``
+        The input array,
+        padded with ``pad_width`` elements equal to ``constant_values``.
     """
-    # xp.pad is available on numpy, cupy and jax.numpy; on torch, reuse
-    # http://github.com/pytorch/pytorch/blob/main/torch/_numpy/_funcs_impl.py#L2045
-
-    if mode != 'constant':
+    if mode != "constant":
         raise NotImplementedError()
 
-    value = kwargs.get("constant_values", 0)
-    if kwargs and list(kwargs.keys()) != ['constant_values']:
-        raise ValueError(f"Unknown kwargs: {kwargs}")
+    value = constant_values
 
     if xp is None:
         xp = array_namespace(x)
 
-    if is_array_api_strict_namespace(xp):
-        padded = xp.full(
-            tuple(x + 2*pad_width for x in x.shape), fill_value=value, dtype=x.dtype
-        )
-        padded[(slice(pad_width, -pad_width, None),)*x.ndim] = x
-        return padded
-    elif is_torch_namespace(xp):
-        pad_width = xp.asarray(pad_width)
-        pad_width = xp.broadcast_to(pad_width, (x.ndim, 2))
-        pad_width = xp.flip(pad_width, axis=(0,)).flatten()
-        return xp.nn.functional.pad(x, tuple(pad_width), value=value)
-
-    else:
-        return xp.pad(x, pad_width, mode=mode, **kwargs)
+    padded = xp.full(
+        tuple(x + 2 * pad_width for x in x.shape), fill_value=value, dtype=x.dtype
+    )
+    padded[(slice(pad_width, -pad_width, None),) * x.ndim] = x
+    return padded
