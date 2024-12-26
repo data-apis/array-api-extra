@@ -544,46 +544,14 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
 def pad(
     x: Array,
     pad_width: int,
-    mode: str = "constant",
     *,
     constant_values: bool | int | float | complex = 0,
-    xp: ModuleType | None = None,
-) -> Array:
-    """
-    Pad the input array.
-
-    Parameters
-    ----------
-    x : array
-        Input array.
-    pad_width : int
-        Pad the input array with this many elements from each side.
-    mode : str, optional
-        Only "constant" mode is currently supported, which pads with
-        the value passed to `constant_values`.
-    constant_values : python scalar, optional
-        Use this value to pad the input. Default is zero.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
-
-    Returns
-    -------
-    array
-        The input array,
-        padded with ``pad_width`` elements equal to ``constant_values``.
-    """
-    if mode != "constant":
-        msg = "Only `'constant'` mode is currently supported"
-        raise NotImplementedError(msg)
-
-    value = constant_values
-
-    if xp is None:
-        xp = array_namespace(x)
-
+    xp: ModuleType,
+) -> Array:  # numpydoc ignore=PR01,RT01
+    """See docstring in `_delegators.py`."""
     padded = xp.full(
         tuple(x + 2 * pad_width for x in x.shape),
-        fill_value=value,
+        fill_value=constant_values,
         dtype=x.dtype,
         device=_compat.device(x),
     )

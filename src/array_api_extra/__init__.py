@@ -1,12 +1,12 @@
 """Extra array functions built on top of the array API standard."""
 
+from ._delegators import pad
 from ._lib._funcs import (
     atleast_nd,
     cov,
     create_diagonal,
     expand_dims,
     kron,
-    pad,
     setdiff1d,
     sinc,
 )

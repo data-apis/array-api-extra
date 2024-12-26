@@ -3,7 +3,7 @@
 # `array-api-compat` to override the import location
 
 try:
-    from ..._array_api_compat_vendor import (  # pyright: ignore[reportMissingImports]
+    from ...._array_api_compat_vendor import (  # pyright: ignore[reportMissingImports]
         array_namespace,  # pyright: ignore[reportUnknownVariableType]
         device,  # pyright: ignore[reportUnknownVariableType]
         is_cupy_namespace,  # pyright: ignore[reportUnknownVariableType]
