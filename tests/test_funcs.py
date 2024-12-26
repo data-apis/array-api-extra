@@ -13,6 +13,7 @@ from array_api_extra import (
     create_diagonal,
     expand_dims,
     kron,
+    pad,
     setdiff1d,
     sinc,
 )
@@ -385,3 +386,33 @@ class TestSinc:
 
     def test_xp(self):
         assert_array_equal(sinc(xp.asarray(0.0), xp=xp), xp.asarray(1.0))
+
+
+class TestPad:
+    def test_simple(self):
+        a = xp.arange(1, 4)
+        padded = pad(a, 2)
+        assert xp.all(padded == xp.asarray([0, 0, 1, 2, 3, 0, 0]))
+
+    def test_fill_value(self):
+        a = xp.arange(1, 4)
+        padded = pad(a, 2, constant_values=42)
+        assert xp.all(padded == xp.asarray([42, 42, 1, 2, 3, 42, 42]))
+
+    def test_ndim(self):
+        a = xp.reshape(xp.arange(2 * 3 * 4), (2, 3, 4))
+        padded = pad(a, 2)
+        assert padded.shape == (6, 7, 8)
+
+    def test_mode_not_implemented(self):
+        a = xp.arange(3)
+        with pytest.raises(NotImplementedError, match="Only `'constant'`"):
+            pad(a, 2, mode="edge")
+
+    def test_device(self):
+        device = xp.Device("device1")
+        a = xp.asarray(0.0, device=device)
+        assert pad(a, 2).device == device
+
+    def test_xp(self):
+        assert_array_equal(pad(xp.asarray(0), 1, xp=xp), xp.zeros(3))

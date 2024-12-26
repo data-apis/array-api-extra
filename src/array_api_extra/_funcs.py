@@ -12,6 +12,7 @@ __all__ = [
     "create_diagonal",
     "expand_dims",
     "kron",
+    "pad",
     "setdiff1d",
     "sinc",
 ]
@@ -538,3 +539,53 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
         xp.asarray(xp.finfo(x.dtype).eps, dtype=x.dtype, device=_compat.device(x)),
     )
     return xp.sin(y) / y
+
+
+def pad(
+    x: Array,
+    pad_width: int,
+    mode: str = "constant",
+    *,
+    xp: ModuleType | None = None,
+    constant_values: bool | int | float | complex = 0,
+) -> Array:
+    """
+    Pad the input array.
+
+    Parameters
+    ----------
+    x : array
+        Input array.
+    pad_width : int
+        Pad the input array with this many elements from each side.
+    mode : str, optional
+        Only "constant" mode is currently supported, which pads with
+        the value passed to `constant_values`.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+    constant_values : python scalar, optional
+        Use this value to pad the input. Default is zero.
+
+    Returns
+    -------
+    array
+        The input array,
+        padded with ``pad_width`` elements equal to ``constant_values``.
+    """
+    if mode != "constant":
+        msg = "Only `'constant'` mode is currently supported"
+        raise NotImplementedError(msg)
+
+    value = constant_values
+
+    if xp is None:
+        xp = array_namespace(x)
+
+    padded = xp.full(
+        tuple(x + 2 * pad_width for x in x.shape),
+        fill_value=value,
+        dtype=x.dtype,
+        device=_compat.device(x),
+    )
+    padded[(slice(pad_width, -pad_width, None),) * x.ndim] = x
+    return padded
