@@ -1,6 +1,6 @@
 """Extra array functions built on top of the array API standard."""
 
-from ._funcs import (
+from ._lib._funcs import (
     atleast_nd,
     cov,
     create_diagonal,

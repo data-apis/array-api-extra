@@ -17,7 +17,7 @@ from array_api_extra import (
     setdiff1d,
     sinc,
 )
-from array_api_extra._lib._typing import Array
+from array_api_extra._lib._utils._typing import Array
 
 
 class TestAtLeastND:

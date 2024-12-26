@@ -1,1 +1,1 @@
-"""Modules housing private functions."""
+"""Array-agnostic implementations for the public API."""
