@@ -408,3 +408,11 @@ class TestPad:
         a = xp.arange(3)
         with pytest.raises(NotImplementedError, match="Only `'constant'`"):
             pad(a, 2, mode="edge")
+
+    def test_device(self):
+        device = xp.Device("device1")
+        a = xp.asarray(0.0, device=device)
+        assert pad(a, 2).device == device
+
+    def test_xp(self):
+        assert_array_equal(pad(xp.asarray(0), 1, xp=xp), xp.zeros(3))

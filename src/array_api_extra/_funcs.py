@@ -582,7 +582,10 @@ def pad(
         xp = array_namespace(x)
 
     padded = xp.full(
-        tuple(x + 2 * pad_width for x in x.shape), fill_value=value, dtype=x.dtype
+        tuple(x + 2 * pad_width for x in x.shape),
+        fill_value=value,
+        dtype=x.dtype,
+        device=_compat.device(x),
     )
     padded[(slice(pad_width, -pad_width, None),) * x.ndim] = x
     return padded
