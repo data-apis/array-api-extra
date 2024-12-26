@@ -15,6 +15,7 @@ from array_api_extra import (
     kron,
     setdiff1d,
     sinc,
+    pad,
 )
 from array_api_extra._lib._typing import Array
 
@@ -385,3 +386,24 @@ class TestSinc:
 
     def test_xp(self):
         assert_array_equal(sinc(xp.asarray(0.0), xp=xp), xp.asarray(1.0))
+
+
+class TestPad:
+    def test_simple(self):
+        a = xp.arange(1, 4)
+        padded = pad(a, 2)
+        assert xp.all(padded == xp.asarray([0, 0, 1, 2, 3, 0, 0]))
+
+    def test_fill_value(self):
+        a = xp.arange(1, 4)
+        padded = pad(a, 2, constant_values=42)
+        assert xp.all(padded == xp.asarray([42, 42, 1, 2, 3, 42, 42]))
+
+    def test_ndim(self):
+        a = xp.reshape(xp.arange(2*3*4), (2, 3, 4))
+        padded = pad(a, 2)
+        assert padded.shape == (6, 7, 8)
+
+    def test_typo(self):
+        with pytest.raises(ValueError, match="Unknown"):
+            pad(xp.arange(2), pad_width=3, oops=3)
