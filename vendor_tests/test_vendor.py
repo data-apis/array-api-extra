@@ -19,6 +19,6 @@ def test_vendor_extra():
 
 def test_vendor_extra_uses_vendor_compat():
     from ._array_api_compat_vendor import array_namespace as n1
-    from .array_api_extra._lib._compat import array_namespace as n2
+    from .array_api_extra._lib._utils._compat import array_namespace as n2
 
     assert n1 is n2

@@ -2,9 +2,9 @@
 
 import warnings
 
-from ._lib import _compat, _utils
-from ._lib._compat import array_namespace
-from ._lib._typing import Array, ModuleType
+from ._utils import _compat, _helpers
+from ._utils._compat import array_namespace
+from ._utils._typing import Array, ModuleType
 
 __all__ = [
     "atleast_nd",
@@ -136,7 +136,7 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
-    avg = _utils.mean(m, axis=1, xp=xp)
+    avg = _helpers.mean(m, axis=1, xp=xp)
     fact = m.shape[1] - 1
 
     if fact <= 0:
@@ -449,7 +449,7 @@ def setdiff1d(
     else:
         x1 = xp.unique_values(x1)
         x2 = xp.unique_values(x2)
-    return x1[_utils.in1d(x1, x2, assume_unique=True, invert=True, xp=xp)]
+    return x1[_helpers.in1d(x1, x2, assume_unique=True, invert=True, xp=xp)]
 
 
 def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
@@ -544,46 +544,14 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
 def pad(
     x: Array,
     pad_width: int,
-    mode: str = "constant",
     *,
-    xp: ModuleType | None = None,
     constant_values: bool | int | float | complex = 0,
-) -> Array:
-    """
-    Pad the input array.
-
-    Parameters
-    ----------
-    x : array
-        Input array.
-    pad_width : int
-        Pad the input array with this many elements from each side.
-    mode : str, optional
-        Only "constant" mode is currently supported, which pads with
-        the value passed to `constant_values`.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
-    constant_values : python scalar, optional
-        Use this value to pad the input. Default is zero.
-
-    Returns
-    -------
-    array
-        The input array,
-        padded with ``pad_width`` elements equal to ``constant_values``.
-    """
-    if mode != "constant":
-        msg = "Only `'constant'` mode is currently supported"
-        raise NotImplementedError(msg)
-
-    value = constant_values
-
-    if xp is None:
-        xp = array_namespace(x)
-
+    xp: ModuleType,
+) -> Array:  # numpydoc ignore=PR01,RT01
+    """See docstring in `_delegators.py`."""
     padded = xp.full(
         tuple(x + 2 * pad_width for x in x.shape),
-        fill_value=value,
+        fill_value=constant_values,
         dtype=x.dtype,
         device=_compat.device(x),
     )

@@ -1,4 +1,4 @@
-"""Utility functions used by `array_api_extra/_funcs.py`."""
+"""Helper functions used by `array_api_extra/_funcs.py`."""
 
 from . import _compat
 from ._typing import Array, ModuleType
