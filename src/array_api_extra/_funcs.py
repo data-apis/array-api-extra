@@ -623,8 +623,10 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
         You may use two alternate syntaxes::
 
-          at(x, idx).set(value)  # or add(value), etc.
-          at(x)[idx].set(value)
+          >>> import array_api_extra as xpx
+          >>> xpx.at(x, idx).set(value)  # or add(value), etc.
+          >>> xpx.at(x)[idx].set(value)
+
     copy : bool, optional
         True (default)
             Ensure that the inputs are not modified.
@@ -647,14 +649,15 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     (a) When you use ``copy=None``, you should always immediately overwrite
     the parameter array::
 
-        x = at(x, 0).set(2, copy=None)
+        >>> import array_api_extra as xpx
+        >>> x = xpx.at(x, 0).set(2, copy=None)
 
     The anti-pattern below must be avoided, as it will result in different
     behaviour on read-only versus writeable arrays::
 
-        x = xp.asarray([0, 0, 0])
-        y = at(x, 0).set(2, copy=None)
-        z = at(x, 1).set(3, copy=None)
+        >>> x = xp.asarray([0, 0, 0])
+        >>> y = xpx.at(x, 0).set(2, copy=None)
+        >>> z = xpx.at(x, 1).set(3, copy=None)
 
     In the above example, ``x == [0, 0, 0]``, ``y == [2, 0, 0]`` and z == ``[0, 3, 0]``
     when ``x`` is read-only, whereas ``x == y == z == [2, 3, 0]`` when ``x`` is
@@ -667,9 +670,10 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
         >>> import numpy as np
         >>> import jax.numpy as jnp
-        >>> at(np.asarray([123]), np.asarray([0, 0])).add(1)
+        >>> import array_api_extra as xpx
+        >>> xpx.at(np.asarray([123]), np.asarray([0, 0])).add(1)
         array([124])
-        >>> at(jnp.asarray([123]), jnp.asarray([0, 0])).add(1)
+        >>> xpx.at(jnp.asarray([123]), jnp.asarray([0, 0])).add(1)
         Array([125], dtype=int32)
 
     See Also
@@ -686,21 +690,22 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     --------
     Given either of these equivalent expressions::
 
-      x = at(x)[1].add(2, copy=None)
-      x = at(x, 1).add(2, copy=None)
+      >>> import array_api_extra as xpx
+      >>> x = xpx.at(x)[1].add(2, copy=None)
+      >>> x = xpx.at(x, 1).add(2, copy=None)
 
     If x is a JAX array, they are the same as::
 
-      x = x.at[1].add(2)
+      >>> x = x.at[1].add(2)
 
     If x is a read-only numpy array, they are the same as::
 
-      x = x.copy()
-      x[1] += 2
+      >>> x = x.copy()
+      >>> x[1] += 2
 
     For other known backends, they are the same as::
 
-      x[1] += 2
+      >>> x[1] += 2
     """
 
     _x: Array
