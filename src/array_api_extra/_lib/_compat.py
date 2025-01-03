@@ -4,16 +4,22 @@
 
 try:
     from ..._array_api_compat_vendor import (  # pyright: ignore[reportMissingImports]
-        array_namespace,  # pyright: ignore[reportUnknownVariableType]
-        device,  # pyright: ignore[reportUnknownVariableType]
+        array_namespace,
+        device,
+        is_jax_array,
+        is_writeable_array,
     )
 except ImportError:
     from array_api_compat import (  # pyright: ignore[reportMissingTypeStubs]
-        array_namespace,  # pyright: ignore[reportUnknownVariableType]
+        array_namespace,
         device,
+        is_jax_array,
+        is_writeable_array,
     )
 
 __all__ = [
     "array_namespace",
     "device",
+    "is_jax_array",
+    "is_writeable_array",
 ]
