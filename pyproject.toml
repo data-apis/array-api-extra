@@ -71,7 +71,7 @@ array-api-extra = { path = ".", editable = true }
 [tool.pixi.feature.lint.dependencies]
 pre-commit = "*"
 pylint = "*"
-basedmypy = "2.8.*"
+basedmypy = "*"
 basedpyright = "*"
 numpydoc = ">=1.8.0,<2"
 # import dependencies for mypy:
@@ -99,7 +99,9 @@ tests-cov = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=
 
 clean-vendor-compat = "rm -rf vendor_tests/array_api_compat"
 clean-vendor-extra = "rm -rf vendor_tests/array_api_extra"
-copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/", depends-on = ["clean-vendor-compat"] }
+copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/", depends-on = [
+    "clean-vendor-compat",
+] }
 copy-vendor-extra = { cmd = "cp -r src/array_api_extra vendor_tests/", depends-on = ["clean-vendor-extra"] }
 tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-compat", "copy-vendor-extra"] }
 
