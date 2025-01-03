@@ -12,7 +12,7 @@ from ._funcs import (
     sinc,
 )
 
-__version__ = "0.4.1.dev0"
+__version__ = "0.5.0"
 
 # pylint: disable=duplicate-code
 __all__ = [
