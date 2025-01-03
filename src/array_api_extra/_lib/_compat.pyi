@@ -1,5 +1,8 @@
 """Static type stubs for `_compat.py`."""
 
+# https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
+from __future__ import annotations
+
 from types import ModuleType
 
 from ._typing import Array, Device

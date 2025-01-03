@@ -1,5 +1,8 @@
 """Public API Functions."""
 
+# https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
+from __future__ import annotations
+
 import operator
 import warnings
 
@@ -719,7 +722,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self._x = x
         self._idx = idx
 
-    def __getitem__(self, idx: Index, /) -> "at":  # numpydoc ignore=PR01,RT01
+    def __getitem__(self, idx: Index, /) -> at:  # numpydoc ignore=PR01,RT01
         """
         Allow for the alternate syntax ``at(x)[start:stop:step]``.
 
