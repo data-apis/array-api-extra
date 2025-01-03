@@ -140,7 +140,7 @@ def test_alternate_index_syntax():
 
 @pytest.mark.parametrize("copy", [True, False])
 @pytest.mark.parametrize("op", ["add", "subtract", "multiply", "divide", "power"])
-def test_iops_incompatible_dtype(op, copy):
+def test_iops_incompatible_dtype(op: str, copy: bool):
     """Test that at() replicates the backend's behaviour for
     in-place operations with incompatible dtypes.
 
