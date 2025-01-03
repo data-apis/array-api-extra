@@ -1,6 +1,7 @@
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from importlib import import_module
+from typing import cast
 
 import numpy as np
 import pytest
@@ -100,7 +101,8 @@ def test_update_ops(
         pytest.skip("at() does not support updates on sparse arrays")
 
     with assert_copy(array, expect_copy):
-        y = getattr(at(array)[1:], op)(arg, **kwargs)
+        func = cast(Callable[..., Array], getattr(at(array)[1:], op))  # type: ignore[no-any-explicit]
+        y = func(arg, **kwargs)
         assert isinstance(y, type(array))
         assert_array_equal(y, expect)
 
@@ -153,6 +155,6 @@ def test_iops_incompatible_dtype(op: str, copy: bool):
     to dtype('int64') with casting rule 'same_kind'
     """
     a = np.asarray([2, 4])
-    func = getattr(at(a)[:], op)
+    func = cast(Callable[..., Array], getattr(at(a)[:], op))  # type: ignore[no-any-explicit]
     with pytest.raises(TypeError, match="Cannot cast ufunc"):
         func(1.1, copy=copy)
