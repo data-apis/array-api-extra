@@ -136,3 +136,23 @@ def test_alternate_index_syntax():
         at(a).set(4)
     with pytest.raises(ValueError, match="Index"):
         at(a, 0)[0].set(4)
+
+
+@pytest.mark.parametrize("copy", [True, False])
+@pytest.mark.parametrize("op", ["add", "subtract", "multiply", "divide", "power"])
+def test_iops_incompatible_dtype(op, copy):
+    """Test that at() replicates the backend's behaviour for
+    in-place operations with incompatible dtypes.
+
+    Note:
+    >>> a = np.asarray([1, 2, 3])
+    >>> a / 1.5
+    array([0.        , 0.66666667, 1.33333333])
+    >>> a /= 1.5
+    UFuncTypeError: Cannot cast ufunc 'divide' output from dtype('float64')
+    to dtype('int64') with casting rule 'same_kind'
+    """
+    a = np.asarray([2, 4])
+    func = getattr(at(a)[:], op)
+    with pytest.raises(TypeError, match="Cannot cast ufunc"):
+        func(1.1, copy=copy)

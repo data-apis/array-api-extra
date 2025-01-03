@@ -848,7 +848,11 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] += y`` and return the updated array."""
-        return self._iop("add", operator.add, y, copy=copy, xp=xp)
+
+        # Note for this and all other methods based on _iop:
+        # operator.iadd and operator.add subtly differ in behaviour, as
+        # only iadd will trigger exceptions when y has an incompatible dtype.
+        return self._iop("add", operator.iadd, y, copy=copy, xp=xp)
 
     def subtract(
         self,
@@ -858,7 +862,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] -= y`` and return the updated array."""
-        return self._iop("subtract", operator.sub, y, copy=copy, xp=xp)
+        return self._iop("subtract", operator.isub, y, copy=copy, xp=xp)
 
     def multiply(
         self,
@@ -868,7 +872,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] *= y`` and return the updated array."""
-        return self._iop("multiply", operator.mul, y, copy=copy, xp=xp)
+        return self._iop("multiply", operator.imul, y, copy=copy, xp=xp)
 
     def divide(
         self,
@@ -878,7 +882,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] /= y`` and return the updated array."""
-        return self._iop("divide", operator.truediv, y, copy=copy, xp=xp)
+        return self._iop("divide", operator.itruediv, y, copy=copy, xp=xp)
 
     def power(
         self,
@@ -888,7 +892,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] **= y`` and return the updated array."""
-        return self._iop("power", operator.pow, y, copy=copy, xp=xp)
+        return self._iop("power", operator.ipow, y, copy=copy, xp=xp)
 
     def min(
         self,
