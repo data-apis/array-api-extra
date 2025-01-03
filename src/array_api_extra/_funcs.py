@@ -628,15 +628,16 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
           >>> xpx.at(x)[idx].set(value)
 
     copy : bool, optional
-        True (default)
+        None (default)
+            The array parameter *may* be modified in place if it is
+            possible and beneficial for performance.
+            You should not reuse it after calling this function.
+        True
             Ensure that the inputs are not modified.
         False
             Ensure that the update operation writes back to the input.
             Raise ``ValueError`` if a copy cannot be avoided.
-        None
-            The array parameter *may* be modified in place if it is
-            possible and beneficial for performance.
-            You should not reuse it after calling this function.
+
     xp : array_namespace, optional
         The standard-compatible namespace for `x`. Default: infer.
 
@@ -646,18 +647,18 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     Warnings
     --------
-    (a) When you use ``copy=None``, you should always immediately overwrite
+    (a) When you omit the ``copy`` parameter, you should always immediately overwrite
     the parameter array::
 
         >>> import array_api_extra as xpx
-        >>> x = xpx.at(x, 0).set(2, copy=None)
+        >>> x = xpx.at(x, 0).set(2)
 
     The anti-pattern below must be avoided, as it will result in different
     behaviour on read-only versus writeable arrays::
 
         >>> x = xp.asarray([0, 0, 0])
-        >>> y = xpx.at(x, 0).set(2, copy=None)
-        >>> z = xpx.at(x, 1).set(3, copy=None)
+        >>> y = xpx.at(x, 0).set(2)
+        >>> z = xpx.at(x, 1).set(3)
 
     In the above example, ``x == [0, 0, 0]``, ``y == [2, 0, 0]`` and z == ``[0, 3, 0]``
     when ``x`` is read-only, whereas ``x == y == z == [2, 3, 0]`` when ``x`` is
@@ -691,8 +692,8 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     Given either of these equivalent expressions::
 
       >>> import array_api_extra as xpx
-      >>> x = xpx.at(x)[1].add(2, copy=None)
-      >>> x = xpx.at(x, 1).add(2, copy=None)
+      >>> x = xpx.at(x)[1].add(2)
+      >>> x = xpx.at(x, 1).add(2)
 
     If x is a JAX array, they are the same as::
 
@@ -735,8 +736,8 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         at_op: str,
         y: Array,
         /,
-        copy: bool | None = True,
-        xp: ModuleType | None = None,
+        copy: bool | None,
+        xp: ModuleType | None,
     ) -> tuple[Array, None] | tuple[None, Array]:  # numpydoc ignore=PR01
         """
         Perform common prepocessing to all update operations.
@@ -800,7 +801,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self,
         y: Array,
         /,
-        copy: bool | None = True,
+        copy: bool | None = None,
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] = y`` and return the update array."""
@@ -819,8 +820,8 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         elwise_op: Callable[[Array, Array], Array],
         y: Array,
         /,
-        copy: bool | None = True,
-        xp: ModuleType | None = None,
+        copy: bool | None,
+        xp: ModuleType | None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """
         ``x[idx] += y`` or equivalent in-place operation on a subset of x.
@@ -843,7 +844,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self,
         y: Array,
         /,
-        copy: bool | None = True,
+        copy: bool | None = None,
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] += y`` and return the updated array."""
@@ -853,7 +854,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self,
         y: Array,
         /,
-        copy: bool | None = True,
+        copy: bool | None = None,
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] -= y`` and return the updated array."""
@@ -863,7 +864,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self,
         y: Array,
         /,
-        copy: bool | None = True,
+        copy: bool | None = None,
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] *= y`` and return the updated array."""
@@ -873,7 +874,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self,
         y: Array,
         /,
-        copy: bool | None = True,
+        copy: bool | None = None,
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] /= y`` and return the updated array."""
@@ -883,7 +884,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self,
         y: Array,
         /,
-        copy: bool | None = True,
+        copy: bool | None = None,
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] **= y`` and return the updated array."""
@@ -893,7 +894,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self,
         y: Array,
         /,
-        copy: bool | None = True,
+        copy: bool | None = None,
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] = minimum(x[idx], y)`` and return the updated array."""
@@ -906,7 +907,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self,
         y: Array,
         /,
-        copy: bool | None = True,
+        copy: bool | None = None,
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] = maximum(x[idx], y)`` and return the updated array."""

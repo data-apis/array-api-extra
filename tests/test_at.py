@@ -72,7 +72,7 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
         ({"copy": True}, True),
         ({"copy": False}, False),
         ({"copy": None}, None),  # Behavior is backend-specific
-        ({}, True),  # Test that the copy parameter defaults to True
+        ({}, None),  # Test that the copy parameter defaults to None
     ],
 )
 @pytest.mark.parametrize(
@@ -125,12 +125,12 @@ def test_xp():
 
 def test_alternate_index_syntax():
     a = np.asarray([1, 2, 3])
-    assert_array_equal(at(a, 0).set(4), [4, 2, 3])
-    assert_array_equal(at(a)[0].set(4), [4, 2, 3])
+    assert_array_equal(at(a, 0).set(4, copy=True), [4, 2, 3])
+    assert_array_equal(at(a)[0].set(4, copy=True), [4, 2, 3])
 
     a_at = at(a)
-    assert_array_equal(a_at[0].add(1), [2, 2, 3])
-    assert_array_equal(a_at[1].add(2), [1, 4, 3])
+    assert_array_equal(a_at[0].add(1, copy=True), [2, 2, 3])
+    assert_array_equal(a_at[1].add(2, copy=True), [1, 4, 3])
 
     with pytest.raises(ValueError, match="Index"):
         at(a).set(4)
