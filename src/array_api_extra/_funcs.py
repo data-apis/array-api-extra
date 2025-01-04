@@ -5,10 +5,9 @@ from __future__ import annotations
 
 import operator
 import warnings
-
-# https://github.com/pylint-dev/pylint/issues/10112
-from collections.abc import Callable  # pylint: disable=import-error
-from typing import ClassVar, Literal
+from collections.abc import Callable
+from types import ModuleType
+from typing import ClassVar, Literal, cast
 
 from ._lib import _compat, _utils
 from ._lib._compat import (
@@ -16,7 +15,7 @@ from ._lib._compat import (
     is_jax_array,
     is_writeable_array,
 )
-from ._lib._typing import Array, Index, ModuleType
+from ._lib._typing import Array, Index
 
 __all__ = [
     "at",
@@ -779,7 +778,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         if copy:
             if is_jax_array(x):
                 # Use JAX's at[]
-                func = getattr(x.at[idx], at_op)
+                func = cast(Callable[[Array], Array], getattr(x.at[idx], at_op))
                 return func(y), None
             # Emulate at[] behaviour for non-JAX arrays
             # with a copy followed by an update
