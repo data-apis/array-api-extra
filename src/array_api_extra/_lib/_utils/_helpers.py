@@ -3,8 +3,10 @@
 # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
 
+from types import ModuleType
+
 from . import _compat
-from ._typing import Array, ModuleType
+from ._typing import Array
 
 __all__ = ["in1d", "mean"]
 

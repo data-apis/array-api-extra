@@ -1,1 +1,1 @@
-"""Array-agnostic implementations for the public API."""
+"""Internals of array-api-extra."""

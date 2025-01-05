@@ -1,4 +1,6 @@
-"""Delegators to existing implementations for Public API Functions."""
+"""Delegation to existing implementations for Public API Functions."""
+
+from types import ModuleType
 
 from ._lib import _funcs
 from ._lib._utils._compat import (
@@ -8,7 +10,7 @@ from ._lib._utils._compat import (
     is_numpy_namespace,
     is_torch_namespace,
 )
-from ._lib._utils._typing import Array, ModuleType
+from ._lib._utils._typing import Array
 
 
 def pad(

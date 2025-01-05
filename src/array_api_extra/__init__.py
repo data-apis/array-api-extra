@@ -1,6 +1,6 @@
 """Extra array functions built on top of the array API standard."""
 
-from ._delegators import pad
+from ._delegation import pad
 from ._lib._funcs import (
     at,
     atleast_nd,

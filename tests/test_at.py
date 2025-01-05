@@ -13,7 +13,7 @@ from array_api_compat import (  # type: ignore[import-untyped]  # pyright: ignor
 )
 
 from array_api_extra import at
-from array_api_extra._lib._typing import Array
+from array_api_extra._lib._utils._typing import Array
 
 all_libraries = (
     "array_api_strict",
