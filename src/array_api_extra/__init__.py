@@ -2,6 +2,7 @@
 
 from ._delegators import pad
 from ._lib._funcs import (
+    at,
     atleast_nd,
     cov,
     create_diagonal,
@@ -11,11 +12,12 @@ from ._lib._funcs import (
     sinc,
 )
 
-__version__ = "0.4.1.dev0"
+__version__ = "0.5.1.dev0"
 
 # pylint: disable=duplicate-code
 __all__ = [
     "__version__",
+    "at",
     "atleast_nd",
     "cov",
     "create_diagonal",

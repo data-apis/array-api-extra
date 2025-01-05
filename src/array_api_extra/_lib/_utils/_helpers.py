@@ -1,5 +1,8 @@
 """Helper functions used by `array_api_extra/_funcs.py`."""
 
+# https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
+from __future__ import annotations
+
 from . import _compat
 from ._typing import Array, ModuleType
 
