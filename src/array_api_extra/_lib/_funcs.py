@@ -556,7 +556,7 @@ def pad(
     constant_values: bool | int | float | complex = 0,
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
-    """See docstring in `_delegators.py`."""
+    """See docstring in `array_api_extra._delegation.py`."""
     padded = xp.full(
         tuple(x + 2 * pad_width for x in x.shape),
         fill_value=constant_values,
