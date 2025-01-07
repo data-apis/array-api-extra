@@ -6,8 +6,9 @@ from __future__ import annotations
 import operator
 import warnings
 from collections.abc import Callable
+from enum import Enum
 from types import ModuleType
-from typing import ClassVar, Literal, cast
+from typing import ClassVar, cast
 
 from ._lib import _compat, _utils
 from ._lib._compat import (
@@ -635,6 +636,31 @@ def pad(
     return padded
 
 
+class _AtOp(Enum):
+    """Operations for use in `xpx.at`."""
+
+    SET = "set"
+    ADD = "add"
+    SUBTRACT = "subtract"
+    MULTIPLY = "multiply"
+    DIVIDE = "divide"
+    POWER = "power"
+    MIN = "min"
+    MAX = "max"
+
+    # @override from Python 3.12
+    def __str__(self) -> str:  # type: ignore[explicit-override]  # pyright: ignore[reportImplicitOverride]
+        """
+        Return string representation (useful for pytest logs).
+
+        Returns
+        -------
+        str
+            The operation's name.
+        """
+        return self.value
+
+
 _undef = object()
 
 
@@ -784,7 +810,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def _update_common(
         self,
-        at_op: str,
+        at_op: _AtOp,
         y: Array,
         /,
         copy: bool | None,
@@ -827,7 +853,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         if copy:
             if is_jax_array(x):
                 # Use JAX's at[]
-                func = cast(Callable[[Array], Array], getattr(x.at[idx], at_op))
+                func = cast(Callable[[Array], Array], getattr(x.at[idx], at_op.value))
                 return func(y), None
             # Emulate at[] behaviour for non-JAX arrays
             # with a copy followed by an update
@@ -856,7 +882,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] = y`` and return the update array."""
-        res, x = self._update_common("set", y, copy=copy, xp=xp)
+        res, x = self._update_common(_AtOp.SET, y, copy=copy, xp=xp)
         if res is not None:
             return res
         assert x is not None
@@ -865,9 +891,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def _iop(
         self,
-        at_op: Literal[
-            "set", "add", "subtract", "multiply", "divide", "power", "min", "max"
-        ],
+        at_op: _AtOp,
         elwise_op: Callable[[Array, Array], Array],
         y: Array,
         /,
@@ -903,7 +927,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         # Note for this and all other methods based on _iop:
         # operator.iadd and operator.add subtly differ in behaviour, as
         # only iadd will trigger exceptions when y has an incompatible dtype.
-        return self._iop("add", operator.iadd, y, copy=copy, xp=xp)
+        return self._iop(_AtOp.ADD, operator.iadd, y, copy=copy, xp=xp)
 
     def subtract(
         self,
@@ -913,7 +937,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] -= y`` and return the updated array."""
-        return self._iop("subtract", operator.isub, y, copy=copy, xp=xp)
+        return self._iop(_AtOp.SUBTRACT, operator.isub, y, copy=copy, xp=xp)
 
     def multiply(
         self,
@@ -923,7 +947,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] *= y`` and return the updated array."""
-        return self._iop("multiply", operator.imul, y, copy=copy, xp=xp)
+        return self._iop(_AtOp.MULTIPLY, operator.imul, y, copy=copy, xp=xp)
 
     def divide(
         self,
@@ -933,7 +957,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] /= y`` and return the updated array."""
-        return self._iop("divide", operator.itruediv, y, copy=copy, xp=xp)
+        return self._iop(_AtOp.DIVIDE, operator.itruediv, y, copy=copy, xp=xp)
 
     def power(
         self,
@@ -943,7 +967,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] **= y`` and return the updated array."""
-        return self._iop("power", operator.ipow, y, copy=copy, xp=xp)
+        return self._iop(_AtOp.POWER, operator.ipow, y, copy=copy, xp=xp)
 
     def min(
         self,
@@ -956,7 +980,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         if xp is None:
             xp = array_namespace(self._x)
         y = xp.asarray(y)
-        return self._iop("min", xp.minimum, y, copy=copy, xp=xp)
+        return self._iop(_AtOp.MIN, xp.minimum, y, copy=copy, xp=xp)
 
     def max(
         self,
@@ -969,4 +993,4 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         if xp is None:
             xp = array_namespace(self._x)
         y = xp.asarray(y)
-        return self._iop("max", xp.maximum, y, copy=copy, xp=xp)
+        return self._iop(_AtOp.MAX, xp.maximum, y, copy=copy, xp=xp)
