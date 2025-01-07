@@ -232,6 +232,11 @@ reportUnknownVariableType = false
 # false positives for input validation
 reportUnreachable = false
 
+executionEnvironments = [
+    { root = "tests", reportPrivateUsage = false },
+    { root = "src" },
+]
+
 
 # Ruff
 
