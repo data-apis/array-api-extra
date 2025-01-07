@@ -301,22 +301,39 @@ Raise <code class="docutils literal notranslate"><span class="pre">ValueError</s
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>(a) When you omit the <code class="docutils literal notranslate"><span class="pre">copy</span></code> parameter, you should always immediately overwrite
-the parameter array:</p>
+<p>(a) When you omit the <code class="docutils literal notranslate"><span class="pre">copy</span></code> parameter, you should never reuse the parameter
+array later on; ideally, you should reassign it immediately:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">array_api_extra</span> <span class="k">as</span> <span class="nn">xpx</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">xpx</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The anti-pattern below must be avoided, as it will result in different
-behaviour on read-only versus writeable arrays:</p>
+<p>The above best practice pattern ensures that the behaviour won’t change depending
+on whether <code class="docutils literal notranslate"><span class="pre">x</span></code> is writeable or not, as the original <code class="docutils literal notranslate"><span class="pre">x</span></code> object is dereferenced
+as soon as <code class="docutils literal notranslate"><span class="pre">xpx.at</span></code> returns; this way there is no risk to accidentally update it
+twice.</p>
+<p>On the reverse, the anti-pattern below must be avoided, as it will result in
+different behaviour on read-only versus writeable arrays:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">xpx</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">xpx</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In the above example, <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">==</span> <span class="pre">[2,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> and z == <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">3,</span> <span class="pre">0]</span></code>
-when <code class="docutils literal notranslate"><span class="pre">x</span></code> is read-only, whereas <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">y</span> <span class="pre">==</span> <span class="pre">z</span> <span class="pre">==</span> <span class="pre">[2,</span> <span class="pre">3,</span> <span class="pre">0]</span></code> when <code class="docutils literal notranslate"><span class="pre">x</span></code> is
-writeable!</p>
+<p>In the above example, both calls to <code class="docutils literal notranslate"><span class="pre">xpx.at</span></code> update <code class="docutils literal notranslate"><span class="pre">x</span></code> in place <em>if possible</em>.
+This causes the behaviour to diverge depending on whether <code class="docutils literal notranslate"><span class="pre">x</span></code> is writeable or not:</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">x</span></code> is writeable, then after the snippet above you’ll have
+<code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">y</span> <span class="pre">==</span> <span class="pre">z</span> <span class="pre">==</span> <span class="pre">[2,</span> <span class="pre">3,</span> <span class="pre">0]</span></code></p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">x</span></code> is read-only, then you’ll end up with
+<code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">==</span> <span class="pre">[2,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> and <code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">==</span> <span class="pre">[0,</span> <span class="pre">3,</span> <span class="pre">0]</span></code>.</p></li>
+</ul>
+<p>The correct pattern to use if you want diverging outputs from the same input is
+to enforce copies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">xpx</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Never updates x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">xpx</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># May or may not update x in place</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">x</span>  <span class="c1"># avoid accidental reuse of x as we don&#39;t know its state anymore</span>
+</pre></div>
+</div>
 <p>(b) The array API standard does not support integer array indices.
 The behaviour of update methods when the index is an array of integers is
 undefined and will vary between backends; this is particularly true when the
