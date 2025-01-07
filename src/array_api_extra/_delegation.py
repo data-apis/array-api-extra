@@ -73,7 +73,7 @@ def _delegate(xp: ModuleType, *backends: IsNamespace) -> bool:
 
 def pad(
     x: Array,
-    pad_width: int,
+    pad_width: int | tuple[int, int] | list[tuple[int, int]],
     mode: str = "constant",
     *,
     constant_values: bool | int | float | complex = 0,
@@ -86,8 +86,12 @@ def pad(
     ----------
     x : array
         Input array.
-    pad_width : int
+    pad_width : int or tuple of ints or list of pairs of ints
         Pad the input array with this many elements from each side.
+        If a list of tuples, ``[(before_0, after_0), ... (before_N, after_N)]``,
+        each pair applies to the corresponding axis of ``x``.
+        A single tuple, ``(before, after)``, is equivalent to a list of ``x.ndim``
+        copies of this tuple.
     mode : str, optional
         Only "constant" mode is currently supported, which pads with
         the value passed to `constant_values`.

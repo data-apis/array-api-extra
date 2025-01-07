@@ -551,19 +551,47 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
 
 def pad(
     x: Array,
-    pad_width: int,
+    pad_width: int | tuple[int, int] | list[tuple[int, int]],
     *,
     constant_values: bool | int | float | complex = 0,
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
+    # make pad_width a list of length-2 tuples of ints
+    x_ndim = cast(int, x.ndim)
+    if isinstance(pad_width, int):
+        pad_width = [(pad_width, pad_width)] * x_ndim
+    if isinstance(pad_width, tuple):
+        pad_width = [pad_width] * x_ndim
+
+    # https://github.com/data-apis/array-api-extra/pull/82#discussion_r1905688819
+    slices: list[slice] = []  # type: ignore[no-any-explicit]
+    newshape: list[int] = []
+    for ax, w_tpl in enumerate(pad_width):
+        if len(w_tpl) != 2:
+            msg = f"expect a 2-tuple (before, after), got {w_tpl}."
+            raise ValueError(msg)
+
+        sh = x.shape[ax]
+        if w_tpl[0] == 0 and w_tpl[1] == 0:
+            sl = slice(None, None, None)
+        else:
+            start, stop = w_tpl
+            stop = None if stop == 0 else -stop
+
+            sl = slice(start, stop, None)
+            sh += w_tpl[0] + w_tpl[1]
+
+        newshape.append(sh)
+        slices.append(sl)
+
     padded = xp.full(
-        tuple(x + 2 * pad_width for x in x.shape),
+        tuple(newshape),
         fill_value=constant_values,
         dtype=x.dtype,
         device=_compat.device(x),
     )
-    padded[(slice(pad_width, -pad_width, None),) * x.ndim] = x
+    padded[tuple(slices)] = x
     return padded
 
 
@@ -613,22 +641,39 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     Warnings
     --------
-    (a) When you omit the ``copy`` parameter, you should always immediately overwrite
-    the parameter array::
+    (a) When you omit the ``copy`` parameter, you should never reuse the parameter
+    array later on; ideally, you should reassign it immediately::
 
         >>> import array_api_extra as xpx
         >>> x = xpx.at(x, 0).set(2)
 
-    The anti-pattern below must be avoided, as it will result in different
-    behaviour on read-only versus writeable arrays::
+    The above best practice pattern ensures that the behaviour won't change depending
+    on whether ``x`` is writeable or not, as the original ``x`` object is dereferenced
+    as soon as ``xpx.at`` returns; this way there is no risk to accidentally update it
+    twice.
+
+    On the reverse, the anti-pattern below must be avoided, as it will result in
+    different behaviour on read-only versus writeable arrays::
 
         >>> x = xp.asarray([0, 0, 0])
         >>> y = xpx.at(x, 0).set(2)
         >>> z = xpx.at(x, 1).set(3)
 
-    In the above example, ``x == [0, 0, 0]``, ``y == [2, 0, 0]`` and z == ``[0, 3, 0]``
-    when ``x`` is read-only, whereas ``x == y == z == [2, 3, 0]`` when ``x`` is
-    writeable!
+    In the above example, both calls to ``xpx.at`` update ``x`` in place *if possible*.
+    This causes the behaviour to diverge depending on whether ``x`` is writeable or not:
+
+    - If ``x`` is writeable, then after the snippet above you'll have
+      ``x == y == z == [2, 3, 0]``
+    - If ``x`` is read-only, then you'll end up with
+      ``x == [0, 0, 0]``, ``y == [2, 0, 0]`` and ``z == [0, 3, 0]``.
+
+    The correct pattern to use if you want diverging outputs from the same input is
+    to enforce copies::
+
+        >>> x = xp.asarray([0, 0, 0])
+        >>> y = xpx.at(x, 0).set(2, copy=True)  # Never updates x
+        >>> z = xpx.at(x, 1).set(3)  # May or may not update x in place
+        >>> del x  # avoid accidental reuse of x as we don't know its state anymore
 
     (b) The array API standard does not support integer array indices.
     The behaviour of update methods when the index is an array of integers is
@@ -728,7 +773,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             raise ValueError(msg)
 
         if copy not in (True, False, None):
-            msg = f"copy must be True, False, or None; got {copy!r}"  # pyright: ignore[reportUnreachable]
+            msg = f"copy must be True, False, or None; got {copy!r}"
             raise ValueError(msg)
 
         if copy is None:

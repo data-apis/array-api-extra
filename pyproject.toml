@@ -204,12 +204,13 @@ files = ["src", "tests"]
 python_version = "3.10"
 warn_unused_configs = true
 strict = true
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-warn_unreachable = true
+enable_error_code = ["ignore-without-code", "truthy-bool"]
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 # data-apis/array-api#589
 disallow_any_expr = false
+# false positives with input validation
+disable_error_code = ["redundant-expr", "unreachable"]
 
 [[tool.mypy.overrides]]
 module = "array_api_extra.*"
@@ -232,6 +233,8 @@ reportExplicitAny = false
 reportUnknownMemberType = false
 # no array-api-compat type stubs
 reportUnknownVariableType = false
+# false positives for input validation
+reportUnreachable = false
 
 
 # Ruff
