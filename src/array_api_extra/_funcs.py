@@ -596,7 +596,7 @@ def pad(
 
     # make pad_width a list of length-2 tuples of ints
     if isinstance(pad_width, int):
-        pad_width = [(pad_width, pad_width)] * x.ndim
+        pad_width = cast(list[tuple[int, int]], [(pad_width, pad_width)] * x.ndim)
 
     if isinstance(pad_width, tuple):
         pad_width = [pad_width] * x.ndim
@@ -812,7 +812,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             raise ValueError(msg)
 
         if copy not in (True, False, None):
-            msg = f"copy must be True, False, or None; got {copy!r}"  # pyright: ignore[reportUnreachable]
+            msg = f"copy must be True, False, or None; got {copy!r}"
             raise ValueError(msg)
 
         if copy is None:
