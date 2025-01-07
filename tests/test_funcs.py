@@ -426,7 +426,7 @@ class TestPad:
         assert padded.shape == (6, 7)
 
         with pytest.raises(ValueError, match="expect a 2-tuple"):
-            pad(a, [(1, 2, 3)])  # type: ignore[list-item]
+            pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
 
     def test_list_of_tuples_width(self):
         a = xp.reshape(xp.arange(12), (3, 4))

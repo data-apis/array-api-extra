@@ -595,17 +595,17 @@ def pad(
     value = constant_values
 
     # make pad_width a list of length-2 tuples of ints
+    x_ndim = cast(int, x.ndim)
     if isinstance(pad_width, int):
-        pad_width = cast(list[tuple[int, int]], [(pad_width, pad_width)] * x.ndim)
-
+        pad_width = [(pad_width, pad_width)] * x_ndim
     if isinstance(pad_width, tuple):
-        pad_width = [pad_width] * x.ndim
+        pad_width = [pad_width] * x_ndim
 
     if xp is None:
         xp = array_namespace(x)
 
-    slices = []
-    newshape = []
+    slices: list[slice] = []
+    newshape: list[int] = []
     for ax, w_tpl in enumerate(pad_width):
         if len(w_tpl) != 2:
             msg = f"expect a 2-tuple (before, after), got {w_tpl}."
