@@ -117,7 +117,7 @@ def pad(
         pad_width = xp.asarray(pad_width)
         pad_width = xp.broadcast_to(pad_width, (x.ndim, 2))
         pad_width = xp.flip(pad_width, axis=(0,)).flatten()
-        return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)
+        return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     if _delegate(xp, NUMPY, JAX, CUPY):
         return xp.pad(x, pad_width, mode, constant_values=constant_values)
