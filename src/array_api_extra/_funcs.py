@@ -650,7 +650,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     Warnings
     --------
     (a) When you omit the ``copy`` parameter, you should never reuse the parameter
-    array later on; ideally, you should dereference it immediately::
+    array later on; ideally, you should reassign it immediately::
 
         >>> import array_api_extra as xpx
         >>> x = xpx.at(x, 0).set(2)
