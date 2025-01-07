@@ -2469,7 +2469,7 @@ packages:
 - pypi: .
   name: array-api-extra
   version: 0.5.1.dev0
-  sha256: d8083ec4ee363a390f2afd622df56756078ce3ba5f1f67e88867111a2d306b57
+  sha256: d9d3497be732d1746f2506cfdf33f4901c35e010fb0810bf540b8d053a43d203
   requires_dist:
   - array-api-compat>=1.10.0,<2
   - furo>=2023.8.17 ; extra == 'docs'
