@@ -416,3 +416,22 @@ class TestPad:
 
     def test_xp(self):
         assert_array_equal(pad(xp.asarray(0), 1, xp=xp), xp.zeros(3))
+
+    def test_tuple_width(self):
+        a = xp.reshape(xp.arange(12), (3, 4))
+        padded = pad(a, (1, 0))
+        assert padded.shape == (4, 5)
+
+        padded = pad(a, (1, 2))
+        assert padded.shape == (6, 7)
+
+        with pytest.raises(ValueError, match="expect a 2-tuple"):
+            pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
+
+    def test_list_of_tuples_width(self):
+        a = xp.reshape(xp.arange(12), (3, 4))
+        padded = pad(a, [(1, 0), (0, 2)])
+        assert padded.shape == (4, 6)
+
+        padded = pad(a, [(1, 0), (0, 0)])
+        assert padded.shape == (4, 4)
