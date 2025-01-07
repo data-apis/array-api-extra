@@ -673,7 +673,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     - If ``x`` is writeable, then after the snippet above you'll have
       ``x == y == z == [2, 3, 0]``
     - If ``x`` is read-only, then you'll end up with
-      ``x == [0, 0, 0]``, ``y == [2, 0, 0]`` and z == ``[0, 3, 0]``.
+      ``x == [0, 0, 0]``, ``y == [2, 0, 0]`` and ``z == [0, 3, 0]``.
 
     The correct pattern to use if you want diverging outputs from the same input is
     to enforce copies::
