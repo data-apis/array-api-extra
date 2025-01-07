@@ -1,5 +1,6 @@
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
+from enum import Enum
 from importlib import import_module
 from typing import cast
 
@@ -13,31 +14,37 @@ from array_api_compat import (  # type: ignore[import-untyped]  # pyright: ignor
 )
 
 from array_api_extra import at
+from array_api_extra._lib._funcs import _AtOp
 from array_api_extra._lib._utils._typing import Array
 
-all_libraries = (
-    "array_api_strict",
-    "numpy",
-    "numpy_readonly",
-    "cupy",
-    "torch",
-    "dask.array",
-    "sparse",
-    "jax.numpy",
-)
+
+class Library(Enum):
+    ARRAY_API_STRICT = "array_api_strict"
+    NUMPY = "numpy"
+    NUMPY_READONLY = "numpy_readonly"
+    CUPY = "cupy"
+    TORCH = "torch"
+    DASK_ARRAY = "dask.array"
+    SPARSE = "sparse"
+    JAX_NUMPY = "jax.numpy"
+
+    # @override from Python 3.12
+    def __str__(self) -> str:  # type: ignore[explicit-override]  # pyright: ignore[reportImplicitOverride]
+        return self.value
 
 
-@pytest.fixture(params=all_libraries)
+@pytest.fixture(params=tuple(Library))
 def array(request: pytest.FixtureRequest) -> Array:
     library = request.param
-    if library == "numpy_readonly":
+    if library is Library.NUMPY_READONLY:
         x = np.asarray([10.0, 20.0, 30.0])
         x.flags.writeable = False
     else:
+        library_name = library.value
         try:
-            lib = import_module(library)
+            lib = import_module(library_name)
         except ImportError:
-            pytest.skip(f"{library} is not installed")
+            pytest.skip(f"{library_name} is not installed")
         x = lib.asarray([10.0, 20.0, 30.0])
     return x
 
@@ -79,21 +86,21 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
 @pytest.mark.parametrize(
     ("op", "arg", "expect"),
     [
-        ("set", 40.0, [10.0, 40.0, 40.0]),
-        ("add", 40.0, [10.0, 60.0, 70.0]),
-        ("subtract", 100.0, [10.0, -80.0, -70.0]),
-        ("multiply", 2.0, [10.0, 40.0, 60.0]),
-        ("divide", 2.0, [10.0, 10.0, 15.0]),
-        ("power", 2.0, [10.0, 400.0, 900.0]),
-        ("min", 25.0, [10.0, 20.0, 25.0]),
-        ("max", 25.0, [10.0, 25.0, 30.0]),
+        (_AtOp.SET, 40.0, [10.0, 40.0, 40.0]),
+        (_AtOp.ADD, 40.0, [10.0, 60.0, 70.0]),
+        (_AtOp.SUBTRACT, 100.0, [10.0, -80.0, -70.0]),
+        (_AtOp.MULTIPLY, 2.0, [10.0, 40.0, 60.0]),
+        (_AtOp.DIVIDE, 2.0, [10.0, 10.0, 15.0]),
+        (_AtOp.POWER, 2.0, [10.0, 400.0, 900.0]),
+        (_AtOp.MIN, 25.0, [10.0, 20.0, 25.0]),
+        (_AtOp.MAX, 25.0, [10.0, 25.0, 30.0]),
     ],
 )
 def test_update_ops(
     array: Array,
     kwargs: dict[str, bool | None],
     expect_copy: bool | None,
-    op: str,
+    op: _AtOp,
     arg: float,
     expect: list[float],
 ):
@@ -101,7 +108,7 @@ def test_update_ops(
         pytest.skip("at() does not support updates on sparse arrays")
 
     with assert_copy(array, expect_copy):
-        func = cast(Callable[..., Array], getattr(at(array)[1:], op))  # type: ignore[no-any-explicit]
+        func = cast(Callable[..., Array], getattr(at(array)[1:], op.value))  # type: ignore[no-any-explicit]
         y = func(arg, **kwargs)
         assert isinstance(y, type(array))
         assert_array_equal(y, expect)
@@ -141,8 +148,10 @@ def test_alternate_index_syntax():
 
 
 @pytest.mark.parametrize("copy", [True, False])
-@pytest.mark.parametrize("op", ["add", "subtract", "multiply", "divide", "power"])
-def test_iops_incompatible_dtype(op: str, copy: bool):
+@pytest.mark.parametrize(
+    "op", [_AtOp.ADD, _AtOp.SUBTRACT, _AtOp.MULTIPLY, _AtOp.DIVIDE, _AtOp.POWER]
+)
+def test_iops_incompatible_dtype(op: _AtOp, copy: bool):
     """Test that at() replicates the backend's behaviour for
     in-place operations with incompatible dtypes.
 
@@ -155,6 +164,6 @@ def test_iops_incompatible_dtype(op: str, copy: bool):
     to dtype('int64') with casting rule 'same_kind'
     """
     a = np.asarray([2, 4])
-    func = cast(Callable[..., Array], getattr(at(a)[:], op))  # type: ignore[no-any-explicit]
+    func = cast(Callable[..., Array], getattr(at(a)[:], op.value))  # type: ignore[no-any-explicit]
     with pytest.raises(TypeError, match="Cannot cast ufunc"):
         func(1.1, copy=copy)
