@@ -1,7 +1,6 @@
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from enum import Enum
-from importlib import import_module
 from typing import cast
 
 import numpy as np
@@ -40,12 +39,8 @@ def array(request: pytest.FixtureRequest) -> Array:
         x = np.asarray([10.0, 20.0, 30.0])
         x.flags.writeable = False
     else:
-        library_name = library.value
-        try:
-            lib = import_module(library_name)
-        except ImportError:
-            pytest.skip(f"{library_name} is not installed")
-        x = lib.asarray([10.0, 20.0, 30.0])
+        xp = pytest.importorskip(library.value)
+        x = xp.asarray([10.0, 20.0, 30.0])
     return x
 
 
