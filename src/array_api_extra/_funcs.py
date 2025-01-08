@@ -605,7 +605,7 @@ def pad(
     if xp is None:
         xp = array_namespace(x)
 
-    # https://github.com/data-apis/array-api-extra/pull/82#discussion_r1905688819
+    # https://github.com/python/typeshed/issues/13376
     slices: list[slice] = []  # type: ignore[no-any-explicit]
     newshape: list[int] = []
     for ax, w_tpl in enumerate(pad_width):
