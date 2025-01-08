@@ -3,23 +3,35 @@
 # `array-api-compat` to override the import location
 
 try:
-    from ..._array_api_compat_vendor import (  # pyright: ignore[reportMissingImports]
+    from ...._array_api_compat_vendor import (  # pyright: ignore[reportMissingImports]
         array_namespace,
         device,
+        is_cupy_namespace,
         is_jax_array,
+        is_jax_namespace,
+        is_numpy_namespace,
+        is_torch_namespace,
         is_writeable_array,
     )
 except ImportError:
     from array_api_compat import (  # pyright: ignore[reportMissingTypeStubs]
         array_namespace,
         device,
+        is_cupy_namespace,
         is_jax_array,
+        is_jax_namespace,
+        is_numpy_namespace,
+        is_torch_namespace,
         is_writeable_array,
     )
 
 __all__ = [
     "array_namespace",
     "device",
+    "is_cupy_namespace",
     "is_jax_array",
+    "is_jax_namespace",
+    "is_numpy_namespace",
+    "is_torch_namespace",
     "is_writeable_array",
 ]

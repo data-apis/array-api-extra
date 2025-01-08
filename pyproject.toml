@@ -177,7 +177,11 @@ tests-backends = ["py310", "tests", "backends", "cuda-backends"]
 minversion = "6.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
-filterwarnings = ["error"]
+filterwarnings = [
+    "error",
+    # TODO: when Python 3.10 is dropped, use `enum.member` in `_delegation.py`
+    "ignore:functools.partial will be a method descriptor:FutureWarning",
+]
 log_cli_level = "INFO"
 testpaths = ["tests"]
 

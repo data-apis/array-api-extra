@@ -1,1 +1,1 @@
-"""Modules housing private functions."""
+"""Internals of array-api-extra."""
