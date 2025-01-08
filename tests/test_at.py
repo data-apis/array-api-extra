@@ -1,7 +1,6 @@
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from enum import Enum
-from importlib import import_module
 from typing import cast
 
 import numpy as np
