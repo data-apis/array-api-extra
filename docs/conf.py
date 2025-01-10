@@ -53,8 +53,9 @@ myst_enable_extensions = [
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "jax": ("https://jax.readthedocs.io/en/latest", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
     "dask": ("https://docs.dask.org/en/stable", None),
+    "jax": ("https://jax.readthedocs.io/en/latest", None),
 }
 
 nitpick_ignore = [
