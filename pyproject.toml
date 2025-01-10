@@ -113,6 +113,7 @@ furo = ">=2023.08.17"
 myst-parser = ">=0.13"
 sphinx-copybutton = "*"
 sphinx-autodoc-typehints = "*"
+numpy = "*"
 
 [tool.pixi.feature.docs.tasks]
 docs = { cmd = "sphinx-build . build/", cwd = "docs" }

@@ -6,6 +6,7 @@
     :nosignatures:
     :toctree: generated
 
+    apply_numpy_func
     at
     atleast_nd
     cov

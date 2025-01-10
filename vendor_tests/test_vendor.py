@@ -6,13 +6,17 @@ def test_vendor_compat():
     from ._array_api_compat_vendor import (  # type: ignore[attr-defined]
         array_namespace,
         device,
+        is_dask_namespace,
         is_jax_array,
+        is_jax_namespace,
         is_writeable_array,
     )
 
     x = xp.asarray([1, 2, 3])
     assert array_namespace(x) is xp
     device(x)
+    assert not is_dask_namespace(xp)
+    assert not is_jax_namespace(xp)
     assert not is_jax_array(x)
     assert is_writeable_array(x)
 

@@ -1,5 +1,6 @@
 """Extra array functions built on top of the array API standard."""
 
+from ._apply import apply_numpy_func
 from ._funcs import (
     at,
     atleast_nd,
@@ -17,6 +18,7 @@ __version__ = "0.5.1.dev0"
 # pylint: disable=duplicate-code
 __all__ = [
     "__version__",
+    "apply_numpy_func",
     "at",
     "atleast_nd",
     "cov",
