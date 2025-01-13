@@ -214,8 +214,12 @@ def create_diagonal(
         raise ValueError(err_msg)
     n = x.shape[0] + abs(offset)
     diag = xp.zeros(n**2, dtype=x.dtype, device=_compat.device(x))
-    i = offset if offset >= 0 else abs(offset) * n
-    diag[i : min(n * (n - offset), diag.shape[0]) : n + 1] = x
+
+    start = offset if offset >= 0 else abs(offset) * n
+    stop = min(n * (n - offset), diag.shape[0])
+    step = n + 1
+    diag = at(diag)[start:stop:step].set(x)
+
     return xp.reshape(diag, (n, n))
 
 
@@ -407,9 +411,8 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
     result = xp.multiply(a_arr, b_arr)
 
     # Reshape back and return
-    a_shape = xp.asarray(a_shape)
-    b_shape = xp.asarray(b_shape)
-    return xp.reshape(result, tuple(xp.multiply(a_shape, b_shape)))
+    res_shape = tuple(a_s * b_s for a_s, b_s in zip(a_shape, b_shape, strict=True))
+    return xp.reshape(result, res_shape)
 
 
 def setdiff1d(
@@ -632,8 +635,7 @@ def pad(
         dtype=x.dtype,
         device=_compat.device(x),
     )
-    padded[tuple(slices)] = x
-    return padded
+    return at(padded, tuple(slices)).set(x)
 
 
 class _AtOp(Enum):

@@ -1,56 +1,29 @@
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
-from enum import Enum
 from typing import cast
 
 import numpy as np
 import pytest
 from array_api_compat import (  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
     array_namespace,
-    is_dask_array,
     is_pydata_sparse_array,
     is_writeable_array,
 )
 
 from array_api_extra import at
 from array_api_extra._funcs import _AtOp
-from array_api_extra._lib._typing import Array
+from array_api_extra._lib._typing import Array, ModuleType
+from array_api_extra.testing import xp_assert_equal
+
+from .conftest import Library
 
 
-class Library(Enum):
-    ARRAY_API_STRICT = "array_api_strict"
-    NUMPY = "numpy"
-    NUMPY_READONLY = "numpy_readonly"
-    CUPY = "cupy"
-    TORCH = "torch"
-    DASK_ARRAY = "dask.array"
-    SPARSE = "sparse"
-    JAX_NUMPY = "jax.numpy"
-
-    # @override from Python 3.12
-    def __str__(self) -> str:  # type: ignore[explicit-override]  # pyright: ignore[reportImplicitOverride]
-        return self.value
-
-
-@pytest.fixture(params=tuple(Library))
-def array(request: pytest.FixtureRequest) -> Array:
-    library = request.param
-    if library is Library.NUMPY_READONLY:
-        x = np.asarray([10.0, 20.0, 30.0])
+@pytest.fixture
+def array(library: Library, xp: ModuleType) -> Array:
+    x = xp.asarray([10.0, 20.0, 30.0])
+    if library == Library.NUMPY_READONLY:
         x.flags.writeable = False
-    else:
-        xp = pytest.importorskip(library.value)
-        x = xp.asarray([10.0, 20.0, 30.0])
     return x
-
-
-def assert_array_equal(a: Array, b: Array) -> None:
-    xp = array_namespace(a)
-    b = xp.asarray(b)
-    eq = xp.all(a == b)
-    if is_dask_array(a):
-        eq = eq.compute()
-    assert eq
 
 
 @contextmanager
@@ -66,7 +39,7 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
 
     if copy is None:
         copy = not is_writeable_array(array)
-    assert_array_equal(xp.all(array == array_orig), copy)
+    xp_assert_equal(xp.all(array == array_orig), xp.asarray(copy))
 
 
 @pytest.mark.parametrize(
@@ -92,6 +65,7 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
     ],
 )
 def test_update_ops(
+    xp: ModuleType,
     array: Array,
     kwargs: dict[str, bool | None],
     expect_copy: bool | None,
@@ -106,7 +80,7 @@ def test_update_ops(
         func = cast(Callable[..., Array], getattr(at(array)[1:], op.value))  # type: ignore[no-any-explicit]
         y = func(arg, **kwargs)
         assert isinstance(y, type(array))
-        assert_array_equal(y, expect)
+        xp_assert_equal(y, xp.asarray(expect))
 
 
 def test_copy_invalid():
@@ -129,12 +103,12 @@ def test_xp():
 
 def test_alternate_index_syntax():
     a = np.asarray([1, 2, 3])
-    assert_array_equal(at(a, 0).set(4, copy=True), [4, 2, 3])
-    assert_array_equal(at(a)[0].set(4, copy=True), [4, 2, 3])
+    xp_assert_equal(at(a, 0).set(4, copy=True), np.asarray([4, 2, 3]))
+    xp_assert_equal(at(a)[0].set(4, copy=True), np.asarray([4, 2, 3]))
 
     a_at = at(a)
-    assert_array_equal(a_at[0].add(1, copy=True), [2, 2, 3])
-    assert_array_equal(a_at[1].add(2, copy=True), [1, 4, 3])
+    xp_assert_equal(a_at[0].add(1, copy=True), np.asarray([2, 2, 3]))
+    xp_assert_equal(a_at[1].add(2, copy=True), np.asarray([1, 4, 3]))
 
     with pytest.raises(ValueError, match="Index"):
         at(a).set(4)
