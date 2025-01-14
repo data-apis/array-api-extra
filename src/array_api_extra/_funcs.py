@@ -656,7 +656,7 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
 
     Returns
     -------
-    array: Scalar integer array
+    array: 0-dimensional integer array
         The number of unique elements in `x`. It can be lazy.
     """
     if xp is None:
