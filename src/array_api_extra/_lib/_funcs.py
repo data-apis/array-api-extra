@@ -3,6 +3,7 @@
 # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
 
+import math
 import operator
 import warnings
 from collections.abc import Callable
@@ -21,6 +22,7 @@ __all__ = [
     "create_diagonal",
     "expand_dims",
     "kron",
+    "nunique",
     "pad",
     "setdiff1d",
     "sinc",
@@ -210,8 +212,12 @@ def create_diagonal(
         raise ValueError(err_msg)
     n = x.shape[0] + abs(offset)
     diag = xp.zeros(n**2, dtype=x.dtype, device=_compat.device(x))
-    i = offset if offset >= 0 else abs(offset) * n
-    diag[i : min(n * (n - offset), diag.shape[0]) : n + 1] = x
+
+    start = offset if offset >= 0 else abs(offset) * n
+    stop = min(n * (n - offset), diag.shape[0])
+    step = n + 1
+    diag = at(diag)[start:stop:step].set(x)
+
     return xp.reshape(diag, (n, n))
 
 
@@ -403,9 +409,8 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
     result = xp.multiply(a_arr, b_arr)
 
     # Reshape back and return
-    a_shape = xp.asarray(a_shape)
-    b_shape = xp.asarray(b_shape)
-    return xp.reshape(result, tuple(xp.multiply(a_shape, b_shape)))
+    res_shape = tuple(a_s * b_s for a_s, b_s in zip(a_shape, b_shape, strict=True))
+    return xp.reshape(result, res_shape)
 
 
 def setdiff1d(
@@ -565,7 +570,7 @@ def pad(
     if isinstance(pad_width, tuple):
         pad_width = [pad_width] * x_ndim
 
-    # https://github.com/data-apis/array-api-extra/pull/82#discussion_r1905688819
+    # https://github.com/python/typeshed/issues/13376
     slices: list[slice] = []  # type: ignore[no-any-explicit]
     newshape: list[int] = []
     for ax, w_tpl in enumerate(pad_width):
@@ -592,8 +597,43 @@ def pad(
         dtype=x.dtype,
         device=_compat.device(x),
     )
-    padded[tuple(slices)] = x
-    return padded
+    return at(padded, tuple(slices)).set(x)
+
+
+def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
+    """
+    Count the number of unique elements in an array.
+
+    Compatible with JAX and Dask, whose laziness would be otherwise
+    problematic.
+
+    Parameters
+    ----------
+    x : Array
+        Input array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array: 0-dimensional integer array
+        The number of unique elements in `x`. It can be lazy.
+    """
+    if xp is None:
+        xp = array_namespace(x)
+
+    if is_jax_array(x):
+        # size= is JAX-specific
+        # https://github.com/data-apis/array-api/issues/883
+        _, counts = xp.unique_counts(x, size=_compat.size(x))
+        return xp.astype(counts, xp.bool).sum()
+
+    _, counts = xp.unique_counts(x)
+    n = _compat.size(counts)
+    # FIXME https://github.com/data-apis/array-api-compat/pull/231
+    if n is None or math.isnan(n):  # e.g. Dask, ndonnx
+        return xp.astype(counts, xp.bool).sum()
+    return xp.asarray(n, device=_compat.device(x))
 
 
 class _AtOp(Enum):

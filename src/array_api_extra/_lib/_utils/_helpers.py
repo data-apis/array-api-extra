@@ -56,7 +56,9 @@ def in1d(
     order = xp.argsort(ar, stable=True)
     reverse_order = xp.argsort(order, stable=True)
     sar = xp.take(ar, order, axis=0)
-    if sar.size >= 1:
+    ar_size = _compat.size(sar)
+    assert ar_size is not None, "xp.unique*() on lazy backends raises"
+    if ar_size >= 1:
         bool_ar = sar[1:] != sar[:-1] if invert else sar[1:] == sar[:-1]
     else:
         bool_ar = xp.asarray([False]) if invert else xp.asarray([True])

@@ -12,6 +12,7 @@
     create_diagonal
     expand_dims
     kron
+    nunique
     pad
     setdiff1d
     sinc

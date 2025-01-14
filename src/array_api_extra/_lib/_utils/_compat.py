@@ -10,8 +10,10 @@ try:
         is_jax_array,
         is_jax_namespace,
         is_numpy_namespace,
+        is_pydata_sparse_namespace,
         is_torch_namespace,
         is_writeable_array,
+        size,
     )
 except ImportError:
     from array_api_compat import (  # pyright: ignore[reportMissingTypeStubs]
@@ -21,8 +23,10 @@ except ImportError:
         is_jax_array,
         is_jax_namespace,
         is_numpy_namespace,
+        is_pydata_sparse_namespace,
         is_torch_namespace,
         is_writeable_array,
+        size,
     )
 
 __all__ = [
@@ -32,6 +36,8 @@ __all__ = [
     "is_jax_array",
     "is_jax_namespace",
     "is_numpy_namespace",
+    "is_pydata_sparse_namespace",
     "is_torch_namespace",
     "is_writeable_array",
+    "size",
 ]

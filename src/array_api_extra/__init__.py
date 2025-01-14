@@ -8,6 +8,7 @@ from ._lib._funcs import (
     create_diagonal,
     expand_dims,
     kron,
+    nunique,
     setdiff1d,
     sinc,
 )
@@ -23,6 +24,7 @@ __all__ = [
     "create_diagonal",
     "expand_dims",
     "kron",
+    "nunique",
     "pad",
     "setdiff1d",
     "sinc",
