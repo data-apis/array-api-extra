@@ -180,7 +180,7 @@ xfail_strict = true
 filterwarnings = ["error"]
 log_cli_level = "INFO"
 testpaths = ["tests"]
-
+markers = ["skip_xp_backend(library, *, reason=None): Skip test for a specific backend"]
 
 # Coverage
 
@@ -315,6 +315,7 @@ checks = [
 exclude = [ # don't report on objects that match any of these regex
     '.*test_at.*',
     '.*test_funcs.*',
+    '.*test_testing.*',
     '.*test_utils.*',
     '.*test_version.*',
     '.*test_vendor.*',
