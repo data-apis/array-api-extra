@@ -11,6 +11,7 @@ from array_api_extra import (
     create_diagonal,
     expand_dims,
     kron,
+    nunique,
     pad,
     setdiff1d,
     sinc,
@@ -448,3 +449,21 @@ class TestPad:
 
         padded = pad(a, [(1, 0), (0, 0)])
         assert padded.shape == (4, 4)
+
+
+class TestNUnique:
+    def test_simple(self, xp: ModuleType):
+        a = xp.asarray([[1, 1], [0, 2], [2, 2]])
+        xp_assert_equal(nunique(a), xp.asarray(3))
+
+    def test_empty(self, xp: ModuleType):
+        a = xp.asarray([])
+        xp_assert_equal(nunique(a), xp.asarray(0))
+
+    def test_device(self, xp: ModuleType, device: Device):
+        a = xp.asarray(0.0, device=device)
+        assert get_device(nunique(a)) == device
+
+    def test_xp(self, xp: ModuleType):
+        a = xp.asarray([[1, 1], [0, 2], [2, 2]])
+        xp_assert_equal(nunique(a, xp=xp), xp.asarray(3))
