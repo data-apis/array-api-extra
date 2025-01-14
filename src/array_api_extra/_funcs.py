@@ -14,10 +14,8 @@ from typing import ClassVar, cast
 from ._lib import _compat, _utils
 from ._lib._compat import (
     array_namespace,
-    device,
     is_jax_array,
     is_writeable_array,
-    size,
 )
 from ._lib._typing import Array, Index
 
@@ -667,15 +665,15 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
     if is_jax_array(x):
         # size= is JAX-specific
         # https://github.com/data-apis/array-api/issues/883
-        _, counts = xp.unique_counts(x, size=size(x))
+        _, counts = xp.unique_counts(x, size=_compat.size(x))
         return xp.astype(counts, xp.bool).sum()
 
     _, counts = xp.unique_counts(x)
-    n = size(counts)
+    n = _compat.size(counts)
     # FIXME https://github.com/data-apis/array-api-compat/pull/231
     if n is None or math.isnan(n):  # e.g. Dask, ndonnx
         return xp.astype(counts, xp.bool).sum()
-    return xp.asarray(n, device=device(x))
+    return xp.asarray(n, device=_compat.device(x))
 
 
 class _AtOp(Enum):
