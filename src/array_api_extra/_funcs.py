@@ -3,6 +3,7 @@
 # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
 
+import math
 import operator
 import warnings
 from collections.abc import Callable
@@ -13,8 +14,10 @@ from typing import ClassVar, cast
 from ._lib import _compat, _utils
 from ._lib._compat import (
     array_namespace,
+    device,
     is_jax_array,
     is_writeable_array,
+    size,
 )
 from ._lib._typing import Array, Index
 
@@ -25,6 +28,7 @@ __all__ = [
     "create_diagonal",
     "expand_dims",
     "kron",
+    "nunique",
     "pad",
     "setdiff1d",
     "sinc",
@@ -636,6 +640,42 @@ def pad(
         device=_compat.device(x),
     )
     return at(padded, tuple(slices)).set(x)
+
+
+def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
+    """
+    Count the number of unique elements in an array.
+
+    Compatible with JAX and Dask, whose laziness would be otherwise
+    problematic.
+
+    Parameters
+    ----------
+    x : Array
+        Input array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array: Scalar integer array
+        The number of unique elements in `x`. It can be lazy.
+    """
+    if xp is None:
+        xp = array_namespace(x)
+
+    if is_jax_array(x):
+        # size= is JAX-specific
+        # https://github.com/data-apis/array-api/issues/883
+        _, counts = xp.unique_counts(x, size=size(x))
+        return xp.astype(counts, xp.bool).sum()
+
+    _, counts = xp.unique_counts(x)
+    n = size(counts)
+    # FIXME https://github.com/data-apis/array-api-compat/pull/231
+    if n is None or math.isnan(n):  # e.g. Dask, ndonnx
+        return xp.astype(counts, xp.bool).sum()
+    return xp.asarray(n, device=device(x))
 
 
 class _AtOp(Enum):
