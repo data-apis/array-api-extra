@@ -16,8 +16,8 @@ from array_api_extra import (
     sinc,
 )
 from array_api_extra._lib._compat import device as get_device
+from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._typing import Array, Device, ModuleType
-from array_api_extra.testing import xp_assert_close, xp_assert_equal
 
 from .conftest import Library
 

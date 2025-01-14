@@ -1,12 +1,16 @@
-"""Testing utilities."""
+"""
+Testing utilities.
 
-from ._lib._compat import (
+Note that this is private API; don't expect it to be stable.
+"""
+
+from ._compat import (
     array_namespace,
     is_cupy_namespace,
     is_pydata_sparse_namespace,
     is_torch_namespace,
 )
-from ._lib._typing import Array, ModuleType
+from ._typing import Array, ModuleType
 
 __all__ = ["xp_assert_close", "xp_assert_equal"]
 

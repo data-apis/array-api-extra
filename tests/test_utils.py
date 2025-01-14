@@ -2,9 +2,9 @@ import numpy as np
 import pytest
 
 from array_api_extra._lib._compat import device as get_device
+from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._typing import Array, Device, ModuleType
 from array_api_extra._lib._utils import in1d
-from array_api_extra.testing import xp_assert_equal
 
 from .conftest import Library
 

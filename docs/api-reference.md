@@ -15,15 +15,3 @@
     setdiff1d
     sinc
 ```
-
-## Test tools
-
-```{eval-rst}
-.. currentmodule:: array_api_extra.testing
-.. autosummary::
-    :nosignatures:
-    :toctree: generated
-
-    xp_assert_equal
-    xp_assert_close
-```

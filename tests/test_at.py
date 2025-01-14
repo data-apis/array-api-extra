@@ -12,8 +12,8 @@ from array_api_compat import (  # type: ignore[import-untyped]  # pyright: ignor
 
 from array_api_extra import at
 from array_api_extra._funcs import _AtOp
+from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._typing import Array, ModuleType
-from array_api_extra.testing import xp_assert_equal
 
 from .conftest import Library
 

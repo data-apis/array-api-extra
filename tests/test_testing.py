@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from array_api_extra.testing import xp_assert_close, xp_assert_equal
+from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 
 from .conftest import Library
 
