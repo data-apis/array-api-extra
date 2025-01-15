@@ -144,27 +144,34 @@ sparse = ">=0.15"
 jax = "*"
 
 [tool.pixi.feature.backends.target.win-64.dependencies]
-# pytorch = "*"  # Package unavailable on Windows
+pytorch = "*"
 dask = "*"
 sparse = ">=0.15"
-# jax = "*"  # Package unavailable on Windows
+# jax = "*"  # unavailable
 
 # Backends that require a GPU host and a CUDA driver
+[tool.pixi.feature.cuda-backends]
+system-requirements = { cuda = "12" }
+
 [tool.pixi.feature.cuda-backends.target.linux-64.dependencies]
 cupy = "*"
+jaxlib = { version = "*", build = "cuda12*" }
 
 [tool.pixi.feature.cuda-backends.target.osx-arm64.dependencies]
-# cupy = "*"  # Package unavailable on macOSX
+# cupy = "*"  # unavailable
+# jaxlib = { version = "*", build = "cuda12*" }  # unavailable
 
 [tool.pixi.feature.cuda-backends.target.win-64.dependencies]
 cupy = "*"
+# jaxlib = { version = "*", build = "cuda12*" }  # unavailable
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
 lint = { features = ["lint"], solve-group = "default" }
 tests = { features = ["tests"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
-dev = { features = ["lint", "tests", "docs", "dev"], solve-group = "default" }
+dev = { features = ["lint", "tests", "docs", "dev", "backends"], solve-group = "default" }
+dev-cuda = { features = ["lint", "tests", "docs", "dev", "backends", "cuda-backends"] }
 ci-py310 = ["py310", "tests"]
 ci-py313 = ["py313", "tests"]
 # CUDA not available on free github actions
