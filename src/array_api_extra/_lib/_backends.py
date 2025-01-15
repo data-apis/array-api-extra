@@ -1,4 +1,4 @@
-"""Code specifying libraries array-api-extra interacts with."""
+"""Backends with which array-api-extra interacts."""
 
 from collections.abc import Callable
 from enum import Enum
