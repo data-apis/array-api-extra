@@ -34,7 +34,7 @@ Used by:
 
 - [SciPy](https://github.com/scipy/scipy) - Fundamental algorithms for
   scientific computing.
-- ...
+- _your library? Let us know!_
 
 ## Contributors
 
