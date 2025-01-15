@@ -46,12 +46,16 @@ class NumPyReadOnly:
     """
     Variant of array_api_compat.numpy producing read-only arrays.
 
+    Read-only numpy arrays fail on `__iadd__` etc., whereas read-only libraries such as
+    JAX and Sparse simply don't define those methods, which makes calls to `+=` fall
+    back to `__add__`.
+
     Note that this is not a full read-only Array API library. Notably,
-    array_namespace(x) returns array_api_compat.numpy, and as a consequence array
-    creation functions invoked internally by the tested functions will return
-    writeable arrays, as long as you don't explicitly pass xp=xp.
-    For this reason, tests that do pass xp=xp may misbehave and should be skipped
-    for NUMPY_READONLY.
+    `array_namespace(x)` returns array_api_compat.numpy. This is actually the desired
+    behaviour, so that when a tested function internally calls `xp =
+    array_namespace(*args) or xp`, it will internally create writeable arrays.
+    For this reason, tests that explicitly pass xp=xp to the tested functions may
+    misbehave and should be skipped for NUMPY_READONLY.
     """
 
     def __getattr__(self, name: str) -> object:  # numpydoc ignore=PR01,RT01
