@@ -3,12 +3,11 @@ from types import ModuleType
 import numpy as np
 import pytest
 
+from array_api_extra._lib import Library
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._helpers import in1d
 from array_api_extra._lib._utils._typing import Array, Device
-
-from .conftest import Library
 
 # mypy: disable-error-code=no-untyped-usage
 

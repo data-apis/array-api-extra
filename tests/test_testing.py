@@ -1,9 +1,8 @@
 import numpy as np
 import pytest
 
+from array_api_extra._lib import Library
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
-
-from .conftest import Library
 
 # mypy: disable-error-code=no-any-decorated
 # pyright: reportUnknownParameterType=false,reportMissingParameterType=false

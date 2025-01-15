@@ -1,58 +1,15 @@
 """Delegation to existing implementations for Public API Functions."""
 
-import functools
-from enum import Enum
 from types import ModuleType
-from typing import final
 
-from ._lib import _funcs
-from ._lib._utils._compat import (
-    array_namespace,
-    is_cupy_namespace,
-    is_jax_namespace,
-    is_numpy_namespace,
-    is_torch_namespace,
-)
+from ._lib import Library, _funcs
+from ._lib._utils._compat import array_namespace
 from ._lib._utils._typing import Array
 
 __all__ = ["pad"]
 
 
-@final
-class IsNamespace(Enum):
-    """Enum to access is_namespace functions as the backend."""
-
-    # TODO: when Python 3.10 is dropped, use `enum.member`
-    # https://stackoverflow.com/a/74302109
-    CUPY = functools.partial(is_cupy_namespace)
-    JAX = functools.partial(is_jax_namespace)
-    NUMPY = functools.partial(is_numpy_namespace)
-    TORCH = functools.partial(is_torch_namespace)
-
-    def __call__(self, xp: ModuleType) -> bool:
-        """
-        Call the is_namespace function.
-
-        Parameters
-        ----------
-        xp : array_namespace
-            Array namespace to check.
-
-        Returns
-        -------
-        bool
-            ``True`` if xp matches the namespace, ``False`` otherwise.
-        """
-        return self.value(xp)
-
-
-CUPY = IsNamespace.CUPY
-JAX = IsNamespace.JAX
-NUMPY = IsNamespace.NUMPY
-TORCH = IsNamespace.TORCH
-
-
-def _delegate(xp: ModuleType, *backends: IsNamespace) -> bool:
+def _delegate(xp: ModuleType, *backends: Library) -> bool:
     """
     Check whether `xp` is one of the `backends` to delegate to.
 
@@ -68,7 +25,7 @@ def _delegate(xp: ModuleType, *backends: IsNamespace) -> bool:
     bool
         ``True`` if `xp` matches one of the `backends`, ``False`` otherwise.
     """
-    return any(is_namespace(xp) for is_namespace in backends)
+    return any(backend.is_namespace(xp) for backend in backends)
 
 
 def pad(
@@ -113,13 +70,13 @@ def pad(
         raise NotImplementedError(msg)
 
     # https://github.com/pytorch/pytorch/blob/cf76c05b4dc629ac989d1fb8e789d4fac04a095a/torch/_numpy/_funcs_impl.py#L2045-L2056
-    if _delegate(xp, TORCH):
+    if _delegate(xp, Library.TORCH):
         pad_width = xp.asarray(pad_width)
         pad_width = xp.broadcast_to(pad_width, (x.ndim, 2))
         pad_width = xp.flip(pad_width, axis=(0,)).flatten()
         return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
-    if _delegate(xp, NUMPY, JAX, CUPY):
+    if _delegate(xp, Library.NUMPY, Library.JAX_NUMPY, Library.CUPY):
         return xp.pad(x, pad_width, mode, constant_values=constant_values)
 
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)

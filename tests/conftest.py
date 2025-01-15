@@ -1,31 +1,14 @@
 """Pytest fixtures."""
 
-from enum import Enum
 from types import ModuleType
 from typing import cast
 
 import pytest
 
+from array_api_extra._lib import Library
 from array_api_extra._lib._utils._compat import array_namespace
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._typing import Device
-
-
-class Library(Enum):
-    """All array libraries explicitly tested by array-api-extra."""
-
-    ARRAY_API_STRICT = "array_api_strict"
-    NUMPY = "numpy"
-    NUMPY_READONLY = "numpy_readonly"
-    CUPY = "cupy"
-    TORCH = "torch"
-    DASK_ARRAY = "dask.array"
-    SPARSE = "sparse"
-    JAX_NUMPY = "jax.numpy"
-
-    def __str__(self) -> str:  # type: ignore[explicit-override]  # pyright: ignore[reportImplicitOverride]  # numpydoc ignore=RT01
-        """Pretty-print parameterized test names."""
-        return self.value
 
 
 @pytest.fixture(params=tuple(Library))
@@ -60,8 +43,7 @@ def xp(library: Library) -> ModuleType:  # numpydoc ignore=PR01,RT03
     -------
     The current array namespace.
     """
-    name = "numpy" if library == Library.NUMPY_READONLY else library.value
-    xp = pytest.importorskip(name)
+    xp = pytest.importorskip(library.module_name)
     if library == Library.JAX_NUMPY:
         import jax  # type: ignore[import-not-found]  # pyright: ignore[reportMissingImports]
 
