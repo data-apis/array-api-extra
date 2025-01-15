@@ -171,7 +171,7 @@ lint = { features = ["lint"], solve-group = "default" }
 tests = { features = ["tests"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
 dev = { features = ["lint", "tests", "docs", "dev", "backends"], solve-group = "default" }
-dev-cuda = { features = ["lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "default" }
+dev-cuda = { features = ["lint", "tests", "docs", "dev", "backends", "cuda-backends"] }
 ci-py310 = ["py310", "tests"]
 ci-py313 = ["py313", "tests"]
 # CUDA not available on free github actions
