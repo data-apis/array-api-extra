@@ -421,7 +421,7 @@ class TestPad:
     def test_mode_not_implemented(self, xp: ModuleType):
         a = xp.arange(3)
         with pytest.raises(NotImplementedError, match="Only `'constant'`"):
-            pad(a, 2, mode="edge")  # type: ignore[arg-type]
+            pad(a, 2, mode="edge")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     def test_device(self, xp: ModuleType, device: Device):
         a = xp.asarray(0.0, device=device)
