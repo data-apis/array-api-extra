@@ -20,7 +20,7 @@ def test_vendor_compat():
     assert array_namespace(x) is xp
     device(x)
     assert not is_cupy_namespace(xp)
-    assert not is_dask_namespace(xp)    
+    assert not is_dask_namespace(xp)
     assert not is_jax_array(x)
     assert not is_jax_namespace(xp)
     assert not is_pydata_sparse_namespace(xp)
