@@ -69,12 +69,8 @@ class NumPyReadOnly:
     def _wrap(func: Callable[P, T]) -> Callable[P, T]:  # numpydoc ignore=PR01,RT01
         """Wrap func to make all np.ndarrays it returns read-only."""
 
-        def as_readonly(o: T, seen: set[int]) -> T:  # numpydoc ignore=PR01,RT01
+        def as_readonly(o: T) -> T:  # numpydoc ignore=PR01,RT01
             """Unset the writeable flag in o."""
-            if id(o) in seen:
-                return o
-            seen.add(id(o))
-
             try:
                 # Don't use is_numpy_array(o), as it includes np.generic
                 if isinstance(o, np.ndarray):
@@ -85,13 +81,13 @@ class NumPyReadOnly:
 
             # This works with namedtuples too
             if isinstance(o, tuple | list):
-                return type(o)(*(as_readonly(i, seen) for i in o))  # type: ignore[arg-type,return-value] # pyright: ignore[reportArgumentType,reportUnknownArgumentType]
+                return type(o)(*(as_readonly(i) for i in o))  # type: ignore[arg-type,return-value] # pyright: ignore[reportArgumentType,reportUnknownArgumentType]
 
             return o
 
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:  # numpydoc ignore=GL08
-            return as_readonly(func(*args, **kwargs), seen=set())
+            return as_readonly(func(*args, **kwargs))
 
         return wrapper
 
