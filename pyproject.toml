@@ -144,7 +144,7 @@ sparse = ">=0.15"
 jax = "*"
 
 [tool.pixi.feature.backends.target.win-64.dependencies]
-# pytorch = "*"  # unavailable
+pytorch = "*"
 dask = "*"
 sparse = ">=0.15"
 # jax = "*"  # unavailable
