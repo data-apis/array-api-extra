@@ -31,7 +31,7 @@ def _delegate(xp: ModuleType, *backends: Backend) -> bool:
 def pad(
     x: Array,
     pad_width: int | tuple[int, int] | list[tuple[int, int]],
-    mode: str = "constant",
+    mode: Literal["constant"] = "constant",
     *,
     constant_values: bool | int | float | complex = 0,
     xp: ModuleType | None = None,
