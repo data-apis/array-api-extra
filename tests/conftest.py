@@ -1,13 +1,23 @@
 """Pytest fixtures."""
 
-from enum import Enum
-from typing import cast
+from __future__ import annotations
 
+from collections.abc import Callable
+from enum import Enum
+from functools import wraps
+from typing import ParamSpec, TypeVar, cast
+
+import numpy as np
 import pytest
 
 from array_api_extra._lib._compat import array_namespace
 from array_api_extra._lib._compat import device as get_device
 from array_api_extra._lib._typing import Device, ModuleType
+
+T = TypeVar("T")
+P = ParamSpec("P")
+
+np_compat = array_namespace(np.empty(0))
 
 
 class Library(Enum):
@@ -50,6 +60,56 @@ def library(request: pytest.FixtureRequest) -> Library:  # numpydoc ignore=PR01,
     return elem
 
 
+class NumPyReadOnly:
+    """
+    Variant of array_api_compat.numpy producing read-only arrays.
+
+    Note that this is not a full read-only Array API library. Notably,
+    array_namespace(x) returns array_api_compat.numpy, and as a consequence array
+    creation functions invoked internally by the tested functions will return
+    writeable arrays, as long as you don't explicitly pass xp=xp.
+    For this reason, tests that do pass xp=xp may misbehave and should be skipped
+    for NUMPY_READONLY.
+    """
+
+    def __getattr__(self, name: str) -> object:  # numpydoc ignore=PR01,RT01
+        """Wrap all functions that return arrays to make their output read-only."""
+        func = getattr(np_compat, name)
+        if not callable(func) or isinstance(func, type):
+            return func
+        return self._wrap(func)
+
+    @staticmethod
+    def _wrap(func: Callable[P, T]) -> Callable[P, T]:  # numpydoc ignore=PR01,RT01
+        """Wrap func to make all np.ndarrays it returns read-only."""
+
+        def as_readonly(o: T, seen: set[int]) -> T:  # numpydoc ignore=PR01,RT01
+            """Unset the writeable flag in o."""
+            if id(o) in seen:
+                return o
+            seen.add(id(o))
+
+            try:
+                # Don't use is_numpy_array(o), as it includes np.generic
+                if isinstance(o, np.ndarray):
+                    o.flags.writeable = False
+            except TypeError:
+                # Cannot interpret as a data type
+                return o
+
+            # This works with namedtuples too
+            if isinstance(o, tuple | list):
+                return type(o)(*(as_readonly(i, seen) for i in o))  # type: ignore[arg-type,return-value] # pyright: ignore[reportArgumentType,reportUnknownArgumentType]
+
+            return o
+
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:  # numpydoc ignore=GL08
+            return as_readonly(func(*args, **kwargs), seen=set())
+
+        return wrapper
+
+
 @pytest.fixture
 def xp(library: Library) -> ModuleType:  # numpydoc ignore=PR01,RT03
     """
@@ -59,8 +119,9 @@ def xp(library: Library) -> ModuleType:  # numpydoc ignore=PR01,RT03
     -------
     The current array namespace.
     """
-    name = "numpy" if library == Library.NUMPY_READONLY else library.value
-    xp = pytest.importorskip(name)
+    if library == Library.NUMPY_READONLY:
+        return NumPyReadOnly()  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
+    xp = pytest.importorskip(library.value)
     if library == Library.JAX_NUMPY:
         import jax  # type: ignore[import-not-found]  # pyright: ignore[reportMissingImports]
 
