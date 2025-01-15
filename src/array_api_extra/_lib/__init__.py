@@ -1,5 +1,5 @@
 """Internals of array-api-extra."""
 
-from ._libraries import Library
+from ._backends import Backend
 
-__all__ = ["Library"]
+__all__ = ["Backend"]

@@ -2,14 +2,14 @@
 
 from types import ModuleType
 
-from ._lib import Library, _funcs
+from ._lib import Backend, _funcs
 from ._lib._utils._compat import array_namespace
 from ._lib._utils._typing import Array
 
 __all__ = ["pad"]
 
 
-def _delegate(xp: ModuleType, *backends: Library) -> bool:
+def _delegate(xp: ModuleType, *backends: Backend) -> bool:
     """
     Check whether `xp` is one of the `backends` to delegate to.
 
@@ -70,13 +70,13 @@ def pad(
         raise NotImplementedError(msg)
 
     # https://github.com/pytorch/pytorch/blob/cf76c05b4dc629ac989d1fb8e789d4fac04a095a/torch/_numpy/_funcs_impl.py#L2045-L2056
-    if _delegate(xp, Library.TORCH):
+    if _delegate(xp, Backend.TORCH):
         pad_width = xp.asarray(pad_width)
         pad_width = xp.broadcast_to(pad_width, (x.ndim, 2))
         pad_width = xp.flip(pad_width, axis=(0,)).flatten()
         return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
-    if _delegate(xp, Library.NUMPY, Library.JAX_NUMPY, Library.CUPY):
+    if _delegate(xp, Backend.NUMPY, Backend.JAX_NUMPY, Backend.CUPY):
         return xp.pad(x, pad_width, mode, constant_values=constant_values)
 
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)

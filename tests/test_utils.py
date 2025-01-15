@@ -3,7 +3,7 @@ from types import ModuleType
 import numpy as np
 import pytest
 
-from array_api_extra._lib import Library
+from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._helpers import in1d
@@ -13,8 +13,8 @@ from array_api_extra._lib._utils._typing import Array, Device
 
 
 class TestIn1D:
-    @pytest.mark.skip_xp_backend(Library.DASK_ARRAY, reason="no argsort")
-    @pytest.mark.skip_xp_backend(Library.SPARSE, reason="no unique_inverse, no device")
+    @pytest.mark.skip_xp_backend(Backend.DASK_ARRAY, reason="no argsort")
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no unique_inverse, no device")
     # cover both code paths
     @pytest.mark.parametrize("x2", [np.arange(9), np.arange(15)])
     def test_no_invert_assume_unique(self, xp: ModuleType, x2: Array):
@@ -24,13 +24,13 @@ class TestIn1D:
         actual = in1d(x1, x2)
         xp_assert_equal(actual, expected)
 
-    @pytest.mark.skip_xp_backend(Library.SPARSE, reason="no device")
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no device")
     def test_device(self, xp: ModuleType, device: Device):
         x1 = xp.asarray([3, 8, 20], device=device)
         x2 = xp.asarray([2, 3, 4], device=device)
         assert get_device(in1d(x1, x2)) == device
 
-    @pytest.mark.skip_xp_backend(Library.SPARSE, reason="no arange, no device")
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no arange, no device")
     def test_xp(self, xp: ModuleType):
         x1 = xp.asarray([1, 6])
         x2 = xp.arange(5)

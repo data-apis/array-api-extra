@@ -9,6 +9,7 @@ environments:
       linux-64:
       - conda: https://prefix.dev/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-2_kmp_llvm.tar.bz2
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/aws-c-auth-0.8.0-h205f482_16.conda
@@ -190,6 +191,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/zstd-1.5.6-ha6fb4c9_0.conda
       - pypi: .
       osx-arm64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/aws-c-auth-0.8.0-hfc2798a_16.conda
@@ -363,6 +365,7 @@ environments:
       - pypi: .
       win-64:
       - conda: https://prefix.dev/conda-forge/win-64/_openmp_mutex-4.5-2_gnu.conda
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/aws-c-auth-0.8.0-hd11252f_16.conda
@@ -515,6 +518,7 @@ environments:
       linux-64:
       - conda: https://prefix.dev/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-2_gnu.tar.bz2
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/bzip2-1.0.8-h4bc722e_7.conda
@@ -557,6 +561,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/tzdata-2024b-hc8b5060_0.conda
       - pypi: .
       osx-arm64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/bzip2-1.0.8-h99b78c6_7.conda
@@ -593,6 +598,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/tzdata-2024b-hc8b5060_0.conda
       - pypi: .
       win-64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/bzip2-1.0.8-h2466b09_7.conda
@@ -641,6 +647,7 @@ environments:
       linux-64:
       - conda: https://prefix.dev/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-2_gnu.tar.bz2
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/bzip2-1.0.8-h4bc722e_7.conda
@@ -683,6 +690,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/tzdata-2024b-hc8b5060_0.conda
       - pypi: .
       osx-arm64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/bzip2-1.0.8-h99b78c6_7.conda
@@ -721,6 +729,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/tzdata-2024b-hc8b5060_0.conda
       - pypi: .
       win-64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/bzip2-1.0.8-h2466b09_7.conda
@@ -771,6 +780,7 @@ environments:
       linux-64:
       - conda: https://prefix.dev/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-2_gnu.tar.bz2
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/bzip2-1.0.8-h4bc722e_7.conda
       - conda: https://prefix.dev/conda-forge/linux-64/ca-certificates-2024.12.14-hbcca054_0.conda
@@ -794,6 +804,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/tzdata-2024b-hc8b5060_0.conda
       - pypi: .
       osx-arm64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/bzip2-1.0.8-h99b78c6_7.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/ca-certificates-2024.12.14-hf0a4a13_0.conda
@@ -812,6 +823,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/tzdata-2024b-hc8b5060_0.conda
       - pypi: .
       win-64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/bzip2-1.0.8-h2466b09_7.conda
       - conda: https://prefix.dev/conda-forge/win-64/ca-certificates-2024.12.14-h56e8100_0.conda
@@ -840,6 +852,7 @@ environments:
       linux-64:
       - conda: https://prefix.dev/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-2_gnu.tar.bz2
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/alabaster-1.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
@@ -969,6 +982,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/zstd-1.5.6-ha6fb4c9_0.conda
       - pypi: .
       osx-arm64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/alabaster-1.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
@@ -1093,6 +1107,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/zstd-1.5.6-hb46c0d2_0.conda
       - pypi: .
       win-64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/alabaster-1.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
@@ -1225,6 +1240,7 @@ environments:
       linux-64:
       - conda: https://prefix.dev/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-2_gnu.tar.bz2
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/alabaster-1.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/babel-2.16.0-pyhd8ed1ab_1.conda
@@ -1295,6 +1311,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/zstd-1.5.6-ha6fb4c9_0.conda
       - pypi: .
       osx-arm64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/alabaster-1.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/babel-2.16.0-pyhd8ed1ab_1.conda
@@ -1359,6 +1376,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/zstd-1.5.6-hb46c0d2_0.conda
       - pypi: .
       win-64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/alabaster-1.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/babel-2.16.0-pyhd8ed1ab_1.conda
@@ -1433,6 +1451,7 @@ environments:
       linux-64:
       - conda: https://prefix.dev/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-2_gnu.tar.bz2
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/alabaster-1.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
@@ -1534,6 +1553,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/zstd-1.5.6-ha6fb4c9_0.conda
       - pypi: .
       osx-arm64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/alabaster-1.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
@@ -1630,6 +1650,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/zstd-1.5.6-hb46c0d2_0.conda
       - pypi: .
       win-64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/alabaster-1.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
@@ -1736,6 +1757,7 @@ environments:
       linux-64:
       - conda: https://prefix.dev/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-2_gnu.tar.bz2
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/bzip2-1.0.8-h4bc722e_7.conda
@@ -1778,6 +1800,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/tzdata-2024b-hc8b5060_0.conda
       - pypi: .
       osx-arm64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/bzip2-1.0.8-h99b78c6_7.conda
@@ -1816,6 +1839,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/tzdata-2024b-hc8b5060_0.conda
       - pypi: .
       win-64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/bzip2-1.0.8-h2466b09_7.conda
@@ -1866,6 +1890,7 @@ environments:
       linux-64:
       - conda: https://prefix.dev/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-2_kmp_llvm.tar.bz2
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/aws-c-auth-0.8.0-h205f482_16.conda
@@ -2062,6 +2087,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/zstd-1.5.6-ha6fb4c9_0.conda
       - pypi: .
       osx-arm64:
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/aws-c-auth-0.8.0-hfc2798a_16.conda
@@ -2235,6 +2261,7 @@ environments:
       - pypi: .
       win-64:
       - conda: https://prefix.dev/conda-forge/win-64/_openmp_mutex-4.5-2_gnu.conda
+      - conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-compat-1.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/aws-c-auth-0.8.0-hd11252f_16.conda
@@ -2442,6 +2469,17 @@ packages:
   purls: []
   size: 49468
   timestamp: 1718213032772
+- conda: https://prefix.dev/conda-forge/noarch/aenum-3.1.15-pyhd8ed1ab_1.conda
+  sha256: 969b3eecb27ad94cfa61256ec46b63bedf64005caa4fc550e195f8c0e9c28e91
+  md5: b4aee7f46cb6804e46f6ff0b0256e782
+  depends:
+  - python >=3.9
+  license: BSD-3-Clause
+  license_family: BSD
+  purls:
+  - pkg:pypi/aenum?source=hash-mapping
+  size: 105264
+  timestamp: 1734358382625
 - conda: https://prefix.dev/conda-forge/noarch/alabaster-1.0.0-pyhd8ed1ab_1.conda
   sha256: 6c4456a138919dae9edd3ac1a74b6fbe5fd66c05675f54df2f8ab8c8d0cc6cea
   md5: 1fd9696649f65fd6611fcdb4ffec738a
@@ -2467,7 +2505,7 @@ packages:
 - pypi: .
   name: array-api-extra
   version: 0.5.1.dev0
-  sha256: 4ec1183114a670b9c9b9b351826c962ad92ab470b1914a163e4a5ed02d0e04a0
+  sha256: b1ad0e85422d0758a047455236680f845386243f0e8b15524c39100a61774968
   requires_dist:
   - array-api-compat>=1.10.0,<2
   - furo>=2023.8.17 ; extra == 'docs'
