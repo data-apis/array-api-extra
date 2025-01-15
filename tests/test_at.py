@@ -1,5 +1,6 @@
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
+from types import ModuleType
 from typing import cast
 
 import numpy as np
@@ -10,11 +11,10 @@ from array_api_compat import (  # type: ignore[import-untyped]  # pyright: ignor
 )
 
 from array_api_extra import at
-from array_api_extra._funcs import _AtOp
+from array_api_extra._lib import Backend
+from array_api_extra._lib._funcs import _AtOp
 from array_api_extra._lib._testing import xp_assert_equal
-from array_api_extra._lib._typing import Array, ModuleType
-
-from .conftest import Library
+from array_api_extra._lib._utils._typing import Array
 
 
 @contextmanager
@@ -34,7 +34,7 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
 
 
 @pytest.mark.skip_xp_backend(
-    Library.SPARSE, reason="read-only library without .at support"
+    Backend.SPARSE, reason="read-only backend without .at support"
 )
 @pytest.mark.parametrize(
     ("kwargs", "expect_copy"),

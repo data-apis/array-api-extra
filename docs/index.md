@@ -10,7 +10,8 @@ contributors.md
 ```
 
 This is a library housing "array-agnostic" implementations of functions built on
-top of [the Python array API standard](https://data-apis.org/array-api/).
+top of [the Python array API standard](https://data-apis.org/array-api/), as
+well as delegation to existing implementations for known array library backends.
 
 The intended users of this library are "array-consuming" libraries which are
 using [array-api-compat](https://data-apis.org/array-api-compat/) to make their
@@ -23,7 +24,7 @@ It is currently used by:
 
 - [SciPy](https://github.com/scipy/scipy) - Fundamental algorithms for
   scientific computing.
-- ...
+- _your library? Let us know!_
 
 (installation)=
 
@@ -33,6 +34,8 @@ It is currently used by:
 [on PyPI](https://pypi.org/project/array-api-extra/):
 
 ```shell
+uv add array-api-extra
+# or
 python -m pip install array-api-extra
 ```
 
@@ -40,9 +43,9 @@ And
 [on conda-forge](https://prefix.dev/channels/conda-forge/packages/array-api-extra):
 
 ```shell
-mamba install array-api-extra
-# or
 pixi add array-api-extra
+# or
+mamba install array-api-extra
 ```
 
 ```{warning}
@@ -52,7 +55,7 @@ a specific version, or vendor the library inside your own.
 ```
 
 ```{note}
-This library depends on array-api-compat. We aim for compatibility with
+This library depends on `array-api-compat`. We aim for compatibility with
 the latest released version of array-api-compat, and your mileage may vary
 with older or dev versions.
 ```
@@ -69,8 +72,8 @@ and copy it into the appropriate place in your library, like:
 cp -a array-api-extra/src/array_api_extra mylib/vendored/
 ```
 
-`array-api-extra` depends on `array-api-compat`. You may either add a dependency
-in your own project to `array-api-compat` or vendor it too:
+You may either add a dependency to array-api-compat in your own project, or
+vendor it too:
 
 1. Clone
    [the array-api-compat repository](https://github.com/data-apis/array-api-compat)
@@ -81,14 +84,14 @@ in your own project to `array-api-compat` or vendor it too:
    ```
 
 2. Create a new hook file which array-api-extra will use instead of the
-   top-level `array-api-compat` if present:
+   top-level array-api-compat if present:
 
    ```
    echo 'from mylib.vendored.array_api_compat import *' > mylib/vendored/_array_api_compat_vendor.py
    ```
 
-This also allows overriding `array-api-compat` functions if you so wish. E.g.
-your `mylib/vendored/_array_api_compat_vendor.py` could look like this:
+This also allows overriding array-api-compat functions if you so wish. E.g. your
+`mylib/vendored/_array_api_compat_vendor.py` could look like this:
 
 ```python
 from mylib.vendored.array_api_compat import *
@@ -104,6 +107,13 @@ def array_namespace(*xs, **kwargs):
         return _array_namespace_orig(*xs, **kwargs)
 ```
 
+```{tip}
+See [an example of this in SciPy][scipy-vendor-example].
+```
+
+[scipy-vendor-example]:
+https://github.com/scipy/scipy/blob/main/scipy/_lib/_array_api_compat_vendor.py
+
 (usage)=
 
 ## Usage
@@ -115,9 +125,9 @@ import array_api_extra as xpx
 
 ...
 xp = array_namespace(x)
-y = xp.sum(x)
+y = xp.sum(x)  # use functions from `xp` as normal
 ...
-return xpx.atleast_nd(y, ndim=2, xp=xp)
+return xpx.atleast_nd(y, ndim=2, xp=xp)  # use functions from `xpx`, passing `xp=xp`
 ```
 
 ```{note}
@@ -131,13 +141,13 @@ is called internally to determine the namespace.
 ```
 
 In the examples shown in the docstrings of functions from this library,
-[`array-api-strict`](https://data-apis.org/array-api-strict/) is used as the
-array namespace `xp`. In reality, code using this library will be written to
-work with any compatible array namespace as `xp`, not any particular
-implementation.
+[array-api-strict](https://data-apis.org/array-api-strict/) is used as the array
+namespace `xp`. In reality, code using this library will be written to work with
+any compatible array namespace as `xp`, not any particular implementation.
 
-Some functions may only work with array libraries supported by array-api-compat.
-This will be clearly indicated in the docs.
+Some functions may only work with specific array libraries supported by
+array-api-compat. This should be clearly indicated in the docs - please open an
+issue if this is not the case!
 
 (scope)=
 
@@ -151,12 +161,16 @@ Functions that are in-scope for this library will:
   libraries.
 - Be implemented with type annotations and
   [numpydoc-style docstrings](https://numpydoc.readthedocs.io/en/latest/format.html).
-- Be tested against `array-api-strict`.
+- Be tested against array-api-strict and various existing backends.
 
 Functions are implemented purely in terms of the array API standard where
 possible. Where functions must use library-specific helpers for libraries
 supported by array-api-compat, this will be clearly marked in their API
 reference page.
+
+Delegation is added for some functions to use native implementations for the
+given array type, instead of the array-agnostic implementations, as this may
+increase performance.
 
 In particular, the following kinds of function are also in-scope:
 
@@ -168,15 +182,12 @@ In particular, the following kinds of function are also in-scope:
 
 The following features are currently out-of-scope for this library:
 
-- Delegation to known, existing array libraries (unless necessary).
-  - It is quite simple to wrap functions in this library to also use existing
-    implementations. Such delegation will not live in this library for now, but
-    the array-agnostic functions in this library could form an array-agnostic
-    backend for such delegating functions in the future, here or elsewhere.
 - Functions which accept "array-like" input, or standard-incompatible
   namespaces.
   - It is possible to prepare input arrays and a standard-compatible namespace
-    via `array-api-compat` downstream in consumer libraries.
+    via array-api-compat downstream in consumer libraries. The `xp` argument can
+    also be omitted to infer the standard-compatible namespace using
+    `array_namespace` internally.
 - Functions which are specific to a particular domain.
   - These functions may belong better in an array-consuming library which is
     specific to that domain.

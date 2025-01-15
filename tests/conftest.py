@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from enum import Enum
 from functools import wraps
+from types import ModuleType
 from typing import ParamSpec, TypeVar, cast
 
 import numpy as np
 import pytest
 
-from array_api_extra._lib._compat import array_namespace
-from array_api_extra._lib._compat import device as get_device
-from array_api_extra._lib._typing import Device, ModuleType
+from array_api_extra._lib import Backend
+from array_api_extra._lib._utils._compat import array_namespace
+from array_api_extra._lib._utils._compat import device as get_device
+from array_api_extra._lib._utils._typing import Device
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -20,38 +21,21 @@ P = ParamSpec("P")
 np_compat = array_namespace(np.empty(0))
 
 
-class Library(Enum):
-    """All array libraries explicitly tested by array-api-extra."""
-
-    ARRAY_API_STRICT = "array_api_strict"
-    NUMPY = "numpy"
-    NUMPY_READONLY = "numpy_readonly"
-    CUPY = "cupy"
-    TORCH = "torch"
-    DASK_ARRAY = "dask.array"
-    SPARSE = "sparse"
-    JAX_NUMPY = "jax.numpy"
-
-    def __str__(self) -> str:  # type: ignore[explicit-override]  # pyright: ignore[reportImplicitOverride]  # numpydoc ignore=RT01
-        """Pretty-print parameterized test names."""
-        return self.value
-
-
-@pytest.fixture(params=tuple(Library))
-def library(request: pytest.FixtureRequest) -> Library:  # numpydoc ignore=PR01,RT03
+@pytest.fixture(params=tuple(Backend))
+def library(request: pytest.FixtureRequest) -> Backend:  # numpydoc ignore=PR01,RT03
     """
     Parameterized fixture that iterates on all libraries.
 
     Returns
     -------
-    The current Library enum.
+    The current Backend enum.
     """
-    elem = cast(Library, request.param)
+    elem = cast(Backend, request.param)
 
     for marker in request.node.iter_markers("skip_xp_backend"):
         skip_library = marker.kwargs.get("library") or marker.args[0]  # type: ignore[no-untyped-usage]
-        if not isinstance(skip_library, Library):
-            msg = "argument of skip_xp_backend must be a Library enum"
+        if not isinstance(skip_library, Backend):
+            msg = "argument of skip_xp_backend must be a Backend enum"
             raise TypeError(msg)
         if skip_library == elem:
             reason = cast(str, marker.kwargs.get("reason", "skip_xp_backend"))
@@ -111,7 +95,7 @@ class NumPyReadOnly:
 
 
 @pytest.fixture
-def xp(library: Library) -> ModuleType:  # numpydoc ignore=PR01,RT03
+def xp(library: Backend) -> ModuleType:  # numpydoc ignore=PR01,RT03
     """
     Parameterized fixture that iterates on all libraries.
 
@@ -119,10 +103,10 @@ def xp(library: Library) -> ModuleType:  # numpydoc ignore=PR01,RT03
     -------
     The current array namespace.
     """
-    if library == Library.NUMPY_READONLY:
+    if library == Backend.NUMPY_READONLY:
         return NumPyReadOnly()  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
     xp = pytest.importorskip(library.value)
-    if library == Library.JAX_NUMPY:
+    if library == Backend.JAX_NUMPY:
         import jax  # type: ignore[import-not-found]  # pyright: ignore[reportMissingImports]
 
         jax.config.update("jax_enable_x64", True)
@@ -133,14 +117,14 @@ def xp(library: Library) -> ModuleType:  # numpydoc ignore=PR01,RT03
 
 @pytest.fixture
 def device(
-    library: Library, xp: ModuleType
+    library: Backend, xp: ModuleType
 ) -> Device:  # numpydoc ignore=PR01,RT01,RT03
     """
     Return a valid device for the backend.
 
     Where possible, return a device that is not the default one.
     """
-    if library == Library.ARRAY_API_STRICT:
+    if library == Backend.ARRAY_API_STRICT:
         d = xp.Device("device1")
         assert get_device(xp.empty(0)) != d
         return d

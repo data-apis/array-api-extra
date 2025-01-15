@@ -1,5 +1,6 @@
 import contextlib
 import warnings
+from types import ModuleType
 
 import numpy as np
 import pytest
@@ -16,16 +17,15 @@ from array_api_extra import (
     setdiff1d,
     sinc,
 )
-from array_api_extra._lib._compat import device as get_device
+from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
-from array_api_extra._lib._typing import Array, Device, ModuleType
-
-from .conftest import Library
+from array_api_extra._lib._utils._compat import device as get_device
+from array_api_extra._lib._utils._typing import Array, Device
 
 # mypy: disable-error-code=no-untyped-usage
 
 
-@pytest.mark.skip_xp_backend(Library.SPARSE, reason="no expand_dims")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no expand_dims")
 class TestAtLeastND:
     def test_0D(self, xp: ModuleType):
         x = xp.asarray(1.0)
@@ -97,7 +97,7 @@ class TestAtLeastND:
         xp_assert_equal(y, x)
 
 
-@pytest.mark.skip_xp_backend(Library.SPARSE, reason="no isdtype")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestCov:
     def test_basic(self, xp: ModuleType):
         xp_assert_close(
@@ -136,7 +136,7 @@ class TestCov:
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(cov(x)) == device
 
-    @pytest.mark.skip_xp_backend(Library.NUMPY_READONLY)
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY)
     def test_xp(self, xp: ModuleType):
         xp_assert_close(
             cov(xp.asarray([[0.0, 2.0], [1.0, 1.0], [2.0, 0.0]]).T, xp=xp),
@@ -144,7 +144,7 @@ class TestCov:
         )
 
 
-@pytest.mark.skip_xp_backend(Library.SPARSE, reason="no device")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no device")
 class TestCreateDiagonal:
     def test_1d(self, xp: ModuleType):
         # from np.diag tests
@@ -190,10 +190,10 @@ class TestCreateDiagonal:
         xp_assert_equal(y, xp.asarray([[1, 0], [0, 2]]))
 
 
-@pytest.mark.skip_xp_backend(Library.SPARSE, reason="no sparse.expand_dims")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no sparse.expand_dims")
 class TestExpandDims:
-    @pytest.mark.skip_xp_backend(Library.DASK_ARRAY, reason="tuple index out of range")
-    @pytest.mark.skip_xp_backend(Library.TORCH, reason="tuple index out of range")
+    @pytest.mark.skip_xp_backend(Backend.DASK_ARRAY, reason="tuple index out of range")
+    @pytest.mark.skip_xp_backend(Backend.TORCH, reason="tuple index out of range")
     def test_functionality(self, xp: ModuleType):
         def _squeeze_all(b: Array) -> Array:
             """Mimics `np.squeeze(b)`. `xpx.squeeze`?"""
@@ -251,7 +251,7 @@ class TestExpandDims:
         assert y.shape == (1, 1, 1, 3)
 
 
-@pytest.mark.skip_xp_backend(Library.SPARSE, reason="no sparse.expand_dims")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no sparse.expand_dims")
 class TestKron:
     def test_basic(self, xp: ModuleType):
         # Using 0-dimensional array
@@ -330,11 +330,11 @@ class TestKron:
         xp_assert_equal(kron(a, b, xp=xp), k)
 
 
-@pytest.mark.skip_xp_backend(Library.DASK_ARRAY, reason="no argsort")
-@pytest.mark.skip_xp_backend(Library.SPARSE, reason="no device")
+@pytest.mark.skip_xp_backend(Backend.DASK_ARRAY, reason="no argsort")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no device")
 class TestSetDiff1D:
     @pytest.mark.skip_xp_backend(
-        Library.TORCH, reason="index_select not implemented for uint32"
+        Backend.TORCH, reason="index_select not implemented for uint32"
     )
     def test_setdiff1d(self, xp: ModuleType):
         x1 = xp.asarray([6, 5, 4, 7, 1, 2, 7, 4])
@@ -367,7 +367,7 @@ class TestSetDiff1D:
         x2 = xp.asarray([2, 3, 4], device=device)
         assert get_device(setdiff1d(x1, x2)) == device
 
-    @pytest.mark.skip_xp_backend(Library.NUMPY_READONLY)
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY)
     def test_xp(self, xp: ModuleType):
         x1 = xp.asarray([3, 8, 20])
         x2 = xp.asarray([2, 3, 4])
@@ -376,7 +376,7 @@ class TestSetDiff1D:
         xp_assert_equal(actual, expected)
 
 
-@pytest.mark.skip_xp_backend(Library.SPARSE, reason="no isdtype")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestSinc:
     def test_simple(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0)), xp.asarray(1.0))
@@ -403,7 +403,7 @@ class TestSinc:
         xp_assert_equal(sinc(xp.asarray(0.0), xp=xp), xp.asarray(1.0))
 
 
-@pytest.mark.skip_xp_backend(Library.SPARSE, reason="no arange, no device")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no arange, no device")
 class TestPad:
     def test_simple(self, xp: ModuleType):
         a = xp.arange(1, 4)
@@ -423,7 +423,7 @@ class TestPad:
     def test_mode_not_implemented(self, xp: ModuleType):
         a = xp.arange(3)
         with pytest.raises(NotImplementedError, match="Only `'constant'`"):
-            pad(a, 2, mode="edge")
+            pad(a, 2, mode="edge")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     def test_device(self, xp: ModuleType, device: Device):
         a = xp.asarray(0.0, device=device)
@@ -441,7 +441,7 @@ class TestPad:
         padded = pad(a, (1, 2))
         assert padded.shape == (6, 7)
 
-        with pytest.raises(ValueError, match="expect a 2-tuple"):
+        with pytest.raises((ValueError, RuntimeError)):
             pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
 
     def test_list_of_tuples_width(self, xp: ModuleType):

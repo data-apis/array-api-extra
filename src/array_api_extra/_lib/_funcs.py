@@ -1,4 +1,4 @@
-"""Public API Functions."""
+"""Array-agnostic implementations for the public API."""
 
 # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
@@ -11,13 +11,9 @@ from enum import Enum
 from types import ModuleType
 from typing import ClassVar, cast
 
-from ._lib import _compat, _utils
-from ._lib._compat import (
-    array_namespace,
-    is_jax_array,
-    is_writeable_array,
-)
-from ._lib._typing import Array, Index
+from ._utils import _compat, _helpers
+from ._utils._compat import array_namespace, is_jax_array, is_writeable_array
+from ._utils._typing import Array, Index
 
 __all__ = [
     "at",
@@ -151,7 +147,7 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
-    avg = _utils.mean(m, axis=1, xp=xp)
+    avg = _helpers.mean(m, axis=1, xp=xp)
     fact = m.shape[1] - 1
 
     if fact <= 0:
@@ -467,7 +463,7 @@ def setdiff1d(
     else:
         x1 = xp.unique_values(x1)
         x2 = xp.unique_values(x2)
-    return x1[_utils.in1d(x1, x2, assume_unique=True, invert=True, xp=xp)]
+    return x1[_helpers.in1d(x1, x2, assume_unique=True, invert=True, xp=xp)]
 
 
 def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
@@ -562,53 +558,17 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
 def pad(
     x: Array,
     pad_width: int | tuple[int, int] | list[tuple[int, int]],
-    mode: str = "constant",
     *,
-    xp: ModuleType | None = None,
     constant_values: bool | int | float | complex = 0,
-) -> Array:
-    """
-    Pad the input array.
-
-    Parameters
-    ----------
-    x : array
-        Input array.
-    pad_width : int or tuple of ints or list of pairs of ints
-        Pad the input array with this many elements from each side.
-        If a list of tuples, ``[(before_0, after_0), ... (before_N, after_N)]``,
-        each pair applies to the corresponding axis of ``x``.
-        A single tuple, ``(before, after)``, is equivalent to a list of ``x.ndim``
-        copies of this tuple.
-    mode : str, optional
-        Only "constant" mode is currently supported, which pads with
-        the value passed to `constant_values`.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
-    constant_values : python scalar, optional
-        Use this value to pad the input. Default is zero.
-
-    Returns
-    -------
-    array
-        The input array,
-        padded with ``pad_width`` elements equal to ``constant_values``.
-    """
-    if mode != "constant":
-        msg = "Only `'constant'` mode is currently supported"
-        raise NotImplementedError(msg)
-
-    value = constant_values
-
+    xp: ModuleType,
+) -> Array:  # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._delegation.py`."""
     # make pad_width a list of length-2 tuples of ints
     x_ndim = cast(int, x.ndim)
     if isinstance(pad_width, int):
         pad_width = [(pad_width, pad_width)] * x_ndim
     if isinstance(pad_width, tuple):
         pad_width = [pad_width] * x_ndim
-
-    if xp is None:
-        xp = array_namespace(x)
 
     # https://github.com/python/typeshed/issues/13376
     slices: list[slice] = []  # type: ignore[no-any-explicit]
@@ -633,7 +593,7 @@ def pad(
 
     padded = xp.full(
         tuple(newshape),
-        fill_value=value,
+        fill_value=constant_values,
         dtype=x.dtype,
         device=_compat.device(x),
     )
