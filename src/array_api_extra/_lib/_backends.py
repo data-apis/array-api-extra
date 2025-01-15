@@ -17,29 +17,23 @@ class Backend(Enum):  # numpydoc ignore=PR01,PR02  # type: ignore[no-subclass-an
     Parameters
     ----------
     value : str
-        String describing the backend.
+        Name of the backend's module.
     is_namespace : Callable[[ModuleType], bool]
         Function to check whether an input module is the array namespace
         corresponding to the backend.
-    module_name : str
-        Name of the backend's module.
     """
 
-    ARRAY_API_STRICT = (
-        "array_api_strict",
-        _compat.is_array_api_strict_namespace,
-        "array_api_strict",
-    )
-    NUMPY = "numpy", _compat.is_numpy_namespace, "numpy"
-    NUMPY_READONLY = "numpy_readonly", _compat.is_numpy_namespace, "numpy"
-    CUPY = "cupy", _compat.is_cupy_namespace, "cupy"
-    TORCH = "torch", _compat.is_torch_namespace, "torch"
-    DASK_ARRAY = "dask.array", _compat.is_dask_namespace, "dask.array"
-    SPARSE = "sparse", _compat.is_pydata_sparse_namespace, "sparse"
-    JAX_NUMPY = "jax.numpy", _compat.is_jax_namespace, "jax.numpy"
+    ARRAY_API_STRICT = "array_api_strict", _compat.is_array_api_strict_namespace
+    NUMPY = "numpy", _compat.is_numpy_namespace
+    NUMPY_READONLY = "numpy_readonly", _compat.is_numpy_namespace
+    CUPY = "cupy", _compat.is_cupy_namespace
+    TORCH = "torch", _compat.is_torch_namespace
+    DASK_ARRAY = "dask.array", _compat.is_dask_namespace
+    SPARSE = "sparse", _compat.is_pydata_sparse_namespace
+    JAX_NUMPY = "jax.numpy", _compat.is_jax_namespace
 
     def __new__(
-        cls, value: str, _is_namespace: Callable[[ModuleType], bool], _module_name: str
+        cls, value: str, _is_namespace: Callable[[ModuleType], bool]
     ):  # numpydoc ignore=GL08
         obj = object.__new__(cls)
         obj._value_ = value
@@ -49,10 +43,8 @@ class Backend(Enum):  # numpydoc ignore=PR01,PR02  # type: ignore[no-subclass-an
         self,
         value: str,  # noqa: ARG002  # pylint: disable=unused-argument
         is_namespace: Callable[[ModuleType], bool],
-        module_name: str,
     ):  # numpydoc ignore=GL08
         self.is_namespace = is_namespace
-        self.module_name = module_name
 
     def __str__(self) -> str:  # type: ignore[explicit-override]  # pyright: ignore[reportImplicitOverride]  # numpydoc ignore=RT01
         """Pretty-print parameterized test names."""

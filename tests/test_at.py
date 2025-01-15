@@ -7,7 +7,6 @@ import numpy as np
 import pytest
 from array_api_compat import (  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
     array_namespace,
-    is_pydata_sparse_array,
     is_writeable_array,
 )
 
@@ -16,14 +15,6 @@ from array_api_extra._lib import Backend
 from array_api_extra._lib._funcs import _AtOp
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._typing import Array
-
-
-@pytest.fixture
-def array(library: Backend, xp: ModuleType) -> Array:
-    x = xp.asarray([10.0, 20.0, 30.0])
-    if library == Backend.NUMPY_READONLY:
-        x.flags.writeable = False
-    return x
 
 
 @contextmanager
@@ -42,6 +33,9 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
     xp_assert_equal(xp.all(array == array_orig), xp.asarray(copy))
 
 
+@pytest.mark.skip_xp_backend(
+    Backend.SPARSE, reason="read-only backend without .at support"
+)
 @pytest.mark.parametrize(
     ("kwargs", "expect_copy"),
     [
@@ -66,15 +60,13 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
 )
 def test_update_ops(
     xp: ModuleType,
-    array: Array,
     kwargs: dict[str, bool | None],
     expect_copy: bool | None,
     op: _AtOp,
     arg: float,
     expect: list[float],
 ):
-    if is_pydata_sparse_array(array):
-        pytest.skip("at() does not support updates on sparse arrays")
+    array = xp.asarray([10.0, 20.0, 30.0])
 
     with assert_copy(array, expect_copy):
         func = cast(Callable[..., Array], getattr(at(array)[1:], op.value))  # type: ignore[no-any-explicit]
