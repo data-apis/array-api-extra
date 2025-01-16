@@ -112,7 +112,16 @@ See [an example of this in SciPy][scipy-vendor-example].
 ```
 
 [scipy-vendor-example]:
-https://github.com/scipy/scipy/blob/main/scipy/_lib/_array_api_compat_vendor.py
+  https://github.com/scipy/scipy/blob/main/scipy/_lib/_array_api_compat_vendor.py
+
+## Versioning
+
+This project uses [EffVer](https://jacobtomlinson.dev/effver/). TL;DR:
+
+- To bump from version `x.y.z` to `x.(y+1).0` of array-api-extra, expect that
+  you may need to put in some work.
+- To bump from version `x.y.z` to `x.y.(z+1)`, any work needed on your side
+  should be minimal. Please open an issue if this is not the case!
 
 (usage)=
 
