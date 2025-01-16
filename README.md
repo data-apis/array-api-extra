@@ -45,7 +45,7 @@ See https://data-apis.org/array-api-extra/#installation.
 
 This project uses [EffVer](https://jacobtomlinson.dev/effver/). TL;DR:
 
-- To bump from version `x.y.z` to `x.(y+1).z` of array-api-extra, expect that
+- To bump from version `x.y.z` to `x.(y+1).0` of array-api-extra, expect that
   you may need to put in some work.
 - To bump from version `x.y.z` to `x.y.(z+1)`, any work needed on your side
   should be minimal. Please open an issue if this is not the case!
