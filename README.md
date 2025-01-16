@@ -10,6 +10,7 @@
 [![PyPI version][pypi-version]][pypi-link]
 [![Conda-Forge][conda-badge]][conda-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
+[![EffVer Versioning](https://img.shields.io/badge/version_scheme-EffVer-0097a7)](https://jacobtomlinson.dev/effver)
 
 <!-- SPHINX-START -->
 
@@ -35,6 +36,19 @@ Used by:
 - [SciPy](https://github.com/scipy/scipy) - Fundamental algorithms for
   scientific computing.
 - _your library? Let us know!_
+
+## Installation
+
+See https://data-apis.org/array-api-extra/#installation.
+
+## Versioning
+
+This project uses [EffVer](https://jacobtomlinson.dev/effver/). TL;DR:
+
+- To bump from version `x.y.z` to `x.(y+1).z` of array-api-extra, expect that
+  you may need to put in some work.
+- To bump from version `x.y.z` to `x.y.(z+1)`, any work needed on your side
+  should be minimal. Please open an issue if this is not the case!
 
 ## Contributors
 
