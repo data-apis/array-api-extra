@@ -167,7 +167,7 @@ cupy = "*"
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
-lint = { features = ["lint"], solve-group = "default" }
+lint = { features = ["lint", "backends"], solve-group = "default" }
 tests = { features = ["tests"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
 dev = { features = ["lint", "tests", "docs", "dev", "backends"], solve-group = "default" }

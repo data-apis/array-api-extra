@@ -22,6 +22,7 @@ from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._typing import Array, Device
 
+# some xp backends are untyped
 # mypy: disable-error-code=no-untyped-usage
 
 
@@ -330,6 +331,74 @@ class TestKron:
         xp_assert_equal(kron(a, b, xp=xp), k)
 
 
+class TestNUnique:
+    def test_simple(self, xp: ModuleType):
+        a = xp.asarray([[1, 1], [0, 2], [2, 2]])
+        xp_assert_equal(nunique(a), xp.asarray(3))
+
+    def test_empty(self, xp: ModuleType):
+        a = xp.asarray([])
+        xp_assert_equal(nunique(a), xp.asarray(0))
+
+    def test_device(self, xp: ModuleType, device: Device):
+        a = xp.asarray(0.0, device=device)
+        assert get_device(nunique(a)) == device
+
+    def test_xp(self, xp: ModuleType):
+        a = xp.asarray([[1, 1], [0, 2], [2, 2]])
+        xp_assert_equal(nunique(a, xp=xp), xp.asarray(3))
+
+
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no arange, no device")
+class TestPad:
+    def test_simple(self, xp: ModuleType):
+        a = xp.arange(1, 4)
+        padded = pad(a, 2)
+        xp_assert_equal(padded, xp.asarray([0, 0, 1, 2, 3, 0, 0]))
+
+    def test_fill_value(self, xp: ModuleType):
+        a = xp.arange(1, 4)
+        padded = pad(a, 2, constant_values=42)
+        xp_assert_equal(padded, xp.asarray([42, 42, 1, 2, 3, 42, 42]))
+
+    def test_ndim(self, xp: ModuleType):
+        a = xp.reshape(xp.arange(2 * 3 * 4), (2, 3, 4))
+        padded = pad(a, 2)
+        assert padded.shape == (6, 7, 8)
+
+    def test_mode_not_implemented(self, xp: ModuleType):
+        a = xp.arange(3)
+        with pytest.raises(NotImplementedError, match="Only `'constant'`"):
+            pad(a, 2, mode="edge")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+
+    def test_device(self, xp: ModuleType, device: Device):
+        a = xp.asarray(0.0, device=device)
+        assert get_device(pad(a, 2)) == device
+
+    def test_xp(self, xp: ModuleType):
+        padded = pad(xp.asarray(0), 1, xp=xp)
+        xp_assert_equal(padded, xp.asarray(0))
+
+    def test_tuple_width(self, xp: ModuleType):
+        a = xp.reshape(xp.arange(12), (3, 4))
+        padded = pad(a, (1, 0))
+        assert padded.shape == (4, 5)
+
+        padded = pad(a, (1, 2))
+        assert padded.shape == (6, 7)
+
+        with pytest.raises((ValueError, RuntimeError)):
+            pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
+
+    def test_list_of_tuples_width(self, xp: ModuleType):
+        a = xp.reshape(xp.arange(12), (3, 4))
+        padded = pad(a, [(1, 0), (0, 2)])
+        assert padded.shape == (4, 6)
+
+        padded = pad(a, [(1, 0), (0, 0)])
+        assert padded.shape == (4, 4)
+
+
 @pytest.mark.skip_xp_backend(Backend.DASK_ARRAY, reason="no argsort")
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no device")
 class TestSetDiff1D:
@@ -401,71 +470,3 @@ class TestSinc:
 
     def test_xp(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0), xp=xp), xp.asarray(1.0))
-
-
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no arange, no device")
-class TestPad:
-    def test_simple(self, xp: ModuleType):
-        a = xp.arange(1, 4)
-        padded = pad(a, 2)
-        xp_assert_equal(padded, xp.asarray([0, 0, 1, 2, 3, 0, 0]))
-
-    def test_fill_value(self, xp: ModuleType):
-        a = xp.arange(1, 4)
-        padded = pad(a, 2, constant_values=42)
-        xp_assert_equal(padded, xp.asarray([42, 42, 1, 2, 3, 42, 42]))
-
-    def test_ndim(self, xp: ModuleType):
-        a = xp.reshape(xp.arange(2 * 3 * 4), (2, 3, 4))
-        padded = pad(a, 2)
-        assert padded.shape == (6, 7, 8)
-
-    def test_mode_not_implemented(self, xp: ModuleType):
-        a = xp.arange(3)
-        with pytest.raises(NotImplementedError, match="Only `'constant'`"):
-            pad(a, 2, mode="edge")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
-
-    def test_device(self, xp: ModuleType, device: Device):
-        a = xp.asarray(0.0, device=device)
-        assert get_device(pad(a, 2)) == device
-
-    def test_xp(self, xp: ModuleType):
-        padded = pad(xp.asarray(0), 1, xp=xp)
-        xp_assert_equal(padded, xp.asarray(0))
-
-    def test_tuple_width(self, xp: ModuleType):
-        a = xp.reshape(xp.arange(12), (3, 4))
-        padded = pad(a, (1, 0))
-        assert padded.shape == (4, 5)
-
-        padded = pad(a, (1, 2))
-        assert padded.shape == (6, 7)
-
-        with pytest.raises((ValueError, RuntimeError)):
-            pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
-
-    def test_list_of_tuples_width(self, xp: ModuleType):
-        a = xp.reshape(xp.arange(12), (3, 4))
-        padded = pad(a, [(1, 0), (0, 2)])
-        assert padded.shape == (4, 6)
-
-        padded = pad(a, [(1, 0), (0, 0)])
-        assert padded.shape == (4, 4)
-
-
-class TestNUnique:
-    def test_simple(self, xp: ModuleType):
-        a = xp.asarray([[1, 1], [0, 2], [2, 2]])
-        xp_assert_equal(nunique(a), xp.asarray(3))
-
-    def test_empty(self, xp: ModuleType):
-        a = xp.asarray([])
-        xp_assert_equal(nunique(a), xp.asarray(0))
-
-    def test_device(self, xp: ModuleType, device: Device):
-        a = xp.asarray(0.0, device=device)
-        assert get_device(nunique(a)) == device
-
-    def test_xp(self, xp: ModuleType):
-        a = xp.asarray([[1, 1], [0, 2], [2, 2]])
-        xp_assert_equal(nunique(a, xp=xp), xp.asarray(3))
