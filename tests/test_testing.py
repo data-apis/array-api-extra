@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from types import ModuleType
+
 import numpy as np
 import pytest
 
@@ -18,7 +21,7 @@ from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
         ),
     ],
 )
-def test_assert_close_equal_basic(xp, func):
+def test_assert_close_equal_basic(xp: ModuleType, func: Callable[..., None]):  # type: ignore[no-any-explicit]
     func(xp.asarray(0), xp.asarray(0))
     func(xp.asarray([1, 2]), xp.asarray([1, 2]))
 
@@ -47,7 +50,7 @@ def test_assert_close_equal_basic(xp, func):
         ),
     ],
 )
-def test_assert_close_equal_namespace(xp, func):
+def test_assert_close_equal_namespace(xp: ModuleType, func: Callable[..., None]):  # type: ignore[no-any-explicit]
     with pytest.raises(AssertionError):
         func(xp.asarray(0), np.asarray(0))
     with pytest.raises(TypeError):
@@ -57,7 +60,7 @@ def test_assert_close_equal_namespace(xp, func):
 
 
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
-def test_assert_close_tolerance(xp):
+def test_assert_close_tolerance(xp: ModuleType):
     xp_assert_close(xp.asarray([100.0]), xp.asarray([102.0]), rtol=0.03)
     with pytest.raises(AssertionError):
         xp_assert_close(xp.asarray([100.0]), xp.asarray([102.0]), rtol=0.01)

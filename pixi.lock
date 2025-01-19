@@ -42,10 +42,9 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/coverage-7.6.10-py310h89163eb_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/cpython-3.10.16-py310hd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cytoolz-1.0.1-py310ha75aee5_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/filelock-3.16.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/freetype-2.12.1-h267a509_2.conda
@@ -223,10 +222,9 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/coverage-7.6.10-py310hc74094e_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/cpython-3.10.16-py310hd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/cytoolz-1.0.1-py310h078409c_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/filelock-3.16.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/freetype-2.12.1-hadb7bae_2.conda
@@ -390,10 +388,9 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/contourpy-1.3.1-py310hc19bc0b_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/coverage-7.6.10-py310h38315fa_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/cytoolz-1.0.1-py310ha8f682b_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/filelock-3.16.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/freetype-2.12.1-hdaf720e_2.conda
@@ -890,13 +887,12 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/coverage-7.6.10-py312h178313f_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/cpython-3.12.8-py312hd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cytoolz-1.0.1-py312h66e93f0_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/decorator-5.1.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/dill-0.3.9-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/executing-2.1.0-pyhd8ed1ab_1.conda
@@ -1139,13 +1135,12 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/coverage-7.6.10-py312h998013c_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/cpython-3.12.8-py312hd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/cytoolz-1.0.1-py312hea69d52_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/decorator-5.1.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/dill-0.3.9-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/executing-2.1.0-pyhd8ed1ab_1.conda
@@ -1373,13 +1368,12 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/contourpy-1.3.1-py312hd5eb7cc_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/coverage-7.6.10-py312h31fea79_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/cytoolz-1.0.1-py312h4389bb4_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/decorator-5.1.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/dill-0.3.9-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/executing-2.1.0-pyhd8ed1ab_1.conda
@@ -1637,13 +1631,12 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/cupy-core-13.3.0-py312h1acd1a8_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cusparselt-0.6.3.2-hdea8103_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cytoolz-1.0.1-py312h66e93f0_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/decorator-5.1.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/dill-0.3.9-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/executing-2.1.0-pyhd8ed1ab_1.conda
@@ -1921,13 +1914,12 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/coverage-7.6.10-py312h998013c_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/cpython-3.12.8-py312hd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/cytoolz-1.0.1-py312hea69d52_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/decorator-5.1.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/dill-0.3.9-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/executing-2.1.0-pyhd8ed1ab_1.conda
@@ -2165,13 +2157,12 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/cupy-13.3.0-py312h584ea29_2.conda
       - conda: https://prefix.dev/conda-forge/win-64/cupy-core-13.3.0-py312h2a51dd3_2.conda
       - conda: https://prefix.dev/conda-forge/win-64/cytoolz-1.0.1-py312h4389bb4_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/decorator-5.1.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/dill-0.3.9-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/executing-2.1.0-pyhd8ed1ab_1.conda
@@ -2609,12 +2600,11 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/contourpy-1.3.1-py312h68727a3_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/cpython-3.12.8-py312hd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cytoolz-1.0.1-py312h66e93f0_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/dill-0.3.9-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/filelock-3.16.1-pyhd8ed1ab_1.conda
@@ -2830,12 +2820,11 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/contourpy-1.3.1-py312hb23fbb9_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/cpython-3.12.8-py312hd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/cytoolz-1.0.1-py312hea69d52_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/dill-0.3.9-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/filelock-3.16.1-pyhd8ed1ab_1.conda
@@ -3036,12 +3025,11 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/colorama-0.4.6-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/contourpy-1.3.1-py312hd5eb7cc_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/cytoolz-1.0.1-py312h4389bb4_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/dill-0.3.9-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/filelock-3.16.1-pyhd8ed1ab_1.conda
@@ -3399,10 +3387,9 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/cupy-core-13.3.0-py310h8de46e0_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cusparselt-0.6.3.2-hdea8103_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cytoolz-1.0.1-py310ha75aee5_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/fastrlock-0.8.3-py310h8c668a6_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/filelock-3.16.1-pyhd8ed1ab_1.conda
@@ -3615,10 +3602,9 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/coverage-7.6.10-py310hc74094e_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/cpython-3.10.16-py310hd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/cytoolz-1.0.1-py310h078409c_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/filelock-3.16.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/freetype-2.12.1-hadb7bae_2.conda
@@ -3792,10 +3778,9 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/cupy-13.3.0-py310h619d0c7_2.conda
       - conda: https://prefix.dev/conda-forge/win-64/cupy-core-13.3.0-py310h441eff7_2.conda
       - conda: https://prefix.dev/conda-forge/win-64/cytoolz-1.0.1-py310ha8f682b_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/exceptiongroup-1.2.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/fastrlock-0.8.3-py310h9a06e79_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/filelock-3.16.1-pyhd8ed1ab_1.conda
@@ -4000,18 +3985,9 @@ packages:
 - pypi: .
   name: array-api-extra
   version: 0.6.1.dev0
-  sha256: a145e7bc8c8eea7df2ca51454c6ecf9babc0648b29be9cbf08bd92693dfe00ec
+  sha256: 575ccf37475308b2cb6aa49893fe8456aec287f46027fb6c22daa6fc2bb79eac
   requires_dist:
   - array-api-compat>=1.10.0,<2
-  - furo>=2023.8.17 ; extra == 'docs'
-  - myst-parser>=0.13 ; extra == 'docs'
-  - sphinx-autodoc-typehints ; extra == 'docs'
-  - sphinx-copybutton ; extra == 'docs'
-  - sphinx>=7.0 ; extra == 'docs'
-  - array-api-strict ; extra == 'tests'
-  - numpy ; extra == 'tests'
-  - pytest-cov>=3 ; extra == 'tests'
-  - pytest>=6 ; extra == 'tests'
   requires_python: '>=3.10'
   editable: true
 - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.2-pyhd8ed1ab_1.conda
@@ -6215,15 +6191,14 @@ packages:
   - pkg:pypi/cytoolz?source=hash-mapping
   size: 316347
   timestamp: 1734107735311
-- conda: https://prefix.dev/conda-forge/noarch/dask-2024.12.1-pyhd8ed1ab_0.conda
-  sha256: 4caae23bb33892998bee07024ddf1eec346400556c7bb7d45d1cee148af060d1
-  md5: f3134df9565c4d4415ff0e61f3aa28d0
+- conda: https://prefix.dev/conda-forge/noarch/dask-2025.1.0-pyhd8ed1ab_0.conda
+  sha256: 1fe5a011a4f1684d9665bb8e313f8794ceb2bbce47bea74d7c347a052c9e91eb
+  md5: a5f91379331b61157c203ca69da6331b
   depends:
   - bokeh >=3.1.0
   - cytoolz >=0.11.0
-  - dask-core >=2024.12.1,<2024.12.2.0a0
-  - dask-expr >=1.1,<1.2
-  - distributed >=2024.12.1,<2024.12.2.0a0
+  - dask-core >=2025.1.0,<2025.1.1.0a0
+  - distributed >=2025.1.0,<2025.1.1.0a0
   - jinja2 >=2.10.3
   - lz4 >=4.3.2
   - numpy >=1.24
@@ -6233,13 +6208,12 @@ packages:
   constrains:
   - openssl !=1.1.1e
   license: BSD-3-Clause
-  license_family: BSD
   purls: []
-  size: 7590
-  timestamp: 1734476244327
-- conda: https://prefix.dev/conda-forge/noarch/dask-core-2024.12.1-pyhd8ed1ab_0.conda
-  sha256: a2dfdb73143ddc75ee7ca25b0a8c714ecaedafb45c6a4684883b7648924e2ea3
-  md5: 48060c395f1e87a80330c0adaad332f7
+  size: 7599
+  timestamp: 1737299223355
+- conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.1.0-pyhd8ed1ab_0.conda
+  sha256: 5f2e27f1a000b1f04fa02914db21b7074772571f293fa2afe3606e4e499ad4d8
+  md5: 0abebcf57fa0d8f2f0d92f49c47d3f06
   depends:
   - click >=8.1
   - cloudpickle >=3.0.0
@@ -6254,22 +6228,8 @@ packages:
   license_family: BSD
   purls:
   - pkg:pypi/dask?source=hash-mapping
-  size: 906359
-  timestamp: 1734468020040
-- conda: https://prefix.dev/conda-forge/noarch/dask-expr-1.1.21-pyhd8ed1ab_0.conda
-  sha256: 5aceb0fb2ba39a3fa30f5b8fe7b0d9d832aacdc76dd2b01bd88d92893eabc50f
-  md5: e72a014dbbd35545dcfba4de9c92fb1d
-  depends:
-  - dask-core 2024.12.1
-  - pandas >=2
-  - pyarrow >=14.0.1
-  - python >=3.10
-  license: BSD-3-Clause
-  license_family: BSD
-  purls:
-  - pkg:pypi/dask-expr?source=hash-mapping
-  size: 185833
-  timestamp: 1734473200411
+  size: 961820
+  timestamp: 1737242447534
 - conda: https://prefix.dev/conda-forge/noarch/decorator-5.1.1-pyhd8ed1ab_1.conda
   sha256: 84e5120c97502a3785e8c3241c3bf51f64b4d445f13b4d2445db00d9816fe479
   md5: d622d8d7ee8868870f9cbe259f381181
@@ -6303,14 +6263,14 @@ packages:
   - pkg:pypi/distlib?source=hash-mapping
   size: 274151
   timestamp: 1733238487461
-- conda: https://prefix.dev/conda-forge/noarch/distributed-2024.12.1-pyhd8ed1ab_0.conda
-  sha256: 0cdd52fd0654428eb5bc6f460747ac484d07cca8434e361078f20e2c3258bb1e
-  md5: 58df114d7649ddb3f68c9b9adc6fbabe
+- conda: https://prefix.dev/conda-forge/noarch/distributed-2025.1.0-pyhd8ed1ab_0.conda
+  sha256: 4419d4e5dfb8e5e2da10c38a46316c7681a4faf72bbfd13abcc9dd90feb8e541
+  md5: 5ec97e707606eaa891eedb406eba507b
   depends:
   - click >=8.0
   - cloudpickle >=3.0.0
   - cytoolz >=0.11.2
-  - dask-core >=2024.12.1,<2024.12.2.0a0
+  - dask-core >=2025.1.0,<2025.1.1.0a0
   - jinja2 >=2.10.3
   - locket >=1.0.0
   - msgpack-python >=1.0.2
@@ -6330,8 +6290,8 @@ packages:
   license_family: BSD
   purls:
   - pkg:pypi/distributed?source=hash-mapping
-  size: 803908
-  timestamp: 1734473202885
+  size: 802199
+  timestamp: 1737295363044
 - conda: https://prefix.dev/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
   sha256: fa5966bb1718bbf6967a85075e30e4547901410cc7cb7b16daf68942e9a94823
   md5: 24c1ca34138ee57de72a943237cde4cc
