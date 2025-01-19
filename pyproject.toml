@@ -28,21 +28,6 @@ classifiers = [
 dynamic = ["version"]
 dependencies = ["array-api-compat>=1.10.0,<2"]
 
-[project.optional-dependencies]
-tests = [
-    "pytest >=6",
-    "pytest-cov >=3",
-    "array-api-strict",
-    "numpy",
-]
-docs = [
-    "sphinx>=7.0",
-    "myst_parser>=0.13",
-    "sphinx_copybutton",
-    "sphinx_autodoc_typehints",
-    "furo>=2023.08.17",
-]
-
 [project.urls]
 Homepage = "https://github.com/data-apis/array-api-extra"
 "Bug Tracker" = "https://github.com/data-apis/array-api-extra/issues"
@@ -178,30 +163,24 @@ ci-py313 = ["py313", "tests"]
 ci-backends = ["py310", "tests", "backends"]
 tests-backends = ["py310", "tests", "backends", "cuda-backends"]
 
+
 # pytest
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
-filterwarnings = [
-    "error",
-    # TODO: when Python 3.10 is dropped, use `enum.member` in `_delegation.py`
-    "ignore:functools.partial will be a method descriptor:FutureWarning",
-]
+filterwarnings = ["error"]
 log_cli_level = "INFO"
 testpaths = ["tests"]
 markers = ["skip_xp_backend(library, *, reason=None): Skip test for a specific backend"]
+
 
 # Coverage
 
 [tool.coverage]
 run.source = ["array_api_extra"]
-report.exclude_also = [
-    '\.\.\.',
-    'if typing.TYPE_CHECKING:',
-    'if TYPE_CHECKING:',
-]
+report.exclude_also = ['\.\.\.']
 
 
 # mypy
@@ -212,17 +191,10 @@ python_version = "3.10"
 warn_unused_configs = true
 strict = true
 enable_error_code = ["ignore-without-code", "truthy-bool"]
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-# data-apis/array-api#589
+# https://github.com/data-apis/array-api-typing
 disallow_any_expr = false
 # false positives with input validation
 disable_error_code = ["redundant-expr", "unreachable"]
-
-[[tool.mypy.overrides]]
-module = "array_api_extra.*"
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
 
 
 # pyright
@@ -233,10 +205,10 @@ pythonVersion = "3.10"
 pythonPlatform = "All"
 typeCheckingMode = "all"
 
-# data-apis/array-api#589
+# https://github.com/data-apis/array-api-typing
 reportAny = false
 reportExplicitAny = false
-# data-apis/array-api-strict#6
+# no array-api-strict type stubs
 reportUnknownMemberType = false
 # no array-api-compat type stubs
 reportUnknownVariableType = false
@@ -293,25 +265,17 @@ ignore = [
     "N806",    # Variable in function should be lowercase
 ]
 
-[tool.ruff.lint.per-file-ignores]
-"tests/**" = ["T20"]
-
 
 # Pylint
 
 [tool.pylint]
 py-version = "3.10"
-ignore-paths = [".*/_version.py"]
 reports.output-format = "colorized"
-similarities.ignore-imports = "yes"
 messages_control.disable = [
-    "design",
-    "fixme",
-    "line-too-long",
-    "missing-module-docstring",
-    "missing-function-docstring",
-    "too-many-lines",
-    "wrong-import-position",
+    "design",                     # ignore heavily opinionated design checks
+    "fixme",                      # allow FIXME comments
+    "line-too-long",              # ruff handles this
+    "missing-function-docstring", # numpydoc handles this
 ]
 
 
@@ -320,9 +284,9 @@ messages_control.disable = [
 [tool.numpydoc_validation]
 checks = [
     "all",  # report on all checks, except the below
-    "EX01",
-    "SA01",
-    "ES01",
+    "EX01", # most docstrings do not need an example
+    "SA01", # data-apis/array-api-extra#87
+    "ES01", # most docstrings do not need an extended summary
 ]
 exclude = [ # don't report on objects that match any of these regex
     '.*test_at.*',
