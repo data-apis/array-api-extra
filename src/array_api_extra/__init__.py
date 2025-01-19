@@ -1,8 +1,8 @@
 """Extra array functions built on top of the array API standard."""
 
 from ._delegation import pad
+from ._lib._at import at
 from ._lib._funcs import (
-    at,
     atleast_nd,
     cov,
     create_diagonal,

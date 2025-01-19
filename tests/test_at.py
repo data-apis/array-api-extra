@@ -12,7 +12,7 @@ from array_api_compat import (  # type: ignore[import-untyped]  # pyright: ignor
 
 from array_api_extra import at
 from array_api_extra._lib import Backend
-from array_api_extra._lib._funcs import _AtOp
+from array_api_extra._lib._at import _AtOp
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._typing import Array
 

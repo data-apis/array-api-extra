@@ -105,9 +105,9 @@ def xp(library: Backend) -> ModuleType:  # numpydoc ignore=PR01,RT03
         return NumPyReadOnly()  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
     xp = pytest.importorskip(library.value)
     if library == Backend.JAX_NUMPY:
-        import jax  # type: ignore[import-not-found]  # pyright: ignore[reportMissingImports]
+        import jax
 
-        jax.config.update("jax_enable_x64", True)
+        jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call]
 
     # Possibly wrap module with array_api_compat
     return array_namespace(xp.empty(0))
