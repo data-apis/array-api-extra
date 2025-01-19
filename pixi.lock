@@ -4000,9 +4000,9 @@ packages:
 - pypi: .
   name: array-api-extra
   version: 0.6.1.dev0
-  sha256: 52b696213bb2919ec3cdcc449975e86b00c80891681aafcce92b180ffaaca463
+  sha256: a145e7bc8c8eea7df2ca51454c6ecf9babc0648b29be9cbf08bd92693dfe00ec
   requires_dist:
-  - array-api-compat
+  - array-api-compat>=1.10.0,<2
   - furo>=2023.8.17 ; extra == 'docs'
   - myst-parser>=0.13 ; extra == 'docs'
   - sphinx-autodoc-typehints ; extra == 'docs'
