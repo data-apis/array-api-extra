@@ -266,12 +266,15 @@
 have found themselves writing private array-agnostic functions in the process of
 converting code to consume the standard.</p>
 <p>Thanks to <a class="reference internal" href="contributors.html"><span class="std std-doc">all contributors</span></a> so far!</p>
-<section id="how-to-contribute-a-function">
-<h2>How to contribute a function<a class="headerlink" href="#how-to-contribute-a-function" title="Link to this heading">¶</a></h2>
+<section id="how-to-contribute-a-new-function">
+<h2>How to contribute a new function<a class="headerlink" href="#how-to-contribute-a-new-function" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/data-apis/array-api-extra/issues/new">Open an issue</a> to
-propose the new function.</p></li>
-<li><p>Add the implementation of your function to <code class="docutils literal notranslate"><span class="pre">src/array_api_extra/_funcs.py</span></code>.</p>
+propose the new function. You may want to wait for initial feedback on the
+issue before diving into an implementation. Feel free to skip this step if
+there is already an open issue for the function.</p></li>
+<li><p>Add the implementation of your function to
+<code class="docutils literal notranslate"><span class="pre">src/array_api_extra/_lib/_funcs.py</span></code>.</p>
 <ul>
 <li><p>Ensure that your function includes type annotations and a
 <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">numpydoc-style docstring</a>.</p></li>
@@ -283,6 +286,32 @@ propose the new function.</p></li>
 <li><p>Add a test class for your function in <code class="docutils literal notranslate"><span class="pre">tests/test_funcs.py</span></code>.</p></li>
 <li><p>Add your function to <code class="docutils literal notranslate"><span class="pre">docs/api-reference.md</span></code>.</p></li>
 <li><p><a class="reference external" href="https://github.com/data-apis/array-api-extra/pulls">Make a PR!</a></p></li>
+</ul>
+</section>
+<section id="how-to-add-delegation-to-a-function">
+<h2>How to add delegation to a function<a class="headerlink" href="#how-to-add-delegation-to-a-function" title="Link to this heading">¶</a></h2>
+<p>See <a class="reference external" href="https://github.com/data-apis/array-api-extra/issues/100">the tracker for adding delegation</a>.</p>
+<ul class="simple">
+<li><p>If you would like to discuss the task before diving into the implementation,
+click on the three dots next to the function on the tracker issue, and choose
+“Convert to sub-issue”.</p></li>
+<li><p>Create a function in <code class="docutils literal notranslate"><span class="pre">src/array_api_extra/_delegation.py</span></code> with a signature
+matching the function in <code class="docutils literal notranslate"><span class="pre">src/array_api_extra/_lib/_funcs.py</span></code>, and move the
+docstring to the new function. Leave a one-line docstring in <code class="docutils literal notranslate"><span class="pre">_funcs.py</span></code>,
+pointing to <code class="docutils literal notranslate"><span class="pre">_delegation.py</span></code> to see the full docstring.</p></li>
+<li><p>Also move the initial <code class="docutils literal notranslate"><span class="pre">array_namespace</span></code> call and any input validation over to
+the new function.</p></li>
+<li><p>Add delegation to backends using the <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">_delegate</span></code> pattern. See
+<code class="docutils literal notranslate"><span class="pre">src/array_api_extra/_lib/_backends.py</span></code> for the full list of backends we have
+worked with so far.</p></li>
+<li><p>After all delegation layers, return the result from the implementation in
+<code class="docutils literal notranslate"><span class="pre">_funcs</span></code>.</p></li>
+<li><p>Simplify the signature in <code class="docutils literal notranslate"><span class="pre">_funcs.py</span></code> to remove impossible arguments now that
+it is only called internally via <code class="docutils literal notranslate"><span class="pre">_delegation</span></code>. For example, the <code class="docutils literal notranslate"><span class="pre">xp</span></code>
+parameter can be changed from type <code class="docutils literal notranslate"><span class="pre">ModuleType</span> <span class="pre">|</span> <span class="pre">None</span></code> to <code class="docutils literal notranslate"><span class="pre">ModuleType</span></code>.</p></li>
+<li><p>Don’t worry if you are not sure how to do some of the above steps or think you
+might have done something wrong -
+<a class="reference external" href="https://github.com/data-apis/array-api-extra/pulls">make a PR!</a></p></li>
 </ul>
 </section>
 <section id="development-workflow">
@@ -431,7 +460,8 @@ tasks available in the <code class="docutils literal notranslate"><span class="p
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Contributing</a><ul>
-<li><a class="reference internal" href="#how-to-contribute-a-function">How to contribute a function</a></li>
+<li><a class="reference internal" href="#how-to-contribute-a-new-function">How to contribute a new function</a></li>
+<li><a class="reference internal" href="#how-to-add-delegation-to-a-function">How to add delegation to a function</a></li>
 <li><a class="reference internal" href="#development-workflow">Development workflow</a></li>
 </ul>
 </li>
