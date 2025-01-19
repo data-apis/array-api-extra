@@ -410,6 +410,87 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
     return xp.reshape(result, res_shape)
 
 
+def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
+    """
+    Count the number of unique elements in an array.
+
+    Compatible with JAX and Dask, whose laziness would be otherwise
+    problematic.
+
+    Parameters
+    ----------
+    x : Array
+        Input array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array: 0-dimensional integer array
+        The number of unique elements in `x`. It can be lazy.
+    """
+    if xp is None:
+        xp = array_namespace(x)
+
+    if is_jax_array(x):
+        # size= is JAX-specific
+        # https://github.com/data-apis/array-api/issues/883
+        _, counts = xp.unique_counts(x, size=_compat.size(x))
+        return xp.astype(counts, xp.bool).sum()
+
+    _, counts = xp.unique_counts(x)
+    n = _compat.size(counts)
+    # FIXME https://github.com/data-apis/array-api-compat/pull/231
+    if n is None or math.isnan(n):  # e.g. Dask, ndonnx
+        return xp.astype(counts, xp.bool).sum()
+    return xp.asarray(n, device=_compat.device(x))
+
+
+def pad(
+    x: Array,
+    pad_width: int | tuple[int, int] | list[tuple[int, int]],
+    *,
+    constant_values: bool | int | float | complex = 0,
+    xp: ModuleType,
+) -> Array:  # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._delegation.py`."""
+    # make pad_width a list of length-2 tuples of ints
+    x_ndim = cast(int, x.ndim)
+    if isinstance(pad_width, int):
+        pad_width = [(pad_width, pad_width)] * x_ndim
+    if isinstance(pad_width, tuple):
+        pad_width = [pad_width] * x_ndim
+
+    # https://github.com/python/typeshed/issues/13376
+    slices: list[slice] = []  # type: ignore[no-any-explicit]
+    newshape: list[int] = []
+    for ax, w_tpl in enumerate(pad_width):
+        if len(w_tpl) != 2:
+            msg = f"expect a 2-tuple (before, after), got {w_tpl}."
+            raise ValueError(msg)
+
+        sh = x.shape[ax]
+        if w_tpl[0] == 0 and w_tpl[1] == 0:
+            sl = slice(None, None, None)
+        else:
+            start, stop = w_tpl
+            stop = None if stop == 0 else -stop
+
+            sl = slice(start, stop, None)
+            sh += w_tpl[0] + w_tpl[1]
+
+        newshape.append(sh)
+        slices.append(sl)
+
+    padded = xp.full(
+        tuple(newshape),
+        fill_value=constant_values,
+        dtype=x.dtype,
+        device=_compat.device(x),
+    )
+    return at(padded, tuple(slices)).set(x)
+
+
 def setdiff1d(
     x1: Array,
     x2: Array,
@@ -550,84 +631,3 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
         xp.asarray(xp.finfo(x.dtype).eps, dtype=x.dtype, device=_compat.device(x)),
     )
     return xp.sin(y) / y
-
-
-def pad(
-    x: Array,
-    pad_width: int | tuple[int, int] | list[tuple[int, int]],
-    *,
-    constant_values: bool | int | float | complex = 0,
-    xp: ModuleType,
-) -> Array:  # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
-    # make pad_width a list of length-2 tuples of ints
-    x_ndim = cast(int, x.ndim)
-    if isinstance(pad_width, int):
-        pad_width = [(pad_width, pad_width)] * x_ndim
-    if isinstance(pad_width, tuple):
-        pad_width = [pad_width] * x_ndim
-
-    # https://github.com/python/typeshed/issues/13376
-    slices: list[slice] = []  # type: ignore[no-any-explicit]
-    newshape: list[int] = []
-    for ax, w_tpl in enumerate(pad_width):
-        if len(w_tpl) != 2:
-            msg = f"expect a 2-tuple (before, after), got {w_tpl}."
-            raise ValueError(msg)
-
-        sh = x.shape[ax]
-        if w_tpl[0] == 0 and w_tpl[1] == 0:
-            sl = slice(None, None, None)
-        else:
-            start, stop = w_tpl
-            stop = None if stop == 0 else -stop
-
-            sl = slice(start, stop, None)
-            sh += w_tpl[0] + w_tpl[1]
-
-        newshape.append(sh)
-        slices.append(sl)
-
-    padded = xp.full(
-        tuple(newshape),
-        fill_value=constant_values,
-        dtype=x.dtype,
-        device=_compat.device(x),
-    )
-    return at(padded, tuple(slices)).set(x)
-
-
-def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
-    """
-    Count the number of unique elements in an array.
-
-    Compatible with JAX and Dask, whose laziness would be otherwise
-    problematic.
-
-    Parameters
-    ----------
-    x : Array
-        Input array.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
-
-    Returns
-    -------
-    array: 0-dimensional integer array
-        The number of unique elements in `x`. It can be lazy.
-    """
-    if xp is None:
-        xp = array_namespace(x)
-
-    if is_jax_array(x):
-        # size= is JAX-specific
-        # https://github.com/data-apis/array-api/issues/883
-        _, counts = xp.unique_counts(x, size=_compat.size(x))
-        return xp.astype(counts, xp.bool).sum()
-
-    _, counts = xp.unique_counts(x)
-    n = _compat.size(counts)
-    # FIXME https://github.com/data-apis/array-api-compat/pull/231
-    if n is None or math.isnan(n):  # e.g. Dask, ndonnx
-        return xp.astype(counts, xp.bool).sum()
-    return xp.asarray(n, device=_compat.device(x))
