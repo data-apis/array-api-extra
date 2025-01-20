@@ -390,12 +390,12 @@ class TestPad:
         with pytest.raises((ValueError, RuntimeError)):
             pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
 
-    def test_list_of_tuples_width(self, xp: ModuleType):
+    def test_sequence_of_tuples_width(self, xp: ModuleType):
         a = xp.reshape(xp.arange(12), (3, 4))
-        padded = pad(a, [(1, 0), (0, 2)])
-        assert padded.shape == (4, 6)
 
-        padded = pad(a, [(1, 0), (0, 0)])
+        padded = pad(a, ((1, 0), (0, 2)))
+        assert padded.shape == (4, 6)
+        padded = pad(a, ((1, 0), (0, 0)))
         assert padded.shape == (4, 4)
 
 

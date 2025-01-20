@@ -1,5 +1,6 @@
 """Delegation to existing implementations for Public API Functions."""
 
+from collections.abc import Sequence
 from types import ModuleType
 from typing import Literal
 
@@ -31,7 +32,7 @@ def _delegate(xp: ModuleType, *backends: Backend) -> bool:
 
 def pad(
     x: Array,
-    pad_width: int | tuple[int, int] | list[tuple[int, int]],
+    pad_width: int | tuple[int, int] | Sequence[tuple[int, int]],
     mode: Literal["constant"] = "constant",
     *,
     constant_values: bool | int | float | complex = 0,
@@ -44,9 +45,9 @@ def pad(
     ----------
     x : array
         Input array.
-    pad_width : int or tuple of ints or list of pairs of ints
+    pad_width : int or tuple of ints or sequence of pairs of ints
         Pad the input array with this many elements from each side.
-        If a list of tuples, ``[(before_0, after_0), ... (before_N, after_N)]``,
+        If a sequence of tuples, ``[(before_0, after_0), ... (before_N, after_N)]``,
         each pair applies to the corresponding axis of ``x``.
         A single tuple, ``(before, after)``, is equivalent to a list of ``x.ndim``
         copies of this tuple.
