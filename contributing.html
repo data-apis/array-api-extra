@@ -369,7 +369,7 @@ at <a class="reference external" href="https://github.com/data-apis/array-api-ex
 <ul class="simple">
 <li><p>To run the lint suite:</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="n">lint</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span> <span class="n">lint</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -381,17 +381,24 @@ at <a class="reference external" href="https://github.com/data-apis/array-api-ex
 <ul class="simple">
 <li><p>To run individual parts of the lint suite separately:</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="n">pre</span><span class="o">-</span><span class="n">commit</span>
-<span class="n">pixi</span> <span class="n">run</span> <span class="n">pylint</span>
-<span class="n">pixi</span> <span class="n">run</span> <span class="n">mypy</span>
-<span class="n">pixi</span> <span class="n">run</span> <span class="n">pyright</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span> <span class="n">pre</span><span class="o">-</span><span class="n">commit</span>
+<span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span> <span class="n">pylint</span>
+<span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span> <span class="n">mypy</span>
+<span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span> <span class="n">pyright</span>
 </pre></div>
 </div>
 <p>Alternative environments are available with a subset of the dependencies and
 tasks available in the <code class="docutils literal notranslate"><span class="pre">dev</span></code> environment:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">docs</span>
 <span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">tests</span>
+<span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">tests</span><span class="o">-</span><span class="n">backends</span>
 <span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span>
+</pre></div>
+</div>
+<p>If you run on a host with CUDA hardware, you can enable extra tests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">dev</span><span class="o">-</span><span class="n">cuda</span>
+<span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">tests</span><span class="o">-</span><span class="n">cuda</span>
+<span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">tests</span><span class="o">-</span><span class="n">cuda</span> <span class="n">tests</span>
 </pre></div>
 </div>
 </section>
