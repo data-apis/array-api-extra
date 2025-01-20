@@ -6,11 +6,13 @@
     :nosignatures:
     :toctree: generated
 
+    allclose
     at
     atleast_nd
     cov
     create_diagonal
     expand_dims
+    isclose
     kron
     nunique
     pad

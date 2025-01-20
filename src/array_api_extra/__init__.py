@@ -1,6 +1,6 @@
 """Extra array functions built on top of the array API standard."""
 
-from ._delegation import pad
+from ._delegation import allclose, isclose, pad
 from ._lib._at import at
 from ._lib._funcs import (
     atleast_nd,
@@ -18,11 +18,13 @@ __version__ = "0.6.1.dev0"
 # pylint: disable=duplicate-code
 __all__ = [
     "__version__",
+    "allclose",
     "at",
     "atleast_nd",
     "cov",
     "create_diagonal",
     "expand_dims",
+    "isclose",
     "kron",
     "nunique",
     "pad",

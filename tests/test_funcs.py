@@ -6,11 +6,13 @@ import numpy as np
 import pytest
 
 from array_api_extra import (
+    allclose,
     at,
     atleast_nd,
     cov,
     create_diagonal,
     expand_dims,
+    isclose,
     kron,
     nunique,
     pad,
@@ -23,7 +25,7 @@ from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._typing import Array, Device
 
 # some xp backends are untyped
-# mypy: disable-error-code=no-untyped-usage
+# mypy: disable-error-code=no-untyped-def
 
 
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no expand_dims")
@@ -250,6 +252,139 @@ class TestExpandDims:
         x = xp.asarray([1, 2, 3])
         y = expand_dims(x, axis=(0, 1, 2), xp=xp)
         assert y.shape == (1, 1, 1, 3)
+
+
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
+class TestIsClose:
+    # FIXME use lazywhere to avoid warnings on inf
+    @pytest.mark.filterwarnings("ignore:invalid value encountered")
+    @pytest.mark.parametrize(
+        ("a", "b"),
+        [
+            (0.0, 0.0),
+            (1.0, 1.0),
+            (1.0, 2.0),
+            (1.0, -1.0),
+            (100.0, 101.0),
+            (0, 0),
+            (1, 1),
+            (1, 2),
+            (1, -1),
+            (1.0 + 1j, 1.0 + 1j),
+            (1.0 + 1j, 1.0 - 1j),
+            (float("inf"), float("inf")),
+            (float("inf"), 100.0),
+            (float("inf"), float("-inf")),
+            (float("nan"), float("nan")),
+            (float("nan"), 0.0),
+            (0.0, float("nan")),
+            (1e6, 1e6 + 1),  # True - within rtol
+            (1e6, 1e6 + 100),  # False - outside rtol
+            (1e-6, 1.1e-6),  # False - outside atol
+            (1e-7, 1.1e-7),  # True - outside atol
+            (1e6 + 0j, 1e6 + 1j),  # True - within rtol
+            (1e6 + 0j, 1e6 + 100j),  # False - outside rtol
+        ],
+    )
+    def test_basic(self, a: float, b: float, xp: ModuleType):
+        a_xp = xp.asarray(a)
+        b_xp = xp.asarray(b)
+
+        xp_assert_equal(isclose(a_xp, b_xp), xp.asarray(np.isclose(a, b)))
+        xp_assert_equal(allclose(a_xp, b_xp), xp.asarray(np.allclose(a, b)))
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            r_xp = xp.asarray(np.arange(10), dtype=a_xp.dtype)
+            ar_xp = a_xp * r_xp
+            br_xp = b_xp * r_xp
+            ar_np = a * np.arange(10)
+            br_np = b * np.arange(10)
+
+        xp_assert_equal(isclose(ar_xp, br_xp), xp.asarray(np.isclose(ar_np, br_np)))
+
+    @pytest.mark.parametrize("dtype", ["float32", "int32"])
+    def test_broadcast(self, dtype: str, xp: ModuleType):
+        dtype = getattr(xp, dtype)
+        a = xp.asarray([1, 2, 3], dtype=dtype)
+        b = xp.asarray([[1], [5]], dtype=dtype)
+        actual = isclose(a, b)
+        expect = xp.asarray(
+            [[True, False, False], [False, False, False]], dtype=xp.bool
+        )
+
+        xp_assert_equal(actual, expect)
+
+    # FIXME use lazywhere to avoid warnings on inf
+    @pytest.mark.filterwarnings("ignore:invalid value encountered")
+    def test_some_inf(self, xp: ModuleType):
+        a = xp.asarray([0.0, 1.0, float("inf"), float("inf"), float("inf")])
+        b = xp.asarray([1e-9, 1.0, float("inf"), float("-inf"), 2.0])
+        actual = isclose(a, b)
+        xp_assert_equal(actual, xp.asarray([True, True, True, False, False]))
+
+    def test_equal_nan(self, xp: ModuleType):
+        a = xp.asarray([float("nan"), float("nan"), 1.0])
+        b = xp.asarray([float("nan"), 1.0, float("nan")])
+        xp_assert_equal(isclose(a, b), xp.asarray([False, False, False]))
+        xp_assert_equal(isclose(a, b, equal_nan=True), xp.asarray([True, False, False]))
+        xp_assert_equal(allclose(a[:1], b[:1]), xp.asarray(False))
+        xp_assert_equal(allclose(a[:1], b[:1], equal_nan=True), xp.asarray(True))
+
+    @pytest.mark.parametrize("dtype", ["float32", "complex64", "int32"])
+    def test_tolerance(self, dtype: str, xp: ModuleType):
+        dtype = getattr(xp, dtype)
+        a = xp.asarray([100, 100], dtype=dtype)
+        b = xp.asarray([101, 102], dtype=dtype)
+        xp_assert_equal(isclose(a, b), xp.asarray([False, False]))
+        xp_assert_equal(isclose(a, b, atol=1), xp.asarray([True, False]))
+        xp_assert_equal(isclose(a, b, rtol=0.01), xp.asarray([True, False]))
+        xp_assert_equal(allclose(a[:1], b[:1]), xp.asarray(False))
+        xp_assert_equal(allclose(a[:1], b[:1], atol=1), xp.asarray(True))
+        xp_assert_equal(allclose(a[:1], b[:1], rtol=0.01), xp.asarray(True))
+
+        # Attempt to trigger division by 0 in rtol on int dtype
+        xp_assert_equal(isclose(a, b, rtol=0), xp.asarray([False, False]))
+        xp_assert_equal(isclose(a, b, atol=1, rtol=0), xp.asarray([True, False]))
+        xp_assert_equal(allclose(a[:1], b[:1], rtol=0), xp.asarray(False))
+        xp_assert_equal(allclose(a[:1], b[:1], atol=1, rtol=0), xp.asarray(True))
+
+    def test_very_small_numbers(self, xp: ModuleType):
+        a = xp.asarray([1e-9, 1e-9])
+        b = xp.asarray([1.0001e-9, 1.00001e-9])
+        # Difference is below default atol
+        xp_assert_equal(isclose(a, b), xp.asarray([True, True]))
+        # Use only rtol
+        xp_assert_equal(isclose(a, b, atol=0), xp.asarray([False, True]))
+        xp_assert_equal(isclose(a, b, atol=0, rtol=0), xp.asarray([False, False]))
+
+    def test_bool_dtype(self, xp: ModuleType):
+        a = xp.asarray([False, True, False])
+        b = xp.asarray([True, True, False])
+        xp_assert_equal(isclose(a, b), xp.asarray([False, True, True]))
+        xp_assert_equal(isclose(a, b, atol=1), xp.asarray([True, True, True]))
+        xp_assert_equal(isclose(a, b, atol=2), xp.asarray([True, True, True]))
+        xp_assert_equal(isclose(a, b, rtol=1), xp.asarray([True, True, True]))
+        xp_assert_equal(isclose(a, b, rtol=2), xp.asarray([True, True, True]))
+
+        xp_assert_equal(allclose(a, b), xp.asarray(False))
+        xp_assert_equal(allclose(a, b, atol=1), xp.asarray(True))
+        xp_assert_equal(allclose(a, b, atol=2), xp.asarray(True))
+        xp_assert_equal(allclose(a, b, rtol=1), xp.asarray(True))
+        xp_assert_equal(allclose(a, b, rtol=2), xp.asarray(True))
+
+        # Test broadcasting
+        xp_assert_equal(
+            isclose(a, xp.asarray(True), atol=1), xp.asarray([True, True, True])
+        )
+        xp_assert_equal(
+            isclose(xp.asarray(True), b, atol=1), xp.asarray([True, True, True])
+        )
+
+    def test_xp(self, xp: ModuleType):
+        a = xp.asarray([0.0, 0.0])
+        b = xp.asarray([1e-9, 1e-4])
+        xp_assert_equal(isclose(a, b, xp=xp), xp.asarray([True, False]))
 
 
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no expand_dims")

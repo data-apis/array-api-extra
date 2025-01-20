@@ -61,6 +61,11 @@ def xp_assert_equal(actual: Array, desired: Array, err_msg: str = "") -> None:
         The expected array (typically hardcoded).
     err_msg : str, optional
         Error message to display on failure.
+
+    See Also
+    --------
+    xp_assert_close
+    numpy.testing.assert_array_equal
     """
     xp = _check_ns_shape_dtype(actual, desired)
 
@@ -112,6 +117,16 @@ def xp_assert_close(
         Absolute tolerance. Default: 0.
     err_msg : str, optional
         Error message to display on failure.
+
+    See Also
+    --------
+    xp_assert_equal
+    allclose
+    numpy.testing.assert_allclose
+
+    Notes
+    -----
+    The default `atol` and `rtol` differ from `xpx.allclose`.
     """
     xp = _check_ns_shape_dtype(actual, desired)
 

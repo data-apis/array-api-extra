@@ -8,7 +8,7 @@ from ._lib import Backend, _funcs
 from ._lib._utils._compat import array_namespace
 from ._lib._utils._typing import Array
 
-__all__ = ["pad"]
+__all__ = ["allclose", "isclose", "pad"]
 
 
 def _delegate(xp: ModuleType, *backends: Backend) -> bool:
@@ -28,6 +28,144 @@ def _delegate(xp: ModuleType, *backends: Backend) -> bool:
         ``True`` if `xp` matches one of the `backends`, ``False`` otherwise.
     """
     return any(backend.is_namespace(xp) for backend in backends)
+
+
+def allclose(
+    a: Array,
+    b: Array,
+    *,
+    rtol: float = 1e-05,
+    atol: float = 1e-08,
+    equal_nan: bool = False,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Return True if two arrays are element-wise equal within a tolerance.
+
+    This is a simple convenience reduction around `isclose`.
+
+    Parameters
+    ----------
+    a, b : Array
+        Input arrays to compare.
+    rtol : array_like, optional
+        The relative tolerance parameter.
+    atol : array_like, optional
+        The absolute tolerance parameter.
+    equal_nan : bool, optional
+        Whether to compare NaN's as equal. If True, NaN's in `a` will be considered
+        equal to NaN's in `b` in the output array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a` and `b`. Default: infer.
+
+    Returns
+    -------
+    Array
+        A 0-dimensional boolean array, containing `True` if all `a` is elementwise close
+        to `b` and `False` otherwise.
+
+    See Also
+    --------
+    isclose
+    math.isclose
+
+    Notes
+    -----
+    If `xp` is a lazy backend (e.g. Dask, JAX), you may not be able to test the result
+    contents with ``bool(allclose(a, b))`` or ``if allclose(a, b): ...``.
+    """
+    xp = array_namespace(a, b) if xp is None else xp
+    return xp.all(isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan, xp=xp))
+
+
+def isclose(
+    a: Array,
+    b: Array,
+    *,
+    rtol: float = 1e-05,
+    atol: float = 1e-08,
+    equal_nan: bool = False,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Return a boolean array where two arrays are element-wise equal within a tolerance.
+
+    The tolerance values are positive, typically very small numbers. The relative
+    difference `(rtol * abs(b))` and the absolute difference atol are added together to
+    compare against the absolute difference between a and b.
+
+    NaNs are treated as equal if they are in the same place and if equal_nan=True. Infs
+    are treated as equal if they are in the same place and of the same sign in both
+    arrays.
+
+    Parameters
+    ----------
+    a, b : Array
+        Input arrays to compare.
+    rtol : array_like, optional
+        The relative tolerance parameter (see Notes).
+    atol : array_like, optional
+        The absolute tolerance parameter (see Notes).
+    equal_nan : bool, optional
+        Whether to compare NaN's as equal. If True, NaN's in `a` will be considered
+        equal to NaN's in `b` in the output array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a` and `b`. Default: infer.
+
+    Returns
+    -------
+    Array
+        A boolean array of shape broadcasted from `a` and `b`, containing `True` where
+        ``a`` is close to ``b``, and `False` otherwise.
+
+    Warnings
+    --------
+    The default atol is not appropriate for comparing numbers with magnitudes much
+    smaller than one ) (see notes).
+
+    See Also
+    --------
+    allclose
+    math.isclose
+
+    Notes
+    -----
+    For finite values, `isclose` uses the following equation to test whether two
+    floating point values are equivalent::
+
+        absolute(a - b) <= (atol + rtol * absolute(b))
+
+    Unlike the built-in `math.isclose`, the above equation is not symmetric in a and b,
+    so that `isclose(a, b)` might be different from `isclose(b, a)` in some rare
+    cases.
+
+    The default value of `atol` is not appropriate when the reference value `b` has
+    magnitude smaller than one. For example, it is unlikely that ``a = 1e-9`` and
+    ``b = 2e-9`` should be considered "close", yet ``isclose(1e-9, 2e-9)`` is `True`
+    with default settings. Be sure to select atol for the use case at hand, especially
+    for defining the threshold below which a non-zero value in `a` will be considered
+    "close" to a very small or zero value in `b`.
+
+    The comparison of `a` and `b` uses standard broadcasting, which means that `a` and
+    `b` need not have the same shape in order for `isclose(a, b)` to evaluate to
+    `True`.
+
+    `isclose` is not defined for non-numeric data types. `bool` is considered a numeric
+    data-type for this purpose.
+    """
+    xp = array_namespace(a, b) if xp is None else xp
+
+    if _delegate(
+        xp,
+        Backend.NUMPY,
+        Backend.CUPY,
+        Backend.DASK,
+        Backend.JAX,
+        Backend.TORCH,
+    ):
+        return xp.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan)
+
+    return _funcs.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan, xp=xp)
 
 
 def pad(
