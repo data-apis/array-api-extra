@@ -28,9 +28,9 @@ class Backend(Enum):  # numpydoc ignore=PR01,PR02  # type: ignore[no-subclass-an
     NUMPY_READONLY = "numpy_readonly", _compat.is_numpy_namespace
     CUPY = "cupy", _compat.is_cupy_namespace
     TORCH = "torch", _compat.is_torch_namespace
-    DASK_ARRAY = "dask.array", _compat.is_dask_namespace
+    DASK = "dask.array", _compat.is_dask_namespace
     SPARSE = "sparse", _compat.is_pydata_sparse_namespace
-    JAX_NUMPY = "jax.numpy", _compat.is_jax_namespace
+    JAX = "jax.numpy", _compat.is_jax_namespace
 
     def __new__(
         cls, value: str, _is_namespace: Callable[[ModuleType], bool]

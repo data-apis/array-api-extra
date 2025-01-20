@@ -26,7 +26,7 @@ from array_api_extra._lib._utils._typing import Array, Device
 # mypy: disable-error-code=no-untyped-usage
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no expand_dims")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="sparse:no expand_dims")
 class TestAtLeastND:
     def test_0D(self, xp: ModuleType):
         x = xp.asarray(1.0)
@@ -98,7 +98,7 @@ class TestAtLeastND:
         xp_assert_equal(y, x)
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="sparse:no isdtype")
 class TestCov:
     def test_basic(self, xp: ModuleType):
         xp_assert_close(
@@ -137,7 +137,9 @@ class TestCov:
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(cov(x)) == device
 
-    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY)
+    @pytest.mark.skip_xp_backend(
+        Backend.NUMPY_READONLY, reason="numpy_readonly:explicit xp"
+    )
     def test_xp(self, xp: ModuleType):
         xp_assert_close(
             cov(xp.asarray([[0.0, 2.0], [1.0, 1.0], [2.0, 0.0]]).T, xp=xp),
@@ -145,7 +147,7 @@ class TestCov:
         )
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no device")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="sparse:no device kwarg in asarray")
 class TestCreateDiagonal:
     def test_1d(self, xp: ModuleType):
         # from np.diag tests
@@ -191,10 +193,10 @@ class TestCreateDiagonal:
         xp_assert_equal(y, xp.asarray([[1, 0], [0, 2]]))
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no sparse.expand_dims")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="sparse:no expand_dims")
 class TestExpandDims:
-    @pytest.mark.skip_xp_backend(Backend.DASK_ARRAY, reason="tuple index out of range")
-    @pytest.mark.skip_xp_backend(Backend.TORCH, reason="tuple index out of range")
+    @pytest.mark.skip_xp_backend(Backend.DASK, reason="dask:tuple index out of range")
+    @pytest.mark.skip_xp_backend(Backend.TORCH, reason="torch:tuple index out of range")
     def test_functionality(self, xp: ModuleType):
         def _squeeze_all(b: Array) -> Array:
             """Mimics `np.squeeze(b)`. `xpx.squeeze`?"""
@@ -252,7 +254,7 @@ class TestExpandDims:
         assert y.shape == (1, 1, 1, 3)
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no sparse.expand_dims")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="sparse:no expand_dims")
 class TestKron:
     def test_basic(self, xp: ModuleType):
         # Using 0-dimensional array
@@ -349,7 +351,9 @@ class TestNUnique:
         xp_assert_equal(nunique(a, xp=xp), xp.asarray(3))
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no arange, no device")
+@pytest.mark.skip_xp_backend(
+    Backend.SPARSE, reason="sparse:no arange, no device kwarg in asarray"
+)
 class TestPad:
     def test_simple(self, xp: ModuleType):
         a = xp.arange(1, 4)
@@ -399,8 +403,8 @@ class TestPad:
         assert padded.shape == (4, 4)
 
 
-@pytest.mark.skip_xp_backend(Backend.DASK_ARRAY, reason="no argsort")
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no device")
+@pytest.mark.skip_xp_backend(Backend.DASK, reason="dask:no argsort")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="sparse:no device kwarg in asarray")
 class TestSetDiff1D:
     @pytest.mark.skip_xp_backend(
         Backend.TORCH, reason="index_select not implemented for uint32"
@@ -436,7 +440,9 @@ class TestSetDiff1D:
         x2 = xp.asarray([2, 3, 4], device=device)
         assert get_device(setdiff1d(x1, x2)) == device
 
-    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY)
+    @pytest.mark.skip_xp_backend(
+        Backend.NUMPY_READONLY, reason="numpy_readonly:explicit xp"
+    )
     def test_xp(self, xp: ModuleType):
         x1 = xp.asarray([3, 8, 20])
         x2 = xp.asarray([2, 3, 4])
@@ -445,7 +451,7 @@ class TestSetDiff1D:
         xp_assert_equal(actual, expected)
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="sparse:no isdtype")
 class TestSinc:
     def test_simple(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0)), xp.asarray(1.0))

@@ -17,7 +17,9 @@ from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
         xp_assert_equal,
         pytest.param(
             xp_assert_close,
-            marks=pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype"),
+            marks=pytest.mark.skip_xp_backend(
+                Backend.SPARSE, reason="sparse:no isdtype"
+            ),
         ),
     ],
 )
@@ -38,15 +40,19 @@ def test_assert_close_equal_basic(xp: ModuleType, func: Callable[..., None]):  #
         func(xp.asarray([1, 2]), xp.asarray([1, 3]), err_msg="hello")
 
 
-@pytest.mark.skip_xp_backend(Backend.NUMPY)
-@pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY)
+@pytest.mark.skip_xp_backend(Backend.NUMPY, reason="numpy:test other ns vs. numpy")
+@pytest.mark.skip_xp_backend(
+    Backend.NUMPY_READONLY, reason="numpy_readonly:test other ns vs. numpy"
+)
 @pytest.mark.parametrize(
     "func",
     [
         xp_assert_equal,
         pytest.param(
             xp_assert_close,
-            marks=pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype"),
+            marks=pytest.mark.skip_xp_backend(
+                Backend.SPARSE, reason="sparse:no isdtype"
+            ),
         ),
     ],
 )
@@ -59,7 +65,7 @@ def test_assert_close_equal_namespace(xp: ModuleType, func: Callable[..., None])
         func(xp.asarray([0]), [0])
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="sparse:no isdtype")
 def test_assert_close_tolerance(xp: ModuleType):
     xp_assert_close(xp.asarray([100.0]), xp.asarray([102.0]), rtol=0.03)
     with pytest.raises(AssertionError):
