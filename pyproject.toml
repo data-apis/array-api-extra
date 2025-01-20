@@ -212,7 +212,7 @@ typeCheckingMode = "all"
 # https://github.com/data-apis/array-api-typing
 reportAny = false
 reportExplicitAny = false
-# no array-api-strict type stubsl pytest fixtures
+# no array-api-strict type stubs; pytest fixtures
 reportUnknownMemberType = false
 # no array-api-compat type stubs; pytest fixtures
 reportUnknownVariableType = false

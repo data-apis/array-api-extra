@@ -136,4 +136,8 @@ pixi shell -e lint
 
 If you run on a host with CUDA hardware, you can enable extra tests:
 
-pixi shell -e dev-cuda pixi shell -e tests-cuda pixi run -e tests-cuda tests
+```
+pixi shell -e dev-cuda
+pixi shell -e tests-cuda
+pixi run -e tests-cuda tests
+```
