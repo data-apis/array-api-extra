@@ -37,9 +37,9 @@ jobs:
           environments: lint
       - name: Run Pylint, Mypy & Pyright
         run: |
-          pixi run -e lint pylint
-          pixi run -e lint mypy
-          pixi run -e lint pyright
+          pixi run pylint
+          pixi run mypy
+          pixi run pyright
 
   checks:
     name: Check ${{ matrix.environment }}
@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        environment: [ci-py310, ci-py313, ci-backends]
+        environment: [tests-py310, tests-py313, tests-backends]
         runs-on: [ubuntu-latest]
 
     steps:
