@@ -107,7 +107,8 @@ def xp(library: Backend) -> ModuleType:  # numpydoc ignore=PR01,RT03
     if library == Backend.JAX_NUMPY:
         import jax
 
-        jax.config.update("jax_enable_x64", True)
+        # suppress unused-ignore to run mypy in -e lint as well as -e dev
+        jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call,unused-ignore]
 
     # Possibly wrap module with array_api_compat
     return array_namespace(xp.empty(0))

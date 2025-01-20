@@ -53,9 +53,7 @@ array-api-compat = ">=1.10.0,<2"
 [tool.pixi.pypi-dependencies]
 array-api-extra = { path = ".", editable = true }
 
-# lint-env: pixi hack to composite the dev environment on top of lint
-# without being asked if you want to run lint tasks in dev
-[tool.pixi.feature.lint-env.dependencies]
+[tool.pixi.feature.lint.dependencies]
 pre-commit = "*"
 pylint = "*"
 basedmypy = "*"
@@ -154,11 +152,11 @@ cupy = "*"
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
-lint = { features = ["lint", "lint-env"], solve-group = "default" }
+lint = { features = ["lint"], solve-group = "default" }
 tests = { features = ["tests"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
-dev = { features = ["lint-env", "tests", "docs", "dev", "backends"], solve-group = "default" }
-dev-cuda = { features = ["lint-env", "tests", "docs", "dev", "backends", "cuda-backends"] }
+dev = { features = ["lint", "tests", "docs", "dev", "backends"], solve-group = "default" }
+dev-cuda = { features = ["lint", "tests", "docs", "dev", "backends", "cuda-backends"] }
 tests-py310 = ["py310", "tests"]
 tests-py313 = ["py313", "tests"]
 # CUDA not available on free github actions and on some developers' PCs
