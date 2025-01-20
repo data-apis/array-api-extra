@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import math
 import warnings
+from collections.abc import Sequence
 from types import ModuleType
 from typing import cast
 
@@ -448,7 +449,7 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
 
 def pad(
     x: Array,
-    pad_width: int | tuple[int, int] | list[tuple[int, int]],
+    pad_width: int | tuple[int, int] | Sequence[tuple[int, int]],
     *,
     constant_values: bool | int | float | complex = 0,
     xp: ModuleType,
@@ -456,15 +457,22 @@ def pad(
     """See docstring in `array_api_extra._delegation.py`."""
     # make pad_width a list of length-2 tuples of ints
     x_ndim = cast(int, x.ndim)
+
     if isinstance(pad_width, int):
-        pad_width = [(pad_width, pad_width)] * x_ndim
-    if isinstance(pad_width, tuple):
-        pad_width = [pad_width] * x_ndim
+        pad_width_seq = [(pad_width, pad_width)] * x_ndim
+    elif (
+        isinstance(pad_width, tuple)
+        and len(pad_width) == 2
+        and all(isinstance(i, int) for i in pad_width)
+    ):
+        pad_width_seq = [cast(tuple[int, int], pad_width)] * x_ndim
+    else:
+        pad_width_seq = cast(list[tuple[int, int]], list(pad_width))
 
     # https://github.com/python/typeshed/issues/13376
     slices: list[slice] = []  # type: ignore[no-any-explicit]
     newshape: list[int] = []
-    for ax, w_tpl in enumerate(pad_width):
+    for ax, w_tpl in enumerate(pad_width_seq):
         if len(w_tpl) != 2:
             msg = f"expect a 2-tuple (before, after), got {w_tpl}."
             raise ValueError(msg)
