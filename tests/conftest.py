@@ -1,6 +1,7 @@
 """Pytest fixtures."""
 
 from collections.abc import Callable
+from contextlib import suppress
 from functools import wraps
 from types import ModuleType
 from typing import ParamSpec, TypeVar, cast
@@ -36,7 +37,9 @@ def library(request: pytest.FixtureRequest) -> Backend:  # numpydoc ignore=PR01,
             msg = "argument of skip_xp_backend must be a Backend enum"
             raise TypeError(msg)
         if skip_library == elem:
-            reason = cast(str, marker.kwargs.get("reason", "skip_xp_backend"))
+            reason = skip_library.value
+            with suppress(KeyError):
+                reason += ":" + cast(str, marker.kwargs["reason"])
             pytest.skip(reason=reason)
 
     return elem
