@@ -152,16 +152,16 @@ cupy = "*"
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
-lint = { features = ["lint", "backends"], solve-group = "default" }
+lint = { features = ["lint"], solve-group = "default" }
 tests = { features = ["tests"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
 dev = { features = ["lint", "tests", "docs", "dev", "backends"], solve-group = "default" }
 dev-cuda = { features = ["lint", "tests", "docs", "dev", "backends", "cuda-backends"] }
-ci-py310 = ["py310", "tests"]
-ci-py313 = ["py313", "tests"]
-# CUDA not available on free github actions
-ci-backends = ["py310", "tests", "backends"]
-tests-backends = ["py310", "tests", "backends", "cuda-backends"]
+tests-py310 = ["py310", "tests"]
+tests-py313 = ["py313", "tests"]
+# CUDA not available on free github actions and on some developers' PCs
+tests-backends = ["py310", "tests", "backends"]
+tests-cuda = ["py310", "tests", "backends", "cuda-backends"]
 
 
 # pytest
@@ -196,6 +196,10 @@ disallow_any_expr = false
 # false positives with input validation
 disable_error_code = ["redundant-expr", "unreachable"]
 
+[[tool.mypy.overrides]]
+# slow/unavailable on Windows; do not add to the lint env
+module = ["dask.*", "jax.*"]
+ignore_missing_imports = true
 
 # pyright
 
@@ -208,10 +212,13 @@ typeCheckingMode = "all"
 # https://github.com/data-apis/array-api-typing
 reportAny = false
 reportExplicitAny = false
-# no array-api-strict type stubs
+# no array-api-strict type stubs; pytest fixtures
 reportUnknownMemberType = false
-# no array-api-compat type stubs
+# no array-api-compat type stubs; pytest fixtures
 reportUnknownVariableType = false
+# Redundant with mypy checks
+reportMissingImports = false
+reportMissingTypeStubs = false
 # false positives for input validation
 reportUnreachable = false
 

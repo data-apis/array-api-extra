@@ -3,7 +3,7 @@
 # `array-api-compat` to override the import location
 
 try:
-    from ...._array_api_compat_vendor import (  # pyright: ignore[reportMissingImports]
+    from ...._array_api_compat_vendor import (
         array_namespace,
         device,
         is_array_api_strict_namespace,
@@ -18,7 +18,7 @@ try:
         size,
     )
 except ImportError:
-    from array_api_compat import (  # pyright: ignore[reportMissingTypeStubs]
+    from array_api_compat import (
         array_namespace,
         device,
         is_array_api_strict_namespace,

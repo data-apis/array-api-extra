@@ -106,7 +106,7 @@ pixi run pre-commit-install
 - To run the lint suite:
 
 ```
-pixi run lint
+pixi run -e lint lint
 ```
 
 - To enter an interactive Python prompt:
@@ -118,10 +118,10 @@ pixi run ipython
 - To run individual parts of the lint suite separately:
 
 ```
-pixi run pre-commit
-pixi run pylint
-pixi run mypy
-pixi run pyright
+pixi run -e lint pre-commit
+pixi run -e lint pylint
+pixi run -e lint mypy
+pixi run -e lint pyright
 ```
 
 Alternative environments are available with a subset of the dependencies and
@@ -130,5 +130,14 @@ tasks available in the `dev` environment:
 ```
 pixi shell -e docs
 pixi shell -e tests
+pixi shell -e tests-backends
 pixi shell -e lint
+```
+
+If you run on a host with CUDA hardware, you can enable extra tests:
+
+```
+pixi shell -e dev-cuda
+pixi shell -e tests-cuda
+pixi run -e tests-cuda tests
 ```

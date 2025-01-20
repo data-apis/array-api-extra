@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        environment: [ci-py310, ci-py313, ci-backends]
+        environment: [tests-py310, tests-py313, tests-backends]
         runs-on: [ubuntu-latest]
 
     steps:

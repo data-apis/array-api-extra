@@ -5,15 +5,12 @@ from typing import cast
 
 import numpy as np
 import pytest
-from array_api_compat import (  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]
-    array_namespace,
-    is_writeable_array,
-)
 
 from array_api_extra import at
 from array_api_extra._lib import Backend
 from array_api_extra._lib._at import _AtOp
 from array_api_extra._lib._testing import xp_assert_equal
+from array_api_extra._lib._utils._compat import array_namespace, is_writeable_array
 from array_api_extra._lib._utils._typing import Array
 
 
