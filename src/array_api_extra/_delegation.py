@@ -77,7 +77,7 @@ def pad(
         pad_width = xp.flip(pad_width, axis=(0,)).flatten()
         return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
-    if _delegate(xp, Backend.NUMPY, Backend.JAX_NUMPY, Backend.CUPY):
+    if _delegate(xp, Backend.NUMPY, Backend.JAX, Backend.CUPY):
         return xp.pad(x, pad_width, mode, constant_values=constant_values)
 
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)

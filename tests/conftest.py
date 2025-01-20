@@ -104,7 +104,7 @@ def xp(library: Backend) -> ModuleType:  # numpydoc ignore=PR01,RT03
     if library == Backend.NUMPY_READONLY:
         return NumPyReadOnly()  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
     xp = pytest.importorskip(library.value)
-    if library == Backend.JAX_NUMPY:
+    if library == Backend.JAX:
         import jax
 
         # suppress unused-ignore to run mypy in -e lint as well as -e dev

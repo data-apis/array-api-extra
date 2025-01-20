@@ -31,7 +31,7 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
 
 
 @pytest.mark.skip_xp_backend(
-    Backend.SPARSE, reason="read-only backend without .at support"
+    Backend.SPARSE, reason="sparse:read-only backend without .at support"
 )
 @pytest.mark.parametrize(
     ("kwargs", "expect_copy"),
