@@ -4,11 +4,13 @@ Testing utilities.
 Note that this is private API; don't expect it to be stable.
 """
 
+import math
 from types import ModuleType
 
 from ._utils._compat import (
     array_namespace,
     is_cupy_namespace,
+    is_dask_namespace,
     is_pydata_sparse_namespace,
     is_torch_namespace,
 )
@@ -40,8 +42,16 @@ def _check_ns_shape_dtype(
     msg = f"namespaces do not match: {actual_xp} != f{desired_xp}"
     assert actual_xp == desired_xp, msg
 
-    msg = f"shapes do not match: {actual.shape} != f{desired.shape}"
-    assert actual.shape == desired.shape, msg
+    actual_shape = actual.shape
+    desired_shape = desired.shape
+    if is_dask_namespace(desired_xp):
+        if any(math.isnan(i) for i in actual_shape):
+            actual_shape = actual.compute().shape
+        if any(math.isnan(i) for i in desired_shape):
+            desired_shape = desired.compute().shape
+
+    msg = f"shapes do not match: {actual_shape} != f{desired_shape}"
+    assert actual_shape == desired_shape, msg
 
     msg = f"dtypes do not match: {actual.dtype} != {desired.dtype}"
     assert actual.dtype == desired.dtype, msg

@@ -366,6 +366,20 @@ class TestIsClose:
             isclose(xp.asarray(True), b, atol=1), xp.asarray([True, True, True])
         )
 
+    def test_none_shape(self, xp: ModuleType):
+        a = xp.asarray([1, 5, 0])
+        b = xp.asarray([1, 4, 2])
+        b = b[a < 5]
+        a = a[a < 5]
+        xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
+
+    def test_none_shape_bool(self, xp: ModuleType):
+        a = xp.asarray([True, True, False])
+        b = xp.asarray([True, False, True])
+        b = b[a]
+        a = a[a]
+        xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
+
     def test_xp(self, xp: ModuleType):
         a = xp.asarray([0.0, 0.0])
         b = xp.asarray([1e-9, 1e-4])
