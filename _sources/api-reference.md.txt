@@ -11,6 +11,7 @@
     cov
     create_diagonal
     expand_dims
+    isclose
     kron
     nunique
     pad
