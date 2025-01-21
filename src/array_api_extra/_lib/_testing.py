@@ -136,7 +136,7 @@ def xp_assert_close(
 
     Notes
     -----
-    The default `atol` and `rtol` differ from `xp.all(xpx.allclose(a, b))`.
+    The default `atol` and `rtol` differ from `xp.all(xpx.isclose(a, b))`.
     """
     xp = _check_ns_shape_dtype(actual, desired)
 

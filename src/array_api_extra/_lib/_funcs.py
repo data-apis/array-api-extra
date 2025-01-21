@@ -312,10 +312,9 @@ def isclose(
     rtol: float = 1e-05,
     atol: float = 1e-08,
     equal_nan: bool = False,
-    xp: ModuleType | None = None,
+    xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
-    xp = array_namespace(a, b) if xp is None else xp
 
     a_inexact = xp.isdtype(a.dtype, ("real floating", "complex floating"))
     b_inexact = xp.isdtype(b.dtype, ("real floating", "complex floating"))
