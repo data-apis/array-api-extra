@@ -6,7 +6,6 @@
     :nosignatures:
     :toctree: generated
 
-    allclose
     at
     atleast_nd
     cov

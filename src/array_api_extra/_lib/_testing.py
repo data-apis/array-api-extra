@@ -121,12 +121,12 @@ def xp_assert_close(
     See Also
     --------
     xp_assert_equal
-    allclose
+    isclose
     numpy.testing.assert_allclose
 
     Notes
     -----
-    The default `atol` and `rtol` differ from `xpx.allclose`.
+    The default `atol` and `rtol` differ from `xp.all(xpx.allclose(a, b))`.
     """
     xp = _check_ns_shape_dtype(actual, desired)
 

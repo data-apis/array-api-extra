@@ -6,7 +6,6 @@ import numpy as np
 import pytest
 
 from array_api_extra import (
-    allclose,
     at,
     atleast_nd,
     cov,
@@ -291,7 +290,6 @@ class TestIsClose:
         b_xp = xp.asarray(b)
 
         xp_assert_equal(isclose(a_xp, b_xp), xp.asarray(np.isclose(a, b)))
-        xp_assert_equal(allclose(a_xp, b_xp), xp.asarray(np.allclose(a, b)))
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -328,8 +326,6 @@ class TestIsClose:
         b = xp.asarray([float("nan"), 1.0, float("nan")])
         xp_assert_equal(isclose(a, b), xp.asarray([False, False, False]))
         xp_assert_equal(isclose(a, b, equal_nan=True), xp.asarray([True, False, False]))
-        xp_assert_equal(allclose(a[:1], b[:1]), xp.asarray(False))
-        xp_assert_equal(allclose(a[:1], b[:1], equal_nan=True), xp.asarray(True))
 
     @pytest.mark.parametrize("dtype", ["float32", "complex64", "int32"])
     def test_tolerance(self, dtype: str, xp: ModuleType):
@@ -339,15 +335,10 @@ class TestIsClose:
         xp_assert_equal(isclose(a, b), xp.asarray([False, False]))
         xp_assert_equal(isclose(a, b, atol=1), xp.asarray([True, False]))
         xp_assert_equal(isclose(a, b, rtol=0.01), xp.asarray([True, False]))
-        xp_assert_equal(allclose(a[:1], b[:1]), xp.asarray(False))
-        xp_assert_equal(allclose(a[:1], b[:1], atol=1), xp.asarray(True))
-        xp_assert_equal(allclose(a[:1], b[:1], rtol=0.01), xp.asarray(True))
 
         # Attempt to trigger division by 0 in rtol on int dtype
         xp_assert_equal(isclose(a, b, rtol=0), xp.asarray([False, False]))
         xp_assert_equal(isclose(a, b, atol=1, rtol=0), xp.asarray([True, False]))
-        xp_assert_equal(allclose(a[:1], b[:1], rtol=0), xp.asarray(False))
-        xp_assert_equal(allclose(a[:1], b[:1], atol=1, rtol=0), xp.asarray(True))
 
     def test_very_small_numbers(self, xp: ModuleType):
         a = xp.asarray([1e-9, 1e-9])
@@ -366,12 +357,6 @@ class TestIsClose:
         xp_assert_equal(isclose(a, b, atol=2), xp.asarray([True, True, True]))
         xp_assert_equal(isclose(a, b, rtol=1), xp.asarray([True, True, True]))
         xp_assert_equal(isclose(a, b, rtol=2), xp.asarray([True, True, True]))
-
-        xp_assert_equal(allclose(a, b), xp.asarray(False))
-        xp_assert_equal(allclose(a, b, atol=1), xp.asarray(True))
-        xp_assert_equal(allclose(a, b, atol=2), xp.asarray(True))
-        xp_assert_equal(allclose(a, b, rtol=1), xp.asarray(True))
-        xp_assert_equal(allclose(a, b, rtol=2), xp.asarray(True))
 
         # Test broadcasting
         xp_assert_equal(

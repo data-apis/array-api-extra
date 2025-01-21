@@ -8,7 +8,7 @@ from ._lib import Backend, _funcs
 from ._lib._utils._compat import array_namespace
 from ._lib._utils._typing import Array
 
-__all__ = ["allclose", "isclose", "pad"]
+__all__ = ["isclose", "pad"]
 
 
 def _delegate(xp: ModuleType, *backends: Backend) -> bool:
@@ -28,54 +28,6 @@ def _delegate(xp: ModuleType, *backends: Backend) -> bool:
         ``True`` if `xp` matches one of the `backends`, ``False`` otherwise.
     """
     return any(backend.is_namespace(xp) for backend in backends)
-
-
-def allclose(
-    a: Array,
-    b: Array,
-    *,
-    rtol: float = 1e-05,
-    atol: float = 1e-08,
-    equal_nan: bool = False,
-    xp: ModuleType | None = None,
-) -> Array:
-    """
-    Return True if two arrays are element-wise equal within a tolerance.
-
-    This is a simple convenience reduction around `isclose`.
-
-    Parameters
-    ----------
-    a, b : Array
-        Input arrays to compare.
-    rtol : array_like, optional
-        The relative tolerance parameter.
-    atol : array_like, optional
-        The absolute tolerance parameter.
-    equal_nan : bool, optional
-        Whether to compare NaN's as equal. If True, NaN's in `a` will be considered
-        equal to NaN's in `b` in the output array.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `a` and `b`. Default: infer.
-
-    Returns
-    -------
-    Array
-        A 0-dimensional boolean array, containing `True` if all `a` is elementwise close
-        to `b` and `False` otherwise.
-
-    See Also
-    --------
-    isclose
-    math.isclose
-
-    Notes
-    -----
-    If `xp` is a lazy backend (e.g. Dask, JAX), you may not be able to test the result
-    contents with ``bool(allclose(a, b))`` or ``if allclose(a, b): ...``.
-    """
-    xp = array_namespace(a, b) if xp is None else xp
-    return xp.all(isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan, xp=xp))
 
 
 def isclose(
@@ -125,7 +77,6 @@ def isclose(
 
     See Also
     --------
-    allclose
     math.isclose
 
     Notes
