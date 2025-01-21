@@ -293,7 +293,6 @@ checks = [
     "all",  # report on all checks, except the below
     "EX01", # most docstrings do not need an example
     "SA01", # data-apis/array-api-extra#87
-    "SA04", # Missing description for See Also cross-reference
     "ES01", # most docstrings do not need an extended summary
 ]
 exclude = [ # don't report on objects that match any of these regex

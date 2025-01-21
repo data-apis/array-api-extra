@@ -43,10 +43,10 @@ def isclose(
     Return a boolean array where two arrays are element-wise equal within a tolerance.
 
     The tolerance values are positive, typically very small numbers. The relative
-    difference `(rtol * abs(b))` and the absolute difference atol are added together to
-    compare against the absolute difference between a and b.
+    difference ``(rtol * abs(b))`` and the absolute difference `atol` are added together to
+    compare against the absolute difference between `a` and `b`.
 
-    NaNs are treated as equal if they are in the same place and if equal_nan=True. Infs
+    NaNs are treated as equal if they are in the same place and if ``equal_nan=True``. Infs
     are treated as equal if they are in the same place and of the same sign in both
     arrays.
 
@@ -67,17 +67,17 @@ def isclose(
     Returns
     -------
     Array
-        A boolean array of shape broadcasted from `a` and `b`, containing `True` where
-        ``a`` is close to ``b``, and `False` otherwise.
+        A boolean array of shape broadcasted from `a` and `b`, containing ``True`` where
+        `a` is close to `b`, and ``False`` otherwise.
 
     Warnings
     --------
-    The default atol is not appropriate for comparing numbers with magnitudes much
-    smaller than one ) (see notes).
+    The default `atol` is not appropriate for comparing numbers with magnitudes much
+    smaller than one (see notes).
 
     See Also
     --------
-    math.isclose
+    math.isclose : Similar function in stdlib for Python scalars.
 
     Notes
     -----
@@ -86,22 +86,22 @@ def isclose(
 
         absolute(a - b) <= (atol + rtol * absolute(b))
 
-    Unlike the built-in `math.isclose`, the above equation is not symmetric in a and b,
-    so that `isclose(a, b)` might be different from `isclose(b, a)` in some rare
+    Unlike the built-in `math.isclose`, the above equation is not symmetric in `a` and `b`,
+    so that ``isclose(a, b)`` might be different from ``isclose(b, a)`` in some rare
     cases.
 
     The default value of `atol` is not appropriate when the reference value `b` has
     magnitude smaller than one. For example, it is unlikely that ``a = 1e-9`` and
-    ``b = 2e-9`` should be considered "close", yet ``isclose(1e-9, 2e-9)`` is `True`
-    with default settings. Be sure to select atol for the use case at hand, especially
+    ``b = 2e-9`` should be considered "close", yet ``isclose(1e-9, 2e-9)`` is ``True``
+    with default settings. Be sure to select `atol` for the use case at hand, especially
     for defining the threshold below which a non-zero value in `a` will be considered
     "close" to a very small or zero value in `b`.
 
     The comparison of `a` and `b` uses standard broadcasting, which means that `a` and
-    `b` need not have the same shape in order for `isclose(a, b)` to evaluate to
-    `True`.
+    `b` need not have the same shape in order for ``isclose(a, b)`` to evaluate to
+    ``True``.
 
-    `isclose` is not defined for non-numeric data types. `bool` is considered a numeric
+    `isclose` is not defined for non-numeric data types. ``bool`` is considered a numeric
     data-type for this purpose.
     """
     xp = array_namespace(a, b) if xp is None else xp

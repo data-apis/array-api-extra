@@ -74,8 +74,8 @@ def xp_assert_equal(actual: Array, desired: Array, err_msg: str = "") -> None:
 
     See Also
     --------
-    xp_assert_close
-    numpy.testing.assert_array_equal
+    xp_assert_close : Similar function for inexact equality checks.
+    numpy.testing.assert_array_equal : Similar function for NumPy arrays.
     """
     xp = _check_ns_shape_dtype(actual, desired)
 
@@ -130,9 +130,9 @@ def xp_assert_close(
 
     See Also
     --------
-    xp_assert_equal
-    isclose
-    numpy.testing.assert_allclose
+    xp_assert_equal : Similar function for exact equality checks.
+    isclose : Public function for checking closeness.
+    numpy.testing.assert_allclose : Similar function for NumPy arrays.
 
     Notes
     -----
