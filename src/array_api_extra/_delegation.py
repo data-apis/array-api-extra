@@ -43,11 +43,11 @@ def isclose(
     Return a boolean array where two arrays are element-wise equal within a tolerance.
 
     The tolerance values are positive, typically very small numbers. The relative
-    difference ``(rtol * abs(b))`` and the absolute difference `atol` are added together to
-    compare against the absolute difference between `a` and `b`.
+    difference ``(rtol * abs(b))`` and the absolute difference `atol` are added together
+    to compare against the absolute difference between `a` and `b`.
 
-    NaNs are treated as equal if they are in the same place and if ``equal_nan=True``. Infs
-    are treated as equal if they are in the same place and of the same sign in both
+    NaNs are treated as equal if they are in the same place and if ``equal_nan=True``.
+    Infs are treated as equal if they are in the same place and of the same sign in both
     arrays.
 
     Parameters
@@ -86,7 +86,8 @@ def isclose(
 
         absolute(a - b) <= (atol + rtol * absolute(b))
 
-    Unlike the built-in `math.isclose`, the above equation is not symmetric in `a` and `b`,
+    Unlike the built-in `math.isclose`,
+    the above equation is not symmetric in `a` and `b`,
     so that ``isclose(a, b)`` might be different from ``isclose(b, a)`` in some rare
     cases.
 
@@ -101,8 +102,8 @@ def isclose(
     `b` need not have the same shape in order for ``isclose(a, b)`` to evaluate to
     ``True``.
 
-    `isclose` is not defined for non-numeric data types. ``bool`` is considered a numeric
-    data-type for this purpose.
+    `isclose` is not defined for non-numeric data types.
+    ``bool`` is considered a numeric data-type for this purpose.
     """
     xp = array_namespace(a, b) if xp is None else xp
 
