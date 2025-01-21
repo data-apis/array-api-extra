@@ -1,6 +1,6 @@
 """Extra array functions built on top of the array API standard."""
 
-from ._delegation import pad
+from ._delegation import isclose, pad
 from ._lib._at import at
 from ._lib._funcs import (
     atleast_nd,
@@ -23,6 +23,7 @@ __all__ = [
     "cov",
     "create_diagonal",
     "expand_dims",
+    "isclose",
     "kron",
     "nunique",
     "pad",
