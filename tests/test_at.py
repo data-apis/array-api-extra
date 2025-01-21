@@ -1,3 +1,4 @@
+import math
 import pickle
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
@@ -100,14 +101,7 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
     [
         (False, False),
         (False, True),
-        pytest.param(
-            True,
-            False,
-            marks=(
-                pytest.mark.skip_xp_backend(Backend.JAX, reason="TODO special case"),
-                pytest.mark.skip_xp_backend(Backend.DASK, reason="TODO special case"),
-            ),
-        ),
+        (True, False),  # Uses xp.where(idx, y, x) on JAX and Dask
         pytest.param(
             True,
             True,
@@ -176,11 +170,16 @@ def test_alternate_index_syntax():
         at(a, 0)[0].set(4)
 
 
-@pytest.mark.parametrize("copy", [True, False])
+@pytest.mark.skip_xp_backend(
+    Backend.SPARSE, reason="read-only backend without .at support"
+)
+@pytest.mark.parametrize("copy", [True, None])
 @pytest.mark.parametrize(
     "op", [_AtOp.ADD, _AtOp.SUBTRACT, _AtOp.MULTIPLY, _AtOp.DIVIDE, _AtOp.POWER]
 )
-def test_iops_incompatible_dtype(op: _AtOp, copy: bool):
+def test_iops_incompatible_dtype(
+    xp: ModuleType, library: Backend, op: _AtOp, copy: bool | None
+):
     """Test that at() replicates the backend's behaviour for
     in-place operations with incompatible dtypes.
 
@@ -192,6 +191,62 @@ def test_iops_incompatible_dtype(op: _AtOp, copy: bool):
     UFuncTypeError: Cannot cast ufunc 'divide' output from dtype('float64')
     to dtype('int64') with casting rule 'same_kind'
     """
-    x = np.asarray([2, 4])
-    with pytest.raises(TypeError, match="Cannot cast ufunc"):
-        at_op(x, slice(None), op, 1.1, copy=copy)
+    x = xp.asarray([2, 4])
+
+    if library is Backend.DASK:
+        z = at_op(x, slice(None), op, 1.1, copy=copy)
+        assert z.dtype == x.dtype
+
+    elif library is Backend.JAX:
+        with pytest.warns(FutureWarning, match="cannot safely cast"):
+            z = at_op(x, slice(None), op, 1.1, copy=copy)
+        assert z.dtype == x.dtype
+
+    else:
+        with pytest.raises(Exception, match=r"cast|promote|dtype"):
+            at_op(x, slice(None), op, 1.1, copy=copy)
+
+
+@pytest.mark.skip_xp_backend(
+    Backend.SPARSE, reason="read-only backend without .at support"
+)
+@pytest.mark.parametrize(
+    "op", [_AtOp.ADD, _AtOp.SUBTRACT, _AtOp.MULTIPLY, _AtOp.DIVIDE, _AtOp.POWER]
+)
+def test_bool_mask_incompatible_dtype(xp: ModuleType, library: Backend, op: _AtOp):
+    """
+    When xp.where(idx, y, x) would promote the dtype of the output
+    to y.dtype, at(x, idx).set(y) must retain x.dtype instead
+    """
+    x = xp.asarray([1, 2])
+    idx = xp.asarray([True, False])
+    if library in (Backend.DASK, Backend.JAX):
+        z = at_op(x, idx, op, 1.1)
+        assert z.dtype == x.dtype
+
+    else:
+        with pytest.raises(Exception, match=r"cast|promote|dtype"):
+            at_op(x, idx, op, 1.1)
+
+
+@pytest.mark.skip_xp_backend(
+    Backend.SPARSE, reason="read-only backend without .at support"
+)
+def test_bool_mask_nd(xp: ModuleType):
+    x = xp.asarray([[1, 2, 3], [4, 5, 6]])
+    idx = xp.asarray([[True, False, False], [False, True, True]])
+    z = at_op(x, idx, _AtOp.SET, 0)
+    xp_assert_equal(z, xp.asarray([[0, 2, 3], [4, 0, 0]]))
+
+
+@pytest.mark.skip_xp_backend(
+    Backend.SPARSE, reason="read-only backend without .at support"
+)
+@pytest.mark.skip_xp_backend(Backend.DASK, reason="FIXME need scipy's lazywhere")
+@pytest.mark.parametrize("bool_mask", [False, True])
+def test_no_inf_warnings(xp: ModuleType, bool_mask: bool):
+    x = xp.asarray([math.inf, 1.0, 2.0])
+    idx = ~xp.isinf(x) if bool_mask else slice(1, None)
+    # inf - inf -> nan with a warning
+    z = at_op(x, idx, _AtOp.SUBTRACT, math.inf)
+    xp_assert_equal(z, xp.asarray([math.inf, -math.inf, -math.inf]))

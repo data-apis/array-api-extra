@@ -9,7 +9,12 @@ from enum import Enum
 from types import ModuleType
 from typing import ClassVar, cast
 
-from ._utils._compat import array_namespace, is_jax_array, is_writeable_array
+from ._utils._compat import (
+    array_namespace,
+    is_dask_array,
+    is_jax_array,
+    is_writeable_array,
+)
 from ._utils._typing import Array, Index
 
 
@@ -141,6 +146,25 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     not explicitly covered by ``array-api-compat``, are not supported by update
     methods.
 
+    Boolean masks are supported on Dask and jitted JAX arrays exclusively
+    when `idx` has the same shape as `x` and `y` is 0-dimensional.
+    Note that this is support is not available in JAX's native
+    ``x.at[mask].set(y)``.
+
+    This pattern::
+
+        >>> mask = m(x)
+        >>> x[mask] = f(x[mask])
+
+    Can't be replaced by `at`, as it won't work on Dask and JAX inside jax.jit::
+
+        >>> mask = m(x)
+        >>> x = xpx.at(x, mask).set(f(x[mask])  # Crash on Dask and jax.jit
+
+    You should instead use::
+
+        >>> x = xp.where(m(x), f(x), x)
+
     Examples
     --------
     Given either of these equivalent expressions::
@@ -189,6 +213,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self,
         at_op: _AtOp,
         in_place_op: Callable[[Array, Array | object], Array] | None,
+        out_of_place_op: Callable[[Array, Array], Array] | None,
         y: Array | object,
         /,
         copy: bool | None,
@@ -210,6 +235,16 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
                 x[idx] = y
 
+        out_of_place_op : Callable[[Array, Array], Array] | None
+            Out-of-place operation to apply when idx is a boolean mask and the backend
+            doesn't support in-place updates::
+
+                x = xp.where(idx, out_of_place_op(x, y), x)
+
+            If None::
+
+                x = xp.where(idx, y, x)
+
         y : array or object
             Right-hand side of the operation.
         copy : bool or None
@@ -223,6 +258,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             Updated `x`.
         """
         x, idx = self._x, self._idx
+        xp = array_namespace(x, y) if xp is None else xp
 
         if idx is _undef:
             msg = (
@@ -247,15 +283,41 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         else:
             writeable = is_writeable_array(x)
 
+        # JAX inside jax.jit and Dask don't support in-place updates with boolean
+        # mask. However we can handle the common special case of 0-dimensional y
+        # with where(idx, y, x) instead.
+        if (
+            (is_dask_array(idx) or is_jax_array(idx))
+            and idx.dtype == xp.bool
+            and idx.shape == x.shape
+        ):
+            y_xp = xp.asarray(y, dtype=x.dtype)
+            if y_xp.ndim == 0:
+                if out_of_place_op:
+                    # FIXME: suppress inf warnings on dask with lazywhere
+                    out = xp.where(idx, out_of_place_op(x, y_xp), x)
+                    # Undo int->float promotion on JAX after _AtOp.DIVIDE
+                    out = xp.astype(out, x.dtype, copy=False)
+                else:
+                    out = xp.where(idx, y_xp, x)
+
+                if copy:
+                    return out
+                x[()] = out
+                return x
+            # else: this will work on eager JAX and crash on jax.jit and Dask
+
         if copy:
             if is_jax_array(x):
                 # Use JAX's at[]
                 func = cast(Callable[[Array], Array], getattr(x.at[idx], at_op.value))
-                return func(y)
+                out = func(y)
+                # Undo int->float promotion on JAX after _AtOp.DIVIDE
+                return xp.astype(out, x.dtype, copy=False)
+
             # Emulate at[] behaviour for non-JAX arrays
             # with a copy followed by an update
-            if xp is None:
-                xp = array_namespace(x)
+
             x = xp.asarray(x, copy=True)
             if writeable is False:
                 # A copy of a read-only numpy array is writeable
@@ -283,7 +345,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] = y`` and return the update array."""
-        return self._op(_AtOp.SET, None, y, copy=copy, xp=xp)
+        return self._op(_AtOp.SET, None, None, y, copy=copy, xp=xp)
 
     def add(
         self,
@@ -297,7 +359,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         # Note for this and all other methods based on _iop:
         # operator.iadd and operator.add subtly differ in behaviour, as
         # only iadd will trigger exceptions when y has an incompatible dtype.
-        return self._op(_AtOp.ADD, operator.iadd, y, copy=copy, xp=xp)
+        return self._op(_AtOp.ADD, operator.iadd, operator.add, y, copy=copy, xp=xp)
 
     def subtract(
         self,
@@ -307,7 +369,9 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] -= y`` and return the updated array."""
-        return self._op(_AtOp.SUBTRACT, operator.isub, y, copy=copy, xp=xp)
+        return self._op(
+            _AtOp.SUBTRACT, operator.isub, operator.sub, y, copy=copy, xp=xp
+        )
 
     def multiply(
         self,
@@ -317,7 +381,9 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] *= y`` and return the updated array."""
-        return self._op(_AtOp.MULTIPLY, operator.imul, y, copy=copy, xp=xp)
+        return self._op(
+            _AtOp.MULTIPLY, operator.imul, operator.mul, y, copy=copy, xp=xp
+        )
 
     def divide(
         self,
@@ -327,7 +393,9 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] /= y`` and return the updated array."""
-        return self._op(_AtOp.DIVIDE, operator.itruediv, y, copy=copy, xp=xp)
+        return self._op(
+            _AtOp.DIVIDE, operator.itruediv, operator.truediv, y, copy=copy, xp=xp
+        )
 
     def power(
         self,
@@ -337,7 +405,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] **= y`` and return the updated array."""
-        return self._op(_AtOp.POWER, operator.ipow, y, copy=copy, xp=xp)
+        return self._op(_AtOp.POWER, operator.ipow, operator.pow, y, copy=copy, xp=xp)
 
     def min(
         self,
@@ -349,7 +417,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         """Apply ``x[idx] = minimum(x[idx], y)`` and return the updated array."""
         xp = array_namespace(self._x) if xp is None else xp
         y = xp.asarray(y)
-        return self._op(_AtOp.MIN, xp.minimum, y, copy=copy, xp=xp)
+        return self._op(_AtOp.MIN, xp.minimum, xp.minimum, y, copy=copy, xp=xp)
 
     def max(
         self,
@@ -361,4 +429,4 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         """Apply ``x[idx] = maximum(x[idx], y)`` and return the updated array."""
         xp = array_namespace(self._x) if xp is None else xp
         y = xp.asarray(y)
-        return self._op(_AtOp.MAX, xp.maximum, y, copy=copy, xp=xp)
+        return self._op(_AtOp.MAX, xp.maximum, xp.maximum, y, copy=copy, xp=xp)
