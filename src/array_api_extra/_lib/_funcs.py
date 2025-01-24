@@ -11,7 +11,12 @@ from typing import cast
 
 from ._at import at
 from ._utils import _compat, _helpers
-from ._utils._compat import array_namespace, is_jax_array
+from ._utils._compat import (
+    array_namespace,
+    is_dask_namespace,
+    is_jax_array,
+    is_jax_namespace,
+)
 from ._utils._helpers import asarrays
 from ._utils._typing import Array
 
@@ -547,6 +552,7 @@ def setdiff1d(
     /,
     *,
     assume_unique: bool = False,
+    fill_value: object | None = None,
     xp: ModuleType | None = None,
 ) -> Array:
     """
@@ -563,6 +569,11 @@ def setdiff1d(
     assume_unique : bool
         If ``True``, the input arrays are both assumed to be unique, which
         can speed up the calculation. Default is ``False``.
+    fill_value : object, optional
+        Pad the output array with this value.
+
+        This is exclusively used for JAX arrays when running inside ``jax.jit``,
+        where all array shapes need to be known in advance.
     xp : array_namespace, optional
         The standard-compatible namespace for `x1` and `x2`. Default: infer.
 
@@ -587,13 +598,86 @@ def setdiff1d(
         xp = array_namespace(x1, x2)
     x1, x2 = asarrays(x1, x2, xp=xp)
 
-    if assume_unique:
-        x1 = xp.reshape(x1, (-1,))
-        x2 = xp.reshape(x2, (-1,))
-    else:
-        x1 = xp.unique_values(x1)
-        x2 = xp.unique_values(x2)
-    return x1[_helpers.in1d(x1, x2, assume_unique=True, invert=True, xp=xp)]
+    x1 = xp.reshape(x1, (-1,))
+    x2 = xp.reshape(x2, (-1,))
+    if x1.shape == (0,) or x2.shape == (0,):
+        return x1
+
+    def _x1_not_in_x2(x1: Array, x2: Array) -> Array:  # numpydoc ignore=PR01,RT01
+        """For each element of x1, return True if it is not also in x2."""
+        # Even when assume_unique=True, there is no provision for x to be sorted
+        x2 = xp.sort(x2)
+        idx = xp.searchsorted(x2, x1)
+
+        # FIXME at() is faster but needs JAX jit support for bool mask
+        # idx = at(idx, idx == x2.shape[0]).set(0)
+        idx = xp.where(idx == x2.shape[0], xp.zeros_like(idx), idx)
+
+        return xp.take(x2, idx, axis=0) != x1
+
+    def _generic_impl(x1: Array, x2: Array) -> Array:  # numpydoc ignore=PR01,RT01
+        """Generic implementation (including eager JAX)."""
+        # Note: there is no provision in the Array API for xp.unique_values to sort
+        if not assume_unique:
+            # Call unique_values early to speed up the algorithm
+            x1 = xp.unique_values(x1)
+            x2 = xp.unique_values(x2)
+        mask = _x1_not_in_x2(x1, x2)
+        x1 = x1[mask]
+        return x1 if assume_unique else xp.sort(x1)
+
+    def _dask_impl(x1: Array, x2: Array) -> Array:  # numpydoc ignore=PR01,RT01
+        """
+        Dask implementation.
+
+        Works around unique_values returning unknown shapes.
+        """
+        # Do not call unique_values yet, as it would make array shapes unknown
+        mask = _x1_not_in_x2(x1, x2)
+        x1 = x1[mask]
+        # Note: da.unique_values sorts
+        return x1 if assume_unique else xp.unique_values(x1)
+
+    def _jax_jit_impl(
+        x1: Array, x2: Array, fill_value: object | None
+    ) -> Array:  # numpydoc ignore=PR01,RT01
+        """
+        JAX implementation inside jax.jit.
+
+        Works around unique_values requiring a size= parameter
+        and not being able to filter by a boolean mask.
+        Returns array the same size as x1, padded with fill_value.
+        """
+        # unique_values inside jax.jit is not supported unless it's got a fixed size
+        mask = _x1_not_in_x2(x1, x2)
+
+        if fill_value is None:
+            fill_value = xp.zeros((), dtype=x1.dtype)
+        else:
+            fill_value = xp.asarray(fill_value, dtype=x1.dtype)
+            if cast(Array, fill_value).ndim != 0:
+                msg = "`fill_value` must be a scalar."
+                raise ValueError(msg)
+
+        x1 = xp.where(mask, x1, fill_value)
+        # Note: jnp.unique_values sorts
+        return xp.unique_values(x1, size=x1.size, fill_value=fill_value)
+
+    if is_dask_namespace(xp):
+        return _dask_impl(x1, x2)
+
+    if is_jax_namespace(xp):
+        import jax
+
+        try:
+            return _generic_impl(x1, x2)  # eager mode
+        except (
+            jax.errors.ConcretizationTypeError,
+            jax.errors.NonConcreteBooleanIndexError,
+        ):
+            return _jax_jit_impl(x1, x2, fill_value)  # inside jax.jit
+
+    return _generic_impl(x1, x2)
 
 
 def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
