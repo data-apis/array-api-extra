@@ -7,8 +7,12 @@ from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._helpers import in1d
 from array_api_extra._lib._utils._typing import Device
+from array_api_extra.testing import lazy_xp_function
 
 # mypy: disable-error-code=no-untyped-usage
+
+# FIXME calls xp.unique_values without size
+lazy_xp_function(in1d, jax_jit=False, static_argnames=("assume_unique", "invert", "xp"))
 
 
 class TestIn1D:

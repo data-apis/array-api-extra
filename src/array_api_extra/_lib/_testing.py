@@ -2,6 +2,7 @@
 Testing utilities.
 
 Note that this is private API; don't expect it to be stable.
+See also ..testing for public testing utilities.
 """
 
 import math

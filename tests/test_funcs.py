@@ -22,9 +22,23 @@ from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._typing import Array, Device
+from array_api_extra.testing import lazy_xp_function
 
 # some xp backends are untyped
 # mypy: disable-error-code=no-untyped-def
+
+lazy_xp_function(atleast_nd, static_argnames=("ndim", "xp"))
+lazy_xp_function(cov, static_argnames="xp")
+# FIXME .device attribute https://github.com/data-apis/array-api-compat/pull/238
+lazy_xp_function(create_diagonal, jax_jit=False, static_argnames=("offset", "xp"))
+lazy_xp_function(expand_dims, static_argnames=("axis", "xp"))
+lazy_xp_function(kron, static_argnames="xp")
+lazy_xp_function(nunique, static_argnames="xp")
+lazy_xp_function(pad, static_argnames=("pad_width", "mode", "constant_values", "xp"))
+# FIXME calls in1d which calls xp.unique_values without size
+lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp"))
+# FIXME .device attribute https://github.com/data-apis/array-api-compat/pull/238
+lazy_xp_function(sinc, jax_jit=False, static_argnames="xp")
 
 
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no expand_dims")

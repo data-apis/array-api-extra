@@ -13,6 +13,7 @@ from array_api_extra._lib import Backend
 from array_api_extra._lib._utils._compat import array_namespace
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._typing import Device
+from array_api_extra.testing import patch_lazy_xp_functions
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -96,7 +97,9 @@ class NumPyReadOnly:
 
 
 @pytest.fixture
-def xp(library: Backend) -> ModuleType:  # numpydoc ignore=PR01,RT03
+def xp(
+    library: Backend, request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> ModuleType:  # numpydoc ignore=PR01,RT03
     """
     Parameterized fixture that iterates on all libraries.
 
@@ -107,6 +110,9 @@ def xp(library: Backend) -> ModuleType:  # numpydoc ignore=PR01,RT03
     if library == Backend.NUMPY_READONLY:
         return NumPyReadOnly()  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
     xp = pytest.importorskip(library.value)
+
+    patch_lazy_xp_functions(request, monkeypatch, xp=xp)
+
     if library == Backend.JAX:
         import jax
 

@@ -54,6 +54,7 @@ array-api-compat = ">=1.10.0,<2"
 array-api-extra = { path = ".", editable = true }
 
 [tool.pixi.feature.lint.dependencies]
+typing-extensions = "*"
 pre-commit = "*"
 pylint = "*"
 basedmypy = "*"
@@ -63,6 +64,9 @@ numpydoc = ">=1.8.0,<2"
 array-api-strict = "*"
 numpy = "*"
 pytest = "*"
+dask-core = "*"  # No distributed, tornado, etc.
+# NOTE: don't add jax, pytorch, sparse, cupy here
+# as they slow down mypy and are not portable across target OSs
 
 [tool.pixi.feature.lint.tasks]
 pre-commit-install = "pre-commit install"
@@ -98,6 +102,10 @@ furo = ">=2023.08.17"
 myst-parser = ">=0.13"
 sphinx-copybutton = "*"
 sphinx-autodoc-typehints = "*"
+# Needed to import parsed modules with autodoc
+dask-core = "*"
+pytest = "*"
+typing-extensions = "*"
 
 [tool.pixi.feature.docs.tasks]
 docs = { cmd = "sphinx-build . build/", cwd = "docs" }
@@ -180,8 +188,10 @@ markers = ["skip_xp_backend(library, *, reason=None): Skip test for a specific b
 
 [tool.coverage]
 run.source = ["array_api_extra"]
-report.exclude_also = ['\.\.\.']
-
+report.exclude_also = [
+    '\.\.\.',
+    'if TYPE_CHECKING:',
+]
 
 # mypy
 
@@ -221,6 +231,8 @@ reportMissingImports = false
 reportMissingTypeStubs = false
 # false positives for input validation
 reportUnreachable = false
+# ruff handles this
+reportUnusedParameter = false
 
 executionEnvironments = [
     { root = "tests", reportPrivateUsage = false },
@@ -282,7 +294,10 @@ messages_control.disable = [
     "design",                     # ignore heavily opinionated design checks
     "fixme",                      # allow FIXME comments
     "line-too-long",              # ruff handles this
+    "unused-argument",            # ruff handles this
     "missing-function-docstring", # numpydoc handles this
+    "import-error",               # mypy handles this
+    "import-outside-toplevel",    # optional dependencies
 ]
 
 
