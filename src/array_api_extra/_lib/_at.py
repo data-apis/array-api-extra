@@ -148,7 +148,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     Boolean masks are supported on Dask and jitted JAX arrays exclusively
     when `idx` has the same shape as `x` and `y` is 0-dimensional.
-    Note that this is support is not available in JAX's native
+    Note that this support is not available in JAX's native
     ``x.at[mask].set(y)``.
 
     This pattern::
