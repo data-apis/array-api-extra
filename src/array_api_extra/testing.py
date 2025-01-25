@@ -132,12 +132,12 @@ def lazy_xp_function(  # type: ignore[no-any-explicit]
           a = xp.asarray([1, 2]) b = myfunc(a)  # This is jitted when xp=jax.numpy c =
           mymodule.myfunc(a)  # This is not
     """
-    func.allow_dask_compute = allow_dask_compute  # type: ignore[attr-defined]  # pyright: ignore[reportFunctionMemberAccess]
-    if jax_jit:
-        func.lazy_jax_jit_kwargs = {  # type: ignore[attr-defined]  # pyright: ignore[reportFunctionMemberAccess]
-            "static_argnums": static_argnums,
-            "static_argnames": static_argnames,
-        }
+    func.lazy_xp_function = {  # type: ignore[attr-defined]  # pyright: ignore[reportFunctionMemberAccess]
+        "allow_dask_compute": allow_dask_compute,
+        "jax_jit": jax_jit,
+        "static_argnums": static_argnums,
+        "static_argnames": static_argnames,
+    }
 
 
 def patch_lazy_xp_functions(
@@ -181,10 +181,13 @@ def patch_lazy_xp_functions(
 
     if is_dask_namespace(xp):
         for name, func in globals_.items():
-            n = getattr(func, "allow_dask_compute", None)
-            if n is not None:
+            kwargs = cast(  # type: ignore[no-any-explicit]
+                "dict[str, Any] | None", getattr(func, "lazy_xp_function", None)
+            )
+            if kwargs is not None:
+                n = kwargs["allow_dask_compute"]
                 assert isinstance(n, int)
-                wrapped = _allow_dask_compute(func, n)
+                wrapped = _dask_wrap(func, n)
                 monkeypatch.setitem(globals_, name, wrapped)
 
     elif is_jax_namespace(xp):
@@ -192,12 +195,16 @@ def patch_lazy_xp_functions(
 
         for name, func in globals_.items():
             kwargs = cast(  # type: ignore[no-any-explicit]
-                "dict[str, Any] | None", getattr(func, "lazy_jax_jit_kwargs", None)
+                "dict[str, Any] | None", getattr(func, "lazy_xp_function", None)
             )
-            if kwargs is not None:
+            if kwargs is not None and kwargs["jax_jit"]:
                 # suppress unused-ignore to run mypy in -e lint as well as -e dev
-                wrapped = cast(Callable[..., Any], jax.jit(func, **kwargs))  # type: ignore[no-any-explicit,no-untyped-call,unused-ignore]
-                monkeypatch.setitem(globals_, name, wrapped)
+                wrapped = jax.jit(  # type: ignore[no-untyped-call,unused-ignore]
+                    func,
+                    static_argnums=kwargs["static_argnums"],
+                    static_argnames=kwargs["static_argnames"],
+                )
+                monkeypatch.setitem(globals_, name, wrapped)  # pyright: ignore[reportUnknownArgumentType]
 
 
 class CountingDaskScheduler(SchedulerGetCallable):
@@ -236,13 +243,15 @@ class CountingDaskScheduler(SchedulerGetCallable):
         return dask.get(dsk, keys, **kwargs)  # type: ignore[attr-defined,no-untyped-call] # pyright: ignore[reportPrivateImportUsage]
 
 
-def _allow_dask_compute(
+def _dask_wrap(
     func: Callable[P, T], n: int
 ) -> Callable[P, T]:  # numpydoc ignore=PR01,RT01
     """
     Wrap `func` to raise if it attempts to call `dask.compute` more than `n` times.
+
+    After the function returns, materialize the graph in order to re-raise exceptions.
     """
-    import dask.config
+    import dask
 
     func_name = getattr(func, "__name__", str(func))
     n_str = f"only up to {n}" if n else "no"
@@ -256,7 +265,12 @@ def _allow_dask_compute(
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:  # numpydoc ignore=GL08
         scheduler = CountingDaskScheduler(n, msg)
-        with dask.config.set({"scheduler": scheduler}):
-            return func(*args, **kwargs)
+        with dask.config.set({"scheduler": scheduler}):  # pyright: ignore[reportPrivateImportUsage]
+            out = func(*args, **kwargs)
+
+        # Block until the graph materializes and reraise exceptions. This allows
+        # `pytest.raises` and `pytest.warns` to work as expected. Note that this would
+        # not work on scheduler='distributed', as it would not block.
+        return dask.persist(out, scheduler="threads")[0]  # type: ignore[no-any-return,attr-defined,no-untyped-call,func-returns-value,index]  # pyright: ignore[reportPrivateImportUsage]
 
     return wrapper
