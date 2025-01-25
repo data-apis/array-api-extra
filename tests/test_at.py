@@ -195,9 +195,6 @@ def test_incompatible_dtype(
     >>> a /= 1.5
     UFuncTypeError: Cannot cast ufunc 'divide' output from dtype('float64')
     to dtype('int64') with casting rule 'same_kind'
-
-    See Also
-    --------
     """
     x = xp.asarray([2, 4])
     idx = xp.asarray([True, False]) if bool_mask else slice(None)
