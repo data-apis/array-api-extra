@@ -1,4 +1,6 @@
 comment: false
+github_checks:
+  annotations: false
 ignore:
   - "src/array_api_extra/_lib/_compat"
   - "src/array_api_extra/_lib/_typing"
