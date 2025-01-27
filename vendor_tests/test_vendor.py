@@ -39,6 +39,15 @@ def test_vendor_extra():
     assert_array_equal(y, x)
 
 
+def test_vendor_extra_testing():
+    from .array_api_extra.testing import lazy_xp_function
+
+    def f(x):
+        return x
+
+    lazy_xp_function(f)
+
+
 def test_vendor_extra_uses_vendor_compat():
     from ._array_api_compat_vendor import array_namespace as n1
     from .array_api_extra._lib._utils._compat import array_namespace as n2

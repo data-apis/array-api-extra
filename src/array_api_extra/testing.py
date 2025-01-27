@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import pytest
 
-from array_api_extra._lib._utils._compat import is_dask_namespace, is_jax_namespace
+from ._lib._utils._compat import is_dask_namespace, is_jax_namespace
 
 __all__ = ["lazy_xp_function", "patch_lazy_xp_functions"]
 
