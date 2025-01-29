@@ -339,6 +339,7 @@ def isclose(
     try:
         nrtol = xp.asarray(int(1.0 / rtol), dtype=b.dtype)
     except OverflowError:
+        # rtol * max_int(dtype) < 1, so it's inconsequential
         return xp.abs(a - b) <= atol
 
     return xp.abs(a - b) <= (atol + xp.abs(b) // nrtol)
