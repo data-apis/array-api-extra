@@ -359,7 +359,7 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
     Parameters
     ----------
     a, b : Array | int | float | complex
-        Input arrays or scalars. At least one must be an Array API object.
+        Input arrays or scalars. At least one must be an array.
     xp : array_namespace, optional
         The standard-compatible namespace for `a` and `b`. Default: infer.
 

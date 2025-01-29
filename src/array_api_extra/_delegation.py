@@ -53,7 +53,7 @@ def isclose(
     Parameters
     ----------
     a, b : Array | int | float | complex | bool
-        Input objects to compare. At least one must be an Array API object.
+        Input objects to compare. At least one must be an array.
     rtol : array_like, optional
         The relative tolerance parameter (see Notes).
     atol : array_like, optional

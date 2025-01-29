@@ -125,7 +125,7 @@ def asarrays(
     a, b : Array | int | float | complex | bool
         Input arrays or scalars. At least one must be an array.
     xp : ModuleType
-        The array API namespace.
+        The standard-compatible namespace for the returned arrays.
 
     Returns
     -------
