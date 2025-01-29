@@ -129,6 +129,11 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         When running inside `jax.jit`, `shape` must be fully known, i.e. it cannot
         contain any `None` elements.
 
+        .. warning::
+
+            `func` must never raise if it's run inside `jax.jit`, as its behavior is
+            undefined.
+
         Using this with `as_numpy=False` is particularly useful to apply non-jittable
         JAX functions to arrays on GPU devices.
         If `as_numpy=True`, the :doc:`jax:transfer_guard` may prevent arrays on a GPU
@@ -254,12 +259,11 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
             for i, (shape, dtype) in enumerate(zip(shapes, dtypes, strict=True))
         )
 
-    elif is_jax_namespace(xp):
-        # If we're inside jax.jit, we can't eagerly convert
-        # the JAX tracer objects to numpy.
-        # Instead, we delay calling wrapped, which will receive
-        # as arguments and will return JAX eager arrays.
-
+    elif is_jax_namespace(xp) and _is_jax_jit_enabled(xp):
+        # Delay calling func with jax.pure_callback, which will forward to func eager
+        # JAX arrays. Do not use jax.pure_callback when running outside of the JIT,
+        # as it does not support raising exceptions:
+        # https://github.com/jax-ml/jax/issues/26102
         import jax
 
         # Shield eager kwargs from being coerced into JAX arrays.
@@ -276,27 +280,19 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         wrapped = _lazy_apply_wrapper(
             partial(func, **eager_kwargs), as_numpy, multi_output, xp
         )
-
-        if any(s is None for shape in shapes for s in shape):
-            # Unknown output shape. Won't work with jax.jit, but it
-            # can work with eager jax.
-            # Raises jax.errors.TracerArrayConversionError if we're inside jax.jit.
-            out = wrapped(*args, **lazy_kwargs)
-
-        else:
-            # suppress unused-ignore to run mypy in -e lint as well as -e dev
-            out = cast(  # type: ignore[bad-cast,unused-ignore]
-                tuple[Array, ...],
-                jax.pure_callback(
-                    wrapped,
-                    tuple(
-                        jax.ShapeDtypeStruct(shape, dtype)  # pyright: ignore[reportUnknownArgumentType]
-                        for shape, dtype in zip(shapes, dtypes, strict=True)
-                    ),
-                    *args,
-                    **lazy_kwargs,
+        # suppress unused-ignore to run mypy in -e lint as well as -e dev
+        out = cast(  # type: ignore[bad-cast,unused-ignore]
+            tuple[Array, ...],
+            jax.pure_callback(
+                wrapped,
+                tuple(
+                    jax.ShapeDtypeStruct(shape, dtype)  # pyright: ignore[reportUnknownArgumentType]
+                    for shape, dtype in zip(shapes, dtypes, strict=True)
                 ),
-            )
+                *args,
+                **lazy_kwargs,
+            ),
+        )
 
     else:
         # Eager backends
@@ -304,6 +300,17 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         out = wrapped(*args, **kwargs)
 
     return out if multi_output else out[0]
+
+
+def _is_jax_jit_enabled(xp: ModuleType) -> bool:  # numpydoc ignore=PR01,RT01
+    """Return True if this function is being called inside ``jax.jit``."""
+    import jax  # pylint: disable=import-outside-toplevel
+
+    x = xp.asarray(False)
+    try:
+        return bool(x)
+    except jax.errors.TracerArrayConversionError:
+        return True
 
 
 def _contains_jax_arrays(x: object) -> bool:  # numpydoc ignore=PR01,RT01

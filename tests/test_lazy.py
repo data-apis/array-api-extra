@@ -63,18 +63,14 @@ def raises(x: Array) -> Array:
 
     return lazy_apply(eager, x, shape=x.shape, dtype=x.dtype)
 
-
 lazy_xp_function(raises)
 
 
-def test_lazy_apply_raises(xp: ModuleType, library: Backend) -> None:
+@pytest.mark.skip_xp_backend(Backend.JAX_JIT, reason="no exception support")
+def test_lazy_apply_raises(xp: ModuleType) -> None:
     x = xp.asarray(0)
 
-    with pytest.raises(
-        # FIXME https://github.com/jax-ml/jax/issues/26102
-        RuntimeError if library is Backend.JAX else CustomError,
-        match="Hello World",
-    ):
+    with pytest.raises(CustomError, match="Hello World"):
         # Here we are disregarding the return value, which would
         # normally cause the graph not to materialize and the
         # exception not to be raised.
