@@ -579,6 +579,21 @@ class TestSetDiff1D:
         actual = setdiff1d(x1, x2, assume_unique=True)
         xp_assert_equal(actual, expected)
 
+    @pytest.mark.parametrize("assume_unique", [True, False])
+    @pytest.mark.parametrize("shape1", [(), (1,), (1, 1)])
+    @pytest.mark.parametrize("shape2", [(), (1,), (1, 1)])
+    def test_shapes(
+        self,
+        assume_unique: bool,
+        shape1: tuple[int, ...],
+        shape2: tuple[int, ...],
+        xp: ModuleType,
+    ):
+        x1 = xp.zeros(shape1)
+        x2 = xp.zeros(shape2)
+        actual = setdiff1d(x1, x2, assume_unique=assume_unique)
+        xp_assert_equal(actual, xp.empty((0,)))
+
     def test_device(self, xp: ModuleType, device: Device):
         x1 = xp.asarray([3, 8, 20], device=device)
         x2 = xp.asarray([2, 3, 4], device=device)
