@@ -580,6 +580,7 @@ def setdiff1d(
 
     if assume_unique:
         x1 = xp.reshape(x1, (-1,))
+        x2 = xp.reshape(x2, (-1,))
     else:
         x1 = xp.unique_values(x1)
         x2 = xp.unique_values(x2)
