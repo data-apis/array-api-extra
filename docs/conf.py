@@ -56,6 +56,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable", None),
     "dask": ("https://docs.dask.org/en/stable", None),
     "jax": ("https://jax.readthedocs.io/en/latest", None),
+    "equinox": ("https://docs.kidger.site/equinox/", None),
 }
 
 nitpick_ignore = [

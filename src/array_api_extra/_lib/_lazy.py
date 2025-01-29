@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import math
+import warnings
 from collections.abc import Callable, Sequence
 from functools import partial, wraps
 from types import ModuleType
@@ -12,9 +13,11 @@ from typing import TYPE_CHECKING, Any, cast, overload
 from ._utils._compat import (
     array_namespace,
     is_array_api_obj,
+    is_dask_array,
     is_dask_namespace,
     is_jax_array,
     is_jax_namespace,
+    is_lazy_array,
 )
 from ._utils._typing import Array, DType
 
@@ -366,3 +369,327 @@ def _lazy_apply_wrapper(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR0
         return (xp.asarray(out),)
 
     return wrapper
+
+
+def lazy_raise(  # numpydoc ignore=SA04
+    x: Array,
+    cond: bool | Array,
+    exc: Exception,
+    *,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Raise an exception if an eager check fails on a lazy array.
+
+    Consider this snippet::
+
+        >>> def f(x, xp):
+        ...     if xp.any(x < 0):
+        ...         raise ValueError("Some points are negative")
+        ...     return x + 1
+
+    The above code fails to compile when x is a JAX array and the function is wrapped
+    by `jax.jit`; it is also extremely slow on Dask. Other lazy backends, e.g. ndonnx,
+    are also expected to misbehave.
+
+    `xp.any(x < 0)` is a 0-dimensional array with `dtype=bool`; the `if` statement calls
+    `bool()` on the Array to convert it to a Python bool.
+
+    On eager backends such as NumPy, this is not a problem. On Dask, `bool()` implicitly
+    triggers a computation of the whole graph so far; what's worse is that the
+    intermediate results are discarded to optimize memory usage, so when later on user
+    explicitly calls `compute()` on their final output, `x` is recalculated from
+    scratch. On JAX, `bool()` raises if its called code is wrapped by `jax.jit` for the
+    same reason.
+
+    You should rewrite the above code as follows::
+
+        >>> def f(x, xp):
+        ...     x = lazy_raise(x, xp.any(x < 0), ValueError("Some points are negative"))
+        ...     return x + 1
+
+    When `xp` is eager, this is equivalent to the original code; if the error condition
+    resolves to True, the function raises immediately and the next line `return x + 1`
+    is never executed.
+    When `xp` is lazy, the function always returns a lazy array. When eventually the
+    user actually computes it, e.g. in Dask by calling `compute()` and in JAX by having
+    their outermost function decorated with `@jax.jit` return, only then the error
+    condition is evaluated. If True, the exception is raised and propagated as normal,
+    and the following nodes of the graph are never executed (so if the health check was
+    in place to prevent not only incorrect results but e.g. a segmentation fault, it's
+    still going to achieve its purpose).
+
+    Parameters
+    ----------
+    x : Array
+        Any one Array, potentially lazy, that is used later on to produce the value
+        returned by your function.
+    cond : bool | Array
+        Must be either a plain Python bool or a 0-dimensional Array with boolean dtype.
+        If True, raise the exception. If False, return x.
+    exc : Exception
+        The exception instance to be raised.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    Array
+        `x`. If both `x` and `cond` are lazy array, the graph underlying `x` is altered
+        to raise `exc` if `cond` is True.
+
+    Raises
+    ------
+    type(x)
+        If `cond` evaluates to True.
+
+    Warnings
+    --------
+    This function raises when x is eager, and quietly skips the check
+    when x is lazy::
+
+        >>> def f(x, xp):
+        ...     lazy_raise(x, xp.any(x < 0), ValueError("Some points are negative"))
+        ...     return x + 1
+
+    And so does this one, as lazy_raise replaces `x` but it does so too late to
+    contribute to the return value::
+
+        >>> def f(x, xp):
+        ...     y = x + 1
+        ...     x = lazy_raise(x, xp.any(x < 0), ValueError("Some points are negative"))
+        ...     return y
+
+    See Also
+    --------
+    lazy_apply
+    lazy_warn
+    lazy_wait_on
+    dask.graph_manipulation.wait_on
+    equinox.error_if
+
+    Notes
+    -----
+    This function will raise if the :doc:`jax:transfer_guard` is active and `cond` is
+    a JAX array on a non-CPU device
+    (`jax-ml/jax#25995 <https://github.com/jax-ml/jax/issues/25998>`_).
+    """
+
+    def _lazy_raise(x: Array, cond: Array) -> Array:  # numpydoc ignore=PR01,RT01
+        """Eager helper of `lazy_raise` running inside the lazy graph."""
+        if cond:
+            raise exc
+        return x
+
+    return _lazy_wait_on_impl(_lazy_raise, x, cond, xp=xp)
+
+
+# Signature of warnings.warn copied from python/typeshed
+@overload
+def lazy_warn(  # type: ignore[no-any-explicit,no-any-decorated]  # numpydoc ignore=GL08
+    x: Array,
+    cond: bool | Array,
+    message: str,
+    category: type[Warning] | None = None,
+    stacklevel: int = 1,
+    source: Any | None = None,
+    *,
+    xp: ModuleType | None = None,
+) -> None: ...
+@overload
+def lazy_warn(  # type: ignore[no-any-explicit,no-any-decorated]  # numpydoc ignore=GL08
+    x: Array,
+    cond: bool | Array,
+    message: Warning,
+    category: Any = None,
+    stacklevel: int = 1,
+    source: Any | None = None,
+    *,
+    xp: ModuleType | None = None,
+) -> None: ...
+
+
+def lazy_warn(  # type: ignore[no-any-explicit]  # numpydoc ignore=SA04,PR04
+    x: Array,
+    cond: bool | Array,
+    message: str | Warning,
+    category: Any = None,
+    stacklevel: int = 1,
+    source: Any | None = None,
+    *,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Call `warnings.warn` if an eager check fails on a lazy array.
+
+    This functions works in the same way as `lazy_raise`; refer to it
+    for the detailed explanation.
+
+    You should replace::
+
+        >>> def f(x, xp):
+        ...     if xp.any(x < 0):
+        ...         warnings.warn("Some points are negative", UserWarning, stacklevel=2)
+        ...     return x + 1
+
+    with::
+
+        >>> def f(x, xp):
+        ...     x = lazy_warn(x, xp.any(x < 0),
+        ...                   "Some points are negative", UserWarning, stacklevel=2)
+        ...     return x + 1
+
+    Parameters
+    ----------
+    x : Array
+        Any one Array, potentially lazy, that is used later on to produce the value
+        returned by your function.
+    cond : bool | Array
+        Must be either a plain Python bool or a 0-dimensional Array with boolean dtype.
+        If True, raise the exception. If False, return x.
+    message, category, stacklevel, source :
+        Parameters to `warnings.warn`. `stacklevel` is automatically increased to
+        compensate for the extra wrapper function.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    Array
+        `x`. If both `x` and `cond` are lazy array, the graph underlying `x` is altered
+        to issue the warning if `cond` is True.
+
+    See Also
+    --------
+    warnings.warn
+    lazy_apply
+    lazy_raise
+    lazy_wait_on
+    dask.graph_manipulation.wait_on
+
+    Notes
+    -----
+    This function will raise if the :doc:`jax:transfer_guard` is active and `cond` is
+    a JAX array on a non-CPU device
+    (`jax-ml/jax#25995 <https://github.com/jax-ml/jax/issues/25998>`_).
+
+    On Dask, the warning is typically going to appear on the log of the
+    worker executing the function instead of on the client.
+    """
+
+    def _lazy_warn(x: Array, cond: Array) -> Array:  # numpydoc ignore=PR01,RT01
+        """Eager helper of `lazy_raise` running inside the lazy graph."""
+        if cond:
+            warnings.warn(message, category, stacklevel=stacklevel + 2, source=source)
+        return x
+
+    return _lazy_wait_on_impl(_lazy_warn, x, cond, xp=xp)
+
+
+def lazy_wait_on(
+    x: Array, *wait_on: ArrayLike, xp: ModuleType | None = None
+) -> Array:  # numpydoc ignore=SA04
+    """
+    Pause materialization of `x` until `wait_on` has been materialized.
+
+    This is typically used to collect multiple calls to `lazy_raise` and/or
+    `lazy_warn` from validation functions that would otherwise return None.
+    If `wait_on` is not a lazy array, just return `x`.
+
+    Read `lazy_raise` for detailed explanation.
+
+    If you use this validation pattern for eager backends::
+
+        def validate(x, xp):
+            if xp.any(x < 10):
+                raise ValueError("Less than 10")
+            if xp.any(x > 20):
+                warnings.warn(UserWarning, "More than 20")
+
+        def f(x, xp):
+            validate(x, xp=xp)
+            return x + 1
+
+    You should rewrite it as follows::
+
+        def validate(x, xp):
+            # Future that evaluates the checks. Contents are inconsequential.
+            # Avoid zero-sized arrays, as they may be elided by the graph optimizer.
+            future = xp.empty(1)
+            future = lazy_raise(future, xp.any(x < 10), ValueError("Less than 10"))
+            future = lazy_warn(future, xp.any(x > 20), UserWarning, "More than 20"))
+            return future
+
+        def f(x, xp):
+            x = lazy_wait_on(x, validate(x, xp=xp), xp=xp)
+            return x + 1
+
+    Parameters
+    ----------
+    x : Array
+        Any one Array, potentially lazy, that is used later on to produce the value
+        returned by your function.
+    *wait_on : ArrayLike
+        Zero or more objects. Block the materialization of `x` until all lazy arrays in
+        `wait_on` has been fully materialized.
+        Eager arrays, python bools and scalars, etc. are ignored.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    Array
+        `x`. If both `x` and `wait_on` are lazy arrays, the graph
+        underlying `x` is altered to wait until `wait_on` has been materialized.
+        If `wait_on` raises, the exception is propagated to `x`.
+
+    See Also
+    --------
+    lazy_apply
+    lazy_raise
+    lazy_warn
+    dask.graph_manipulation.wait_on
+    """
+    xp = array_namespace(x, *wait_on) if xp is None else xp
+
+    if is_dask_namespace(xp):
+        # Apply an arbitrary reduction so that
+        # a) all chunks of each of the wait_on objects are materialized, and
+        # b) the result is a 0-dimensional array, which doesn't interfere with
+        #    map_blocks in _lazy_wait_on_impl.
+        #
+        # For all other backends, _lazy_wait_on_impl calls lazy_apply, which can be told
+        # to disregard the shape of wait_on, so we can skip the reduction.
+        #
+        # Dask offers `dask.graph_manipulation.bind` that does exactly the same thing as
+        # `lazy_wait_on`. As of 2025.1, however, dask.array is in the middle of
+        # transitioning from HighLevelGraph to dask_expr, and dask.graph_manipulation
+        # hasn't been migrated yet.
+        wait_on = tuple(xp.any(w) for w in wait_on if is_dask_array(w))
+
+    def _lazy_wait_on(x: Array, *_: Array) -> Array:  # numpydoc ignore=PR01,RT01
+        """Eager helper of `lazy_wait_on` running inside the lazy graph."""
+        return x
+
+    return _lazy_wait_on_impl(_lazy_wait_on, x, *wait_on, xp=xp)
+
+
+def _lazy_wait_on_impl(  # type: ignore[no-any-explicit] # numpydoc ignore=PR01,RT01
+    eager_func: Callable[..., Array],
+    x: Array,
+    *wait_on: ArrayLike,
+    xp: ModuleType | None,
+) -> Array:
+    """Implementation of lazy_raise, lazy_warn, and lazy_wait_on."""
+    if not any(is_lazy_array(w) for w in wait_on):
+        return eager_func(x, *wait_on)
+
+    xp = array_namespace(x, *wait_on) if xp is None else xp
+
+    if is_dask_namespace(xp):
+        # lazy_apply would rechunk x
+        # Note that wait_on here are always 0-dimensional, as we special-cased
+        # them away in lazy_wait_on when there is a chance that they aren't.
+        return xp.map_blocks(eager_func, x, *wait_on, dtype=x.dtype, meta=x._meta)  # pylint: disable=protected-access
+
+    return lazy_apply(eager_func, x, *wait_on, shape=x.shape, dtype=x.dtype, xp=xp)

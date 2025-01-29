@@ -10,6 +10,9 @@ lazy backends, e.g. Dask or Jax:
     :toctree: generated
 
     lazy_apply
+    lazy_raise
+    lazy_wait_on
+    lazy_warn
     testing.lazy_xp_function
     testing.patch_lazy_xp_functions
 ```

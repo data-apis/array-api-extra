@@ -12,7 +12,7 @@ from ._lib._funcs import (
     setdiff1d,
     sinc,
 )
-from ._lib._lazy import lazy_apply
+from ._lib._lazy import lazy_apply, lazy_raise, lazy_wait_on, lazy_warn
 
 __version__ = "0.6.1.dev0"
 
@@ -27,6 +27,9 @@ __all__ = [
     "isclose",
     "kron",
     "lazy_apply",
+    "lazy_raise",
+    "lazy_wait_on",
+    "lazy_warn",
     "nunique",
     "pad",
     "setdiff1d",
