@@ -69,7 +69,7 @@ class TestIn1D:
         ("complex128", 1.0, True),
         # complex vs. xp.complex
         ("complex64", 1.0j, True),
-        ("complex128", 1.0j, True),        
+        ("complex128", 1.0j, True),
         # Undefined cases
         ("bool", 1, False),
         ("int64", 1.0, False),
