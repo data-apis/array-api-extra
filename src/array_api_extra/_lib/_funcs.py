@@ -12,6 +12,7 @@ from typing import cast
 from ._at import at
 from ._utils import _compat, _helpers
 from ._utils._compat import array_namespace, is_jax_array
+from ._utils._helpers import asarrays
 from ._utils._typing import Array
 
 __all__ = [
@@ -315,6 +316,7 @@ def isclose(
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
+    a, b = asarrays(a, b, xp=xp)
 
     a_inexact = xp.isdtype(a.dtype, ("real floating", "complex floating"))
     b_inexact = xp.isdtype(b.dtype, ("real floating", "complex floating"))
@@ -356,8 +358,8 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
 
     Parameters
     ----------
-    a, b : array
-        Input arrays.
+    a, b : Array | int | float | complex
+        Input arrays or scalars. At least one must be an Array API object.
     xp : array_namespace, optional
         The standard-compatible namespace for `a` and `b`. Default: infer.
 
@@ -420,10 +422,10 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
     """
     if xp is None:
         xp = array_namespace(a, b)
+    a, b = asarrays(a, b, xp=xp)
 
-    b = xp.asarray(b)
     singletons = (1,) * (b.ndim - a.ndim)
-    a = xp.broadcast_to(xp.asarray(a), singletons + a.shape)
+    a = xp.broadcast_to(a, singletons + a.shape)
 
     nd_b, nd_a = b.ndim, a.ndim
     nd_max = max(nd_b, nd_a)
@@ -583,6 +585,7 @@ def setdiff1d(
     """
     if xp is None:
         xp = array_namespace(x1, x2)
+    x1, x2 = asarrays(x1, x2, xp=xp)
 
     if assume_unique:
         x1 = xp.reshape(x1, (-1,))
