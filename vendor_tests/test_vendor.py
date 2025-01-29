@@ -6,12 +6,19 @@ def test_vendor_compat():
     from ._array_api_compat_vendor import (  # type: ignore[attr-defined]
         array_namespace,
         device,
+        is_array_api_obj,
+        is_array_api_strict_namespace,
+        is_cupy_array,
         is_cupy_namespace,
         is_dask_array,
         is_dask_namespace,
         is_jax_array,
         is_jax_namespace,
+        is_numpy_array,
+        is_numpy_namespace,
+        is_pydata_sparse_array,
         is_pydata_sparse_namespace,
+        is_torch_array,
         is_torch_namespace,
         is_writeable_array,
         size,
@@ -20,12 +27,19 @@ def test_vendor_compat():
     x = xp.asarray([1, 2, 3])
     assert array_namespace(x) is xp
     device(x)
+    assert is_array_api_obj(x)
+    assert is_array_api_strict_namespace(xp)
+    assert not is_cupy_array(x)
     assert not is_cupy_namespace(xp)
     assert not is_dask_array(x)
     assert not is_dask_namespace(xp)
     assert not is_jax_array(x)
     assert not is_jax_namespace(xp)
+    assert not is_numpy_array(x)
+    assert not is_numpy_namespace(xp)
+    assert not is_pydata_sparse_array(x)
     assert not is_pydata_sparse_namespace(xp)
+    assert not is_torch_array(x)
     assert not is_torch_namespace(xp)
     assert is_writeable_array(x)
     assert size(x) == 3
