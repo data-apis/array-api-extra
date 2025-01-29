@@ -354,6 +354,13 @@ class TestIsClose:
         xp_assert_equal(isclose(a, b, rtol=0), xp.asarray([False, False]))
         xp_assert_equal(isclose(a, b, atol=1, rtol=0), xp.asarray([True, False]))
 
+    @pytest.mark.parametrize("dtype", ["int8", "uint8"])
+    def test_tolerance_integer_overflow(self, dtype: str, xp: ModuleType):
+        """1/rtol is too large for dtype"""
+        a = xp.asarray([100, 100], dtype=getattr(xp, dtype))
+        b = xp.asarray([100, 101], dtype=getattr(xp, dtype))
+        xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
+
     def test_very_small_numbers(self, xp: ModuleType):
         a = xp.asarray([1e-9, 1e-9])
         b = xp.asarray([1.0001e-9, 1.00001e-9])
