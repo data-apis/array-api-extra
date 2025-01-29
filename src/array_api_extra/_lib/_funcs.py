@@ -335,7 +335,12 @@ def isclose(
     atol = int(atol)
     if rtol == 0:
         return xp.abs(a - b) <= atol
-    nrtol = int(1.0 / rtol)
+
+    try:
+        nrtol = xp.asarray(int(1.0 / rtol), dtype=b.dtype)
+    except OverflowError:
+        return xp.abs(a - b) <= atol
+
     return xp.abs(a - b) <= (atol + xp.abs(b) // nrtol)
 
 
