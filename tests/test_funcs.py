@@ -401,6 +401,24 @@ class TestIsClose:
         a = a[a]
         xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
 
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
+    @pytest.mark.skip_xp_backend(Backend.TORCH, reason="Array API 2024.12 support")
+    def test_python_scalar(self, xp: ModuleType):
+        a = xp.asarray([0.0, 0.1], dtype=xp.float32)
+        xp_assert_equal(isclose(a, 0.0), xp.asarray([True, False]))
+        xp_assert_equal(isclose(0.0, a), xp.asarray([True, False]))
+
+        a = xp.asarray([0, 1], dtype=xp.int16)
+        xp_assert_equal(isclose(a, 0), xp.asarray([True, False]))
+        xp_assert_equal(isclose(0, a), xp.asarray([True, False]))
+
+        xp_assert_equal(isclose(0, 0, xp=xp), xp.asarray(True))
+        xp_assert_equal(isclose(0, 1, xp=xp), xp.asarray(False))
+
+    def test_all_python_scalars(self):
+        with pytest.raises(TypeError, match="Unrecognized"):
+            isclose(0, 0)
+
     def test_xp(self, xp: ModuleType):
         a = xp.asarray([0.0, 0.0])
         b = xp.asarray([1e-9, 1e-4])
@@ -413,30 +431,22 @@ class TestKron:
         # Using 0-dimensional array
         a = xp.asarray(1)
         b = xp.asarray([[1, 2], [3, 4]])
-        k = xp.asarray([[1, 2], [3, 4]])
-        xp_assert_equal(kron(a, b), k)
-        a = xp.asarray([[1, 2], [3, 4]])
-        b = xp.asarray(1)
-        xp_assert_equal(kron(a, b), k)
+        xp_assert_equal(kron(a, b), b)
+        xp_assert_equal(kron(b, a), b)
 
         # Using 1-dimensional array
         a = xp.asarray([3])
         b = xp.asarray([[1, 2], [3, 4]])
         k = xp.asarray([[3, 6], [9, 12]])
         xp_assert_equal(kron(a, b), k)
-        a = xp.asarray([[1, 2], [3, 4]])
-        b = xp.asarray([3])
-        xp_assert_equal(kron(a, b), k)
+        xp_assert_equal(kron(b, a), k)
 
         # Using 3-dimensional array
         a = xp.asarray([[[1]], [[2]]])
         b = xp.asarray([[1, 2], [3, 4]])
         k = xp.asarray([[[1, 2], [3, 4]], [[2, 4], [6, 8]]])
         xp_assert_equal(kron(a, b), k)
-        a = xp.asarray([[1, 2], [3, 4]])
-        b = xp.asarray([[[1]], [[2]]])
-        k = xp.asarray([[[1, 2], [3, 4]], [[2, 4], [6, 8]]])
-        xp_assert_equal(kron(a, b), k)
+        xp_assert_equal(kron(b, a), k)
 
     def test_kron_smoke(self, xp: ModuleType):
         a = xp.ones((3, 3))
@@ -473,6 +483,18 @@ class TestKron:
 
         k = kron(a, b)
         assert k.shape == expected_shape
+
+    def test_python_scalar(self, xp: ModuleType):
+        a = 1
+        # Test no dtype promotion to xp.asarray(a); use b.dtype
+        b = xp.asarray([[1, 2], [3, 4]], dtype=xp.int16)
+        xp_assert_equal(kron(a, b), b)
+        xp_assert_equal(kron(b, a), b)
+        xp_assert_equal(kron(1, 1, xp=xp), xp.asarray(1))
+
+    def test_all_python_scalars(self):
+        with pytest.raises(TypeError, match="Unrecognized"):
+            kron(1, 1)
 
     def test_device(self, xp: ModuleType, device: Device):
         x1 = xp.asarray([1, 2, 3], device=device)
@@ -600,6 +622,28 @@ class TestSetDiff1D:
         x2 = xp.zeros(shape2)
         actual = setdiff1d(x1, x2, assume_unique=assume_unique)
         xp_assert_equal(actual, xp.empty((0,)))
+
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
+    @pytest.mark.parametrize("assume_unique", [True, False])
+    def test_python_scalar(self, xp: ModuleType, assume_unique: bool):
+        # Test no dtype promotion to xp.asarray(x2); use x1.dtype
+        x1 = xp.asarray([3, 1, 2], dtype=xp.int16)
+        x2 = 3
+        actual = setdiff1d(x1, x2, assume_unique=assume_unique)
+        xp_assert_equal(actual, xp.asarray([1, 2], dtype=xp.int16))
+
+        actual = setdiff1d(x2, x1, assume_unique=assume_unique)
+        xp_assert_equal(actual, xp.asarray([], dtype=xp.int16))
+
+        xp_assert_equal(
+            setdiff1d(0, 0, assume_unique=assume_unique, xp=xp),
+            xp.asarray([0])[:0],  # Default int dtype for backend
+        )
+
+    @pytest.mark.parametrize("assume_unique", [True, False])
+    def test_all_python_scalars(self, assume_unique: bool):
+        with pytest.raises(TypeError, match="Unrecognized"):
+            setdiff1d(0, 0, assume_unique=assume_unique)
 
     def test_device(self, xp: ModuleType, device: Device):
         x1 = xp.asarray([3, 8, 20], device=device)
