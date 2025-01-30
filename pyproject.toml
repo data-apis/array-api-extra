@@ -26,7 +26,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = ["array-api-compat>=1.10.0,<2"]
+# dependencies = ["array-api-compat>=1.11.0,<2"]  # DNM
 
 [project.urls]
 Homepage = "https://github.com/data-apis/array-api-extra"
@@ -48,10 +48,11 @@ platforms = ["linux-64", "osx-arm64", "win-64"]
 
 [tool.pixi.dependencies]
 python = ">=3.10,<3.14"
-array-api-compat = ">=1.10.0,<2"
+# array-api-compat = ">=1.11.0,<2"  # DNM
 
 [tool.pixi.pypi-dependencies]
 array-api-extra = { path = ".", editable = true }
+array-api-compat = { git = "https://github.com/data-apis/array-api-compat" }  # DNM
 
 [tool.pixi.feature.lint.dependencies]
 typing-extensions = "*"

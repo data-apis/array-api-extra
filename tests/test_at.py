@@ -208,8 +208,6 @@ def test_incompatible_dtype(
                 z = at_op(x, idx, op, 1.1, copy=copy)
 
     elif library is Backend.DASK:
-        if op in (_AtOp.MIN, _AtOp.MAX):
-            pytest.xfail(reason="need array-api-compat 1.11")
         z = at_op(x, idx, op, 1.1, copy=copy)
 
     elif library is Backend.ARRAY_API_STRICT and op is not _AtOp.SET:
