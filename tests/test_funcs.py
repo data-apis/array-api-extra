@@ -35,8 +35,7 @@ lazy_xp_function(expand_dims, static_argnames=("axis", "xp"))
 lazy_xp_function(kron, static_argnames="xp")
 lazy_xp_function(nunique, static_argnames="xp")
 lazy_xp_function(pad, static_argnames=("pad_width", "mode", "constant_values", "xp"))
-# FIXME calls in1d which calls xp.unique_values without size
-lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp"))
+lazy_xp_function(setdiff1d, static_argnames=("assume_unique", "xp"))
 # FIXME .device attribute https://github.com/data-apis/array-api-compat/pull/238
 lazy_xp_function(sinc, jax_jit=False, static_argnames="xp")
 
@@ -576,8 +575,7 @@ class TestPad:
         assert padded.shape == (4, 4)
 
 
-@pytest.mark.skip_xp_backend(Backend.DASK, reason="no argsort")
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no device kwarg in asarray")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no sort")
 class TestSetDiff1D:
     @pytest.mark.skip_xp_backend(
         Backend.TORCH, reason="index_select not implemented for uint32"
