@@ -16,13 +16,11 @@ skip_as_numpy = [
 ]
 
 
-@pytest.mark.parametrize("as_numpy", [False, pytest.param(True, marks=skip_as_numpy)])
-def test_lazy_apply_kwargs(xp: ModuleType, library: Backend, as_numpy: bool) -> None:
-    expect = np.ndarray if as_numpy or library is Backend.DASK else type(xp.asarray(0))
+class NT(NamedTuple):
+    a: Array
 
-    class NT(NamedTuple):
-        a: Array
 
+def check_lazy_apply_kwargs(x: Array, expect: type, as_numpy: bool) -> Array:
     def f(
         x: Array,
         z: dict[str, list[Array] | tuple[Array, ...] | NT],
@@ -36,10 +34,9 @@ def test_lazy_apply_kwargs(xp: ModuleType, library: Backend, as_numpy: bool) -> 
         assert isinstance(z["baz"][0], expect)
         assert msg == "Hello World"
         assert msgs[0] == "Hello World"
-        return x
+        return x + 1
 
-    x = xp.asarray(0)
-    y = lazy_apply(  # pyright: ignore[reportCallIssue]
+    return lazy_apply(  # pyright: ignore[reportCallIssue]
         f,
         x,
         z={"foo": NT(x), "bar": [x], "baz": (x,)},
@@ -49,7 +46,16 @@ def test_lazy_apply_kwargs(xp: ModuleType, library: Backend, as_numpy: bool) -> 
         dtype=x.dtype,
         as_numpy=as_numpy,
     )
-    xp_assert_equal(x, y)
+
+lazy_xp_function(check_lazy_apply_kwargs, static_argnames=("expect", "as_numpy"))
+
+
+@pytest.mark.parametrize("as_numpy", [False, pytest.param(True, marks=skip_as_numpy)])
+def test_lazy_apply_kwargs(xp: ModuleType, library: Backend, as_numpy: bool) -> None:
+    expect = np.ndarray if as_numpy or library is Backend.DASK else type(xp.asarray(0))
+    x = xp.asarray(0)
+    actual = check_lazy_apply_kwargs(x, expect, as_numpy)
+    xp_assert_equal(actual, x + 1)
 
 
 class CustomError(Exception):
