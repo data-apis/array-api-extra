@@ -9,6 +9,7 @@ from functools import partial, wraps
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast, overload
 
+from ._utils import _compat
 from ._utils._compat import (
     array_namespace,
     is_array_api_obj,
@@ -295,7 +296,7 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         )
 
     else:
-        # Eager backends
+        # Eager backends, including non-jitted JAX
         wrapped = _lazy_apply_wrapper(func, as_numpy, multi_output, xp)
         out = wrapped(*args, **kwargs)
 
@@ -309,7 +310,7 @@ def _is_jax_jit_enabled(xp: ModuleType) -> bool:  # numpydoc ignore=PR01,RT01
     x = xp.asarray(False)
     try:
         return bool(x)
-    except jax.errors.TracerArrayConversionError:
+    except jax.errors.TracerBoolConversionError:
         return True
 
 
@@ -362,6 +363,8 @@ def _lazy_apply_wrapper(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR0
     def wrapper(  # type: ignore[no-any-decorated,no-any-explicit]
         *args: Array, **kwargs: Any
     ) -> tuple[Array, ...]:  # numpydoc ignore=GL08
+        device = _compat.device(args[0]) if args else None
+
         if as_numpy:
             args = _as_numpy(args)
             kwargs = _as_numpy(kwargs)
@@ -369,7 +372,7 @@ def _lazy_apply_wrapper(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR0
 
         if multi_output:
             assert isinstance(out, Sequence)
-            return tuple(xp.asarray(o) for o in out)
-        return (xp.asarray(out),)
+            return tuple(xp.asarray(o, device=device) for o in out)
+        return (xp.asarray(out, device=device),)
 
     return wrapper
