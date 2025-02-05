@@ -11,7 +11,7 @@ import pytest
 from array_api_extra import at
 from array_api_extra._lib import Backend
 from array_api_extra._lib._at import _AtOp
-from array_api_extra._lib._testing import xp_assert_equal
+from array_api_extra._lib._testing import xfail, xp_assert_equal
 from array_api_extra._lib._utils._compat import array_namespace, is_writeable_array
 from array_api_extra._lib._utils._typing import Array, Index
 from array_api_extra.testing import lazy_xp_function
@@ -80,10 +80,12 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
 @pytest.mark.parametrize(
     ("kwargs", "expect_copy"),
     [
-        ({"copy": True}, True),
-        ({"copy": False}, False),
-        ({"copy": None}, None),  # Behavior is backend-specific
-        ({}, None),  # Test that the copy parameter defaults to None
+        pytest.param({"copy": True}, True, id="copy=True"),
+        pytest.param({"copy": False}, False, id="copy=False"),
+        # Behavior is backend-specific
+        pytest.param({"copy": None}, None, id="copy=None"),
+        # Test that the copy parameter defaults to None
+        pytest.param({}, None, id="no copy kwarg"),
     ],
 )
 @pytest.mark.parametrize(
@@ -109,10 +111,10 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
             True,
             True,
             marks=(
-                pytest.mark.skip_xp_backend(
+                pytest.mark.skip_xp_backend(  # test passes when copy=False
                     Backend.JAX, reason="bool mask update with shaped rhs"
                 ),
-                pytest.mark.skip_xp_backend(
+                pytest.mark.xfail_xp_backend(
                     Backend.DASK, reason="bool mask update with shaped rhs"
                 ),
             ),
@@ -177,7 +179,12 @@ def test_alternate_index_syntax():
 @pytest.mark.parametrize("bool_mask", [False, True])
 @pytest.mark.parametrize("op", list(_AtOp))
 def test_incompatible_dtype(
-    xp: ModuleType, library: Backend, op: _AtOp, copy: bool | None, bool_mask: bool
+    xp: ModuleType,
+    library: Backend,
+    request: pytest.FixtureRequest,
+    op: _AtOp,
+    copy: bool | None,
+    bool_mask: bool,
 ):
     """Test that at() replicates the backend's behaviour for
     in-place operations with incompatible dtypes.
@@ -208,8 +215,8 @@ def test_incompatible_dtype(
                 z = at_op(x, idx, op, 1.1, copy=copy)
 
     elif library is Backend.DASK:
-        if op in (_AtOp.MIN, _AtOp.MAX):
-            pytest.xfail(reason="need array-api-compat 1.11")
+        if op in (_AtOp.MIN, _AtOp.MAX) and bool_mask:
+            xfail(request, reason="need array-api-compat 1.11")
         z = at_op(x, idx, op, 1.1, copy=copy)
 
     elif library is Backend.ARRAY_API_STRICT and op is not _AtOp.SET:
@@ -234,8 +241,18 @@ def test_bool_mask_nd(xp: ModuleType):
     xp_assert_equal(z, xp.asarray([[0, 2, 3], [4, 0, 0]]))
 
 
-@pytest.mark.skip_xp_backend(Backend.DASK, reason="FIXME need scipy's lazywhere")
-@pytest.mark.parametrize("bool_mask", [False, True])
+@pytest.mark.parametrize(
+    "bool_mask",
+    [
+        False,
+        pytest.param(
+            True,
+            marks=pytest.mark.xfail_xp_backend(
+                Backend.DASK, reason="FIXME need scipy's lazywhere"
+            ),
+        ),
+    ],
+)
 def test_no_inf_warnings(xp: ModuleType, bool_mask: bool):
     x = xp.asarray([math.inf, 1.0, 2.0])
     idx = ~xp.isinf(x) if bool_mask else slice(1, None)

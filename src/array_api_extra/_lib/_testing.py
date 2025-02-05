@@ -8,6 +8,8 @@ See also ..testing for public testing utilities.
 import math
 from types import ModuleType
 
+import pytest
+
 from ._utils._compat import (
     array_namespace,
     is_cupy_namespace,
@@ -170,3 +172,21 @@ def xp_assert_close(
         np.testing.assert_allclose(
             actual, desired, rtol=rtol, atol=atol, err_msg=err_msg
         )
+
+
+def xfail(request: pytest.FixtureRequest, reason: str) -> None:
+    """
+    XFAIL the currently running test.
+
+    Unlike ``pytest.xfail``, allow rest of test to execute instead of immediately
+    halting it, so that it may result in a XPASS.
+    xref https://github.com/pandas-dev/pandas/issues/38902
+
+    Parameters
+    ----------
+    request : pytest.FixtureRequest
+        ``request`` argument of the test function.
+    reason : str
+        Reason for the expected failure.
+    """
+    request.node.add_marker(pytest.mark.xfail(reason=reason))

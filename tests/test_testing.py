@@ -23,7 +23,7 @@ param_assert_equal_close = pytest.mark.parametrize(
         xp_assert_equal,
         pytest.param(
             xp_assert_close,
-            marks=pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype"),
+            marks=pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype"),
         ),
     ],
 )
@@ -49,17 +49,17 @@ def test_assert_close_equal_basic(xp: ModuleType, func: Callable[..., None]):  #
 
 @pytest.mark.skip_xp_backend(Backend.NUMPY, reason="test other ns vs. numpy")
 @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="test other ns vs. numpy")
-@param_assert_equal_close
+@pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close])
 def test_assert_close_equal_namespace(xp: ModuleType, func: Callable[..., None]):  # type: ignore[no-any-explicit]
-    with pytest.raises(AssertionError):
+    with pytest.raises(AssertionError, match="namespaces do not match"):
         func(xp.asarray(0), np.asarray(0))
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="Unrecognized array input"):
         func(xp.asarray(0), 0)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="list is not a supported array type"):
         func(xp.asarray([0]), [0])
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 def test_assert_close_tolerance(xp: ModuleType):
     xp_assert_close(xp.asarray([100.0]), xp.asarray([102.0]), rtol=0.03)
     with pytest.raises(AssertionError):
@@ -71,7 +71,7 @@ def test_assert_close_tolerance(xp: ModuleType):
 
 
 @param_assert_equal_close
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no bool indexing by sparse arrays")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no bool indexing")
 def test_assert_close_equal_none_shape(xp: ModuleType, func: Callable[..., None]):  # type: ignore[no-any-explicit]
     """On dask and other lazy backends, test that a shape with NaN's or None's
     can be compared to a real shape.
