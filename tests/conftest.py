@@ -38,12 +38,12 @@ def library(request: pytest.FixtureRequest) -> Backend:  # numpydoc ignore=PR01,
         ("xfail_xp_backend", partial(xfail, request)),
     ):
         for marker in request.node.iter_markers(marker_name):
-            skip_library = marker.kwargs.get("library") or marker.args[0]  # type: ignore[no-untyped-usage]
-            if not isinstance(skip_library, Backend):
+            library = marker.kwargs.get("library") or marker.args[0]  # type: ignore[no-untyped-usage]
+            if not isinstance(library, Backend):
                 msg = f"argument of {marker_name} must be a Backend enum"
                 raise TypeError(msg)
-            if skip_library == elem:
-                reason = skip_library.value
+            if library == elem:
+                reason = library.value
                 with suppress(KeyError):
                     reason += ":" + cast(str, marker.kwargs["reason"])
                 skip_or_xfail(reason=reason)
