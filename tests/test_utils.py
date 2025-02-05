@@ -28,7 +28,9 @@ class TestIn1D:
             pytest.param(
                 15,
                 id="slow path",
-                marks=pytest.mark.xfail_xp_backend(Backend.DASK, reason="no argsort"),
+                marks=pytest.mark.xfail_xp_backend(
+                    Backend.DASK, reason="NaN-shaped array"
+                ),
             ),
         ],
     )
