@@ -17,12 +17,21 @@ lazy_xp_function(in1d, jax_jit=False, static_argnames=("assume_unique", "invert"
 
 
 class TestIn1D:
-    @pytest.mark.skip_xp_backend(Backend.DASK, reason="no argsort")
-    @pytest.mark.skip_xp_backend(
-        Backend.SPARSE, reason="no unique_inverse, no device kwarg in asarray"
+    @pytest.mark.xfail_xp_backend(
+        Backend.SPARSE, reason="no unique_inverse, no device kwarg in asarray()"
     )
     # cover both code paths
-    @pytest.mark.parametrize("n", [9, 15])
+    @pytest.mark.parametrize(
+        "n",
+        [
+            pytest.param(9, id="fast path"),
+            pytest.param(
+                15,
+                id="slow path",
+                marks=pytest.mark.xfail_xp_backend(Backend.DASK, reason="no argsort"),
+            ),
+        ],
+    )
     def test_no_invert_assume_unique(self, xp: ModuleType, n: int):
         x1 = xp.asarray([3, 8, 20])
         x2 = xp.arange(n)
@@ -30,14 +39,14 @@ class TestIn1D:
         actual = in1d(x1, x2)
         xp_assert_equal(actual, expected)
 
-    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no device kwarg in asarray")
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in asarray")
     def test_device(self, xp: ModuleType, device: Device):
         x1 = xp.asarray([3, 8, 20], device=device)
         x2 = xp.asarray([2, 3, 4], device=device)
         assert get_device(in1d(x1, x2)) == device
 
-    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="explicit xp")
-    @pytest.mark.skip_xp_backend(
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
+    @pytest.mark.xfail_xp_backend(
         Backend.SPARSE, reason="no arange, no device kwarg in asarray"
     )
     def test_xp(self, xp: ModuleType):
@@ -48,7 +57,7 @@ class TestIn1D:
         xp_assert_equal(actual, expected)
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 @pytest.mark.parametrize(
     ("dtype", "b", "defined"),
     [

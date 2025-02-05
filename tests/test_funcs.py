@@ -41,7 +41,7 @@ lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp
 lazy_xp_function(sinc, jax_jit=False, static_argnames="xp")
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no expand_dims")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
 class TestAtLeastND:
     def test_0D(self, xp: ModuleType):
         x = xp.asarray(1.0)
@@ -108,12 +108,12 @@ class TestAtLeastND:
         assert get_device(atleast_nd(x, ndim=2)) == device
 
     def test_xp(self, xp: ModuleType):
-        x = xp.asarray(1)
-        y = atleast_nd(x, ndim=0, xp=xp)
-        xp_assert_equal(y, x)
+        x = xp.asarray(1.0)
+        y = atleast_nd(x, ndim=1, xp=xp)
+        xp_assert_equal(y, xp.ones((1,)))
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestCov:
     def test_basic(self, xp: ModuleType):
         xp_assert_close(
@@ -160,8 +160,8 @@ class TestCov:
         )
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no device")
 class TestCreateDiagonal:
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_1d(self, xp: ModuleType):
         # from np.diag tests
         vals = 100 * xp.arange(5, dtype=xp.float64)
@@ -177,6 +177,7 @@ class TestCreateDiagonal:
         xp_assert_equal(create_diagonal(vals, offset=2), b)
         xp_assert_equal(create_diagonal(vals, offset=-2), c)
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     @pytest.mark.parametrize("n", range(1, 10))
     @pytest.mark.parametrize("offset", range(1, 10))
     def test_create_diagonal(self, xp: ModuleType, n: int, offset: int):
@@ -196,20 +197,22 @@ class TestCreateDiagonal:
         with pytest.raises(ValueError, match="1-dimensional"):
             create_diagonal(xp.asarray([[1]]))
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(create_diagonal(x)) == device
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_xp(self, xp: ModuleType):
         x = xp.asarray([1, 2])
         y = create_diagonal(x, xp=xp)
         xp_assert_equal(y, xp.asarray([[1, 0], [0, 2]]))
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no expand_dims")
 class TestExpandDims:
-    @pytest.mark.skip_xp_backend(Backend.DASK, reason="tuple index out of range")
-    @pytest.mark.skip_xp_backend(Backend.TORCH, reason="tuple index out of range")
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
+    @pytest.mark.xfail_xp_backend(Backend.DASK, reason="tuple index out of range")
+    @pytest.mark.xfail_xp_backend(Backend.TORCH, reason="tuple index out of range")
     def test_functionality(self, xp: ModuleType):
         def _squeeze_all(b: Array) -> Array:
             """Mimics `np.squeeze(b)`. `xpx.squeeze`?"""
@@ -225,6 +228,7 @@ class TestExpandDims:
             assert b.shape[axis] == 1
             assert _squeeze_all(b).shape == s
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_axis_tuple(self, xp: ModuleType):
         a = xp.empty((3, 3, 3))
         assert expand_dims(a, axis=(0, 1, 2)).shape == (1, 1, 1, 3, 3, 3)
@@ -257,17 +261,19 @@ class TestExpandDims:
         with pytest.raises(ValueError, match="Duplicate dimensions"):
             expand_dims(a, axis=(3, -3))
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(expand_dims(x, axis=0)) == device
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_xp(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3])
         y = expand_dims(x, axis=(0, 1, 2), xp=xp)
         assert y.shape == (1, 1, 1, 3)
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestIsClose:
     # FIXME use lazywhere to avoid warnings on inf
     @pytest.mark.filterwarnings("ignore:invalid value encountered")
@@ -402,7 +408,7 @@ class TestIsClose:
         xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
 
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
-    @pytest.mark.skip_xp_backend(Backend.TORCH, reason="Array API 2024.12 support")
+    @pytest.mark.xfail_xp_backend(Backend.TORCH, reason="Array API 2024.12 support")
     def test_python_scalar(self, xp: ModuleType):
         a = xp.asarray([0.0, 0.1], dtype=xp.float32)
         xp_assert_equal(isclose(a, 0.0), xp.asarray([True, False]))
@@ -425,7 +431,7 @@ class TestIsClose:
         xp_assert_equal(isclose(a, b, xp=xp), xp.asarray([True, False]))
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no expand_dims")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
 class TestKron:
     def test_basic(self, xp: ModuleType):
         # Using 0-dimensional array
@@ -526,7 +532,7 @@ class TestNUnique:
         xp_assert_equal(nunique(a, xp=xp), xp.asarray(3))
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no arange, no device")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange, no device")
 class TestPad:
     def test_simple(self, xp: ModuleType):
         a = xp.arange(1, 4)
@@ -576,10 +582,24 @@ class TestPad:
         assert padded.shape == (4, 4)
 
 
-@pytest.mark.skip_xp_backend(Backend.DASK, reason="no argsort")
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no device kwarg in asarray")
+assume_unique = pytest.mark.parametrize(
+    "assume_unique",
+    [
+        True,
+        pytest.param(
+            False,
+            marks=pytest.mark.xfail_xp_backend(
+                Backend.DASK, reason="NaN-shaped arrays"
+            ),
+        ),
+    ],
+)
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in asarray()")
 class TestSetDiff1D:
-    @pytest.mark.skip_xp_backend(
+    @pytest.mark.xfail_xp_backend(Backend.DASK, reason="NaN-shaped arrays")
+    @pytest.mark.xfail_xp_backend(
         Backend.TORCH, reason="index_select not implemented for uint32"
     )
     def test_setdiff1d(self, xp: ModuleType):
@@ -608,7 +628,7 @@ class TestSetDiff1D:
         actual = setdiff1d(x1, x2, assume_unique=True)
         xp_assert_equal(actual, expected)
 
-    @pytest.mark.parametrize("assume_unique", [True, False])
+    @assume_unique
     @pytest.mark.parametrize("shape1", [(), (1,), (1, 1)])
     @pytest.mark.parametrize("shape2", [(), (1,), (1, 1)])
     def test_shapes(
@@ -623,8 +643,8 @@ class TestSetDiff1D:
         actual = setdiff1d(x1, x2, assume_unique=assume_unique)
         xp_assert_equal(actual, xp.empty((0,)))
 
+    @assume_unique
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
-    @pytest.mark.parametrize("assume_unique", [True, False])
     def test_python_scalar(self, xp: ModuleType, assume_unique: bool):
         # Test no dtype promotion to xp.asarray(x2); use x1.dtype
         x1 = xp.asarray([3, 1, 2], dtype=xp.int16)
@@ -645,21 +665,22 @@ class TestSetDiff1D:
         with pytest.raises(TypeError, match="Unrecognized"):
             setdiff1d(0, 0, assume_unique=assume_unique)
 
-    def test_device(self, xp: ModuleType, device: Device):
+    @assume_unique
+    def test_device(self, xp: ModuleType, device: Device, assume_unique: bool):
         x1 = xp.asarray([3, 8, 20], device=device)
         x2 = xp.asarray([2, 3, 4], device=device)
-        assert get_device(setdiff1d(x1, x2)) == device
+        assert get_device(setdiff1d(x1, x2, assume_unique=assume_unique)) == device
 
-    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="explicit xp")
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
     def test_xp(self, xp: ModuleType):
         x1 = xp.asarray([3, 8, 20])
         x2 = xp.asarray([2, 3, 4])
         expected = xp.asarray([8, 20])
-        actual = setdiff1d(x1, x2, xp=xp)
+        actual = setdiff1d(x1, x2, assume_unique=True, xp=xp)
         xp_assert_equal(actual, expected)
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestSinc:
     def test_simple(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0)), xp.asarray(1.0))
