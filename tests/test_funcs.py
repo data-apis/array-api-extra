@@ -152,7 +152,7 @@ class TestCov:
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(cov(x)) == device
 
-    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="explicit xp")
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
     def test_xp(self, xp: ModuleType):
         xp_assert_close(
             cov(xp.asarray([[0.0, 2.0], [1.0, 1.0], [2.0, 0.0]]).T, xp=xp),
