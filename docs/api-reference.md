@@ -8,6 +8,7 @@
 
     at
     atleast_nd
+    broadcast_shapes
     cov
     create_diagonal
     expand_dims
