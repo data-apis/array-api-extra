@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 from contextlib import suppress
-from functools import wraps
+from functools import partial, wraps
 from types import ModuleType
 from typing import ParamSpec, TypeVar, cast
 
@@ -10,6 +10,7 @@ import numpy as np
 import pytest
 
 from array_api_extra._lib import Backend
+from array_api_extra._lib._testing import xfail
 from array_api_extra._lib._utils._compat import array_namespace
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._typing import Device
@@ -32,16 +33,20 @@ def library(request: pytest.FixtureRequest) -> Backend:  # numpydoc ignore=PR01,
     """
     elem = cast(Backend, request.param)
 
-    for marker in request.node.iter_markers("skip_xp_backend"):
-        skip_library = marker.kwargs.get("library") or marker.args[0]  # type: ignore[no-untyped-usage]
-        if not isinstance(skip_library, Backend):
-            msg = "argument of skip_xp_backend must be a Backend enum"
-            raise TypeError(msg)
-        if skip_library == elem:
-            reason = skip_library.value
-            with suppress(KeyError):
-                reason += ":" + cast(str, marker.kwargs["reason"])
-            pytest.skip(reason=reason)
+    for marker_name, skip_or_xfail in (
+        ("skip_xp_backend", pytest.skip),
+        ("xfail_xp_backend", partial(xfail, request)),
+    ):
+        for marker in request.node.iter_markers(marker_name):
+            library = marker.kwargs.get("library") or marker.args[0]  # type: ignore[no-untyped-usage]
+            if not isinstance(library, Backend):
+                msg = f"argument of {marker_name} must be a Backend enum"
+                raise TypeError(msg)
+            if library == elem:
+                reason = library.value
+                with suppress(KeyError):
+                    reason += ":" + cast(str, marker.kwargs["reason"])
+                skip_or_xfail(reason=reason)
 
     return elem
 
