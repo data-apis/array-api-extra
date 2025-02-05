@@ -3,13 +3,14 @@ from typing import NamedTuple
 
 import numpy as np
 import pytest
-from array_api_compat import array_namespace
 
 import array_api_extra as xpx  # Let some tests bypass lazy_xp_function
 from array_api_extra import lazy_apply
 from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_equal
-from array_api_extra._lib._utils._typing import Array
+from array_api_extra._lib._utils import _compat
+from array_api_extra._lib._utils._compat import array_namespace
+from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
 lazy_xp_function(
@@ -55,6 +56,8 @@ def test_lazy_apply_simple(
 
 @as_numpy
 def test_lazy_apply_broadcast(xp: ModuleType, as_numpy: bool):
+    """Test that default shape and dtype are broadcasted from the inputs."""
+
     def f(x: Array, y: Array) -> Array:
         return x + y
 
@@ -88,31 +91,117 @@ def test_lazy_apply_multi_output(xp: ModuleType, as_numpy: bool):
 
 
 def test_lazy_apply_core_indices(da: ModuleType):
-    """Test that a func that performs reductions along axes does so
+    """
+    Test that a function that performs reductions along axes does so
     globally and not locally to each Dask chunk.
     """
-    pytest.skip("TODO")
+
+    def f(x: Array) -> Array:
+        return x.sum(axis=0) + x
+
+    x_np = np.arange(15).reshape(5, 3)
+    expect = da.asarray(f(x_np))
+    x_da = da.asarray(x_np).rechunk(3)
+
+    # A naive map_blocks fails because it applies f to each chunk separately,
+    # but f needs to reduce along axis 0 which is broken into multiple chunks.
+    # axis 0 is a "core axis" or "core index" (from xarray.apply_ufunc's
+    # "core dimension").
+    with pytest.raises(AssertionError):
+        xp_assert_equal(da.map_blocks(f, x_da), expect)
+
+    xp_assert_equal(lazy_apply(f, x_da), expect)
 
 
 def test_lazy_apply_dont_run_on_meta(da: ModuleType):
     """Test that Dask won't try running func on the meta array,
     as it may have minimum size requirements.
     """
-    pytest.skip("TODO")
+
+    def f(x: Array) -> Array:
+        assert x.size
+        return x + 1
+
+    x = da.arange(10)
+    assert not x._meta.size
+    y = lazy_apply(f, x)
+    xp_assert_equal(y, x + 1)
 
 
-def test_lazy_apply_none_shape(da: ModuleType):
-    pytest.skip("TODO")
+@pytest.mark.xfail_xp_backend(Backend.JAX, reason="unknown shape")
+def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
+    x = xp.asarray([1, 1, 2, 2, 2])
+
+    xp2 = np if library is Backend.DASK else xp
+
+    # Single output
+    values = lazy_apply(xp2.unique_values, x, shape=(None,))
+    xp_assert_equal(values, xp.asarray([1, 2]))
+
+    # Multi output
+    int_type = xp.asarray(0).dtype
+    values, counts = lazy_apply(
+        xp2.unique_counts,
+        x,
+        shape=((None,), (None,)),
+        dtype=(x.dtype, int_type),
+    )
+    xp_assert_equal(values, xp.asarray([1, 2]))
+    xp_assert_equal(counts, xp.asarray([2, 3]))
 
 
-@as_numpy
-def test_lazy_apply_device(xp: ModuleType, as_numpy: bool):
-    pytest.skip("TODO")
+def check_lazy_apply_none_shape_broadcast(x: Array) -> Array:
+    def f(x: Array) -> Array:
+        return x
+
+    x = x[x > 1]
+    return lazy_apply(f, x)
 
 
-@as_numpy
-def test_lazy_apply_no_args(xp: ModuleType, as_numpy: bool):
-    pytest.skip("TODO")
+lazy_xp_function(check_lazy_apply_none_shape_broadcast)
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="bool mask")
+@pytest.mark.xfail_xp_backend(Backend.JAX, reason="unknown shape")
+def test_lazy_apply_none_shape_broadcast(xp: ModuleType):
+    """Broadcast from input array with unknown shape"""
+    x = xp.asarray([1, 2, 2])
+    actual = check_lazy_apply_none_shape_broadcast(x)
+    xp_assert_equal(actual, xp.asarray([2, 2]))
+
+
+@pytest.mark.parametrize(
+    "as_numpy",
+    [
+        False,
+        pytest.param(
+            True,
+            marks=[
+                pytest.mark.skip_xp_backend(
+                    Backend.ARRAY_API_STRICT, reason="device->host copy"
+                ),
+                pytest.mark.skip_xp_backend(Backend.CUPY, reason="device->host copy"),
+                pytest.mark.skip_xp_backend(Backend.SPARSE, reason="densification"),
+            ],
+        ),
+    ],
+)
+def test_lazy_apply_device(xp: ModuleType, as_numpy: bool, device: Device):
+    def f(x: Array) -> Array:
+        xp2 = array_namespace(x)
+        # Deliberately forgetting to add device here to test that the
+        # output is transferred to the right device. This is necessary when
+        # as_numpy=True anyway.
+        return xp2.zeros(x.shape, dtype=x.dtype)
+
+    x = xp.asarray([1, 2], device=device)
+    y = lazy_apply(f, x, as_numpy=as_numpy)
+    assert _compat.device(y) == device
+
+
+def test_lazy_apply_no_args(xp: ModuleType):
+    with pytest.raises(ValueError, match="at least one argument"):
+        lazy_apply(lambda: xp.zeros(1), shape=(1,), dtype=xp.zeros(1).dtype, xp=xp)
 
 
 class NT(NamedTuple):
@@ -128,7 +217,8 @@ def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array
         scalar: int,
     ) -> Array:
         assert isinstance(x, expect_cls)
-        assert int(x) == 0  # JAX will crash if x isn't material
+        # JAX will crash if x isn't material
+        assert int(x) == 0  # type: ignore[call-overload]
         # Did we re-wrap the namedtuple correctly, or did it get
         # accidentally changed to a basic tuple?
         assert isinstance(z["foo"], NT)

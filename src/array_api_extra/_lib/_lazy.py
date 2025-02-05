@@ -195,6 +195,9 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     dask.array.map_overlap
     dask.array.blockwise
     """
+    if not args:
+        msg = "Must have at least one argument array"
+        raise ValueError(msg)
     if xp is None:
         xp = array_namespace(*args)
 
@@ -204,9 +207,13 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     multi_output = False
 
     if shape is None:
-        shapes = [xp.broadcast_shapes(*(arg.shape for arg in args))]
-    elif isinstance(shape, tuple) and all(isinstance(s, int | None) for s in shape):
-        shapes = [shape]  # pyright: ignore[reportAssignmentType]
+        import numpy as np  # DNM
+
+        shapes = [np.broadcast_shapes(*(arg.shape for arg in args))]
+    elif all(isinstance(s, int | None) for s in shape):
+        # Do not test for shape to be a tuple
+        # https://github.com/data-apis/array-api/issues/891#issuecomment-2637430522
+        shapes = [cast(tuple[int | None, ...], shape)]
     else:
         shapes = list(shape)  # type: ignore[arg-type]  # pyright: ignore[reportAssignmentType]
         multi_output = True
