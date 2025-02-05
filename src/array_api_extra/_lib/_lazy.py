@@ -222,20 +222,18 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         dtypes = [xp.result_type(*args)] * len(shapes)
     elif multi_output:
         if not isinstance(dtype, Sequence):
-            msg = "Got sequence of shapes but only one dtype"
-            raise TypeError(msg)
+            msg = "Got multiple shapes but only one dtype"
+            raise ValueError(msg)
         dtypes = list(dtype)  # pyright: ignore[reportUnknownArgumentType]
     else:
         if isinstance(dtype, Sequence):
             msg = "Got single shape but multiple dtypes"
-            raise TypeError(msg)
+            raise ValueError(msg)
+
         dtypes = [dtype]
 
     if len(shapes) != len(dtypes):
         msg = f"Got {len(shapes)} shapes and {len(dtypes)} dtypes"
-        raise ValueError(msg)
-    if len(shapes) == 0:
-        msg = "func must return one or more output arrays"
         raise ValueError(msg)
     del shape
     del dtype

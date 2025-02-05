@@ -90,6 +90,48 @@ def test_lazy_apply_multi_output(xp: ModuleType, as_numpy: bool):
     xp_assert_equal(actual[1], expect[1])
 
 
+@pytest.mark.parametrize(
+    "as_numpy",
+    [
+        pytest.param(
+            False,
+            marks=[
+                pytest.mark.xfail_xp_backend(
+                    Backend.TORCH, reason="illegal dtype promotion"
+                ),
+            ],
+        ),
+        pytest.param(
+            True,
+            marks=[
+                pytest.mark.skip_xp_backend(Backend.CUPY, reason="device->host copy"),
+                pytest.mark.skip_xp_backend(Backend.SPARSE, reason="densification"),
+            ],
+        ),
+    ],
+)
+def test_lazy_apply_multi_output_broadcast_dtype(xp: ModuleType, as_numpy: bool):
+    """
+    If dtype is omitted and there are multiple shapes, use the same
+    dtype for all output arrays, broadcasted from the inputs
+    """
+
+    def f(x: Array, y: Array) -> tuple[Array, Array]:
+        return x + y, x - y
+
+    x = xp.asarray([1, 2], dtype=xp.float32)
+    y = xp.asarray(3, dtype=xp.float64)
+    expect = (
+        xp.asarray([4, 5], dtype=xp.float64),
+        xp.asarray([-2, -1], dtype=xp.float64),
+    )
+    actual = lazy_apply(f, x, y, shape=((2,), (2,)), as_numpy=as_numpy)
+    assert isinstance(actual, tuple)
+    assert len(actual) == 2
+    xp_assert_equal(actual[0], expect[0])
+    xp_assert_equal(actual[1], expect[1])
+
+
 def test_lazy_apply_core_indices(da: ModuleType):
     """
     Test that a function that performs reductions along axes does so
@@ -199,11 +241,6 @@ def test_lazy_apply_device(xp: ModuleType, as_numpy: bool, device: Device):
     assert _compat.device(y) == device
 
 
-def test_lazy_apply_no_args(xp: ModuleType):
-    with pytest.raises(ValueError, match="at least one argument"):
-        lazy_apply(lambda: xp.zeros(1), shape=(1,), dtype=xp.zeros(1).dtype, xp=xp)
-
-
 class NT(NamedTuple):
     a: Array
 
@@ -292,3 +329,21 @@ def test_lazy_apply_raises(xp: ModuleType) -> None:
         # exception not to be raised.
         # However, lazy_xp_function will do it for us on function exit.
         raises(x)
+
+
+def test_invalid_args():
+    def f(x: Array) -> Array:
+        return x
+
+    x = np.asarray(1)
+
+    with pytest.raises(ValueError, match="at least one argument"):
+        _ = lazy_apply(f, shape=(1,), dtype=np.int32, xp=np)
+    with pytest.raises(ValueError, match="at least one argument"):
+        _ = lazy_apply(f, shape=(1,), dtype=np.int32)
+    with pytest.raises(ValueError, match="multiple shapes but only one dtype"):
+        _ = lazy_apply(f, x, shape=[(1,), (2,)], dtype=np.int32)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
+    with pytest.raises(ValueError, match="single shape but multiple dtypes"):
+        _ = lazy_apply(f, x, shape=(1,), dtype=[np.int32, np.int64])
+    with pytest.raises(ValueError, match="2 shapes and 1 dtypes"):
+        _ = lazy_apply(f, x, shape=[(1,), (2,)], dtype=[np.int32])
