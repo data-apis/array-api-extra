@@ -3,12 +3,18 @@ from typing import NamedTuple
 
 import numpy as np
 import pytest
+from array_api_compat import array_namespace
 
+import array_api_extra as xpx  # Let some tests bypass lazy_xp_function
 from array_api_extra import lazy_apply
 from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._typing import Array
 from array_api_extra.testing import lazy_xp_function
+
+lazy_xp_function(
+    lazy_apply, static_argnames=("func", "shape", "dtype", "as_numpy", "xp")
+)
 
 as_numpy = pytest.mark.parametrize(
     "as_numpy",
@@ -26,18 +32,59 @@ as_numpy = pytest.mark.parametrize(
 
 
 @as_numpy
-def test_lazy_apply_simple(xp: ModuleType, as_numpy: bool):
-    pytest.skip("TODO")
+@pytest.mark.parametrize("shape", [(2,), (3, 2)])
+@pytest.mark.parametrize("dtype", ["int32", "float64"])
+def test_lazy_apply_simple(
+    xp: ModuleType, library: Backend, shape: tuple[int, ...], dtype: str, as_numpy: bool
+):
+    def f(x: Array) -> Array:
+        xp2 = array_namespace(x)
+        if as_numpy or library in (Backend.NUMPY_READONLY, Backend.DASK):
+            assert isinstance(x, np.ndarray)
+        else:
+            assert xp2 is xp
+
+        y = xp2.broadcast_to(xp2.astype(x + 1, getattr(xp2, dtype)), shape)
+        return xp2.asarray(y, copy=True)  # Torch: ensure writeable numpy array
+
+    x = xp.asarray([1, 2], dtype=xp.int16)
+    expect = xp.broadcast_to(xp.astype(x + 1, getattr(xp, dtype)), shape)
+    actual = lazy_apply(f, x, shape=shape, dtype=getattr(xp, dtype), as_numpy=as_numpy)
+    xp_assert_equal(actual, expect)
 
 
 @as_numpy
 def test_lazy_apply_broadcast(xp: ModuleType, as_numpy: bool):
-    pytest.skip("TODO")
+    def f(x: Array, y: Array) -> Array:
+        return x + y
+
+    x = xp.asarray([1, 2], dtype=xp.int16)
+    y = xp.asarray([[4], [5], [6]], dtype=xp.int32)
+    z = lazy_apply(f, x, y, as_numpy=as_numpy)
+    xp_assert_equal(z, x + y)
 
 
 @as_numpy
 def test_lazy_apply_multi_output(xp: ModuleType, as_numpy: bool):
-    pytest.skip("TODO")
+    def f(x: Array) -> tuple[Array, Array]:
+        xp2 = array_namespace(x)
+        y = x + xp2.asarray(2, dtype=xp2.int8)  # Sparse: bad dtype propagation
+        z = xp2.broadcast_to(xp2.astype(x + 1, xp2.int16), (3, 2))
+        z = xp2.asarray(z, copy=True)  # Torch: ensure writeable numpy array
+        return y, z
+
+    x = xp.asarray([1, 2], dtype=xp.int8)
+    expect = (
+        xp.asarray([3, 4], dtype=xp.int8),
+        xp.asarray([[2, 3], [2, 3], [2, 3]], dtype=xp.int16),
+    )
+    actual = lazy_apply(
+        f, x, shape=((2,), (3, 2)), dtype=(xp.int8, xp.int16), as_numpy=as_numpy
+    )
+    assert isinstance(actual, tuple)
+    assert len(actual) == 2
+    xp_assert_equal(actual[0], expect[0])
+    xp_assert_equal(actual[1], expect[1])
 
 
 def test_lazy_apply_core_indices(da: ModuleType):
@@ -96,7 +143,8 @@ def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array
         assert isinstance(scalar, int)
         return x + 1  # type: ignore[operator]
 
-    return lazy_apply(  # pyright: ignore[reportCallIssue]
+    # Use explicit namespace to bypass monkey-patching by lazy_xp_function
+    return xpx.lazy_apply(  # pyright: ignore[reportCallIssue]
         eager,
         x,
         # These kwargs can and should be passed through jax.pure_callback
@@ -136,7 +184,8 @@ def raises(x: Array) -> Array:
         msg = "Hello World"
         raise CustomError(msg)
 
-    return lazy_apply(eager, x, shape=x.shape, dtype=x.dtype)
+    # Use explicit namespace to bypass monkey-patching by lazy_xp_function
+    return xpx.lazy_apply(eager, x, shape=x.shape, dtype=x.dtype)
 
 
 # jax.pure_callback does not support raising
