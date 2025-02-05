@@ -192,10 +192,6 @@ markers = [
 
 [tool.coverage]
 run.source = ["array_api_extra"]
-report.exclude_also = [
-    '\.\.\.',
-    'if TYPE_CHECKING:',
-]
 
 # mypy
 

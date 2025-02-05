@@ -19,7 +19,7 @@ from ._utils._compat import (
 )
 from ._utils._typing import Array, DType
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: nocover
     # TODO move outside TYPE_CHECKING
     # depends on scikit-learn abandoning Python 3.9
     # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
