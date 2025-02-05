@@ -64,7 +64,7 @@ def lazy_apply(  # type: ignore[valid-type]
 
 
 def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
-    func: Callable[P, Array | Sequence[ArrayLike]],
+    func: Callable[P, ArrayLike | Sequence[ArrayLike]],
     *args: Array,
     shape: tuple[int | None, ...] | Sequence[tuple[int | None, ...]] | None = None,
     dtype: DType | Sequence[DType] | None = None,
@@ -90,13 +90,13 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         It must return either a single array-like or a sequence of array-likes.
 
         `func` must be a pure function, i.e. without side effects, as depending on the
-        backend it may be executed more than once.
+        backend it may be executed more than once or never.
     *args : Array
         One or more Array API compliant arrays.
 
         If `as_numpy=True`, you need to be able to apply :func:`numpy.asarray` to them
         to convert them to numpy; read notes below about specific backends.
-    shape : tuple[int | None, ...] | Sequence[tuple[int, ...]], optional
+    shape : tuple[int | None, ...] | Sequence[tuple[int | None, ...]], optional
         Output shape or sequence of output shapes, one for each output of `func`.
         Default: assume single output and broadcast shapes of the input arrays.
     dtype : DType | Sequence[DType], optional
@@ -119,34 +119,34 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     Array | tuple[Array, ...]
         The result(s) of `func` applied to the input arrays, wrapped in the same
         array namespace as the inputs.
-        If shape is omitted or a `tuple[int | None, ...]`, this is a single array.
-        Otherwise, it's a tuple of arrays.
+        If shape is omitted or a single `tuple[int | None, ...]`, return a single array.
+        Otherwise, return a tuple of arrays.
 
     Notes
     -----
     JAX
         This allows applying eager functions to jitted JAX arrays, which are lazy.
         The function won't be applied until the JAX array is materialized.
-        When running inside `jax.jit`, `shape` must be fully known, i.e. it cannot
+        When running inside ``jax.jit``, `shape` must be fully known, i.e. it cannot
         contain any `None` elements.
 
         .. warning::
 
-            `func` must never raise if it's run inside `jax.jit`, as its behavior is
+            `func` must never raise inside ``jax.jit``, as the resulting behavior is
             undefined.
 
         Using this with `as_numpy=False` is particularly useful to apply non-jittable
         JAX functions to arrays on GPU devices.
-        If `as_numpy=True`, the :doc:`jax:transfer_guard` may prevent arrays on a GPU
+        If ``as_numpy=True``, the :doc:`jax:transfer_guard` may prevent arrays on a GPU
         device from being transferred back to CPU. This is treated as an implicit
         transfer.
 
     PyTorch, CuPy
-        If `as_numpy=True`, these backends raise by default if you attempt to convert
+        If ``as_numpy=True``, these backends raise by default if you attempt to convert
         arrays on a GPU device to NumPy.
 
     Sparse
-        If `as_numpy=True`, by default sparse prevents implicit densification through
+        If ``as_numpy=True``, by default sparse prevents implicit densification through
         :func:`numpy.asarray`. `This safety mechanism can be disabled
         <https://sparse.pydata.org/en/stable/operations.html#package-configuration>`_.
 
@@ -171,21 +171,21 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         `lazy_apply`.
 
     Dask wrapping around other backends
-        If `as_numpy=False`, `func` will receive in input eager arrays of the meta
-        namespace, as defined by the `._meta` attribute of the input Dask arrays.
+        If ``as_numpy=False``, `func` will receive in input eager arrays of the meta
+        namespace, as defined by the ``._meta`` attribute of the input Dask arrays.
         The outputs of `func` will be wrapped by the meta namespace, and then wrapped
         again by Dask.
 
     Raises
     ------
     jax.errors.TracerArrayConversionError
-        When `xp=jax.numpy`, `shape` is unknown (it contains None on one or more axes)
-        and this function was called inside `jax.jit`.
+        When ``xp=jax.numpy``, `shape` is unknown (it contains None on one or more axes)
+        and this function was called inside ``jax.jit``.
     RuntimeError
-        When `xp=sparse` and auto-densification is disabled.
+        When ``xp=sparse`` and auto-densification is disabled.
     Exception (backend-specific)
         When the backend disallows implicit device to host transfers and the input
-        arrays are on a device, e.g. on GPU.
+        arrays are on a non-CPU device, e.g. on GPU.
 
     See Also
     --------
@@ -237,6 +237,7 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         raise ValueError(msg)
     del shape
     del dtype
+    # End of shape and dtype parsing
 
     # Backend-specific branches
     if is_dask_namespace(xp):

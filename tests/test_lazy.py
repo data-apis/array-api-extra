@@ -170,6 +170,27 @@ def test_lazy_apply_dont_run_on_meta(da: ModuleType):
     xp_assert_equal(y, x + 1)
 
 
+def test_lazy_apply_dask_non_numpy_meta(da: ModuleType):
+    """Test dask wrapping around a meta-namespace other than numpy."""
+    # At the moment of writing, of all Array API namespaces cupy is
+    # the only one that Dask supports.
+    # For this reason, we can only test as_numpy=False since
+    # np.asarray(cp.Array) is blocked by the transfer guard.
+
+    cp = pytest.importorskip("cupy")
+    cp = array_namespace(cp.empty(0))
+    x_cp = cp.asarray([1, 2, 3])
+    x_da = da.asarray([1, 2, 3]).map_blocks(cp.asarray)
+    assert array_namespace(x_da._meta) is cp
+
+    def f(x: Array) -> Array:
+        return x + 1
+
+    y = lazy_apply(f, x_da)
+    assert array_namespace(y._meta) is cp
+    xp_assert_equal(y.compute(), x_cp + 1)
+
+
 @pytest.mark.xfail_xp_backend(Backend.JAX, reason="unknown shape")
 def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
     x = xp.asarray([1, 1, 2, 2, 2])
@@ -241,6 +262,27 @@ def test_lazy_apply_device(xp: ModuleType, as_numpy: bool, device: Device):
     assert _compat.device(y) == device
 
 
+def test_lazy_apply_arraylike(xp: ModuleType):
+    """Wrapped func returns an array-like"""
+    x = xp.asarray([1, 2, 3])
+
+    # Single output
+    def f(x: Array) -> int:
+        return x.shape[0]  # type: ignore[no-any-return]
+
+    expect = xp.asarray(3)
+    actual = lazy_apply(f, x, shape=(), dtype=expect.dtype)
+    xp_assert_equal(actual, expect)
+
+    # Multi output
+    def g(x: Array) -> tuple[int, ...]:
+        return x.shape[0], x.shape
+
+    actual = lazy_apply(g, x, shape=((), (1,)), dtype=(expect.dtype, expect.dtype))
+    xp_assert_equal(actual[0], xp.asarray(3))
+    xp_assert_equal(actual[1], xp.asarray([3]))
+
+
 class NT(NamedTuple):
     a: Array
 
@@ -291,7 +333,7 @@ lazy_xp_function(check_lazy_apply_kwargs, static_argnames=("expect_cls", "as_num
 
 
 @as_numpy
-def test_lazy_apply_kwargs(xp: ModuleType, library: Backend, as_numpy: bool) -> None:
+def test_lazy_apply_kwargs(xp: ModuleType, library: Backend, as_numpy: bool):
     """When as_numpy=True, search and replace arrays in the (nested) keywords arguments
     with numpy arrays, and leave the rest untouched."""
     expect_cls = (
