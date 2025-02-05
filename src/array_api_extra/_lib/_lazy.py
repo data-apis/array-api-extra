@@ -207,9 +207,9 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     multi_output = False
 
     if shape is None:
-        import numpy as np  # DNM
-
-        shapes = [np.broadcast_shapes(*(arg.shape for arg in args))]
+        # FIXME https://github.com/data-apis/array-api-extra/pull/133
+        # shapes = [broadcast_shapes(*(arg.shape for arg in args))]
+        shapes = [xp.broadcast_arrays(*args)[0].shape]
     elif all(isinstance(s, int | None) for s in shape):
         # Do not test for shape to be a tuple
         # https://github.com/data-apis/array-api/issues/891#issuecomment-2637430522
