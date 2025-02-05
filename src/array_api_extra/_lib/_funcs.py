@@ -96,6 +96,7 @@ def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...
     See Also
     --------
     numpy.broadcast_shapes : Equivalent NumPy function.
+    array_api.broadcast_arrays : Function to broadcast actual arrays.
 
     Notes
     -----
