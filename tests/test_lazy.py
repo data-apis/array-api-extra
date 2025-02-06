@@ -9,7 +9,7 @@ from array_api_extra import lazy_apply
 from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils import _compat
-from array_api_extra._lib._utils._compat import array_namespace
+from array_api_extra._lib._utils._compat import array_namespace, is_dask_array
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
@@ -288,12 +288,18 @@ class NT(NamedTuple):
 
 
 def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array:
+    is_dask = is_dask_array(x)
+    recursive: list[object] = []
+    if not is_dask:  # dask.delayed crashes on recursion
+        recursive.append(recursive)
+
     def eager(
         x: Array,
         z: dict[str, list[Array] | tuple[Array, ...] | NT],
         msg: str,
         msgs: list[str],
         scalar: int,
+        recursive: list[list[object]],
     ) -> Array:
         assert isinstance(x, expect_cls)
         # JAX will crash if x isn't material
@@ -310,6 +316,9 @@ def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array
         assert isinstance(msgs[0], str)
         assert scalar == 1  # must be hidden from JAX
         assert isinstance(scalar, int)
+        assert isinstance(recursive, list)
+        if not is_dask:
+            assert recursive[0][0] is recursive[0]
         return x + 1  # type: ignore[operator]
 
     # Use explicit namespace to bypass monkey-patching by lazy_xp_function
@@ -323,6 +332,7 @@ def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array
         msgs=["Hello World"],
         # This will be automatically cast to jax.Array if we don't wrap it
         scalar=1,
+        recursive=recursive,
         shape=x.shape,
         dtype=x.dtype,
         as_numpy=as_numpy,

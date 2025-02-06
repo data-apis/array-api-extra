@@ -324,28 +324,48 @@ def _contains_jax_arrays(x: object) -> bool:  # numpydoc ignore=PR01,RT01
     """
     Test if x is a JAX array or a nested collection with any JAX arrays in it.
     """
-    if is_jax_array(x):
-        return True
-    if isinstance(x, list | tuple):
-        return any(_contains_jax_arrays(i) for i in x)  # pyright: ignore[reportUnknownArgumentType]
-    if isinstance(x, dict):
-        return any(_contains_jax_arrays(i) for i in x.values())  # pyright: ignore[reportUnknownArgumentType]
-    return False
+    seen = set()
+
+    def recursion(x: object) -> bool:  # numpydoc ignore=GL08
+        if id(x) in seen:
+            return False
+        seen.add(id(x))
+
+        if is_jax_array(x):
+            return True
+        if isinstance(x, list | tuple):
+            return any(recursion(i) for i in x)  # pyright: ignore[reportUnknownArgumentType]
+        if isinstance(x, dict):
+            return any(recursion(i) for i in x.values())  # pyright: ignore[reportUnknownArgumentType]
+        return False
+
+    return recursion(x)
 
 
 def _as_numpy(x: object) -> Any:  # type: ignore[no-any-explicit] # numpydoc ignore=PR01,RT01
     """Recursively convert Array API objects in x to NumPy."""
     import numpy as np  # pylint: disable=import-outside-toplevel
 
-    if is_array_api_obj(x):
-        return np.asarray(x)
-    if isinstance(x, list) or type(x) is tuple:  # pylint: disable=unidiomatic-typecheck
-        return type(x)(_as_numpy(i) for i in x)  # pyright: ignore[reportUnknownArgumentType]
-    if isinstance(x, tuple):  # namedtuple
-        return type(x)(*(_as_numpy(i) for i in x))  # pyright: ignore[reportUnknownArgumentType]
-    if isinstance(x, dict):
-        return {k: _as_numpy(v) for k, v in x.items()}  # pyright: ignore[reportUnknownArgumentType]
-    return x
+    seen = set()
+
+    def recursion(x: Any) -> Any:  # type: ignore[no-any-explicit]  # numpydoc ignore=GL08
+        if is_array_api_obj(x):
+            return np.asarray(x)
+        if not isinstance(x, list | tuple | dict):
+            return x
+
+        if id(x) in seen:  # pyright: ignore[reportUnknownArgumentType]
+            return x  # Recursive collections can't contain arrays
+        seen.add(id(x))  # pyright: ignore[reportUnknownArgumentType]
+
+        if isinstance(x, list) or type(x) is tuple:  # pylint: disable=unidiomatic-typecheck  # pyright: ignore[reportUnknownArgumentType]
+            return type(x)(recursion(i) for i in x)  # pyright: ignore[reportUnknownArgumentType]
+        if isinstance(x, tuple):  # namedtuple
+            return type(x)(*(recursion(i) for i in x))  # pyright: ignore[reportUnknownArgumentType]
+        # dict
+        return {k: recursion(v) for k, v in x.items()}
+
+    return recursion(x)
 
 
 def _lazy_apply_wrapper(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR01,RT01
