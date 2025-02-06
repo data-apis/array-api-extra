@@ -72,9 +72,15 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
     array_orig = xp.asarray(array, copy=True)
     yield
 
-    if copy is None:
-        copy = not is_writeable_array(array)
-    xp_assert_equal(xp.all(array == array_orig), xp.asarray(copy))
+    if copy is True:
+        # Original has not been modified
+        xp_assert_equal(array, array_orig)
+    elif copy is False:
+        # Original has been modified
+        with pytest.raises(AssertionError):
+            xp_assert_equal(array, array_orig)
+    # Test nothing for copy=None. Dask changes behaviour depending on
+    # whether it's a special case of a bool mask with scalar RHS or not.
 
 
 @pytest.mark.parametrize(
@@ -89,7 +95,7 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
     ],
 )
 @pytest.mark.parametrize(
-    ("op", "y", "expect"),
+    ("op", "y", "expect_list"),
     [
         (_AtOp.SET, 40.0, [10.0, 40.0, 40.0]),
         (_AtOp.ADD, 40.0, [10.0, 60.0, 70.0]),
@@ -102,14 +108,13 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
     ],
 )
 @pytest.mark.parametrize(
-    ("bool_mask", "shaped_y"),
+    ("bool_mask", "x_ndim", "y_ndim"),
     [
-        (False, False),
-        (False, True),
-        (True, False),  # Uses xp.where(idx, y, x) on JAX and Dask
+        (False, 1, 0),
+        (False, 1, 1),
+        (True, 1, 0),  # Uses xp.where(idx, y, x) on JAX and Dask
         pytest.param(
-            True,
-            True,
+            *(True, 1, 1),
             marks=(
                 pytest.mark.skip_xp_backend(  # test passes when copy=False
                     Backend.JAX, reason="bool mask update with shaped rhs"
@@ -119,6 +124,8 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
                 ),
             ),
         ),
+        (False, 0, 0),
+        (True, 0, 0),
     ],
 )
 def test_update_ops(
@@ -127,13 +134,26 @@ def test_update_ops(
     expect_copy: bool | None,
     op: _AtOp,
     y: float,
-    expect: list[float],
+    expect_list: list[float],
     bool_mask: bool,
-    shaped_y: bool,
+    x_ndim: int,
+    y_ndim: int,
 ):
-    x = xp.asarray([10.0, 20.0, 30.0])
-    idx = xp.asarray([False, True, True]) if bool_mask else slice(1, None)
-    if shaped_y:
+    if x_ndim == 1:
+        x = xp.asarray([10.0, 20.0, 30.0])
+        idx = xp.asarray([False, True, True]) if bool_mask else slice(1, None)
+        expect: list[float] | float = expect_list
+    else:
+        idx = xp.asarray(True) if bool_mask else ()
+        # Pick an element that does change with the operation
+        if op is _AtOp.MIN:
+            x = xp.asarray(30.0)
+            expect = expect_list[2]
+        else:
+            x = xp.asarray(20.0)
+            expect = expect_list[1]
+
+    if y_ndim == 1:
         y = xp.asarray([y, y])
 
     with assert_copy(x, expect_copy):
@@ -259,3 +279,56 @@ def test_no_inf_warnings(xp: ModuleType, bool_mask: bool):
     # inf - inf -> nan with a warning
     z = at_op(x, idx, _AtOp.SUBTRACT, math.inf)
     xp_assert_equal(z, xp.asarray([math.inf, -math.inf, -math.inf]))
+
+
+@pytest.mark.parametrize(
+    "copy",
+    [
+        None,
+        pytest.param(
+            False,
+            marks=[
+                pytest.mark.skip_xp_backend(
+                    Backend.NUMPY, reason="np.generic is read-only"
+                ),
+                pytest.mark.skip_xp_backend(
+                    Backend.NUMPY_READONLY, reason="read-only backend"
+                ),
+                pytest.mark.skip_xp_backend(Backend.JAX, reason="read-only backend"),
+                pytest.mark.skip_xp_backend(Backend.SPARSE, reason="read-only backend"),
+                pytest.mark.xfail_xp_backend(Backend.DASK, reason="dask/dask#11722"),
+            ],
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    "bool_mask",
+    [
+        pytest.param(
+            False,
+            marks=pytest.mark.xfail_xp_backend(Backend.DASK, reason="dask/dask#11722"),
+        ),
+        True,
+    ],
+)
+def test_gh134(xp: ModuleType, bool_mask: bool, copy: bool | None):
+    """
+    Test that xpx.at doesn't encroach in a bug of dask.array.Array.__setitem__, which
+    blindly assumes that chunk contents are writeable np.ndarray objects:
+
+    https://github.com/dask/dask/issues/11722
+
+    In other words: when special-casing bool masks for Dask, unless the user explicitly
+    asks for copy=False, do not needlessly write back to the input.
+    """
+    x = xp.zeros(1)
+
+    # In numpy, we have a writeable np.ndarray in input and a read-only np.generic in
+    # output. As both are Arrays, this behaviour is Array API compliant.
+    # In Dask, we have a writeable da.Array on both sides, and if you call __setitem__
+    # on it all seems fine, but when you compute() your graph is corrupted.
+    y = x[0]
+
+    idx = xp.asarray(True) if bool_mask else ()
+    z = at_op(y, idx, _AtOp.SET, 1, copy=copy)
+    xp_assert_equal(z, xp.asarray(1, dtype=x.dtype))
