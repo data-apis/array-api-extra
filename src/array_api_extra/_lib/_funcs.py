@@ -3,7 +3,6 @@
 # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
 
-import math
 import warnings
 from collections.abc import Sequence
 from types import ModuleType
@@ -484,7 +483,7 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
     _, counts = xp.unique_counts(x)
     n = _compat.size(counts)
     # FIXME https://github.com/data-apis/array-api-compat/pull/231
-    if n is None or math.isnan(n):  # e.g. Dask, ndonnx
+    if n is None:  # e.g. Dask, ndonnx
         return xp.astype(counts, xp.bool).sum()
     return xp.asarray(n, device=_compat.device(x))
 
