@@ -131,11 +131,11 @@ def xp(
     return xp
 
 
-@pytest.fixture(params=[Backend.DASK])  # Select the test with `pytest -k dask`
+@pytest.fixture(params=[Backend.DASK])  # Can select the test with `pytest -k dask`
 def da(
     request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
 ) -> ModuleType:  # numpydoc ignore=PR01,RT01
-    """Fixture that returns dask.array (wrapped by array-api-compat)."""
+    """Variant of the `xp` fixture that only yields dask.array."""
     xp = pytest.importorskip("dask.array")
     xp = array_namespace(xp.empty(0))
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)

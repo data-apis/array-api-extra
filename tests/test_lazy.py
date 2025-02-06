@@ -95,11 +95,9 @@ def test_lazy_apply_multi_output(xp: ModuleType, as_numpy: bool):
     [
         pytest.param(
             False,
-            marks=[
-                pytest.mark.xfail_xp_backend(
-                    Backend.TORCH, reason="illegal dtype promotion"
-                ),
-            ],
+            marks=pytest.mark.xfail_xp_backend(
+                Backend.TORCH, reason="illegal dtype promotion"
+            ),
         ),
         pytest.param(
             True,
@@ -218,7 +216,8 @@ def check_lazy_apply_none_shape_broadcast(x: Array) -> Array:
         return x
 
     x = x[x > 1]
-    return lazy_apply(f, x)
+    # Use explicit namespace to bypass monkey-patching by lazy_xp_function
+    return xpx.lazy_apply(f, x)
 
 
 lazy_xp_function(check_lazy_apply_none_shape_broadcast)
