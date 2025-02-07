@@ -12,7 +12,7 @@ from typing import cast
 from ._at import at
 from ._utils import _compat, _helpers
 from ._utils._compat import array_namespace, is_jax_array
-from ._utils._helpers import asarrays
+from ._utils._helpers import asarrays, ndindex
 from ._utils._typing import Array
 
 __all__ = [
@@ -236,7 +236,7 @@ def create_diagonal(
     Parameters
     ----------
     x : array
-        A 1-D array.
+        An array having shape ``(*batch_dims, k)``.
     offset : int, optional
         Offset from the leading diagonal (default is ``0``).
         Use positive ints for diagonals above the leading diagonal,
@@ -247,7 +247,8 @@ def create_diagonal(
     Returns
     -------
     array
-        A 2-D array with `x` on the diagonal (offset by `offset`).
+        An array having shape ``(*batch_dims, k+abs(offset), k+abs(offset))`` with `x`
+        on the diagonal (offset by `offset`).
 
     Examples
     --------
@@ -270,18 +271,21 @@ def create_diagonal(
     if xp is None:
         xp = array_namespace(x)
 
-    if x.ndim != 1:
-        err_msg = "`x` must be 1-dimensional."
+    if x.ndim == 0:
+        err_msg = "`x` must be at least 1-dimensional."
         raise ValueError(err_msg)
-    n = x.shape[0] + abs(offset)
-    diag = xp.zeros(n**2, dtype=x.dtype, device=_compat.device(x))
+    batch_dims = x.shape[:-1]
+    n = x.shape[-1] + abs(offset)
+    diag = xp.zeros((*batch_dims, n**2), dtype=x.dtype, device=_compat.device(x))
 
-    start = offset if offset >= 0 else abs(offset) * n
-    stop = min(n * (n - offset), diag.shape[0])
-    step = n + 1
-    diag = at(diag)[start:stop:step].set(x)
-
-    return xp.reshape(diag, (n, n))
+    target_slice = slice(
+        offset if offset >= 0 else abs(offset) * n,
+        min(n * (n - offset), diag.shape[-1]),
+        n + 1,
+    )
+    for index in ndindex(*batch_dims):
+        diag = at(diag)[(*index, target_slice)].set(x[(*index, slice(None))])
+    return xp.reshape(diag, (*batch_dims, n, n))
 
 
 def expand_dims(
