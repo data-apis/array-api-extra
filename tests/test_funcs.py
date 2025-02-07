@@ -163,6 +163,7 @@ class TestBroadcastShapes:
             ((math.nan,), (None,)),
             ((1, None, 2, 4), (2, 3, None, 1), (2, None, None, 4)),
             ((1, math.nan, 2), (4, 2, 3, math.nan), (4, 2, None, None)),
+            ((math.nan, 1), (None, 2), (None, 2)),
         ],
     )
     def test_none(self, args: tuple[tuple[float | None, ...], ...]):
