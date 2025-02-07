@@ -3,6 +3,7 @@
 # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
 
+from collections.abc import Generator
 from types import ModuleType
 from typing import cast
 
@@ -175,3 +176,26 @@ def asarrays(
         xa, xb = xp.asarray(a), xp.asarray(b)
 
     return (xb, xa) if swap else (xa, xb)
+
+
+def ndindex(*x: int) -> Generator[tuple[int, ...]]:
+    """
+    Generate all N-dimensional indices for a given array shape.
+
+    Given the shape of an array, an ndindex instance iterates over the N-dimensional
+    index of the array. At each iteration a tuple of indices is returned, the last
+    dimension is iterated over first.
+
+    This has an identical API to numpy.ndindex.
+
+    Parameters
+    ----------
+    *x : int
+        The shape of the array.
+    """
+    if not x:
+        yield ()
+        return
+    for i in ndindex(*x[:-1]):
+        for j in range(x[-1]):
+            yield *i, j
