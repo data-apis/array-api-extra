@@ -72,6 +72,8 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array
     return x
 
 
+# `float` in signature to accept `math.nan` for Dask.
+# `int`s are still accepted as `float` is a superclass of `int` in typing
 def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...]:
     """
     Compute the shape of the broadcasted arrays.
