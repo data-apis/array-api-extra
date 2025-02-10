@@ -5,17 +5,25 @@ from __future__ import annotations
 
 import math
 import warnings
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
+from functools import partial
 from types import ModuleType
-from typing import cast
+from typing import cast, overload
 
 from ._at import at
 from ._utils import _compat, _helpers
-from ._utils._compat import array_namespace, is_jax_array
-from ._utils._helpers import asarrays
-from ._utils._typing import Array
+from ._utils._compat import (
+    array_namespace,
+    is_array_api_obj,
+    is_dask_namespace,
+    is_jax_array,
+    is_jax_namespace,
+)
+from ._utils._helpers import asarrays, get_meta
+from ._utils._typing import Array, DType
 
 __all__ = [
+    "apply_where",
     "atleast_nd",
     "cov",
     "create_diagonal",
@@ -26,6 +34,168 @@ __all__ = [
     "setdiff1d",
     "sinc",
 ]
+
+
+@overload
+def apply_where(  # type: ignore[no-any-explicit,no-any-decorated] # numpydoc ignore=GL08
+    cond: Array,
+    f1: Callable[..., Array],
+    f2: Callable[..., Array],
+    /,
+    *args: Array,
+    xp: ModuleType | None = None,
+) -> Array: ...
+
+
+@overload
+def apply_where(  # type: ignore[no-any-explicit,no-any-decorated] # numpydoc ignore=GL08
+    cond: Array,
+    f1: Callable[..., Array],
+    /,
+    *args: Array,
+    fill_value: Array | int | float | complex | bool,
+    xp: ModuleType | None = None,
+) -> Array: ...
+
+
+def apply_where(  # type: ignore[no-any-explicit,misc] # numpydoc ignore=PR01,PR02
+    cond: Array,
+    f1: Callable[..., Array],
+    f2: Callable[..., Array] | Array,
+    /,
+    *args: Array,
+    fill_value: Array | int | float | complex | bool | None = None,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Run one of two elementwise functions depending on a condition.
+
+    Equivalent to ``f1(*args) if cond else fill_value`` performed elementwise
+    when `fill_value` is defined, otherwise to ``f1(*args) if cond else f2(*args)``.
+
+    Parameters
+    ----------
+    cond : array
+        The condition, expressed as a boolean array.
+    f1 : callable
+        Where `cond` is True, output will be ``f1(arg0[cond], arg1[cond], ...)``.
+    f2 : callable, optional
+        Where `cond` is False, output will be ``f2(arg0[cond], arg1[cond], ...)``.
+        Mutually exclusive with `fill_value`.
+    *args : one or more arrays
+        Arguments to `f1` (and `f2`). Must be broadcastable with `cond`.
+    fill_value : Array or scalar, optional
+        If provided, value with which to fill output array where `cond` is
+        not True. Mutually exclusive with `f2`. You must provide one or the other.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `cond` and `args`. Default: infer.
+
+    Returns
+    -------
+    Array
+        An array with elements from the output of `f1` where `cond` is True and either
+        the output of `f2` or `fill_value` where `cond` is False. The returned array has
+        data type determined by type promotion rules between the output of `f1` and
+        either `fill_value` or the output of `f2`.
+
+    Notes
+    -----
+    ``xp.where(cond, f1(*args), f2(*args))`` requires explicitly evaluating `f1` even
+    when `cond` is False, and `f2` when cond is True. This function evaluates each
+    function only for their matching condition, if the backend allows for it.
+
+    Examples
+    --------
+    >>> a = xp.asarray([5, 4, 3])
+    >>> b = xp.asarray([0, 2, 2])
+    >>> def f(a, b):
+    ...     return a // b
+    >>> apply_where(b != 0, f, a, b, fill_value=xp.nan)
+    array([ nan,  2., 1.])
+    """
+    # Parse and normalize arguments
+    mutually_exc_msg = "Exactly one of `fill_value` or `f2` must be given."
+    if is_array_api_obj(f2):
+        args = (cast(Array, f2), *args)
+        if fill_value is not None:
+            raise TypeError(mutually_exc_msg)
+        f2_: Callable[..., Array] | None = None  # type: ignore[no-any-explicit]
+    else:
+        if not callable(f2):
+            msg = "Third parameter must be either an Array or callable."
+            raise ValueError(msg)
+        f2_ = cast(Callable[..., Array], f2)  # type: ignore[no-any-explicit]
+        if fill_value is None:
+            raise TypeError(mutually_exc_msg)
+        if getattr(fill_value, "ndim", 0) != 0:
+            msg = "`fill_value` must be a scalar."
+            raise ValueError(msg)
+    del f2
+    if not args:
+        msg = "Must give at least one input array."
+        raise TypeError(msg)
+
+    xp = array_namespace(cond, *args) if xp is None else xp
+
+    # Determine output dtype
+    metas = [get_meta(arg, xp=xp) for arg in args]
+    temp1 = f1(*metas)
+    if f2_ is None:
+        if xp.__array_api_version__ >= "2024.12" or is_array_api_obj(fill_value):
+            dtype = xp.result_type(temp1.dtype, fill_value)
+        else:
+            # TODO: remove this when all backends support Array API 2024.12
+            dtype = (xp.empty((), dtype=temp1.dtype) * fill_value).dtype
+    else:
+        temp2 = f2_(*metas)
+        dtype = xp.result_type(temp1, temp2)
+
+    if is_dask_namespace(xp):
+        # Dask does not support assignment by boolean mask
+        meta_xp = array_namespace(get_meta(cond), *metas)
+        # pass dtype to both da.map_blocks and _apply_where
+        return xp.map_blocks(
+            partial(_apply_where, dtype=dtype, xp=meta_xp),
+            cond,
+            f1,
+            f2_,
+            *args,
+            fill_value=fill_value,
+            dtype=dtype,
+            meta=metas[0],
+        )
+
+    return _apply_where(cond, f1, f2_, *args, fill_value=fill_value, dtype=dtype, xp=xp)
+
+
+def _apply_where(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR01,RT01
+    cond: Array,
+    f1: Callable[..., Array],
+    f2: Callable[..., Array] | None,
+    *args: Array,
+    fill_value: Array | int | float | complex | bool | None,
+    dtype: DType,
+    xp: ModuleType,
+) -> Array:
+    """Helper of `apply_where`. On Dask, this runs on a single chunk."""
+
+    if is_jax_namespace(xp):
+        # jax.jit does not support assignment by boolean mask
+        return xp.where(cond, f1(*args), f2(*args) if f2 is not None else fill_value)
+
+    device = _compat.device(cond)
+    cond, *args = xp.broadcast_arrays(cond, *args)  # pyright: ignore[reportAssignmentType]
+    temp1 = f1(*(arr[cond] for arr in args))
+
+    if f2 is None:
+        out = xp.full(cond.shape, fill_value=fill_value, dtype=dtype, device=device)
+    else:
+        ncond = ~cond
+        temp2 = f2(*(arr[ncond] for arr in args))
+        out = xp.empty(cond.shape, dtype=dtype, device=device)
+        out = at(out, ncond).set(temp2)
+
+    return at(out, cond).set(temp1)
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array:

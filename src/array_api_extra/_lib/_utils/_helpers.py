@@ -7,10 +7,8 @@ from types import ModuleType
 from typing import cast
 
 from . import _compat
-from ._compat import is_array_api_obj, is_numpy_array
+from ._compat import array_namespace, is_array_api_obj, is_dask_array, is_numpy_array
 from ._typing import Array
-
-__all__ = ["in1d", "mean"]
 
 
 def in1d(
@@ -175,3 +173,28 @@ def asarrays(
         xa, xb = xp.asarray(a), xp.asarray(b)
 
     return (xb, xa) if swap else (xa, xb)
+
+
+def get_meta(x: Array, xp: ModuleType | None = None) -> Array:
+    """
+    Return a 0-sized dummy array that mocks `x`.
+
+    Parameters
+    ----------
+    x : Array
+        The array to mock.
+    xp : ModuleType, optional
+        The array namespace to use. If None, it is inferred from `x`.
+
+    Returns
+    -------
+    Array
+        Array with size 0 with the same same namespace, dimensionality,
+        dtype and device as `x`.
+        On Dask, return instead the meta array of `x`, which has the
+        namespace of the wrapped backend.
+    """
+    if is_dask_array(x):
+        return x._meta  # pylint: disable=protected-access
+    xp = array_namespace(x) if xp is None else xp
+    return xp.empty((0,) * x.ndim, dtype=x.dtype, device=_compat.device(x))
