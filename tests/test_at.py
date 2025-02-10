@@ -3,7 +3,7 @@ import pickle
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from types import ModuleType
-from typing import Any, cast
+from typing import cast
 
 import numpy as np
 import pytest
@@ -23,12 +23,13 @@ pytestmark = [
 ]
 
 
-def at_op(  # type: ignore[no-any-explicit]
+def at_op(
     x: Array,
     idx: Index,
     op: _AtOp,
     y: Array | object,
-    **kwargs: Any,  # Test the default copy=None
+    copy: bool | None = None,
+    xp: ModuleType | None = None,
 ) -> Array:
     """
     Wrapper around at(x, idx).op(y, copy=copy, xp=xp).
@@ -39,30 +40,33 @@ def at_op(  # type: ignore[no-any-explicit]
     which is not a common use case.
     """
     if isinstance(idx, (slice | tuple)):
-        return _at_op(x, None, pickle.dumps(idx), op, y, **kwargs)
-    return _at_op(x, idx, None, op, y, **kwargs)
+        return _at_op(x, None, pickle.dumps(idx), op, y, copy=copy, xp=xp)
+    return _at_op(x, idx, None, op, y, copy=copy, xp=xp)
 
 
-def _at_op(  # type: ignore[no-any-explicit]
+def _at_op(
     x: Array,
     idx: Index | None,
     idx_pickle: bytes | None,
     op: _AtOp,
     y: Array | object,
-    **kwargs: Any,
+    copy: bool | None,
+    xp: ModuleType | None = None,
 ) -> Array:
     """jitted helper of at_op"""
     if idx_pickle:
         idx = pickle.loads(idx_pickle)
     meth = cast(Callable[..., Array], getattr(at(x, idx), op.value))  # type: ignore[no-any-explicit]
-    return meth(y, **kwargs)
+    return meth(y, copy=copy, xp=xp)
 
 
 lazy_xp_function(_at_op, static_argnames=("op", "idx_pickle", "copy", "xp"))
 
 
 @contextmanager
-def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
+def assert_copy(
+    array: Array, copy: bool | None, expect_copy: bool | None = None
+) -> Generator[None, None, None]:
     if copy is False and not is_writeable_array(array):
         with pytest.raises((TypeError, ValueError)):
             yield
@@ -72,10 +76,13 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
     array_orig = xp.asarray(array, copy=True)
     yield
 
-    if copy is True:
+    if expect_copy is None:
+        expect_copy = copy
+
+    if expect_copy:
         # Original has not been modified
         xp_assert_equal(array, array_orig)
-    elif copy is False:
+    elif expect_copy is False:
         # Original has been modified
         with pytest.raises(AssertionError):
             xp_assert_equal(array, array_orig)
@@ -83,17 +90,7 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
     # whether it's a special case of a bool mask with scalar RHS or not.
 
 
-@pytest.mark.parametrize(
-    ("kwargs", "expect_copy"),
-    [
-        pytest.param({"copy": True}, True, id="copy=True"),
-        pytest.param({"copy": False}, False, id="copy=False"),
-        # Behavior is backend-specific
-        pytest.param({"copy": None}, None, id="copy=None"),
-        # Test that the copy parameter defaults to None
-        pytest.param({}, None, id="no copy kwarg"),
-    ],
-)
+@pytest.mark.parametrize("copy", [False, True, None])
 @pytest.mark.parametrize(
     ("op", "y", "expect_list"),
     [
@@ -130,8 +127,7 @@ def assert_copy(array: Array, copy: bool | None) -> Generator[None, None, None]:
 )
 def test_update_ops(
     xp: ModuleType,
-    kwargs: dict[str, bool | None],
-    expect_copy: bool | None,
+    copy: bool | None,
     op: _AtOp,
     y: float,
     expect_list: list[float],
@@ -156,10 +152,32 @@ def test_update_ops(
     if y_ndim == 1:
         y = xp.asarray([y, y])
 
-    with assert_copy(x, expect_copy):
-        z = at_op(x, idx, op, y, **kwargs)
+    with assert_copy(x, copy):
+        z = at_op(x, idx, op, y, copy=copy)
         assert isinstance(z, type(x))
         xp_assert_equal(z, xp.asarray(expect))
+
+
+@pytest.mark.parametrize("op", list(_AtOp))
+def test_copy_default(xp: ModuleType, library: Backend, op: _AtOp):
+    """
+    Test that the default copy behaviour is False for writeable arrays
+    and True for read-only ones.
+    """
+    x = xp.asarray([1.0, 10.0, 20.0])
+    expect_copy = not is_writeable_array(x)
+    meth = cast(Callable[..., Array], getattr(at(x)[:2], op.value))  # type: ignore[no-any-explicit]
+    with assert_copy(x, None, expect_copy):
+        _ = meth(2.0)
+
+    x = xp.asarray([1.0, 10.0, 20.0])
+    # Dask's default copy value is True for bool masks,
+    # even if the arrays are writeable.
+    expect_copy = not is_writeable_array(x) or library is Backend.DASK
+    idx = xp.asarray([True, True, False])
+    meth = cast(Callable[..., Array], getattr(at(x, idx), op.value))  # type: ignore[no-any-explicit]
+    with assert_copy(x, None, expect_copy):
+        _ = meth(2.0)
 
 
 def test_copy_invalid():
