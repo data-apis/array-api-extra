@@ -1,4 +1,5 @@
 import contextlib
+import math
 import warnings
 from types import ModuleType
 
@@ -8,6 +9,7 @@ import pytest
 from array_api_extra import (
     at,
     atleast_nd,
+    broadcast_shapes,
     cov,
     create_diagonal,
     expand_dims,
@@ -111,6 +113,63 @@ class TestAtLeastND:
         x = xp.asarray(1.0)
         y = atleast_nd(x, ndim=1, xp=xp)
         xp_assert_equal(y, xp.ones((1,)))
+
+
+class TestBroadcastShapes:
+    @pytest.mark.parametrize(
+        "args",
+        [
+            (),
+            ((),),
+            ((), ()),
+            ((1,),),
+            ((1,), (1,)),
+            ((2,), (1,)),
+            ((3, 1, 4), (2, 1)),
+            ((1, 1, 4), (2, 1)),
+            ((1,), ()),
+            ((), (2,), ()),
+            ((0,),),
+            ((0,), (1,)),
+            ((2, 0), (1, 1)),
+            ((2, 0, 3), (2, 1, 1)),
+        ],
+    )
+    def test_simple(self, args: tuple[tuple[int, ...], ...]):
+        expect = np.broadcast_shapes(*args)
+        actual = broadcast_shapes(*args)
+        assert actual == expect
+
+    @pytest.mark.parametrize(
+        "args",
+        [
+            ((2,), (3,)),
+            ((2, 3), (1, 2)),
+            ((2,), (0,)),
+            ((2, 0, 2), (1, 3, 1)),
+        ],
+    )
+    def test_fail(self, args: tuple[tuple[int, ...], ...]):
+        match = "cannot be broadcast to a single shape"
+        with pytest.raises(ValueError, match=match):
+            _ = np.broadcast_shapes(*args)
+        with pytest.raises(ValueError, match=match):
+            _ = broadcast_shapes(*args)
+
+    @pytest.mark.parametrize(
+        "args",
+        [
+            ((None,), (None,)),
+            ((math.nan,), (None,)),
+            ((1, None, 2, 4), (2, 3, None, 1), (2, None, None, 4)),
+            ((1, math.nan, 2), (4, 2, 3, math.nan), (4, 2, None, None)),
+            ((math.nan, 1), (None, 2), (None, 2)),
+        ],
+    )
+    def test_none(self, args: tuple[tuple[float | None, ...], ...]):
+        expect = args[-1]
+        actual = broadcast_shapes(*args[:-1])
+        assert actual == expect
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
