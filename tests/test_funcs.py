@@ -23,6 +23,7 @@ from array_api_extra import (
 from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
+from array_api_extra._lib._utils._helpers import ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
@@ -252,9 +253,17 @@ class TestCreateDiagonal:
         with pytest.raises(ValueError, match="1-dimensional"):
             create_diagonal(xp.asarray(1))
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_2d(self, xp: ModuleType):
-        with pytest.raises(ValueError, match="1-dimensional"):
-            create_diagonal(xp.asarray([[1]]))
+        result = create_diagonal(xp.asarray([[1]]))
+        xp_assert_equal(result, xp.asarray([[[1]]]))
+        b = xp.zeros((3, 2, 4, 5), dtype=xp.int64)
+        for i in ndindex(*b.shape):
+            b = at(b)[i].set(hash(i))
+        c = create_diagonal(b)
+        zero = xp.zeros((), dtype=xp.int64)
+        for i in ndindex(*c.shape):
+            xp_assert_equal(c[i], b[i[:-1]] if i[-2] == i[-1] else zero)
 
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_device(self, xp: ModuleType, device: Device):
