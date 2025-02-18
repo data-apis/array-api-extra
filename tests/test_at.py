@@ -314,21 +314,11 @@ def test_no_inf_warnings(xp: ModuleType, bool_mask: bool):
                 ),
                 pytest.mark.skip_xp_backend(Backend.JAX, reason="read-only backend"),
                 pytest.mark.skip_xp_backend(Backend.SPARSE, reason="read-only backend"),
-                pytest.mark.xfail_xp_backend(Backend.DASK, reason="dask/dask#11722"),
             ],
         ),
     ],
 )
-@pytest.mark.parametrize(
-    "bool_mask",
-    [
-        pytest.param(
-            False,
-            marks=pytest.mark.xfail_xp_backend(Backend.DASK, reason="dask/dask#11722"),
-        ),
-        True,
-    ],
-)
+@pytest.mark.parametrize("bool_mask", [False, True])
 def test_gh134(xp: ModuleType, bool_mask: bool, copy: bool | None):
     """
     Test that xpx.at doesn't encroach in a bug of dask.array.Array.__setitem__, which
