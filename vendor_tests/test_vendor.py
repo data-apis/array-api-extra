@@ -14,6 +14,7 @@ def test_vendor_compat():
         is_dask_namespace,
         is_jax_array,
         is_jax_namespace,
+        is_lazy_array,
         is_numpy_array,
         is_numpy_namespace,
         is_pydata_sparse_array,
@@ -35,6 +36,7 @@ def test_vendor_compat():
     assert not is_dask_namespace(xp)
     assert not is_jax_array(x)
     assert not is_jax_namespace(xp)
+    assert not is_lazy_array(x)
     assert not is_numpy_array(x)
     assert not is_numpy_namespace(xp)
     assert not is_pydata_sparse_array(x)
