@@ -386,8 +386,12 @@ def isclose(
     b_inexact = xp.isdtype(b.dtype, ("real floating", "complex floating"))
     if a_inexact or b_inexact:
         # FIXME: use scipy's lazywhere to suppress warnings on inf
-        out = xp.abs(a - b) <= (atol + rtol * xp.abs(b))
-        out = xp.where(xp.isinf(a) & xp.isinf(b), xp.sign(a) == xp.sign(b), out)
+        out = xp.where(
+            xp.isinf(a) | xp.isinf(b),
+            xp.isinf(a) & xp.isinf(b) & (xp.sign(a) == xp.sign(b)),
+            # Note: inf <= inf is True!
+            xp.abs(a - b) <= (atol + rtol * xp.abs(b)),
+        )
         if equal_nan:
             out = xp.where(xp.isnan(a) & xp.isnan(b), xp.asarray(True), out)
         return out
