@@ -5,7 +5,7 @@
 :hidden:
 self
 api-reference.md
-testing-utils.md
+api-lazy.md
 contributing.md
 contributors.md
 ```
