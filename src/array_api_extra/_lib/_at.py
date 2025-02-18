@@ -275,16 +275,11 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             msg = f"copy must be True, False, or None; got {copy!r}"
             raise ValueError(msg)
 
-        if copy is None:
-            writeable = is_writeable_array(x)
-            copy = not writeable
-        elif copy:
-            writeable = None
-        else:
-            writeable = is_writeable_array(x)
+        writeable = None if copy else is_writeable_array(x)
 
-        # JAX inside jax.jit and Dask don't support in-place updates with boolean
-        # mask. However we can handle the common special case of 0-dimensional y
+        # JAX inside jax.jit doesn't support in-place updates with boolean
+        # masks; Dask exclusively supports __setitem__ but not iops.
+        # We can handle the common special case of 0-dimensional y
         # with where(idx, y, x) instead.
         if (
             (is_dask_array(idx) or is_jax_array(idx))
@@ -293,21 +288,22 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         ):
             y_xp = xp.asarray(y, dtype=x.dtype)
             if y_xp.ndim == 0:
-                if out_of_place_op:
+                if out_of_place_op:  # add(), subtract(), ...
                     # FIXME: suppress inf warnings on dask with lazywhere
                     out = xp.where(idx, out_of_place_op(x, y_xp), x)
                     # Undo int->float promotion on JAX after _AtOp.DIVIDE
                     out = xp.astype(out, x.dtype, copy=False)
-                else:
+                else:  # set()
                     out = xp.where(idx, y_xp, x)
 
-                if copy:
-                    return out
-                x[()] = out
-                return x
+                if copy is False:
+                    x[()] = out
+                    return x
+                return out
+
             # else: this will work on eager JAX and crash on jax.jit and Dask
 
-        if copy:
+        if copy or (copy is None and not writeable):
             if is_jax_array(x):
                 # Use JAX's at[]
                 func = cast(Callable[[Array], Array], getattr(x.at[idx], at_op.value))
@@ -331,7 +327,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             msg = f"Can't update read-only array {x}"
             raise ValueError(msg)
 
-        if in_place_op:
+        if in_place_op:  # add(), subtract(), ...
             x[self._idx] = in_place_op(x[self._idx], y)
         else:  # set()
             x[self._idx] = y
