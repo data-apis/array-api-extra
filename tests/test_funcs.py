@@ -334,8 +334,6 @@ class TestExpandDims:
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestIsClose:
-    # FIXME use lazywhere to avoid warnings on inf
-    @pytest.mark.filterwarnings("ignore:invalid value encountered")
     @pytest.mark.parametrize("swap", [False, True])
     @pytest.mark.parametrize(
         ("a", "b"),
@@ -394,8 +392,6 @@ class TestIsClose:
 
         xp_assert_equal(actual, expect)
 
-    # FIXME use lazywhere to avoid warnings on inf
-    @pytest.mark.filterwarnings("ignore:invalid value encountered")
     def test_some_inf(self, xp: ModuleType):
         a = xp.asarray([0.0, 1.0, xp.inf, xp.inf, xp.inf])
         b = xp.asarray([1e-9, 1.0, xp.inf, -xp.inf, 2.0])

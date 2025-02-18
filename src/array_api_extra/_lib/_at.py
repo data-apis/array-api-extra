@@ -249,14 +249,16 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             Right-hand side of the operation.
         copy : bool or None
             Whether to copy the input array. See the class docstring for details.
-        xp : array_namespace or None
-            The array namespace for the input array.
+        xp : array_namespace, optional
+            The array namespace for the input array. Default: infer.
 
         Returns
         -------
         Array
             Updated `x`.
         """
+        from ._funcs import apply_where
+
         x, idx = self._x, self._idx
         xp = array_namespace(x, y) if xp is None else xp
 
@@ -294,8 +296,10 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             y_xp = xp.asarray(y, dtype=x.dtype)
             if y_xp.ndim == 0:
                 if out_of_place_op:
-                    # FIXME: suppress inf warnings on dask with lazywhere
-                    out = xp.where(idx, out_of_place_op(x, y_xp), x)
+                    # suppress inf warnings on Dask
+                    out = apply_where(
+                        idx, out_of_place_op, x, y_xp, fill_value=x, xp=xp
+                    )
                     # Undo int->float promotion on JAX after _AtOp.DIVIDE
                     out = xp.astype(out, x.dtype, copy=False)
                 else:

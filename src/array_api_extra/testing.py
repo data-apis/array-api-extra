@@ -169,7 +169,7 @@ def patch_lazy_xp_functions(
         Pytest fixture, as acquired by the test itself or by one of its fixtures.
     monkeypatch : pytest.MonkeyPatch
         Pytest fixture, as acquired by the test itself or by one of its fixtures.
-    xp : module
+    xp : array_namespace
         Array namespace to be tested.
 
     See Also
