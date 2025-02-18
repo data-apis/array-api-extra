@@ -236,6 +236,10 @@ reportMissingTypeStubs = false
 reportUnreachable = false
 # ruff handles this
 reportUnusedParameter = false
+# cyclic imports inside function bodies
+reportImportCycles = false
+# PyRight can't trace types in lambdas
+reportUnknownLambdaType = false
 
 executionEnvironments = [
     { root = "tests", reportPrivateUsage = false },
@@ -301,6 +305,7 @@ messages_control.disable = [
     "missing-function-docstring", # numpydoc handles this
     "import-error",               # mypy handles this
     "import-outside-toplevel",    # optional dependencies
+    "cyclic-import",              # cyclic imports inside function bodies
 ]
 
 

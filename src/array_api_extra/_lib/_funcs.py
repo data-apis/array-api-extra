@@ -5,17 +5,26 @@ from __future__ import annotations
 
 import math
 import warnings
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
+from functools import partial
 from types import ModuleType
-from typing import cast
+from typing import cast, overload
 
 from ._at import at
 from ._utils import _compat, _helpers
-from ._utils._compat import array_namespace, is_jax_array
-from ._utils._helpers import asarrays
-from ._utils._typing import Array
+from ._utils._compat import (
+    array_namespace,
+    is_array_api_obj,
+    is_dask_array,
+    is_dask_namespace,
+    is_jax_array,
+    is_jax_namespace,
+)
+from ._utils._helpers import asarrays, meta_namespace
+from ._utils._typing import Array, DType
 
 __all__ = [
+    "apply_where",
     "atleast_nd",
     "broadcast_shapes",
     "cov",
@@ -27,6 +36,178 @@ __all__ = [
     "setdiff1d",
     "sinc",
 ]
+
+
+@overload
+def apply_where(  # type: ignore[no-any-explicit,no-any-decorated] # numpydoc ignore=GL08
+    cond: Array,
+    f1: Callable[..., Array],
+    f2: Callable[..., Array],
+    /,
+    *args: Array,
+    xp: ModuleType | None = None,
+) -> Array: ...
+
+
+@overload
+def apply_where(  # type: ignore[no-any-explicit,no-any-decorated] # numpydoc ignore=GL08
+    cond: Array,
+    f1: Callable[..., Array],
+    /,
+    *args: Array,
+    fill_value: Array | int | float | complex | bool,
+    xp: ModuleType | None = None,
+) -> Array: ...
+
+
+def apply_where(  # type: ignore[no-any-explicit,misc] # numpydoc ignore=PR01,PR02
+    cond: Array,
+    f1: Callable[..., Array],
+    f2: Callable[..., Array] | Array,  # optional positional argument
+    /,
+    *args: Array,
+    fill_value: Array | int | float | complex | bool | None = None,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Run one of two elementwise functions depending on a condition.
+
+    Equivalent to ``f1(*args) if cond else fill_value`` performed elementwise
+    when `fill_value` is defined, otherwise to ``f1(*args) if cond else f2(*args)``.
+
+    Parameters
+    ----------
+    cond : array
+        The condition, expressed as a boolean array.
+    f1 : callable
+        Where `cond` is True, output will be ``f1(arg0[cond], arg1[cond], ...)``.
+    f2 : callable, optional
+        Where `cond` is False, output will be ``f2(arg0[cond], arg1[cond], ...)``.
+        Mutually exclusive with `fill_value`.
+    *args : one or more arrays
+        Arguments to `f1` (and `f2`). Must be broadcastable with `cond`.
+    fill_value : Array or scalar, optional
+        If provided, value with which to fill output array where `cond` is False.
+        It does not need to be scalar.
+        Mutually exclusive with `f2`. You must provide one or the other.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `cond` and `args`. Default: infer.
+
+    Returns
+    -------
+    Array
+        An array with elements from the output of `f1` where `cond` is True and either
+        the output of `f2` or `fill_value` where `cond` is False. The returned array has
+        data type determined by type promotion rules between the output of `f1` and
+        either `fill_value` or the output of `f2`.
+
+    Notes
+    -----
+    ``xp.where(cond, f1(*args), f2(*args))`` requires explicitly evaluating `f1` even
+    when `cond` is False, and `f2` when cond is True. This function evaluates each
+    function only for their matching condition, if the backend allows for it.
+
+    On Dask, f1 and f2 are applied to the individual chunks.
+
+    Examples
+    --------
+    >>> a = xp.asarray([5, 4, 3])
+    >>> b = xp.asarray([0, 2, 2])
+    >>> def f(a, b):
+    ...     return a // b
+    >>> apply_where(b != 0, f, a, b, fill_value=xp.nan)
+    array([ nan,  2., 1.])
+    """
+    # Parse and normalize arguments
+    mutually_exc_msg = "Exactly one of `fill_value` or `f2` must be given."
+    if is_array_api_obj(f2):
+        args = (cast(Array, f2), *args)
+        f2 = None
+        if fill_value is None:
+            raise TypeError(mutually_exc_msg)
+    elif callable(f2):
+        if fill_value is not None:
+            raise TypeError(mutually_exc_msg)
+    else:
+        msg = "Third parameter must be either an Array or callable."
+        raise ValueError(msg)
+    if not args:
+        msg = "Must give at least one input array."
+        raise TypeError(msg)
+    # End argument parsing
+
+    xp = array_namespace(cond, *args) if xp is None else xp
+
+    if not is_dask_namespace(xp):
+        return _apply_where(cond, f1, f2, fill_value, *args, dtype=None, xp=xp)
+
+    # Dask-specific code from here onwards
+
+    meta_xp = meta_namespace(cond, *args, xp=xp)
+    metas = [getattr(arg, "_meta", arg) for arg in args]  # pylint: disable=protected-access
+    # Determine output dtype
+    if f2 is not None:
+        dtype = meta_xp.result_type(f1(*metas), f2(*metas))
+    elif is_dask_array(fill_value):
+        dtype = meta_xp.result_type(f1(*metas), cast(Array, fill_value)._meta)  # pylint: disable=protected-access
+    else:
+        # TODO remove asarrays once all backends support Array API 2024.12
+        dtype = meta_xp.result_type(*asarrays(f1(*metas), fill_value, xp=meta_xp))
+
+    return xp.map_blocks(
+        # pass dtype to both da.map_blocks and _apply_where
+        partial(_apply_where, dtype=dtype, xp=meta_xp),
+        cond,
+        f1,
+        f2,
+        fill_value,
+        *args,
+        dtype=dtype,
+        meta=metas[0],
+    )
+
+
+def _apply_where(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR01,RT01
+    cond: Array,
+    f1: Callable[..., Array],
+    f2: Callable[..., Array] | None,
+    fill_value: Array | int | float | complex | bool | None,
+    *args: Array,
+    dtype: DType | None,
+    xp: ModuleType,
+) -> Array:
+    """Helper of `apply_where`. On Dask, this runs on a single chunk."""
+
+    if is_jax_namespace(xp):
+        # jax.jit does not support assignment by boolean mask
+        return xp.where(cond, f1(*args), f2(*args) if f2 is not None else fill_value)
+
+    device = _compat.device(cond)
+
+    if getattr(fill_value, "ndim", 0):
+        cond, fill_value, *args = xp.broadcast_arrays(cond, fill_value, *args)  # pyright: ignore[reportAssignmentType]
+    else:
+        cond, *args = xp.broadcast_arrays(cond, *args)  # pyright: ignore[reportAssignmentType]
+
+    temp1 = f1(*(arr[cond] for arr in args))
+
+    if f2 is None:
+        if getattr(fill_value, "ndim", 0):
+            return at(fill_value, cond).set(temp1, copy=True)
+
+        if dtype is None:
+            # TODO remove asarrays once all backends support Array API 2024.12
+            dtype = xp.result_type(*asarrays(temp1, fill_value, xp=xp))
+        out = xp.full(cond.shape, fill_value=fill_value, dtype=dtype, device=device)
+    else:
+        ncond = ~cond
+        temp2 = f2(*(arr[ncond] for arr in args))
+        if dtype is None:
+            dtype = xp.result_type(temp1, temp2)
+        out = xp.empty(cond.shape, dtype=dtype, device=device)
+        out = at(out, ncond).set(temp2)
+
+    return at(out, cond).set(temp1)
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array:
@@ -385,12 +566,15 @@ def isclose(
     a_inexact = xp.isdtype(a.dtype, ("real floating", "complex floating"))
     b_inexact = xp.isdtype(b.dtype, ("real floating", "complex floating"))
     if a_inexact or b_inexact:
-        # FIXME: use scipy's lazywhere to suppress warnings on inf
-        out = xp.where(
+        # prevent warnings on numpy and dask on inf - inf
+        mxp = meta_namespace(a, b, xp=xp)
+        out = apply_where(
             xp.isinf(a) | xp.isinf(b),
-            xp.isinf(a) & xp.isinf(b) & (xp.sign(a) == xp.sign(b)),
+            lambda a, b: mxp.isinf(a) & mxp.isinf(b) & (mxp.sign(a) == mxp.sign(b)),  # pyright: ignore[reportUnknownArgumentType]
             # Note: inf <= inf is True!
-            xp.abs(a - b) <= (atol + rtol * xp.abs(b)),
+            lambda a, b: mxp.abs(a - b) <= (atol + rtol * mxp.abs(b)),  # pyright: ignore[reportUnknownArgumentType]
+            *(a, b),
+            xp=xp,
         )
         if equal_nan:
             out = xp.where(xp.isnan(a) & xp.isnan(b), xp.asarray(True), out)
