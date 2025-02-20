@@ -115,7 +115,11 @@ def xp(
     if library == Backend.NUMPY_READONLY:
         return NumPyReadOnly()  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
     xp = pytest.importorskip(library.value)
+    # Possibly wrap module with array_api_compat
+    xp = array_namespace(xp.empty(0))
 
+    # On Dask and JAX, monkey-patch all functions tagged by `lazy_xp_function`
+    # in the global scope of the module containing the test function.
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)
 
     if library == Backend.JAX:
@@ -124,8 +128,18 @@ def xp(
         # suppress unused-ignore to run mypy in -e lint as well as -e dev
         jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call,unused-ignore]
 
-    # Possibly wrap module with array_api_compat
-    return array_namespace(xp.empty(0))
+    return xp
+
+
+@pytest.fixture(params=[Backend.DASK])  # Can select the test with `pytest -k dask`
+def da(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> ModuleType:  # numpydoc ignore=PR01,RT01
+    """Variant of the `xp` fixture that only yields dask.array."""
+    xp = pytest.importorskip("dask.array")
+    xp = array_namespace(xp.empty(0))
+    patch_lazy_xp_functions(request, monkeypatch, xp=xp)
+    return xp
 
 
 @pytest.fixture

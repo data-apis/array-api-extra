@@ -249,8 +249,8 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             Right-hand side of the operation.
         copy : bool or None
             Whether to copy the input array. See the class docstring for details.
-        xp : array_namespace or None
-            The array namespace for the input array.
+        xp : array_namespace, optional
+            The array namespace for the input array. Default: infer.
 
         Returns
         -------

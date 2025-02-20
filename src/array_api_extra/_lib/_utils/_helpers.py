@@ -7,10 +7,10 @@ from types import ModuleType
 from typing import cast
 
 from . import _compat
-from ._compat import is_array_api_obj, is_numpy_array
+from ._compat import array_namespace, is_array_api_obj, is_numpy_array
 from ._typing import Array
 
-__all__ = ["in1d", "mean"]
+__all__ = ["asarrays", "in1d", "is_python_scalar", "mean"]
 
 
 def in1d(
@@ -33,7 +33,7 @@ def in1d(
     https://github.com/numpy/numpy/blob/v1.26.0/numpy/lib/arraysetops.py#L524-L758
     """
     if xp is None:
-        xp = _compat.array_namespace(x1, x2)
+        xp = array_namespace(x1, x2)
 
     # This code is run to make the code significantly faster
     if x2.shape[0] < 10 * x1.shape[0] ** 0.145:
@@ -84,7 +84,7 @@ def mean(
     Complex mean, https://github.com/data-apis/array-api/issues/846.
     """
     if xp is None:
-        xp = _compat.array_namespace(x)
+        xp = array_namespace(x)
 
     if xp.isdtype(x.dtype, "complex floating"):
         x_real = xp.real(x)
@@ -124,8 +124,8 @@ def asarrays(
     ----------
     a, b : Array | int | float | complex | bool
         Input arrays or scalars. At least one must be an array.
-    xp : ModuleType
-        The standard-compatible namespace for the returned arrays.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
 
     Returns
     -------
