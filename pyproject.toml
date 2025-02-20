@@ -191,10 +191,6 @@ markers = [
 
 [tool.coverage]
 run.source = ["array_api_extra"]
-report.exclude_also = [
-    '\.\.\.',
-    'if TYPE_CHECKING:',
-]
 
 # mypy
 
@@ -314,10 +310,5 @@ checks = [
     "ES01", # most docstrings do not need an extended summary
 ]
 exclude = [ # don't report on objects that match any of these regex
-    '.*test_at.*',
-    '.*test_funcs.*',
-    '.*test_testing.*',
-    '.*test_utils.*',
-    '.*test_version.*',
-    '.*test_vendor.*',
+    '.*test_*',
 ]

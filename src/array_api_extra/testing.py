@@ -18,7 +18,7 @@ from ._lib._utils._compat import is_dask_namespace, is_jax_namespace
 
 __all__ = ["lazy_xp_function", "patch_lazy_xp_functions"]
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     # TODO move ParamSpec outside TYPE_CHECKING
     # depends on scikit-learn abandoning Python 3.9
     # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
@@ -169,7 +169,7 @@ def patch_lazy_xp_functions(
         Pytest fixture, as acquired by the test itself or by one of its fixtures.
     monkeypatch : pytest.MonkeyPatch
         Pytest fixture, as acquired by the test itself or by one of its fixtures.
-    xp : module
+    xp : array_namespace
         Array namespace to be tested.
 
     See Also
