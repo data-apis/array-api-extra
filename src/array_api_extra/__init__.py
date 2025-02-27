@@ -14,7 +14,7 @@ from ._lib._funcs import (
     sinc,
 )
 
-__version__ = "0.6.1"
+__version__ = "0.7.0.dev0"
 
 # pylint: disable=duplicate-code
 __all__ = [

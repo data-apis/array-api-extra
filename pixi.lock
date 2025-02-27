@@ -726,7 +726,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/pluggy-1.5.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/pre-commit-4.1.0-pyha770c72_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/prompt-toolkit-3.0.50-pyha770c72_0.conda
-      - conda: https://prefix.dev/conda-forge/win-64/psutil-6.1.1-py313ha7868ed_0.conda
+      - conda: https://prefix.dev/conda-forge/win-64/psutil-7.0.0-py313ha7868ed_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/pthread-stubs-0.4-h0e40799_1002.conda
       - conda: https://prefix.dev/conda-forge/noarch/pure_eval-0.2.3-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/pyarrow-19.0.1-py313hfa70ccb_0.conda
@@ -1526,7 +1526,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/pluggy-1.5.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/pre-commit-4.1.0-pyha770c72_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/prompt-toolkit-3.0.50-pyha770c72_0.conda
-      - conda: https://prefix.dev/conda-forge/win-64/psutil-6.1.1-py312h4389bb4_0.conda
+      - conda: https://prefix.dev/conda-forge/win-64/psutil-7.0.0-py312h4389bb4_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/pthread-stubs-0.4-h0e40799_1002.conda
       - conda: https://prefix.dev/conda-forge/noarch/pure_eval-0.2.3-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/pyarrow-19.0.1-py312h2e8e312_0.conda
@@ -2809,7 +2809,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/partd-1.4.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/pillow-11.1.0-py310h9595edc_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pluggy-1.5.0-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/win-64/psutil-6.1.1-py310ha8f682b_0.conda
+      - conda: https://prefix.dev/conda-forge/win-64/psutil-7.0.0-py310ha8f682b_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/pthread-stubs-0.4-h0e40799_1002.conda
       - conda: https://prefix.dev/conda-forge/win-64/pyarrow-19.0.1-py310h5588dad_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/pyarrow-core-19.0.1-py310h399dd74_0_cpu.conda
@@ -3411,7 +3411,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/partd-1.4.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/pillow-11.1.0-py310h9595edc_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pluggy-1.5.0-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/win-64/psutil-6.1.1-py310ha8f682b_0.conda
+      - conda: https://prefix.dev/conda-forge/win-64/psutil-7.0.0-py310ha8f682b_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/pthread-stubs-0.4-h0e40799_1002.conda
       - conda: https://prefix.dev/conda-forge/win-64/pyarrow-19.0.1-py310h5588dad_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/pyarrow-core-19.0.1-py310h8b91b4e_0_cuda.conda
@@ -3789,7 +3789,7 @@ packages:
   timestamp: 1735201429468
 - pypi: .
   name: array-api-extra
-  version: 0.6.1
+  version: 0.7.0.dev0
   sha256: 9ff14035e127fef2de7e6c05ca1474ff1780e81e4480c8741f612e115d346f7e
   requires_dist:
   - array-api-compat>=1.10.0,<2
@@ -12080,9 +12080,9 @@ packages:
   - pkg:pypi/psutil?source=hash-mapping
   size: 484139
   timestamp: 1740663381126
-- conda: https://prefix.dev/conda-forge/win-64/psutil-6.1.1-py310ha8f682b_0.conda
-  sha256: 88ed52584b3d838ec10c10ad445823bb9b52a0002071e79c9bb63433ff934026
-  md5: e7da623f94edbf9c66f816bee03432a2
+- conda: https://prefix.dev/conda-forge/win-64/psutil-7.0.0-py310ha8f682b_0.conda
+  sha256: 61c016c40848168bc565ceb8f3a78ad2d9288ffbe4236bcec312ef554f1caef2
+  md5: ec78bb694e0ea34958e8f479e723499e
   depends:
   - python >=3.10,<3.11.0a0
   - python_abi 3.10.* *_cp310
@@ -12093,11 +12093,11 @@ packages:
   license_family: BSD
   purls:
   - pkg:pypi/psutil?source=hash-mapping
-  size: 386297
-  timestamp: 1735327974109
-- conda: https://prefix.dev/conda-forge/win-64/psutil-6.1.1-py312h4389bb4_0.conda
-  sha256: 420c86339a8a6c225a79499e9d580df4a23ccbeca6cae4d44fe4fc365654881c
-  md5: f27ba9579b607b6678d8ac296bbd8603
+  size: 369926
+  timestamp: 1740663706146
+- conda: https://prefix.dev/conda-forge/win-64/psutil-7.0.0-py312h4389bb4_0.conda
+  sha256: 088451ee2c9a349e1168f70afe275e58f86350faffb09c032cff76f97d4fb7bb
+  md5: f5b86d6e2e645ee276febe79a310b640
   depends:
   - python >=3.12,<3.13.0a0
   - python_abi 3.12.* *_cp312
@@ -12108,11 +12108,11 @@ packages:
   license_family: BSD
   purls:
   - pkg:pypi/psutil?source=hash-mapping
-  size: 504977
-  timestamp: 1735327974160
-- conda: https://prefix.dev/conda-forge/win-64/psutil-6.1.1-py313ha7868ed_0.conda
-  sha256: a9141ee67dcf85c4b6eb333ff3dbcd4e2cd4d592f768740703cf89b56eda9d68
-  md5: 8a948151d6f16d6cef5318b66c86b972
+  size: 484682
+  timestamp: 1740663813103
+- conda: https://prefix.dev/conda-forge/win-64/psutil-7.0.0-py313ha7868ed_0.conda
+  sha256: d8e5d86e939d5f308c7922835a94458afb29d81c90b5d43c43a5537c9c7adbc1
+  md5: 3cdf99cf98b01856af9f26c5d8036353
   depends:
   - python >=3.13,<3.14.0a0
   - python_abi 3.13.* *_cp313
@@ -12123,8 +12123,8 @@ packages:
   license_family: BSD
   purls:
   - pkg:pypi/psutil?source=hash-mapping
-  size: 511743
-  timestamp: 1735327885260
+  size: 491314
+  timestamp: 1740663777370
 - conda: https://prefix.dev/conda-forge/linux-64/pthread-stubs-0.4-hb9d3cd8_1002.conda
   sha256: 9c88f8c64590e9567c6c80823f0328e58d3b1efb0e1c539c0315ceca764e0973
   md5: b3c17d95b5a10c6e64a21fa17573e70e
