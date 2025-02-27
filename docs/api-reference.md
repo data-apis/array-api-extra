@@ -6,6 +6,7 @@
     :nosignatures:
     :toctree: generated
 
+    apply_where
     at
     atleast_nd
     broadcast_shapes
