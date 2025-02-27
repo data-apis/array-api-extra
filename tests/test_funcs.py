@@ -23,6 +23,7 @@ from array_api_extra import (
 from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
+from array_api_extra._lib._utils._helpers import ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
@@ -221,7 +222,7 @@ class TestCov:
 
 class TestCreateDiagonal:
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
-    def test_1d(self, xp: ModuleType):
+    def test_1d_from_numpy(self, xp: ModuleType):
         # from np.diag tests
         vals = 100 * xp.arange(5, dtype=xp.float64)
         b = xp.zeros((5, 5), dtype=xp.float64)
@@ -239,7 +240,7 @@ class TestCreateDiagonal:
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     @pytest.mark.parametrize("n", range(1, 10))
     @pytest.mark.parametrize("offset", range(1, 10))
-    def test_create_diagonal(self, xp: ModuleType, n: int, offset: int):
+    def test_1d_from_scipy(self, xp: ModuleType, n: int, offset: int):
         # from scipy._lib tests
         rng = np.random.default_rng(2347823)
         one = xp.asarray(1.0)
@@ -248,13 +249,35 @@ class TestCreateDiagonal:
         B = xp.asarray(np.diag(x, offset), dtype=one.dtype)
         xp_assert_equal(A, B)
 
-    def test_0d(self, xp: ModuleType):
+    def test_0d_raises(self, xp: ModuleType):
         with pytest.raises(ValueError, match="1-dimensional"):
             create_diagonal(xp.asarray(1))
 
-    def test_2d(self, xp: ModuleType):
-        with pytest.raises(ValueError, match="1-dimensional"):
-            create_diagonal(xp.asarray([[1]]))
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
+    @pytest.mark.parametrize(
+        "shape",
+        [
+            (0,),
+            (10,),
+            (0, 1),
+            (1, 0),
+            (0, 0),
+            (4, 2, 1),
+            (1, 1, 7),
+            (0, 0, 1),
+            (3, 2, 4, 5),
+        ],
+    )
+    def test_nd(self, xp: ModuleType, shape: tuple[int, ...]):
+        rng = np.random.default_rng(2347823)
+        b = xp.asarray(
+            rng.integers((1 << 64) - 1, size=shape, dtype=np.uint64), dtype=xp.uint64
+        )
+        c = create_diagonal(b)
+        zero = xp.zeros((), dtype=xp.uint64)
+        assert c.shape == (*b.shape, b.shape[-1])
+        for i in ndindex(*c.shape):
+            xp_assert_equal(c[i], b[i[:-1]] if i[-2] == i[-1] else zero)
 
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_device(self, xp: ModuleType, device: Device):
