@@ -32,16 +32,14 @@ from array_api_extra.testing import lazy_xp_function
 
 lazy_xp_function(atleast_nd, static_argnames=("ndim", "xp"))
 lazy_xp_function(cov, static_argnames="xp")
-# FIXME .device attribute https://github.com/data-apis/array-api-compat/pull/238
-lazy_xp_function(create_diagonal, jax_jit=False, static_argnames=("offset", "xp"))
+lazy_xp_function(create_diagonal, static_argnames=("offset", "xp"))
 lazy_xp_function(expand_dims, static_argnames=("axis", "xp"))
 lazy_xp_function(kron, static_argnames="xp")
 lazy_xp_function(nunique, static_argnames="xp")
 lazy_xp_function(pad, static_argnames=("pad_width", "mode", "constant_values", "xp"))
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp"))
-# FIXME .device attribute https://github.com/data-apis/array-api-compat/pull/238
-lazy_xp_function(sinc, jax_jit=False, static_argnames="xp")
+lazy_xp_function(sinc, static_argnames="xp")
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
