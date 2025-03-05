@@ -5,12 +5,15 @@ import pytest
 
 from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_equal
+from array_api_extra._lib._utils._compat import array_namespace
 from array_api_extra._lib._utils._compat import device as get_device
-from array_api_extra._lib._utils._helpers import asarrays, in1d, ndindex
+from array_api_extra._lib._utils._helpers import asarrays, in1d, meta_namespace, ndindex
 from array_api_extra._lib._utils._typing import Device
 from array_api_extra.testing import lazy_xp_function
 
 # mypy: disable-error-code=no-untyped-usage
+
+np_compat = array_namespace(np.empty(0))
 
 # FIXME calls xp.unique_values without size
 lazy_xp_function(in1d, jax_jit=False, static_argnames=("assume_unique", "invert", "xp"))
@@ -155,3 +158,21 @@ class TestAsArrays:
 )
 def test_ndindex(shape: tuple[int, ...]):
     assert tuple(ndindex(*shape)) == tuple(np.ndindex(*shape))
+
+
+class TestMetaNamespace:
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="namespace tests")
+    def test_basic(self, xp: ModuleType, library: Backend):
+        args = None, xp.asarray(0), 1
+        expect = np_compat if library is Backend.DASK else xp
+        assert meta_namespace(*args) is expect
+
+    def test_dask_metas(self, da: ModuleType):
+        cp = pytest.importorskip("cupy")
+        cp_compat = array_namespace(cp.empty(0))
+        args = None, da.from_array(cp.asarray(0)), 1
+        assert meta_namespace(*args) is cp_compat
+
+    def test_xp(self, xp: ModuleType):
+        args = None, xp.asarray(0), 1
+        assert meta_namespace(*args, xp=xp) in (xp, np_compat)
