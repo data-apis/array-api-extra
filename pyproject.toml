@@ -106,6 +106,7 @@ sphinx-autodoc-typehints = "*"
 dask-core = "*"
 pytest = "*"
 typing-extensions = "*"
+numpy = "*"
 
 [tool.pixi.feature.docs.tasks]
 docs = { cmd = "sphinx-build . build/", cwd = "docs" }

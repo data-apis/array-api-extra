@@ -13,6 +13,7 @@ from ._lib._funcs import (
     setdiff1d,
     sinc,
 )
+from ._lib._lazy import lazy_apply
 
 __version__ = "0.7.0.dev0"
 
@@ -27,6 +28,7 @@ __all__ = [
     "expand_dims",
     "isclose",
     "kron",
+    "lazy_apply",
     "nunique",
     "pad",
     "setdiff1d",
