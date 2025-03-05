@@ -11,7 +11,7 @@ import pytest
 from array_api_extra import at
 from array_api_extra._lib import Backend
 from array_api_extra._lib._at import _AtOp
-from array_api_extra._lib._testing import xfail, xp_assert_equal
+from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import array_namespace, is_writeable_array
 from array_api_extra._lib._utils._typing import Array, Index
 from array_api_extra.testing import lazy_xp_function
@@ -219,7 +219,6 @@ def test_alternate_index_syntax():
 def test_incompatible_dtype(
     xp: ModuleType,
     library: Backend,
-    request: pytest.FixtureRequest,
     op: _AtOp,
     copy: bool | None,
     bool_mask: bool,
@@ -253,8 +252,6 @@ def test_incompatible_dtype(
                 z = at_op(x, idx, op, 1.1, copy=copy)
 
     elif library is Backend.DASK:
-        if op in (_AtOp.MIN, _AtOp.MAX) and bool_mask:
-            xfail(request, reason="need array-api-compat 1.11")
         z = at_op(x, idx, op, 1.1, copy=copy)
 
     elif library is Backend.ARRAY_API_STRICT and op is not _AtOp.SET:
