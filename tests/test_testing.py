@@ -222,6 +222,7 @@ def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
     x = xp.asarray([6.0, 7.0])
     if library in (Backend.ARRAY_API_STRICT, Backend.JAX):
         # array-api-strict arrays are auto-converted to numpy
+        # which results in an assertion error for mismatched namespaces
         # eager jax arrays are auto-converted to numpy in eager jax
         # and fail in jax.jit (which lazy_xp_function tests here)
         with pytest.raises((TypeError, AssertionError)):
