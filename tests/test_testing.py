@@ -202,3 +202,33 @@ def test_lazy_xp_function_static_params(xp: ModuleType, func: Callable[..., Arra
     xp_assert_equal(func(x, 0, False), xp.asarray([3.0, 6.0]))
     xp_assert_equal(func(x, 1, flag=True), xp.asarray([2.0, 4.0]))
     xp_assert_equal(func(x, n=1, flag=True), xp.asarray([2.0, 4.0]))
+
+
+try:
+    # Test an arbitrary Cython ufunc (@cython.vectorize).
+    # When SCIPY_ARRAY_API is not set, this is the same as
+    # scipy.special.erf.
+    from scipy.special._ufuncs import erf  # type: ignore[import-not-found]
+
+    lazy_xp_function(erf)  # pyright: ignore[reportUnknownArgumentType]
+except ImportError:
+    erf = None
+
+
+@pytest.mark.filterwarnings("ignore:__array_wrap__:DeprecationWarning")  # torch
+def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
+    pytest.importorskip("scipy")
+    assert erf is not None
+    x = xp.asarray([6.0, 7.0])
+    if library in (Backend.ARRAY_API_STRICT, Backend.JAX):
+        # array-api-strict arrays are auto-converted to numpy
+        # which results in an assertion error for mismatched namespaces
+        # eager jax arrays are auto-converted to numpy in eager jax
+        # and fail in jax.jit (which lazy_xp_function tests here)
+        with pytest.raises((TypeError, AssertionError)):
+            xp_assert_equal(erf(x), xp.asarray([1.0, 1.0]))
+    else:
+        # cupy, dask and sparse define __array_ufunc__ and dispatch accordingly
+        # note that when sparse reduces to scalar it returns a np.generic, which
+        # would make xp_assert_equal fail.
+        xp_assert_equal(erf(x), xp.asarray([1.0, 1.0]))
