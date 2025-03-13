@@ -258,7 +258,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         Array
             Updated `x`.
         """
-        from ._funcs import apply_where
+        from ._funcs import apply_where  # pylint: disable=cyclic-import
 
         x, idx = self._x, self._idx
         xp = array_namespace(x, y) if xp is None else xp
