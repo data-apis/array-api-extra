@@ -200,7 +200,7 @@ def patch_lazy_xp_functions(
     if is_dask_namespace(xp):
         for name, func, tags in iter_tagged():
             n = tags["allow_dask_compute"]
-            wrapped = _allow_dask_compute(func, n)
+            wrapped = _dask_wrap(func, n)
             monkeypatch.setitem(globals_, name, wrapped)
 
     elif is_jax_namespace(xp):
@@ -256,13 +256,15 @@ class CountingDaskScheduler(SchedulerGetCallable):
         return dask.get(dsk, keys, **kwargs)  # type: ignore[attr-defined,no-untyped-call] # pyright: ignore[reportPrivateImportUsage]
 
 
-def _allow_dask_compute(
+def _dask_wrap(
     func: Callable[P, T], n: int
 ) -> Callable[P, T]:  # numpydoc ignore=PR01,RT01
     """
     Wrap `func` to raise if it attempts to call `dask.compute` more than `n` times.
+
+    After the function returns, materialize the graph in order to re-raise exceptions.
     """
-    import dask.config
+    import dask
 
     func_name = getattr(func, "__name__", str(func))
     n_str = f"only up to {n}" if n else "no"
@@ -276,7 +278,12 @@ def _allow_dask_compute(
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:  # numpydoc ignore=GL08
         scheduler = CountingDaskScheduler(n, msg)
-        with dask.config.set({"scheduler": scheduler}):
-            return func(*args, **kwargs)
+        with dask.config.set({"scheduler": scheduler}):  # pyright: ignore[reportPrivateImportUsage]
+            out = func(*args, **kwargs)
+
+        # Block until the graph materializes and reraise exceptions. This allows
+        # `pytest.raises` and `pytest.warns` to work as expected. Note that this would
+        # not work on scheduler='distributed', as it would not block.
+        return dask.persist(out, scheduler="threads")[0]  # type: ignore[no-any-return,attr-defined,no-untyped-call,func-returns-value,index]  # pyright: ignore[reportPrivateImportUsage]
 
     return wrapper

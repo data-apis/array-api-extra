@@ -232,3 +232,32 @@ def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
         # note that when sparse reduces to scalar it returns a np.generic, which
         # would make xp_assert_equal fail.
         xp_assert_equal(erf(x), xp.asarray([1.0, 1.0]))
+
+
+def dask_raises(x: Array) -> Array:
+    def _raises(x: Array) -> Array:
+        # Test that map_blocks doesn't eagerly call the function;
+        # dtype and meta should be sufficient to skip the trial run.
+        assert x.shape == (3,)
+        msg = "Hello world"
+        raise ValueError(msg)
+
+    return x.map_blocks(_raises, dtype=x.dtype, meta=x._meta)
+
+
+lazy_xp_function(dask_raises)
+
+
+def test_lazy_xp_function_eagerly_raises(da: ModuleType):
+    """Test that the pattern::
+
+        with pytest.raises(Exception):
+            func(x)
+
+    works with Dask, even though it normally wouldn't as we're disregarding the func
+    output so the graph would not be ordinarily materialized.
+    lazy_xp_function contains ad-hoc code to materialize and reraise exceptions.
+    """
+    x = da.arange(3)
+    with pytest.raises(ValueError, match="Hello world"):
+        dask_raises(x)
