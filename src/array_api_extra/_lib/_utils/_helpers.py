@@ -220,7 +220,7 @@ def meta_namespace(
     *arrays : Array | int | float | complex | bool | None
         Input arrays.
     xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
+        The standard-compatible namespace for the input arrays. Default: infer.
 
     Returns
     -------
