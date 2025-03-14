@@ -385,7 +385,8 @@ def isclose(
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     a, b = asarrays(a, b, xp=xp)
-    if TYPE_CHECKING:  # Hack around pyright bug  # pragma: no cover
+    # FIXME https://github.com/microsoft/pyright/issues/10085
+    if TYPE_CHECKING:  # pragma: nocover
         assert _compat.is_array_api_obj(a)
         assert _compat.is_array_api_obj(b)
 
@@ -504,13 +505,15 @@ def kron(
     if xp is None:
         xp = array_namespace(a, b)
     a, b = asarrays(a, b, xp=xp)
-    if TYPE_CHECKING:  # Hack around pyright bug  # pragma: no cover
+    # FIXME https://github.com/microsoft/pyright/issues/10085
+    if TYPE_CHECKING:  # pragma: nocover
         assert _compat.is_array_api_obj(a)
         assert _compat.is_array_api_obj(b)
 
     singletons = (1,) * (b.ndim - a.ndim)
     a = xp.broadcast_to(a, singletons + a.shape)
-    if TYPE_CHECKING:  # Hack around pyright bug  # pragma: no cover
+    # FIXME https://github.com/microsoft/pyright/issues/10085
+    if TYPE_CHECKING:  # pragma: nocover
         assert _compat.is_array_api_obj(a)
 
     nd_b, nd_a = b.ndim, a.ndim
@@ -680,7 +683,8 @@ def setdiff1d(
         x1 = xp.unique_values(x1)
         x2 = xp.unique_values(x2)
 
-    if TYPE_CHECKING:  # Hack around pyright bug  # pragma: no cover
+    # FIXME https://github.com/microsoft/pyright/issues/10085
+    if TYPE_CHECKING:  # pragma: nocover
         assert _compat.is_array_api_obj(x1)
 
     return x1[_helpers.in1d(x1, x2, assume_unique=True, invert=True, xp=xp)]
