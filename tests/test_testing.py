@@ -108,6 +108,7 @@ def non_materializable(x: Array) -> Array:
     and it will trigger an expensive computation in dask.
     """
     xp = array_namespace(x)
+    # Crashes inside jax.jit
     # On dask, this triggers two computations of the whole graph
     if xp.any(x < 0.0) or xp.any(x > 10.0):
         msg = "Values must be in the [0, 10] range"
@@ -261,3 +262,39 @@ def test_lazy_xp_function_eagerly_raises(da: ModuleType):
     x = da.arange(3)
     with pytest.raises(ValueError, match="Hello world"):
         dask_raises(x)
+
+
+class Wrapped:
+    def f(x: Array) -> Array:  # noqa: N805  # pyright: ignore[reportSelfClsParameterName]
+        xp = array_namespace(x)
+        # Crash in jax.jit and trigger compute() on dask
+        if not xp.all(x):
+            msg = "Values must be non-zero"
+            raise ValueError(msg)
+        return x
+
+
+class Naked:
+    f = Wrapped.f  # pyright: ignore[reportUnannotatedClassAttribute]
+
+
+lazy_xp_function(Wrapped.f)
+lazy_xp_modules = [Wrapped]
+
+
+def test_lazy_xp_modules(xp: ModuleType, library: Backend):
+    x = xp.asarray([1.0, 2.0])
+    y = Naked.f(x)
+    xp_assert_equal(y, x)
+
+    if library is Backend.JAX:
+        with pytest.raises(
+            TypeError, match="Attempted boolean conversion of traced array"
+        ):
+            Wrapped.f(x)
+    elif library is Backend.DASK:
+        with pytest.raises(AssertionError, match=r"dask\.compute"):
+            Wrapped.f(x)
+    else:
+        y = Wrapped.f(x)
+        xp_assert_equal(y, x)
