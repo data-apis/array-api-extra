@@ -642,7 +642,7 @@ def setdiff1d(
 
     Parameters
     ----------
-    x1 : array
+    x1 : array | int | float | complex | bool
         Input array.
     x2 : array
         Input comparison array.
