@@ -13,8 +13,6 @@ from functools import wraps
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
-import pytest
-
 from ._lib._utils._compat import is_dask_namespace, is_jax_namespace
 
 __all__ = ["lazy_xp_function", "patch_lazy_xp_functions"]
@@ -25,6 +23,7 @@ if TYPE_CHECKING:  # pragma: no cover
     # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
     from typing import ParamSpec
 
+    import pytest
     from dask.typing import Graph, Key, SchedulerGetCallable
     from typing_extensions import override
 
