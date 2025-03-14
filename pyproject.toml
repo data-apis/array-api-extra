@@ -65,7 +65,7 @@ array-api-strict = "*"
 numpy = "*"
 pytest = "*"
 hypothesis = "*"
-dask-core = "*"        # No distributed, tornado, etc.
+dask-core = "*"  # No distributed, tornado, etc.
 # NOTE: don't add jax, pytorch, sparse, cupy here
 # as they slow down mypy and are not portable across target OSs
 
