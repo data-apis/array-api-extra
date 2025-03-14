@@ -185,7 +185,7 @@ increase performance.
 In particular, the following kinds of function are also in-scope:
 
 - Functions which implement
-  [array API standard extension](https://data-apis.org/array-api/2023.12/extensions/index.html)
+  [array API standard extension](https://data-apis.org/array-api/latest/extensions/index.html)
   functions in terms of functions from the base standard.
 - Functions which add functionality (e.g. extra parameters) to functions from
   the standard.

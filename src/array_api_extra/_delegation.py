@@ -31,8 +31,8 @@ def _delegate(xp: ModuleType, *backends: Backend) -> bool:
 
 
 def isclose(
-    a: Array,
-    b: Array,
+    a: Array | complex,
+    b: Array | complex,
     *,
     rtol: float = 1e-05,
     atol: float = 1e-08,
