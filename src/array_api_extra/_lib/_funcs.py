@@ -161,8 +161,7 @@ def _apply_where(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR01,RT01
     temp1 = f1(*(arr[cond] for arr in args))
 
     if f2 is None:
-        # TODO remove asarrays once all backends support Array API 2024.12
-        dtype = xp.result_type(*asarrays(temp1, fill_value, xp=xp))
+        dtype = xp.result_type(temp1, fill_value)
         if getattr(fill_value, "ndim", 0):
             out = xp.astype(fill_value, dtype, copy=True)
         else:

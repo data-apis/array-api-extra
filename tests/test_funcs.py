@@ -256,8 +256,11 @@ class TestApplyWhere:
 
         ref1 = xp.where(cond, f1(*arrays), fill_value)
         ref2 = xp.where(cond, f1(*arrays), f2(*arrays))
-        # TODO remove asarrays once all backends support Array API 2024.12
-        ref3 = xp.where(cond, *asarrays(f1(*arrays), float_fill_value, xp=xp))
+        if library is Backend.ARRAY_API_STRICT:
+            # FIXME https://github.com/data-apis/array-api-strict/issues/131
+            ref3 = xp.where(cond, *asarrays(f1(*arrays), float_fill_value, xp=xp))
+        else:
+            ref3 = xp.where(cond, f1(*arrays), float_fill_value)
 
         xp_assert_close(res1, ref1, rtol=2e-16)
         xp_assert_equal(res2, ref2)
