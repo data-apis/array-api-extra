@@ -5,11 +5,16 @@ from __future__ import annotations
 
 from collections.abc import Generator
 from types import ModuleType
-from typing import cast
+from typing import TYPE_CHECKING
 
 from . import _compat
 from ._compat import array_namespace, is_array_api_obj, is_numpy_array
 from ._typing import Array
+
+if TYPE_CHECKING:  # pragma: no cover
+    # TODO import from typing (requires Python >=3.13)
+    from typing_extensions import TypeIs
+
 
 __all__ = ["asarrays", "in1d", "is_python_scalar", "mean"]
 
@@ -96,16 +101,16 @@ def mean(
     return xp.mean(x, axis=axis, keepdims=keepdims)
 
 
-def is_python_scalar(x: object) -> bool:  # numpydoc ignore=PR01,RT01
+def is_python_scalar(x: object) -> TypeIs[complex]:  # numpydoc ignore=PR01,RT01
     """Return True if `x` is a Python scalar, False otherwise."""
     # isinstance(x, float) returns True for np.float64
     # isinstance(x, complex) returns True for np.complex128
-    return isinstance(x, int | float | complex | bool) and not is_numpy_array(x)
+    return isinstance(x, int | float | complex) and not is_numpy_array(x)
 
 
 def asarrays(
-    a: Array | int | float | complex | bool,
-    b: Array | int | float | complex | bool,
+    a: Array | complex,
+    b: Array | complex,
     xp: ModuleType,
 ) -> tuple[Array, Array]:
     """
@@ -150,9 +155,7 @@ def asarrays(
     if is_array_api_obj(a):
         # a is an Array API object
         # b is a int | float | complex | bool
-
-        # pyright doesn't like it if you reuse the same variable name
-        xa = cast(Array, a)
+        xa = a
 
         # https://data-apis.org/array-api/draft/API_specification/type_promotion.html#mixing-arrays-with-python-scalars
         same_dtype = {
@@ -162,8 +165,8 @@ def asarrays(
             complex: "complex floating",
         }
         kind = same_dtype[type(b)]  # type: ignore[index]
-        if xp.isdtype(xa.dtype, kind):
-            xb = xp.asarray(b, dtype=xa.dtype)
+        if xp.isdtype(a.dtype, kind):
+            xb = xp.asarray(b, dtype=a.dtype)
         else:
             # Undefined behaviour. Let the function deal with it, if it can.
             xb = xp.asarray(b)
