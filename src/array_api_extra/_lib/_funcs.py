@@ -7,7 +7,7 @@ import math
 import warnings
 from collections.abc import Sequence
 from types import ModuleType
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from ._at import at
 from ._utils import _compat, _helpers
@@ -375,8 +375,8 @@ def expand_dims(
 
 
 def isclose(
-    a: Array,
-    b: Array,
+    a: Array | complex,
+    b: Array | complex,
     *,
     rtol: float = 1e-05,
     atol: float = 1e-08,
@@ -385,6 +385,10 @@ def isclose(
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     a, b = asarrays(a, b, xp=xp)
+    # FIXME https://github.com/microsoft/pyright/issues/10085
+    if TYPE_CHECKING:  # pragma: nocover
+        assert _compat.is_array_api_obj(a)
+        assert _compat.is_array_api_obj(b)
 
     a_inexact = xp.isdtype(a.dtype, ("real floating", "complex floating"))
     b_inexact = xp.isdtype(b.dtype, ("real floating", "complex floating"))
@@ -419,7 +423,13 @@ def isclose(
     return xp.abs(a - b) <= (atol + xp.abs(b) // nrtol)
 
 
-def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
+def kron(
+    a: Array | complex,
+    b: Array | complex,
+    /,
+    *,
+    xp: ModuleType | None = None,
+) -> Array:
     """
     Kronecker product of two arrays.
 
@@ -495,9 +505,16 @@ def kron(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
     if xp is None:
         xp = array_namespace(a, b)
     a, b = asarrays(a, b, xp=xp)
+    # FIXME https://github.com/microsoft/pyright/issues/10085
+    if TYPE_CHECKING:  # pragma: nocover
+        assert _compat.is_array_api_obj(a)
+        assert _compat.is_array_api_obj(b)
 
     singletons = (1,) * (b.ndim - a.ndim)
     a = xp.broadcast_to(a, singletons + a.shape)
+    # FIXME https://github.com/microsoft/pyright/issues/10085
+    if TYPE_CHECKING:  # pragma: nocover
+        assert _compat.is_array_api_obj(a)
 
     nd_b, nd_a = b.ndim, a.ndim
     nd_max = max(nd_b, nd_a)
@@ -614,8 +631,8 @@ def pad(
 
 
 def setdiff1d(
-    x1: Array,
-    x2: Array,
+    x1: Array | complex,
+    x2: Array | complex,
     /,
     *,
     assume_unique: bool = False,
@@ -628,7 +645,7 @@ def setdiff1d(
 
     Parameters
     ----------
-    x1 : array
+    x1 : array | int | float | complex | bool
         Input array.
     x2 : array
         Input comparison array.
@@ -665,6 +682,11 @@ def setdiff1d(
     else:
         x1 = xp.unique_values(x1)
         x2 = xp.unique_values(x2)
+
+    # FIXME https://github.com/microsoft/pyright/issues/10085
+    if TYPE_CHECKING:  # pragma: nocover
+        assert _compat.is_array_api_obj(x1)
+
     return x1[_helpers.in1d(x1, x2, assume_unique=True, invert=True, xp=xp)]
 
 
