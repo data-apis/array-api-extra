@@ -273,9 +273,8 @@
 <dt class="sig sig-object py" id="array_api_extra.testing.lazy_xp_function">
 <span class="sig-prename descclassname"><span class="pre">array_api_extra.testing.</span></span><span class="sig-name descname"><span class="pre">lazy_xp_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_dask_compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jax_jit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_argnums</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_argnames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.testing.lazy_xp_function" title="Link to this definition">¶</a></dt>
 <dd><p>Tag a function to be tested on lazy backends.</p>
-<p>Tag a function, which must be imported in the test module globals, so that when any
-tests defined in the same module are executed with <code class="docutils literal notranslate"><span class="pre">xp=jax.numpy</span></code> the function is
-replaced with a jitted version of itself, and when it is executed with
+<p>Tag a function so that when any tests are executed with <code class="docutils literal notranslate"><span class="pre">xp=jax.numpy</span></code> the
+function is replaced with a jitted version of itself, and when it is executed with
 <code class="docutils literal notranslate"><span class="pre">xp=dask.array</span></code> the function will raise if it attempts to materialize the graph.
 This will be later expanded to provide test coverage for other lazy backends.</p>
 <p>In order for the tag to be effective, the test or a fixture must call
@@ -336,17 +335,56 @@ Default: infer from <cite>static_argnums</cite> using <cite>inspect.signature(fu
 </pre></div>
 </div>
 <p class="rubric">Notes</p>
-<p>A test function can circumvent this monkey-patching system by calling <cite>func</cite> as an
-attribute of the original module. You need to sanitize your code to make sure this
-does not happen.</p>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mymodule</span> <span class="kn">from</span><span class="w"> </span><span class="nn">mymodule</span><span class="w"> </span><span class="kn">import</span> <span class="n">myfunc</span>
+<p>In order for this tag to be effective, the test function must be imported into the
+test module globals without its namespace; alternatively its namespace must be
+declared in a <code class="docutils literal notranslate"><span class="pre">lazy_xp_modules</span></code> list in the test module globals.</p>
+<p>Example 1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mymodule</span><span class="w"> </span><span class="kn">import</span> <span class="n">myfunc</span>
 
 <span class="n">lazy_xp_function</span><span class="p">(</span><span class="n">myfunc</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">test_myfunc</span><span class="p">(</span><span class="n">xp</span><span class="p">):</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span> <span class="n">b</span> <span class="o">=</span> <span class="n">myfunc</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  <span class="c1"># This is jitted when xp=jax.numpy c =</span>
-    <span class="n">mymodule</span><span class="o">.</span><span class="n">myfunc</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  <span class="c1"># This is not</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">myfunc</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>Example 2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mymodule</span>
+
+<span class="n">lazy_xp_modules</span> <span class="o">=</span> <span class="p">[</span><span class="n">mymodule</span><span class="p">]</span>
+<span class="n">lazy_xp_function</span><span class="p">(</span><span class="n">mymodule</span><span class="o">.</span><span class="n">myfunc</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_myfunc</span><span class="p">(</span><span class="n">xp</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">mymodule</span><span class="o">.</span><span class="n">myfunc</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>A test function can circumvent this monkey-patching system by using a namespace
+outside of the two above patterns. You need to sanitize your code to make sure this
+only happens intentionally.</p>
+<p>Example 1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mymodule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mymodule</span><span class="w"> </span><span class="kn">import</span> <span class="n">myfunc</span>
+
+<span class="n">lazy_xp_function</span><span class="p">(</span><span class="n">myfunc</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_myfunc</span><span class="p">(</span><span class="n">xp</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">myfunc</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  <span class="c1"># This is wrapped when xp=jax.numpy or xp=dask.array</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">mymodule</span><span class="o">.</span><span class="n">myfunc</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  <span class="c1"># This is not</span>
+</pre></div>
+</div>
+<p>Example 2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mymodule</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">naked</span><span class="p">:</span>
+    <span class="n">myfunc</span> <span class="o">=</span> <span class="n">mymodule</span><span class="o">.</span><span class="n">myfunc</span>
+
+<span class="n">lazy_xp_modules</span> <span class="o">=</span> <span class="p">[</span><span class="n">mymodule</span><span class="p">]</span>
+<span class="n">lazy_xp_function</span><span class="p">(</span><span class="n">mymodule</span><span class="o">.</span><span class="n">myfunc</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_myfunc</span><span class="p">(</span><span class="n">xp</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">mymodule</span><span class="o">.</span><span class="n">myfunc</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  <span class="c1"># This is wrapped when xp=jax.numpy or xp=dask.array</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">naked</span><span class="o">.</span><span class="n">myfunc</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  <span class="c1"># This is not</span>
 </pre></div>
 </div>
 </dd></dl>
