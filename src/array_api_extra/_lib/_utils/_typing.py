@@ -1,22 +1,10 @@
-# pylint: disable=missing-module-docstring  # numpydoc ignore=GL08
-class Array:  # pylint: disable=missing-class-docstring  # numpydoc ignore=GL08
-    pass
+# numpydoc ignore=GL08
+# pylint: disable=missing-module-docstring
 
-
-class DType:  # pylint: disable=missing-class-docstring  # numpydoc ignore=GL08
-    pass
-
-
-class Device:  # pylint: disable=missing-class-docstring  # numpydoc ignore=GL08
-    pass
-
-
-class GetIndex:  # pylint: disable=missing-class-docstring  # numpydoc ignore=GL08
-    pass
-
-
-class SetIndex:  # pylint: disable=missing-class-docstring  # numpydoc ignore=GL08
-    pass
-
+Array = object
+DType = object
+Device = object
+GetIndex = object
+SetIndex = object
 
 __all__ = ["Array", "DType", "Device", "GetIndex", "SetIndex"]
