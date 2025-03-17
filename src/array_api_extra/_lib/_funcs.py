@@ -7,12 +7,12 @@ import math
 import warnings
 from collections.abc import Sequence
 from types import ModuleType
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 from ._at import at
 from ._utils import _compat, _helpers
 from ._utils._compat import array_namespace, is_jax_array
-from ._utils._helpers import asarrays, ndindex
+from ._utils._helpers import asarrays, eager_shape, ndindex
 from ._utils._typing import Array
 
 __all__ = [
@@ -211,11 +211,13 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     m = xp.astype(m, dtype)
 
     avg = _helpers.mean(m, axis=1, xp=xp)
-    fact = m.shape[1] - 1
+
+    m_shape = eager_shape(m)
+    fact = m_shape[1] - 1
 
     if fact <= 0:
         warnings.warn("Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2)
-        fact = 0.0
+        fact = 0
 
     m -= avg[:, None]
     m_transpose = m.T
@@ -274,8 +276,10 @@ def create_diagonal(
     if x.ndim == 0:
         err_msg = "`x` must be at least 1-dimensional."
         raise ValueError(err_msg)
-    batch_dims = x.shape[:-1]
-    n = x.shape[-1] + abs(offset)
+
+    x_shape = eager_shape(x)
+    batch_dims = x_shape[:-1]
+    n = x_shape[-1] + abs(offset)
     diag = xp.zeros((*batch_dims, n**2), dtype=x.dtype, device=_compat.device(x))
 
     target_slice = slice(
@@ -385,10 +389,6 @@ def isclose(
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     a, b = asarrays(a, b, xp=xp)
-    # FIXME https://github.com/microsoft/pyright/issues/10085
-    if TYPE_CHECKING:  # pragma: nocover
-        assert _compat.is_array_api_obj(a)
-        assert _compat.is_array_api_obj(b)
 
     a_inexact = xp.isdtype(a.dtype, ("real floating", "complex floating"))
     b_inexact = xp.isdtype(b.dtype, ("real floating", "complex floating"))
@@ -505,24 +505,17 @@ def kron(
     if xp is None:
         xp = array_namespace(a, b)
     a, b = asarrays(a, b, xp=xp)
-    # FIXME https://github.com/microsoft/pyright/issues/10085
-    if TYPE_CHECKING:  # pragma: nocover
-        assert _compat.is_array_api_obj(a)
-        assert _compat.is_array_api_obj(b)
 
     singletons = (1,) * (b.ndim - a.ndim)
-    a = xp.broadcast_to(a, singletons + a.shape)
-    # FIXME https://github.com/microsoft/pyright/issues/10085
-    if TYPE_CHECKING:  # pragma: nocover
-        assert _compat.is_array_api_obj(a)
+    a = cast(Array, xp.broadcast_to(a, singletons + a.shape))
 
     nd_b, nd_a = b.ndim, a.ndim
     nd_max = max(nd_b, nd_a)
     if nd_a == 0 or nd_b == 0:
         return xp.multiply(a, b)
 
-    a_shape = a.shape
-    b_shape = b.shape
+    a_shape = eager_shape(a)
+    b_shape = eager_shape(b)
 
     # Equalise the shapes by prepending smaller one with 1s
     a_shape = (1,) * max(0, nd_b - nd_a) + a_shape
@@ -587,16 +580,14 @@ def pad(
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
     # make pad_width a list of length-2 tuples of ints
-    x_ndim = cast(int, x.ndim)
-
     if isinstance(pad_width, int):
-        pad_width_seq = [(pad_width, pad_width)] * x_ndim
+        pad_width_seq = [(pad_width, pad_width)] * x.ndim
     elif (
         isinstance(pad_width, tuple)
         and len(pad_width) == 2
         and all(isinstance(i, int) for i in pad_width)
     ):
-        pad_width_seq = [cast(tuple[int, int], pad_width)] * x_ndim
+        pad_width_seq = [cast(tuple[int, int], pad_width)] * x.ndim
     else:
         pad_width_seq = cast(list[tuple[int, int]], list(pad_width))
 
@@ -608,7 +599,8 @@ def pad(
             msg = f"expect a 2-tuple (before, after), got {w_tpl}."
             raise ValueError(msg)
 
-        sh = x.shape[ax]
+        sh = eager_shape(x)[ax]
+
         if w_tpl[0] == 0 and w_tpl[1] == 0:
             sl = slice(None, None, None)
         else:
@@ -674,20 +666,17 @@ def setdiff1d(
     """
     if xp is None:
         xp = array_namespace(x1, x2)
-    x1, x2 = asarrays(x1, x2, xp=xp)
+    # https://github.com/microsoft/pyright/issues/10103
+    x1_, x2_ = asarrays(x1, x2, xp=xp)
 
     if assume_unique:
-        x1 = xp.reshape(x1, (-1,))
-        x2 = xp.reshape(x2, (-1,))
+        x1_ = xp.reshape(x1_, (-1,))
+        x2_ = xp.reshape(x2_, (-1,))
     else:
-        x1 = xp.unique_values(x1)
-        x2 = xp.unique_values(x2)
+        x1_ = xp.unique_values(x1_)
+        x2_ = xp.unique_values(x2_)
 
-    # FIXME https://github.com/microsoft/pyright/issues/10085
-    if TYPE_CHECKING:  # pragma: nocover
-        assert _compat.is_array_api_obj(x1)
-
-    return x1[_helpers.in1d(x1, x2, assume_unique=True, invert=True, xp=xp)]
+    return x1_[_helpers.in1d(x1_, x2_, assume_unique=True, invert=True, xp=xp)]
 
 
 def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:

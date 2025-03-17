@@ -23,7 +23,7 @@ from array_api_extra import (
 from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
-from array_api_extra._lib._utils._helpers import ndindex
+from array_api_extra._lib._utils._helpers import eager_shape, ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
@@ -249,7 +249,7 @@ class TestCreateDiagonal:
 
     def test_0d_raises(self, xp: ModuleType):
         with pytest.raises(ValueError, match="1-dimensional"):
-            create_diagonal(xp.asarray(1))
+            _ = create_diagonal(xp.asarray(1))
 
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     @pytest.mark.parametrize(
@@ -274,7 +274,7 @@ class TestCreateDiagonal:
         c = create_diagonal(b)
         zero = xp.zeros((), dtype=xp.uint64)
         assert c.shape == (*b.shape, b.shape[-1])
-        for i in ndindex(*c.shape):
+        for i in ndindex(*eager_shape(c)):
             xp_assert_equal(c[i], b[i[:-1]] if i[-2] == i[-1] else zero)
 
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
@@ -320,26 +320,26 @@ class TestExpandDims:
         s = (2, 3, 4, 5)
         a = xp.empty(s)
         with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=-6)
+            _ = expand_dims(a, axis=-6)
         with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=5)
+            _ = expand_dims(a, axis=5)
 
         a = xp.empty((3, 3, 3))
         with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=(0, -6))
+            _ = expand_dims(a, axis=(0, -6))
         with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=(0, 5))
+            _ = expand_dims(a, axis=(0, 5))
 
     def test_repeated_axis(self, xp: ModuleType):
         a = xp.empty((3, 3, 3))
         with pytest.raises(ValueError, match="Duplicate dimensions"):
-            expand_dims(a, axis=(1, 1))
+            _ = expand_dims(a, axis=(1, 1))
 
     def test_positive_negative_repeated(self, xp: ModuleType):
         # https://github.com/data-apis/array-api/issues/760#issuecomment-1989449817
         a = xp.empty((2, 3, 4, 5))
         with pytest.raises(ValueError, match="Duplicate dimensions"):
-            expand_dims(a, axis=(3, -3))
+            _ = expand_dims(a, axis=(3, -3))
 
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_device(self, xp: ModuleType, device: Device):
@@ -505,7 +505,7 @@ class TestIsClose:
 
     def test_all_python_scalars(self):
         with pytest.raises(TypeError, match="Unrecognized"):
-            isclose(0, 0)
+            _ = isclose(0, 0)
 
     def test_xp(self, xp: ModuleType):
         a = xp.asarray([0.0, 0.0])
@@ -582,7 +582,7 @@ class TestKron:
 
     def test_all_python_scalars(self):
         with pytest.raises(TypeError, match="Unrecognized"):
-            kron(1, 1)
+            _ = kron(1, 1)
 
     def test_device(self, xp: ModuleType, device: Device):
         x1 = xp.asarray([1, 2, 3], device=device)
@@ -634,7 +634,7 @@ class TestPad:
     def test_mode_not_implemented(self, xp: ModuleType):
         a = xp.arange(3)
         with pytest.raises(NotImplementedError, match="Only `'constant'`"):
-            pad(a, 2, mode="edge")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+            _ = pad(a, 2, mode="edge")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     def test_device(self, xp: ModuleType, device: Device):
         a = xp.asarray(0.0, device=device)
@@ -653,7 +653,7 @@ class TestPad:
         assert padded.shape == (6, 7)
 
         with pytest.raises((ValueError, RuntimeError)):
-            pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
+            _ = pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
 
     def test_sequence_of_tuples_width(self, xp: ModuleType):
         a = xp.reshape(xp.arange(12), (3, 4))
@@ -745,7 +745,7 @@ class TestSetDiff1D:
     @pytest.mark.parametrize("assume_unique", [True, False])
     def test_all_python_scalars(self, assume_unique: bool):
         with pytest.raises(TypeError, match="Unrecognized"):
-            setdiff1d(0, 0, assume_unique=assume_unique)
+            _ = setdiff1d(0, 0, assume_unique=assume_unique)
 
     @assume_unique
     def test_device(self, xp: ModuleType, device: Device, assume_unique: bool):
@@ -773,7 +773,7 @@ class TestSinc:
     @pytest.mark.parametrize("x", [0, 1 + 3j])
     def test_dtype(self, xp: ModuleType, x: int | complex):
         with pytest.raises(ValueError, match="real floating data type"):
-            sinc(xp.asarray(x))
+            _ = sinc(xp.asarray(x))
 
     def test_3d(self, xp: ModuleType):
         x = xp.reshape(xp.arange(18, dtype=xp.float64), (3, 3, 2))

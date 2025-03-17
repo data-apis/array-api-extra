@@ -13,7 +13,7 @@ from array_api_extra._lib import Backend
 from array_api_extra._lib._at import _AtOp
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import array_namespace, is_writeable_array
-from array_api_extra._lib._utils._typing import Array, Index
+from array_api_extra._lib._utils._typing import Array, SetIndex
 from array_api_extra.testing import lazy_xp_function
 
 pytestmark = [
@@ -25,7 +25,7 @@ pytestmark = [
 
 def at_op(
     x: Array,
-    idx: Index,
+    idx: SetIndex,
     op: _AtOp,
     y: Array | object,
     copy: bool | None = None,
@@ -46,7 +46,7 @@ def at_op(
 
 def _at_op(
     x: Array,
-    idx: Index | None,
+    idx: SetIndex | None,
     idx_pickle: bytes | None,
     op: _AtOp,
     y: Array | object,
@@ -56,7 +56,7 @@ def _at_op(
     """jitted helper of at_op"""
     if idx_pickle:
         idx = pickle.loads(idx_pickle)
-    meth = cast(Callable[..., Array], getattr(at(x, idx), op.value))  # type: ignore[no-any-explicit]
+    meth = cast(Callable[..., Array], getattr(at(x, cast(SetIndex, idx)), op.value))  # type: ignore[no-any-explicit]
     return meth(y, copy=copy, xp=xp)
 
 
@@ -183,34 +183,35 @@ def test_copy_default(xp: ModuleType, library: Backend, op: _AtOp):
 def test_copy_invalid():
     a = np.asarray([1, 2, 3])
     with pytest.raises(ValueError, match="copy"):
-        at(a, 0).set(4, copy="invalid")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        _ = at(a, 0).set(4, copy="invalid")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
 def test_xp():
-    a = np.asarray([1, 2, 3])
-    at(a, 0).set(4, xp=np)
-    at(a, 0).add(4, xp=np)
-    at(a, 0).subtract(4, xp=np)
-    at(a, 0).multiply(4, xp=np)
-    at(a, 0).divide(4, xp=np)
-    at(a, 0).power(4, xp=np)
-    at(a, 0).min(4, xp=np)
-    at(a, 0).max(4, xp=np)
+    a = cast(Array, np.asarray([1, 2, 3]))  # type: ignore[bad-cast]  # pyright: ignore[reportInvalidCast]
+    _ = at(a, 0).set(4, xp=np)
+    _ = at(a, 0).add(4, xp=np)
+    _ = at(a, 0).subtract(4, xp=np)
+    _ = at(a, 0).multiply(4, xp=np)
+    _ = at(a, 0).divide(4, xp=np)
+    _ = at(a, 0).power(4, xp=np)
+    _ = at(a, 0).min(4, xp=np)
+    _ = at(a, 0).max(4, xp=np)
 
 
 def test_alternate_index_syntax():
-    a = np.asarray([1, 2, 3])
-    xp_assert_equal(at(a, 0).set(4, copy=True), np.asarray([4, 2, 3]))
-    xp_assert_equal(at(a)[0].set(4, copy=True), np.asarray([4, 2, 3]))
+    xp = cast(ModuleType, np)  # pyright: ignore[reportInvalidCast]
+    a = cast(Array, xp.asarray([1, 2, 3]))
+    xp_assert_equal(at(a, 0).set(4, copy=True), xp.asarray([4, 2, 3]))
+    xp_assert_equal(at(a)[0].set(4, copy=True), xp.asarray([4, 2, 3]))
 
     a_at = at(a)
-    xp_assert_equal(a_at[0].add(1, copy=True), np.asarray([2, 2, 3]))
-    xp_assert_equal(a_at[1].add(2, copy=True), np.asarray([1, 4, 3]))
+    xp_assert_equal(a_at[0].add(1, copy=True), xp.asarray([2, 2, 3]))
+    xp_assert_equal(a_at[1].add(2, copy=True), xp.asarray([1, 4, 3]))
 
     with pytest.raises(ValueError, match="Index"):
-        at(a).set(4)
+        _ = at(a).set(4)
     with pytest.raises(ValueError, match="Index"):
-        at(a, 0)[0].set(4)
+        _ = at(a, 0)[0].set(4)
 
 
 @pytest.mark.parametrize("copy", [True, None])
@@ -256,7 +257,7 @@ def test_incompatible_dtype(
 
     elif library is Backend.ARRAY_API_STRICT and op is not _AtOp.SET:
         with pytest.raises(Exception, match=r"cast|promote|dtype"):
-            at_op(x, idx, op, 1.1, copy=copy)
+            _ = at_op(x, idx, op, 1.1, copy=copy)
 
     elif op in (_AtOp.SET, _AtOp.MIN, _AtOp.MAX):
         # There is no __i<op>__ version of these operations
@@ -264,7 +265,7 @@ def test_incompatible_dtype(
 
     else:
         with pytest.raises(Exception, match=r"cast|promote|dtype"):
-            at_op(x, idx, op, 1.1, copy=copy)
+            _ = at_op(x, idx, op, 1.1, copy=copy)
 
     assert z is None or z.dtype == x.dtype
 

@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from types import ModuleType
+from typing import cast
 
 import numpy as np
 import pytest
@@ -151,19 +152,19 @@ def test_lazy_xp_function(xp: ModuleType):
         with pytest.raises(
             TypeError, match="Attempted boolean conversion of traced array"
         ):
-            non_materializable4(x)  # Wrapped
+            _ = non_materializable4(x)  # Wrapped
 
     elif is_dask_namespace(xp):
         with pytest.raises(
             AssertionError,
             match=r"dask\.compute.* 2 times, but only up to 1 calls are allowed",
         ):
-            non_materializable3(x)
+            _ = non_materializable3(x)
         with pytest.raises(
             AssertionError,
             match=r"dask\.compute.* 1 times, but no calls are allowed",
         ):
-            non_materializable4(x)
+            _ = non_materializable4(x)
 
     else:
         xp_assert_equal(non_materializable3(x), xp.asarray([1.0, 2.0]))
@@ -227,12 +228,12 @@ def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
         # eager jax arrays are auto-converted to numpy in eager jax
         # and fail in jax.jit (which lazy_xp_function tests here)
         with pytest.raises((TypeError, AssertionError)):
-            xp_assert_equal(erf(x), xp.asarray([1.0, 1.0]))
+            xp_assert_equal(cast(Array, erf(x)), xp.asarray([1.0, 1.0]))
     else:
         # cupy, dask and sparse define __array_ufunc__ and dispatch accordingly
         # note that when sparse reduces to scalar it returns a np.generic, which
         # would make xp_assert_equal fail.
-        xp_assert_equal(erf(x), xp.asarray([1.0, 1.0]))
+        xp_assert_equal(cast(Array, erf(x)), xp.asarray([1.0, 1.0]))
 
 
 def dask_raises(x: Array) -> Array:
@@ -243,7 +244,7 @@ def dask_raises(x: Array) -> Array:
         msg = "Hello world"
         raise ValueError(msg)
 
-    return x.map_blocks(_raises, dtype=x.dtype, meta=x._meta)
+    return x.map_blocks(_raises, dtype=x.dtype, meta=x._meta)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
 
 lazy_xp_function(dask_raises)
@@ -261,40 +262,44 @@ def test_lazy_xp_function_eagerly_raises(da: ModuleType):
     """
     x = da.arange(3)
     with pytest.raises(ValueError, match="Hello world"):
-        dask_raises(x)
+        _ = dask_raises(x)
 
 
-class Wrapped:
-    def f(x: Array) -> Array:  # noqa: N805  # pyright: ignore[reportSelfClsParameterName]
-        xp = array_namespace(x)
-        # Crash in jax.jit and trigger compute() on dask
-        if not xp.all(x):
-            msg = "Values must be non-zero"
-            raise ValueError(msg)
-        return x
+wrapped = ModuleType("wrapped")
+naked = ModuleType("naked")
 
 
-class Naked:
-    f = Wrapped.f  # pyright: ignore[reportUnannotatedClassAttribute]
+def f(x: Array) -> Array:
+    xp = array_namespace(x)
+    # Crash in jax.jit and trigger compute() on dask
+    if not xp.all(x):
+        msg = "Values must be non-zero"
+        raise ValueError(msg)
+    return x
 
 
-lazy_xp_function(Wrapped.f)
-lazy_xp_modules = [Wrapped]
+wrapped.f = f  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+naked.f = f  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+del f
+
+
+lazy_xp_function(wrapped.f)
+lazy_xp_modules = [wrapped]
 
 
 def test_lazy_xp_modules(xp: ModuleType, library: Backend):
     x = xp.asarray([1.0, 2.0])
-    y = Naked.f(x)
+    y = naked.f(x)
     xp_assert_equal(y, x)
 
     if library is Backend.JAX:
         with pytest.raises(
             TypeError, match="Attempted boolean conversion of traced array"
         ):
-            Wrapped.f(x)
+            wrapped.f(x)
     elif library is Backend.DASK:
         with pytest.raises(AssertionError, match=r"dask\.compute"):
-            Wrapped.f(x)
+            wrapped.f(x)
     else:
-        y = Wrapped.f(x)
+        y = wrapped.f(x)
         xp_assert_equal(y, x)
