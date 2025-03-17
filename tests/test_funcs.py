@@ -2,11 +2,17 @@ import contextlib
 import math
 import warnings
 from types import ModuleType
+from typing import Any, cast
 
+import hypothesis
+import hypothesis.extra.numpy as npst
 import numpy as np
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 from array_api_extra import (
+    apply_where,
     at,
     atleast_nd,
     broadcast_shapes,
@@ -23,13 +29,14 @@ from array_api_extra import (
 from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
-from array_api_extra._lib._utils._helpers import eager_shape, ndindex
+from array_api_extra._lib._utils._helpers import asarrays, eager_shape, ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
 # some xp backends are untyped
 # mypy: disable-error-code=no-untyped-def
 
+lazy_xp_function(apply_where, static_argnums=(2, 3), static_argnames="xp")
 lazy_xp_function(atleast_nd, static_argnames=("ndim", "xp"))
 lazy_xp_function(cov, static_argnames="xp")
 lazy_xp_function(create_diagonal, static_argnames=("offset", "xp"))
@@ -40,6 +47,230 @@ lazy_xp_function(pad, static_argnames=("pad_width", "mode", "constant_values", "
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp"))
 lazy_xp_function(sinc, static_argnames="xp")
+
+
+class TestApplyWhere:
+    @staticmethod
+    def f1(x: Array, y: Array | int = 10) -> Array:
+        return x + y
+
+    @staticmethod
+    def f2(x: Array, y: Array | int = 10) -> Array:
+        return x - y
+
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    def test_f1_f2(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4])
+        cond = x % 2 == 0
+        actual = apply_where(cond, x, self.f1, self.f2)
+        expect = xp.where(cond, self.f1(x), self.f2(x))
+        xp_assert_equal(actual, expect)
+
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    def test_fill_value(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4])
+        cond = x % 2 == 0
+        actual = apply_where(x % 2 == 0, x, self.f1, fill_value=0)
+        expect = xp.where(cond, self.f1(x), xp.asarray(0))
+        xp_assert_equal(actual, expect)
+
+        actual = apply_where(x % 2 == 0, x, self.f1, fill_value=xp.asarray(0))
+        xp_assert_equal(actual, expect)
+
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    def test_args_tuple(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4])
+        y = xp.asarray([10, 20, 30, 40])
+        cond = x % 2 == 0
+        actual = apply_where(cond, (x, y), self.f1, self.f2)
+        expect = xp.where(cond, self.f1(x, y), self.f2(x, y))
+        xp_assert_equal(actual, expect)
+
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    def test_broadcast(self, xp: ModuleType):
+        x = xp.asarray([1, 2])
+        y = xp.asarray([[10], [20], [30]])
+        cond = xp.broadcast_to(xp.asarray(True), (4, 1, 1))
+
+        actual = apply_where(cond, (x, y), self.f1, self.f2)
+        expect = xp.where(cond, self.f1(x, y), self.f2(x, y))
+        xp_assert_equal(actual, expect)
+
+        actual = apply_where(
+            cond,
+            (x, y),
+            lambda x, _: x,  # pyright: ignore[reportUnknownArgumentType]
+            lambda _, y: y,  # pyright: ignore[reportUnknownArgumentType]
+        )
+        expect = xp.where(cond, x, y)
+        xp_assert_equal(actual, expect)
+
+        # Shaped fill_value
+        actual = apply_where(cond, x, self.f1, fill_value=y)
+        expect = xp.where(cond, self.f1(x), y)
+        xp_assert_equal(actual, expect)
+
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    def test_dtype_propagation(self, xp: ModuleType, library: Backend):
+        x = xp.asarray([1, 2], dtype=xp.int8)
+        y = xp.asarray([3, 4], dtype=xp.int16)
+        cond = x % 2 == 0
+
+        mxp = np if library is Backend.DASK else xp
+        actual = apply_where(
+            cond,
+            (x, y),
+            self.f1,
+            lambda x, y: mxp.astype(x - y, xp.int64),  # pyright: ignore[reportArgumentType,reportUnknownArgumentType]
+        )
+        assert actual.dtype == xp.int64
+
+        actual = apply_where(cond, y, self.f1, fill_value=5)
+        assert actual.dtype == xp.int16
+
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    @pytest.mark.parametrize("fill_value_raw", [3, [3, 4]])
+    @pytest.mark.parametrize(
+        ("fill_value_dtype", "expect_dtype"), [("int32", "int32"), ("int8", "int16")]
+    )
+    def test_dtype_propagation_fill_value(
+        self,
+        xp: ModuleType,
+        fill_value_raw: int | list[int],
+        fill_value_dtype: str,
+        expect_dtype: str,
+    ):
+        x = xp.asarray([1, 2], dtype=xp.int16)
+        cond = x % 2 == 0
+        fill_value = xp.asarray(fill_value_raw, dtype=getattr(xp, fill_value_dtype))
+
+        actual = apply_where(cond, x, self.f1, fill_value=fill_value)
+        assert actual.dtype == getattr(xp, expect_dtype)
+
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    def test_dont_overwrite_fill_value(self, xp: ModuleType):
+        x = xp.asarray([1, 2])
+        fill_value = xp.asarray([100, 200])
+        actual = apply_where(x % 2 == 0, x, self.f1, fill_value=fill_value)
+        xp_assert_equal(actual, xp.asarray([100, 12]))
+        xp_assert_equal(fill_value, xp.asarray([100, 200]))
+
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    def test_dont_run_on_false(self, xp: ModuleType):
+        x = xp.asarray([1.0, 2.0, 0.0])
+        y = xp.asarray([0.0, 3.0, 4.0])
+        # On NumPy, division by zero will trigger warnings
+        actual = apply_where(
+            x == 0,
+            (x, y),
+            lambda x, y: x / y,  # pyright: ignore[reportUnknownArgumentType]
+            lambda x, y: y / x,  # pyright: ignore[reportUnknownArgumentType]
+        )
+        xp_assert_equal(actual, xp.asarray([0.0, 1.5, 0.0]))
+
+    def test_bad_args(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4])
+        cond = x % 2 == 0
+        # Neither f2 nor fill_value
+        with pytest.raises(TypeError, match="Exactly one of"):
+            apply_where(cond, x, self.f1)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue]
+        # Both f2 and fill_value
+        with pytest.raises(TypeError, match="Exactly one of"):
+            apply_where(cond, x, self.f1, self.f2, fill_value=0)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue]
+
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    def test_xp(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4])
+        cond = x % 2 == 0
+        actual = apply_where(cond, x, self.f1, self.f2, xp=xp)
+        expect = xp.where(cond, self.f1(x), self.f2(x))
+        xp_assert_equal(actual, expect)
+
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    def test_device(self, xp: ModuleType, device: Device):
+        x = xp.asarray([1, 2, 3, 4], device=device)
+        y = apply_where(x % 2 == 0, x, self.f1, self.f2)
+        assert get_device(y) == device
+        y = apply_where(x % 2 == 0, x, self.f1, fill_value=0)
+        assert get_device(y) == device
+        y = apply_where(x % 2 == 0, x, self.f1, fill_value=x)
+        assert get_device(y) == device
+
+    # skip instead of xfail in order not to waste time
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="read-only without .at")
+    @pytest.mark.filterwarnings("ignore::RuntimeWarning")  # overflows, etc.
+    @hypothesis.settings(  # pyright: ignore[reportArgumentType]
+        # The xp and library fixtures are not regenerated between hypothesis iterations
+        suppress_health_check=[hypothesis.HealthCheck.function_scoped_fixture],
+        # JAX can take a long time to initialize on the first call
+        deadline=None,
+    )
+    @given(
+        n_arrays=st.integers(min_value=1, max_value=3),
+        rng_seed=st.integers(min_value=1000000000, max_value=9999999999),
+        dtype=st.sampled_from((np.float32, np.float64)),
+        p=st.floats(min_value=0, max_value=1),
+        data=st.data(),
+    )
+    def test_hypothesis(  # type: ignore[no-any-explicit,no-any-decorated]
+        self,
+        n_arrays: int,
+        rng_seed: int,
+        dtype: np.dtype[Any],
+        p: float,
+        data: st.DataObject,
+        xp: ModuleType,
+        library: Backend,
+    ):
+        mbs = npst.mutually_broadcastable_shapes(num_shapes=n_arrays + 1, min_side=0)
+        input_shapes, _ = data.draw(mbs)
+        cond_shape, *shapes = input_shapes
+
+        # cupy/cupy#8382
+        # https://github.com/jax-ml/jax/issues/26658
+        elements = {"allow_subnormal": library not in (Backend.CUPY, Backend.JAX)}
+
+        fill_value = xp.asarray(
+            data.draw(npst.arrays(dtype=dtype, shape=(), elements=elements))
+        )
+        float_fill_value = float(fill_value)
+        if library is Backend.CUPY and dtype is np.float32:
+            # Avoid data-dependent dtype promotion when encountering subnormals
+            # close to the max float32 value
+            float_fill_value = float(np.clip(float_fill_value, -1e38, 1e38))
+
+        arrays = tuple(
+            xp.asarray(
+                data.draw(npst.arrays(dtype=dtype, shape=shape, elements=elements))
+            )
+            for shape in shapes
+        )
+
+        def f1(*args: Array) -> Array:
+            return cast(Array, sum(args))
+
+        def f2(*args: Array) -> Array:
+            return cast(Array, sum(args) / 2)
+
+        rng = np.random.default_rng(rng_seed)
+        cond = xp.asarray(rng.random(size=cond_shape) > p)
+
+        res1 = apply_where(cond, arrays, f1, fill_value=fill_value)
+        res2 = apply_where(cond, arrays, f1, f2)
+        res3 = apply_where(cond, arrays, f1, fill_value=float_fill_value)
+
+        ref1 = xp.where(cond, f1(*arrays), fill_value)
+        ref2 = xp.where(cond, f1(*arrays), f2(*arrays))
+        if library is Backend.ARRAY_API_STRICT:
+            # FIXME https://github.com/data-apis/array-api-strict/issues/131
+            ref3 = xp.where(cond, *asarrays(f1(*arrays), float_fill_value, xp=xp))
+        else:
+            ref3 = xp.where(cond, f1(*arrays), float_fill_value)
+
+        xp_assert_close(res1, ref1, rtol=2e-16)
+        xp_assert_equal(res2, ref2)
+        xp_assert_equal(res3, ref3)
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
@@ -355,8 +586,6 @@ class TestExpandDims:
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestIsClose:
-    # FIXME use lazywhere to avoid warnings on inf
-    @pytest.mark.filterwarnings("ignore:invalid value encountered")
     @pytest.mark.parametrize("swap", [False, True])
     @pytest.mark.parametrize(
         ("a", "b"),
@@ -415,8 +644,6 @@ class TestIsClose:
 
         xp_assert_equal(actual, expect)
 
-    # FIXME use lazywhere to avoid warnings on inf
-    @pytest.mark.filterwarnings("ignore:invalid value encountered")
     def test_some_inf(self, xp: ModuleType):
         a = xp.asarray([0.0, 1.0, xp.inf, xp.inf, xp.inf])
         b = xp.asarray([1e-9, 1.0, xp.inf, -xp.inf, 2.0])

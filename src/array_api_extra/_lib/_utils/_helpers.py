@@ -9,7 +9,12 @@ from types import ModuleType
 from typing import TYPE_CHECKING, cast
 
 from . import _compat
-from ._compat import array_namespace, is_array_api_obj, is_numpy_array
+from ._compat import (
+    array_namespace,
+    is_array_api_obj,
+    is_dask_namespace,
+    is_numpy_array,
+)
 from ._typing import Array
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -18,6 +23,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 __all__ = ["asarrays", "eager_shape", "in1d", "is_python_scalar", "mean"]
+__all__ = ["asarrays", "in1d", "is_python_scalar", "mean", "meta_namespace"]
 
 
 def in1d(
@@ -230,3 +236,33 @@ def eager_shape(x: Array, /) -> tuple[int, ...]:
         msg = "Unsupported lazy shape"
         raise TypeError(msg)
     return cast(tuple[int, ...], shape)
+
+
+def meta_namespace(
+    *arrays: Array | int | float | complex | bool | None,
+    xp: ModuleType | None = None,
+) -> ModuleType:
+    """
+    Get the namespace of Dask chunks.
+
+    On all other backends, just return the namespace of the arrays.
+
+    Parameters
+    ----------
+    *arrays : Array | int | float | complex | bool | None
+        Input arrays.
+    xp : array_namespace, optional
+        The standard-compatible namespace for the input arrays. Default: infer.
+
+    Returns
+    -------
+    array_namespace
+        If xp is Dask, the namespace of the Dask chunks;
+        otherwise, the namespace of the arrays.
+    """
+    xp = array_namespace(*arrays) if xp is None else xp
+    if not is_dask_namespace(xp):
+        return xp
+    # Quietly skip scalars and None's
+    metas = [cast(Array | None, getattr(a, "_meta", None)) for a in arrays]
+    return array_namespace(*metas)
