@@ -666,7 +666,7 @@ def setdiff1d(
     """
     if xp is None:
         xp = array_namespace(x1, x2)
-    # FIXME https://github.com/microsoft/pyright/issues/10103
+    # https://github.com/microsoft/pyright/issues/10103
     x1_, x2_ = asarrays(x1, x2, xp=xp)
 
     if assume_unique:
