@@ -3,9 +3,10 @@
 # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
 
-from collections.abc import Generator
+import math
+from collections.abc import Generator, Iterable
 from types import ModuleType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from . import _compat
 from ._compat import array_namespace, is_array_api_obj, is_numpy_array
@@ -16,7 +17,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing_extensions import TypeIs
 
 
-__all__ = ["asarrays", "in1d", "is_python_scalar", "mean"]
+__all__ = ["asarrays", "eager_shape", "in1d", "is_python_scalar", "mean"]
 
 
 def in1d(
@@ -41,14 +42,17 @@ def in1d(
     if xp is None:
         xp = array_namespace(x1, x2)
 
+    x1_shape = eager_shape(x1)
+    x2_shape = eager_shape(x2)
+
     # This code is run to make the code significantly faster
-    if x2.shape[0] < 10 * x1.shape[0] ** 0.145:
+    if x2_shape[0] < 10 * x1_shape[0] ** 0.145 and isinstance(x2, Iterable):
         if invert:
-            mask = xp.ones(x1.shape[0], dtype=xp.bool, device=_compat.device(x1))
+            mask = xp.ones(x1_shape[0], dtype=xp.bool, device=_compat.device(x1))
             for a in x2:
                 mask &= x1 != a
         else:
-            mask = xp.zeros(x1.shape[0], dtype=xp.bool, device=_compat.device(x1))
+            mask = xp.zeros(x1_shape[0], dtype=xp.bool, device=_compat.device(x1))
             for a in x2:
                 mask |= x1 == a
         return mask
@@ -146,7 +150,8 @@ def asarrays(
     a_scalar = is_python_scalar(a)
     b_scalar = is_python_scalar(b)
     if not a_scalar and not b_scalar:
-        return a, b  # This includes misc. malformed input e.g. str
+        # This includes misc. malformed input e.g. str
+        return a, b  # type: ignore[return-value]
 
     swap = False
     if a_scalar:
@@ -165,7 +170,7 @@ def asarrays(
             float: ("real floating", "complex floating"),
             complex: "complex floating",
         }
-        kind = same_dtype[type(b)]  # type: ignore[index]
+        kind = same_dtype[type(cast(complex, b))]  # type: ignore[index]
         if xp.isdtype(a.dtype, kind):
             xb = xp.asarray(b, dtype=a.dtype)
         else:
@@ -203,3 +208,25 @@ def ndindex(*x: int) -> Generator[tuple[int, ...]]:
     for i in ndindex(*x[:-1]):
         for j in range(x[-1]):
             yield *i, j
+
+
+def eager_shape(x: Array, /) -> tuple[int, ...]:
+    """
+    Return shape of an array. Raise if shape is not fully defined.
+
+    Parameters
+    ----------
+    x : Array
+        Input array.
+
+    Returns
+    -------
+    tuple[int, ...]
+        Shape of the array.
+    """
+    shape = x.shape
+    # Dask arrays uses non-standard NaN instead of None
+    if any(s is None or math.isnan(s) for s in shape):
+        msg = "Unsupported lazy shape"
+        raise TypeError(msg)
+    return cast(tuple[int, ...], shape)

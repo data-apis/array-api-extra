@@ -7,6 +7,7 @@ See also ..testing for public testing utilities.
 
 import math
 from types import ModuleType
+from typing import cast
 
 import pytest
 
@@ -48,10 +49,11 @@ def _check_ns_shape_dtype(
     actual_shape = actual.shape
     desired_shape = desired.shape
     if is_dask_namespace(desired_xp):
-        if any(math.isnan(i) for i in actual_shape):
-            actual_shape = actual.compute().shape
-        if any(math.isnan(i) for i in desired_shape):
-            desired_shape = desired.compute().shape
+        # Dask uses nan instead of None for unknown shapes
+        if any(math.isnan(i) for i in cast(tuple[float, ...], actual_shape)):
+            actual_shape = actual.compute().shape  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+        if any(math.isnan(i) for i in cast(tuple[float, ...], desired_shape)):
+            desired_shape = desired.compute().shape  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
     msg = f"shapes do not match: {actual_shape} != f{desired_shape}"
     assert actual_shape == desired_shape, msg
@@ -100,11 +102,11 @@ def xp_assert_equal(actual: Array, desired: Array, err_msg: str = "") -> None:
         import numpy as np  # pylint: disable=import-outside-toplevel
 
         if is_pydata_sparse_namespace(xp):
-            actual = actual.todense()
-            desired = desired.todense()
+            actual = actual.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+            desired = desired.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
         # JAX uses `np.testing`
-        np.testing.assert_array_equal(actual, desired, err_msg=err_msg)
+        np.testing.assert_array_equal(actual, desired, err_msg=err_msg)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
 def xp_assert_close(
@@ -164,13 +166,17 @@ def xp_assert_close(
         import numpy as np  # pylint: disable=import-outside-toplevel
 
         if is_pydata_sparse_namespace(xp):
-            actual = actual.to_dense()
-            desired = desired.to_dense()
+            actual = actual.to_dense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+            desired = desired.to_dense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
         # JAX uses `np.testing`
         assert isinstance(rtol, float)
-        np.testing.assert_allclose(
-            actual, desired, rtol=rtol, atol=atol, err_msg=err_msg
+        np.testing.assert_allclose(  # pyright: ignore[reportCallIssue]
+            actual,  # pyright: ignore[reportArgumentType]
+            desired,  # pyright: ignore[reportArgumentType]
+            rtol=rtol,
+            atol=atol,
+            err_msg=err_msg,  # type: ignore[call-overload]
         )
 
 

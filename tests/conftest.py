@@ -19,7 +19,7 @@ from array_api_extra.testing import patch_lazy_xp_functions
 T = TypeVar("T")
 P = ParamSpec("P")
 
-np_compat = array_namespace(np.empty(0))
+np_compat = array_namespace(np.empty(0))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
 @pytest.fixture(params=tuple(Backend))

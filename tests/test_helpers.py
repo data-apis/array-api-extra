@@ -1,4 +1,5 @@
 from types import ModuleType
+from typing import cast
 
 import numpy as np
 import pytest
@@ -6,8 +7,8 @@ import pytest
 from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
-from array_api_extra._lib._utils._helpers import asarrays, in1d, ndindex
-from array_api_extra._lib._utils._typing import Device
+from array_api_extra._lib._utils._helpers import asarrays, eager_shape, in1d, ndindex
+from array_api_extra._lib._utils._typing import Array, Device, DType
 from array_api_extra.testing import lazy_xp_function
 
 # mypy: disable-error-code=no-untyped-usage
@@ -139,12 +140,12 @@ class TestAsArrays:
         assert xb.dtype == b.dtype
 
     @pytest.mark.parametrize("dtype", [np.float64, np.complex128])
-    def test_numpy_generics(self, dtype: type):
+    def test_numpy_generics(self, dtype: DType):
         """
         Test special case of np.float64 and np.complex128,
         which are subclasses of float and complex.
         """
-        a = dtype(0)
+        a = cast(Array, dtype(0))  # type: ignore[operator]  # pyright: ignore[reportCallIssue]
         xa, xb = asarrays(a, 0, xp=np)
         assert xa.dtype == dtype
         assert xb.dtype == dtype
@@ -155,3 +156,20 @@ class TestAsArrays:
 )
 def test_ndindex(shape: tuple[int, ...]):
     assert tuple(ndindex(*shape)) == tuple(np.ndindex(*shape))
+
+
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
+def test_eager_shape(xp: ModuleType, library: Backend):
+    a = xp.asarray([1, 2, 3])
+    # Lazy arrays, like Dask, have an eager shape until you slice them with
+    # a lazy boolean mask
+    assert eager_shape(a) == a.shape == (3,)
+
+    b = a[a > 2]
+    if library is Backend.DASK:
+        with pytest.raises(TypeError, match="Unsupported lazy shape"):
+            _ = eager_shape(b)
+    # FIXME can't test use case for None in the shape until we add support for
+    # other lazy backends
+    else:
+        assert eager_shape(b) == b.shape == (1,)

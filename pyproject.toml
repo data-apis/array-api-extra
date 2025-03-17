@@ -203,7 +203,7 @@ enable_error_code = ["ignore-without-code", "truthy-bool"]
 # https://github.com/data-apis/array-api-typing
 disallow_any_expr = false
 # false positives with input validation
-disable_error_code = ["redundant-expr", "unreachable"]
+disable_error_code = ["redundant-expr", "unreachable", "no-any-return"]
 
 [[tool.mypy.overrides]]
 # slow/unavailable on Windows; do not add to the lint env

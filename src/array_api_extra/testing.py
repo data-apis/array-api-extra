@@ -328,6 +328,6 @@ def _dask_wrap(
         # Block until the graph materializes and reraise exceptions. This allows
         # `pytest.raises` and `pytest.warns` to work as expected. Note that this would
         # not work on scheduler='distributed', as it would not block.
-        return dask.persist(out, scheduler="threads")[0]  # type: ignore[no-any-return,attr-defined,no-untyped-call,func-returns-value,index]  # pyright: ignore[reportPrivateImportUsage]
+        return dask.persist(out, scheduler="threads")[0]  # type: ignore[attr-defined,no-untyped-call,func-returns-value,index]  # pyright: ignore[reportPrivateImportUsage]
 
     return wrapper

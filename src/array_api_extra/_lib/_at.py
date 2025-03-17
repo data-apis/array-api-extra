@@ -15,7 +15,7 @@ from ._utils._compat import (
     is_jax_array,
     is_writeable_array,
 )
-from ._utils._typing import Array, Index
+from ._utils._typing import Array, SetIndex
 
 
 class _AtOp(Enum):
@@ -43,7 +43,13 @@ class _AtOp(Enum):
         return self.value
 
 
-_undef = object()
+class Undef(Enum):
+    """Sentinel for undefined values."""
+
+    UNDEF = 0
+
+
+_undef = Undef.UNDEF
 
 
 class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
@@ -188,16 +194,16 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     """
 
     _x: Array
-    _idx: Index
+    _idx: SetIndex | Undef
     __slots__: ClassVar[tuple[str, ...]] = ("_idx", "_x")
 
     def __init__(
-        self, x: Array, idx: Index = _undef, /
+        self, x: Array, idx: SetIndex | Undef = _undef, /
     ) -> None:  # numpydoc ignore=GL08
         self._x = x
         self._idx = idx
 
-    def __getitem__(self, idx: Index, /) -> at:  # numpydoc ignore=PR01,RT01
+    def __getitem__(self, idx: SetIndex, /) -> at:  # numpydoc ignore=PR01,RT01
         """
         Allow for the alternate syntax ``at(x)[start:stop:step]``.
 
@@ -212,9 +218,9 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     def _op(
         self,
         at_op: _AtOp,
-        in_place_op: Callable[[Array, Array | object], Array] | None,
+        in_place_op: Callable[[Array, Array | complex], Array] | None,
         out_of_place_op: Callable[[Array, Array], Array] | None,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None,
         xp: ModuleType | None,
@@ -226,7 +232,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         ----------
         at_op : _AtOp
             Method of JAX's Array.at[].
-        in_place_op : Callable[[Array, Array | object], Array] | None
+        in_place_op : Callable[[Array, Array | complex], Array] | None
             In-place operation to apply on mutable backends::
 
                 x[idx] = in_place_op(x[idx], y)
@@ -245,7 +251,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
                 x = xp.where(idx, y, x)
 
-        y : array or object
+        y : array or complex
             Right-hand side of the operation.
         copy : bool or None
             Whether to copy the input array. See the class docstring for details.
@@ -260,7 +266,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         x, idx = self._x, self._idx
         xp = array_namespace(x, y) if xp is None else xp
 
-        if idx is _undef:
+        if isinstance(idx, Undef):
             msg = (
                 "Index has not been set.\n"
                 "Usage: either\n"
@@ -306,7 +312,10 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         if copy or (copy is None and not writeable):
             if is_jax_array(x):
                 # Use JAX's at[]
-                func = cast(Callable[[Array], Array], getattr(x.at[idx], at_op.value))
+                func = cast(
+                    Callable[[Array | complex], Array],
+                    getattr(x.at[idx], at_op.value),  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownArgumentType]
+                )
                 out = func(y)
                 # Undo int->float promotion on JAX after _AtOp.DIVIDE
                 return xp.astype(out, x.dtype, copy=False)
@@ -315,10 +324,10 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             # with a copy followed by an update
 
             x = xp.asarray(x, copy=True)
-            if writeable is False:
-                # A copy of a read-only numpy array is writeable
-                # Note: this assumes that a copy of a writeable array is writeable
-                writeable = None
+            # A copy of a read-only numpy array is writeable
+            # Note: this assumes that a copy of a writeable array is writeable
+            assert not writeable
+            writeable = None
 
         if writeable is None:
             writeable = is_writeable_array(x)
@@ -328,14 +337,14 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             raise ValueError(msg)
 
         if in_place_op:  # add(), subtract(), ...
-            x[self._idx] = in_place_op(x[self._idx], y)
+            x[idx] = in_place_op(x[idx], y)
         else:  # set()
-            x[self._idx] = y
+            x[idx] = y
         return x
 
     def set(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -345,7 +354,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def add(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -359,7 +368,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def subtract(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -371,7 +380,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def multiply(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -383,7 +392,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def divide(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -395,7 +404,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def power(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -405,7 +414,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def min(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -417,7 +426,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def max(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,

@@ -1,11 +1,22 @@
-"""Static typing helpers."""
+# pylint: disable=missing-module-docstring  # numpydoc ignore=GL08
+class Array:  # pylint: disable=missing-class-docstring  # numpydoc ignore=GL08
+    pass
 
-from typing import Any
 
-# To be changed to a Protocol later (see data-apis/array-api#589)
-Array = Any  # type: ignore[no-any-explicit]
-Device = Any  # type: ignore[no-any-explicit]
-DType = Any  # type: ignore[no-any-explicit]
-Index = Any  # type: ignore[no-any-explicit]
+class DType:  # pylint: disable=missing-class-docstring  # numpydoc ignore=GL08
+    pass
 
-__all__ = ["Array", "DType", "Device", "Index"]
+
+class Device:  # pylint: disable=missing-class-docstring  # numpydoc ignore=GL08
+    pass
+
+
+class GetIndex:  # pylint: disable=missing-class-docstring  # numpydoc ignore=GL08
+    pass
+
+
+class SetIndex:  # pylint: disable=missing-class-docstring  # numpydoc ignore=GL08
+    pass
+
+
+__all__ = ["Array", "DType", "Device", "GetIndex", "SetIndex"]
