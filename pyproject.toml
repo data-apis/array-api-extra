@@ -64,6 +64,7 @@ numpydoc = ">=1.8.0,<2"
 array-api-strict = "*"
 numpy = "*"
 pytest = "*"
+hypothesis = "*"
 dask-core = "*"  # No distributed, tornado, etc.
 # NOTE: don't add jax, pytorch, sparse, cupy here
 # as they slow down mypy and are not portable across target OSs
@@ -79,6 +80,7 @@ lint = { depends-on = ["pre-commit", "pylint", "mypy", "pyright"] }
 [tool.pixi.feature.tests.dependencies]
 pytest = ">=6"
 pytest-cov = ">=3"
+hypothesis = "*"
 array-api-strict = "*"
 numpy = "*"
 
@@ -231,6 +233,10 @@ reportMissingTypeStubs = false
 reportUnreachable = false
 # ruff handles this
 reportUnusedParameter = false
+# cyclic imports inside function bodies
+reportImportCycles = false
+# PyRight can't trace types in lambdas
+reportUnknownLambdaType = false
 
 executionEnvironments = [
     { root = "tests", reportPrivateUsage = false },
