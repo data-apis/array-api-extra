@@ -6,7 +6,7 @@ from __future__ import annotations
 import math
 import warnings
 from collections.abc import Callable, Sequence
-from types import ModuleType
+from types import ModuleType, NoneType
 from typing import cast, overload
 
 from ._at import at
@@ -54,7 +54,7 @@ def apply_where(  # type: ignore[no-any-explicit,no-any-decorated] # numpydoc ig
     f1: Callable[..., Array],
     /,
     *,
-    fill_value: Array | int | float | complex | bool,
+    fill_value: Array | complex,
     xp: ModuleType | None = None,
 ) -> Array: ...
 
@@ -66,7 +66,7 @@ def apply_where(  # type: ignore[no-any-explicit] # numpydoc ignore=PR01,PR02
     f2: Callable[..., Array] | None = None,
     /,
     *,
-    fill_value: Array | int | float | complex | bool | None = None,
+    fill_value: Array | complex | None = None,
     xp: ModuleType | None = None,
 ) -> Array:
     """
@@ -115,11 +115,13 @@ def apply_where(  # type: ignore[no-any-explicit] # numpydoc ignore=PR01,PR02
 
     Examples
     --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
     >>> a = xp.asarray([5, 4, 3])
     >>> b = xp.asarray([0, 2, 2])
     >>> def f(a, b):
     ...     return a // b
-    >>> apply_where(b != 0, (a, b), f, fill_value=xp.nan)
+    >>> xpx.apply_where(b != 0, (a, b), f, fill_value=xp.nan)
     array([ nan,  2., 1.])
     """
     # Parse and normalize arguments
@@ -129,12 +131,12 @@ def apply_where(  # type: ignore[no-any-explicit] # numpydoc ignore=PR01,PR02
     args_ = list(args) if isinstance(args, tuple) else [args]
     del args
 
-    xp = array_namespace(cond, *args_) if xp is None else xp
+    xp = array_namespace(cond, fill_value, *args_) if xp is None else xp
 
-    if getattr(fill_value, "ndim", 0):
-        cond, fill_value, *args_ = xp.broadcast_arrays(cond, fill_value, *args_)
-    else:
+    if isinstance(fill_value, int | float | complex | NoneType):
         cond, *args_ = xp.broadcast_arrays(cond, *args_)
+    else:
+        cond, fill_value, *args_ = xp.broadcast_arrays(cond, fill_value, *args_)
 
     if is_dask_namespace(xp):
         meta_xp = meta_namespace(cond, fill_value, *args_, xp=xp)
@@ -161,10 +163,10 @@ def _apply_where(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR01,RT01
 
     if f2 is None:
         dtype = xp.result_type(temp1, fill_value)
-        if getattr(fill_value, "ndim", 0):
-            out = xp.astype(fill_value, dtype, copy=True)
-        else:
+        if isinstance(fill_value, int | float | complex):
             out = xp.full_like(cond, dtype=dtype, fill_value=fill_value)
+        else:
+            out = xp.astype(fill_value, dtype, copy=True)
     else:
         ncond = ~cond
         temp2 = f2(*(arr[ncond] for arr in args))

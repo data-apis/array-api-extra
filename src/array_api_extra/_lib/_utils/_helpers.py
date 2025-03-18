@@ -22,8 +22,14 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing_extensions import TypeIs
 
 
-__all__ = ["asarrays", "eager_shape", "in1d", "is_python_scalar", "mean"]
-__all__ = ["asarrays", "in1d", "is_python_scalar", "mean", "meta_namespace"]
+__all__ = [
+    "asarrays",
+    "eager_shape",
+    "in1d",
+    "is_python_scalar",
+    "mean",
+    "meta_namespace",
+]
 
 
 def in1d(
