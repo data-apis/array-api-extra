@@ -1,7 +1,7 @@
 # Tools for lazy backends
 
 These additional functions are meant to be used to support compatibility with
-lazy backends, e.g. Dask or Jax:
+lazy backends, e.g. Dask or JAX:
 
 ```{eval-rst}
 .. currentmodule:: array_api_extra
