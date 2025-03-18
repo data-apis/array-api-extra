@@ -72,7 +72,7 @@ def test_assert_close_tolerance(xp: ModuleType):
 
 
 @param_assert_equal_close
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no bool indexing")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
 def test_assert_close_equal_none_shape(xp: ModuleType, func: Callable[..., None]):  # type: ignore[no-any-explicit]
     """On dask and other lazy backends, test that a shape with NaN's or None's
     can be compared to a real shape.

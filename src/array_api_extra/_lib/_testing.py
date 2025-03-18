@@ -166,8 +166,8 @@ def xp_assert_close(
         import numpy as np  # pylint: disable=import-outside-toplevel
 
         if is_pydata_sparse_namespace(xp):
-            actual = actual.to_dense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-            desired = desired.to_dense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+            actual = actual.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+            desired = desired.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
         # JAX uses `np.testing`
         assert isinstance(rtol, float)

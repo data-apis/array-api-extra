@@ -125,7 +125,7 @@ def pad(
     pad_width: int | tuple[int, int] | Sequence[tuple[int, int]],
     mode: Literal["constant"] = "constant",
     *,
-    constant_values: bool | int | float | complex = 0,
+    constant_values: complex = 0,
     xp: ModuleType | None = None,
 ) -> Array:
     """
@@ -168,7 +168,7 @@ def pad(
         pad_width = xp.flip(pad_width, axis=(0,)).flatten()
         return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
-    if _delegate(xp, Backend.NUMPY, Backend.JAX, Backend.CUPY):
+    if _delegate(xp, Backend.NUMPY, Backend.JAX, Backend.CUPY, Backend.SPARSE):
         return xp.pad(x, pad_width, mode, constant_values=constant_values)
 
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)
