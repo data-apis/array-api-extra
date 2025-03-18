@@ -191,26 +191,40 @@ def test_lazy_apply_dask_non_numpy_meta(da: ModuleType):
     xp_assert_equal(y.compute(), x_cp + 1)  # type: ignore[attr-defined]  # pyright: ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
 
 
-@pytest.mark.xfail_xp_backend(Backend.JAX, reason="unknown shape")
 def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
     x = xp.asarray([1, 1, 2, 2, 2])
 
-    xp2 = np if library is Backend.DASK else xp
-
-    # Single output
-    values = lazy_apply(xp2.unique_values, x, shape=(None,))
-    xp_assert_equal(values, xp.asarray([1, 2]))
-
-    # Multi output
+    # TODO mxp = meta_namespace(x, xp=xp)
+    mxp = np if library is Backend.DASK else xp
     int_type = xp.asarray(0).dtype
-    values, counts = lazy_apply(
-        xp2.unique_counts,
-        x,
-        shape=((None,), (None,)),
-        dtype=(x.dtype, int_type),
-    )
-    xp_assert_equal(values, xp.asarray([1, 2]))
-    xp_assert_equal(counts, xp.asarray([2, 3]))
+
+    if library is Backend.JAX:
+        # Single output
+        with pytest.raises(ValueError, match="Output shape must be fully known"):
+            _ = lazy_apply(mxp.unique_values, x, shape=(None,))
+
+        # Multi output
+        with pytest.raises(ValueError, match="Output shape must be fully known"):
+            _ = lazy_apply(
+                mxp.unique_counts,
+                x,
+                shape=((None,), (None,)),
+                dtype=(x.dtype, int_type),
+            )
+    else:
+        # Single output
+        values = lazy_apply(mxp.unique_values, x, shape=(None,))
+        xp_assert_equal(values, xp.asarray([1, 2]))
+
+        # Multi output
+        values, counts = lazy_apply(
+            mxp.unique_counts,
+            x,
+            shape=((None,), (None,)),
+            dtype=(x.dtype, int_type),
+        )
+        xp_assert_equal(values, xp.asarray([1, 2]))
+        xp_assert_equal(counts, xp.asarray([2, 3]))
 
 
 def check_lazy_apply_none_shape_broadcast(x: Array) -> Array:
@@ -349,10 +363,8 @@ lazy_xp_function(check_lazy_apply_kwargs, static_argnames=("expect_cls", "as_num
 def test_lazy_apply_kwargs(xp: ModuleType, library: Backend, as_numpy: bool):
     """When as_numpy=True, search and replace arrays in the (nested) keywords arguments
     with numpy arrays, and leave the rest untouched."""
-    expect_cls = (
-        np.ndarray if as_numpy or library is Backend.DASK else type(xp.asarray(0))
-    )
     x = xp.asarray(0)
+    expect_cls = np.ndarray if as_numpy or library is Backend.DASK else type(x)
     actual = check_lazy_apply_kwargs(x, expect_cls, as_numpy)  # pyright: ignore[reportUnknownArgumentType]
     xp_assert_equal(actual, x + 1)
 

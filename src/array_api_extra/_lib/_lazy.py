@@ -179,9 +179,9 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
 
     Raises
     ------
-    jax.errors.TracerArrayConversionError
-        When ``xp=jax.numpy``, `shape` is unknown (it contains None on one or more axes)
-        and this function was called inside ``jax.jit``.
+    ValueError
+        When ``xp=jax.numpy``, the output `shape` is unknown (it contains ``None`` on
+        one or more axes) and this function was called inside ``jax.jit``.
     RuntimeError
         When ``xp=sparse`` and auto-densification is disabled.
     Exception (backend-specific)
@@ -271,6 +271,10 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         # as it does not support raising exceptions:
         # https://github.com/jax-ml/jax/issues/26102
         import jax
+
+        if any(None in shape for shape in shapes):
+            msg = "Output shape must be fully known when running inside jax.jit"
+            raise ValueError(msg)
 
         # Shield eager kwargs from being coerced into JAX arrays.
         # jax.pure_callback calls jax.jit under the hood, but without the chance of
