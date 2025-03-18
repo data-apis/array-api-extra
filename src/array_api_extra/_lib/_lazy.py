@@ -338,8 +338,6 @@ def _lazy_apply_wrapper(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR0
     def wrapper(  # type: ignore[no-any-decorated,no-any-explicit]
         *args: Array | complex | None, **kwargs: Any
     ) -> tuple[Array, ...]:  # numpydoc ignore=GL08
-        import numpy as np
-
         args_list = []
         device = None
         for arg in args:
@@ -347,6 +345,8 @@ def _lazy_apply_wrapper(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR0
                 if device is None:
                     device = _compat.device(arg)
                 if as_numpy:
+                    import numpy as np
+
                     arg = cast(Array, np.asarray(arg))  # type: ignore[bad-cast]  # noqa: PLW2901  # pyright: ignore[reportInvalidCast]
             args_list.append(arg)
         assert device is not None
