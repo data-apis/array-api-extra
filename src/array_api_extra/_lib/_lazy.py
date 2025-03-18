@@ -28,7 +28,7 @@ if TYPE_CHECKING:  # pragma: no cover
     import numpy as np
     from numpy.typing import ArrayLike
 
-    NumPyObject: TypeAlias = np.ndarray[Any, Any] | np.generic  # type: ignore[no-any-explicit]
+    NumPyObject: TypeAlias = np.ndarray[Any, Any] | np.generic  # type: ignore[explicit-any]
     P = ParamSpec("P")
 else:
     # Sphinx hacks
@@ -40,7 +40,7 @@ else:
 
 
 @overload
-def lazy_apply(  # type: ignore[valid-type]
+def lazy_apply(  # type: ignore[decorated-any, valid-type]
     func: Callable[P, Array | ArrayLike],
     *args: Array | complex | None,
     shape: tuple[int | None, ...] | None = None,
@@ -52,7 +52,7 @@ def lazy_apply(  # type: ignore[valid-type]
 
 
 @overload
-def lazy_apply(  # type: ignore[valid-type]
+def lazy_apply(  # type: ignore[decorated-any, valid-type]
     func: Callable[P, Sequence[Array | ArrayLike]],
     *args: Array | complex | None,
     shape: Sequence[tuple[int | None, ...]],
@@ -244,7 +244,7 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     if is_dask_namespace(xp):
         import dask
 
-        metas: list[Array] = [arg._meta for arg in array_args]  # type: ignore[attr-defined]  # pylint: disable=protected-access    # pyright: ignore[reportAttributeAccessIssue]
+        metas: list[Array] = [arg._meta for arg in array_args]  # pylint: disable=protected-access    # pyright: ignore[reportAttributeAccessIssue]
         meta_xp = array_namespace(*metas)
 
         wrapped = dask.delayed(  # type: ignore[attr-defined]  # pyright: ignore[reportPrivateImportUsage]
@@ -317,7 +317,7 @@ def _is_jax_jit_enabled(xp: ModuleType) -> bool:  # numpydoc ignore=PR01,RT01
         return True
 
 
-def _lazy_apply_wrapper(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR01,RT01
+def _lazy_apply_wrapper(  # type: ignore[explicit-any]  # numpydoc ignore=PR01,RT01
     func: Callable[..., Array | ArrayLike | Sequence[Array | ArrayLike]],
     as_numpy: bool,
     multi_output: bool,
@@ -335,7 +335,7 @@ def _lazy_apply_wrapper(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR0
 
     # On Dask, @wraps causes the graph key to contain the wrapped function's name
     @wraps(func)
-    def wrapper(  # type: ignore[no-any-decorated,no-any-explicit]
+    def wrapper(  # type: ignore[decorated-any,explicit-any]
         *args: Array | complex | None, **kwargs: Any
     ) -> tuple[Array, ...]:  # numpydoc ignore=GL08
         args_list = []

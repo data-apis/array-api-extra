@@ -15,7 +15,7 @@ from array_api_extra._lib._utils._compat import (
 from array_api_extra._lib._utils._typing import Array
 from array_api_extra.testing import lazy_xp_function
 
-# mypy: disable-error-code=no-any-decorated
+# mypy: disable-error-code=decorated-any
 # pyright: reportUnknownParameterType=false,reportMissingParameterType=false
 
 param_assert_equal_close = pytest.mark.parametrize(
@@ -31,7 +31,7 @@ param_assert_equal_close = pytest.mark.parametrize(
 
 
 @param_assert_equal_close
-def test_assert_close_equal_basic(xp: ModuleType, func: Callable[..., None]):  # type: ignore[no-any-explicit]
+def test_assert_close_equal_basic(xp: ModuleType, func: Callable[..., None]):  # type: ignore[explicit-any]
     func(xp.asarray(0), xp.asarray(0))
     func(xp.asarray([1, 2]), xp.asarray([1, 2]))
 
@@ -51,7 +51,7 @@ def test_assert_close_equal_basic(xp: ModuleType, func: Callable[..., None]):  #
 @pytest.mark.skip_xp_backend(Backend.NUMPY, reason="test other ns vs. numpy")
 @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="test other ns vs. numpy")
 @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close])
-def test_assert_close_equal_namespace(xp: ModuleType, func: Callable[..., None]):  # type: ignore[no-any-explicit]
+def test_assert_close_equal_namespace(xp: ModuleType, func: Callable[..., None]):  # type: ignore[explicit-any]
     with pytest.raises(AssertionError, match="namespaces do not match"):
         func(xp.asarray(0), np.asarray(0))
     with pytest.raises(TypeError, match="Unrecognized array input"):
@@ -73,7 +73,7 @@ def test_assert_close_tolerance(xp: ModuleType):
 
 @param_assert_equal_close
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
-def test_assert_close_equal_none_shape(xp: ModuleType, func: Callable[..., None]):  # type: ignore[no-any-explicit]
+def test_assert_close_equal_none_shape(xp: ModuleType, func: Callable[..., None]):  # type: ignore[explicit-any]
     """On dask and other lazy backends, test that a shape with NaN's or None's
     can be compared to a real shape.
     """
@@ -196,7 +196,7 @@ lazy_xp_function(static_params3, static_argnums=1, static_argnames="flag")
 
 
 @pytest.mark.parametrize("func", [static_params1, static_params2, static_params3])
-def test_lazy_xp_function_static_params(xp: ModuleType, func: Callable[..., Array]):  # type: ignore[no-any-explicit]
+def test_lazy_xp_function_static_params(xp: ModuleType, func: Callable[..., Array]):  # type: ignore[explicit-any]
     x = xp.asarray([1.0, 2.0])
     xp_assert_equal(func(x, 1), xp.asarray([3.0, 6.0]))
     xp_assert_equal(func(x, 1, True), xp.asarray([2.0, 4.0]))

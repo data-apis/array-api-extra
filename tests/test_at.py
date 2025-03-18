@@ -56,7 +56,7 @@ def _at_op(
     """jitted helper of at_op"""
     if idx_pickle:
         idx = pickle.loads(idx_pickle)
-    meth = cast(Callable[..., Array], getattr(at(x, cast(SetIndex, idx)), op.value))  # type: ignore[no-any-explicit]
+    meth = cast(Callable[..., Array], getattr(at(x, cast(SetIndex, idx)), op.value))  # type: ignore[explicit-any]
     return meth(y, copy=copy, xp=xp)
 
 
@@ -166,7 +166,7 @@ def test_copy_default(xp: ModuleType, library: Backend, op: _AtOp):
     """
     x = xp.asarray([1.0, 10.0, 20.0])
     expect_copy = not is_writeable_array(x)
-    meth = cast(Callable[..., Array], getattr(at(x)[:2], op.value))  # type: ignore[no-any-explicit]
+    meth = cast(Callable[..., Array], getattr(at(x)[:2], op.value))  # type: ignore[explicit-any]
     with assert_copy(x, None, expect_copy):
         _ = meth(2.0)
 
@@ -175,7 +175,7 @@ def test_copy_default(xp: ModuleType, library: Backend, op: _AtOp):
     # even if the arrays are writeable.
     expect_copy = not is_writeable_array(x) or library is Backend.DASK
     idx = xp.asarray([True, True, False])
-    meth = cast(Callable[..., Array], getattr(at(x, idx), op.value))  # type: ignore[no-any-explicit]
+    meth = cast(Callable[..., Array], getattr(at(x, idx), op.value))  # type: ignore[explicit-any]
     with assert_copy(x, None, expect_copy):
         _ = meth(2.0)
 

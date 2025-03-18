@@ -203,7 +203,7 @@ class TestApplyWhere:
         p=st.floats(min_value=0, max_value=1),
         data=st.data(),
     )
-    def test_hypothesis(  # type: ignore[no-any-explicit,no-any-decorated]
+    def test_hypothesis(  # type: ignore[explicit-any,decorated-any]
         self,
         n_arrays: int,
         rng_seed: int,

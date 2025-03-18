@@ -424,6 +424,6 @@ def test_invalid_args():
     with pytest.raises(ValueError, match="multiple shapes but only one dtype"):
         _ = lazy_apply(f, x, shape=[(1,), (2,)], dtype=np.int32)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
     with pytest.raises(ValueError, match="single shape but multiple dtypes"):
-        _ = lazy_apply(f, x, shape=(1,), dtype=[np.int32, np.int64])  # type: ignore[call-overload]
+        _ = lazy_apply(f, x, shape=(1,), dtype=[np.int32, np.int64])
     with pytest.raises(ValueError, match="2 shapes and 1 dtypes"):
-        _ = lazy_apply(f, x, shape=[(1,), (2,)], dtype=[np.int32])  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
+        _ = lazy_apply(f, x, shape=[(1,), (2,)], dtype=[np.int32])  # type: ignore[arg-type]  # pyright: ignore[reportCallIssue,reportArgumentType]
