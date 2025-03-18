@@ -13,11 +13,10 @@ from ._funcs import broadcast_shapes
 from ._utils import _compat
 from ._utils._compat import (
     array_namespace,
-    is_array_api_obj,
     is_dask_namespace,
-    is_jax_array,
     is_jax_namespace,
 )
+from ._utils._helpers import is_python_scalar
 from ._utils._typing import Array, DType
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -43,7 +42,7 @@ else:
 @overload
 def lazy_apply(  # type: ignore[valid-type]
     func: Callable[P, Array | ArrayLike],
-    *args: Array,
+    *args: Array | complex | None,
     shape: tuple[int | None, ...] | None = None,
     dtype: DType | None = None,
     as_numpy: bool = False,
@@ -55,7 +54,7 @@ def lazy_apply(  # type: ignore[valid-type]
 @overload
 def lazy_apply(  # type: ignore[valid-type]
     func: Callable[P, Sequence[Array | ArrayLike]],
-    *args: Array,
+    *args: Array | complex | None,
     shape: Sequence[tuple[int | None, ...]],
     dtype: Sequence[DType] | None = None,
     as_numpy: bool = False,
@@ -66,7 +65,7 @@ def lazy_apply(  # type: ignore[valid-type]
 
 def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     func: Callable[P, Array | ArrayLike | Sequence[Array | ArrayLike]],
-    *args: Array,
+    *args: Array | complex | None,
     shape: tuple[int | None, ...] | Sequence[tuple[int | None, ...]] | None = None,
     dtype: DType | Sequence[DType] | None = None,
     as_numpy: bool = False,
@@ -92,11 +91,12 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
 
         `func` must be a pure function, i.e. without side effects, as depending on the
         backend it may be executed more than once or never.
-    *args : Array
-        One or more Array API compliant arrays.
+    *args : Array | int | float | complex | bool | None
+        One or more Array API compliant arrays, Python scalars, or None's.
 
-        If `as_numpy=True`, you need to be able to apply :func:`numpy.asarray` to them
-        to convert them to numpy; read notes below about specific backends.
+        If `as_numpy=True`, you need to be able to apply :func:`numpy.asarray` to
+        non-None args to convert them to numpy; read notes below about specific
+        backends.
     shape : tuple[int | None, ...] | Sequence[tuple[int | None, ...]], optional
         Output shape or sequence of output shapes, one for each output of `func`.
         Default: assume single output and broadcast shapes of the input arrays.
@@ -113,7 +113,7 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         The standard-compatible namespace for `args`. Default: infer.
     **kwargs : Any, optional
         Additional keyword arguments to pass verbatim to `func`.
-        Any array objects in them will be converted to numpy when ``as_numpy=True``.
+        They cannot contain Array objects.
 
     Returns
     -------
@@ -196,7 +196,9 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     dask.array.map_overlap
     dask.array.blockwise
     """
-    if not args:
+    args_not_none = [arg for arg in args if arg is not None]
+    array_args = [arg for arg in args_not_none if not is_python_scalar(arg)]
+    if not array_args:
         msg = "Must have at least one argument array"
         raise ValueError(msg)
     if xp is None:
@@ -208,7 +210,7 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     multi_output = False
 
     if shape is None:
-        shapes = [broadcast_shapes(*(arg.shape for arg in args))]
+        shapes = [broadcast_shapes(*(arg.shape for arg in array_args))]
     elif all(isinstance(s, int | None) for s in shape):
         # Do not test for shape to be a tuple
         # https://github.com/data-apis/array-api/issues/891#issuecomment-2637430522
@@ -218,7 +220,7 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
         multi_output = True
 
     if dtype is None:
-        dtypes = [xp.result_type(*args)] * len(shapes)
+        dtypes = [xp.result_type(*args_not_none)] * len(shapes)
     elif multi_output:
         if not isinstance(dtype, Sequence):
             msg = "Got multiple shapes but only one dtype"
@@ -242,7 +244,7 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     if is_dask_namespace(xp):
         import dask
 
-        metas: list[Array] = [arg._meta for arg in args if hasattr(arg, "_meta")]  # pylint: disable=protected-access  # pyright: ignore[reportAttributeAccessIssue]
+        metas: list[Array] = [arg._meta for arg in array_args]  # type: ignore[attr-defined]  # pylint: disable=protected-access    # pyright: ignore[reportAttributeAccessIssue]
         meta_xp = array_namespace(*metas)
 
         wrapped = dask.delayed(  # type: ignore[attr-defined]  # pyright: ignore[reportPrivateImportUsage]
@@ -276,20 +278,13 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
             msg = "Output shape must be fully known when running inside jax.jit"
             raise ValueError(msg)
 
-        # Shield eager kwargs from being coerced into JAX arrays.
+        # Shield kwargs from being coerced into JAX arrays.
         # jax.pure_callback calls jax.jit under the hood, but without the chance of
         # passing static_argnames / static_argnums.
-        lazy_kwargs = {}
-        eager_kwargs = {}
-        for k, v in kwargs.items():
-            if _contains_jax_arrays(v):
-                lazy_kwargs[k] = v
-            else:
-                eager_kwargs[k] = v
-
         wrapped = _lazy_apply_wrapper(
-            partial(func, **eager_kwargs), as_numpy, multi_output, xp
+            partial(func, **kwargs), as_numpy, multi_output, xp
         )
+
         # suppress unused-ignore to run mypy in -e lint as well as -e dev
         out = cast(  # type: ignore[bad-cast,unused-ignore]
             tuple[Array, ...],
@@ -300,7 +295,6 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
                     for shape, dtype in zip(shapes, dtypes, strict=True)
                 ),
                 *args,
-                **lazy_kwargs,
             ),
         )
 
@@ -323,54 +317,6 @@ def _is_jax_jit_enabled(xp: ModuleType) -> bool:  # numpydoc ignore=PR01,RT01
         return True
 
 
-def _contains_jax_arrays(x: object) -> bool:  # numpydoc ignore=PR01,RT01
-    """
-    Test if x is a JAX array or a nested collection with any JAX arrays in it.
-    """
-    seen = set()
-
-    def recursion(x: object) -> bool:  # numpydoc ignore=GL08
-        if id(x) in seen:
-            return False
-        seen.add(id(x))
-
-        if is_jax_array(x):
-            return True
-        if isinstance(x, list | tuple):
-            return any(recursion(i) for i in x)  # pyright: ignore[reportUnknownArgumentType]
-        if isinstance(x, dict):
-            return any(recursion(i) for i in x.values())  # pyright: ignore[reportUnknownArgumentType]
-        return False
-
-    return recursion(x)
-
-
-def _as_numpy(x: object) -> Any:  # type: ignore[no-any-explicit] # numpydoc ignore=PR01,RT01
-    """Recursively convert Array API objects in x to NumPy."""
-    import numpy as np  # pylint: disable=import-outside-toplevel
-
-    seen = set()
-
-    def recursion(x: Any) -> Any:  # type: ignore[no-any-explicit]  # numpydoc ignore=GL08
-        if is_array_api_obj(x):
-            return np.asarray(x)
-        if not isinstance(x, list | tuple | dict):
-            return x
-
-        if id(x) in seen:  # pyright: ignore[reportUnknownArgumentType]
-            return x  # Recursive collections can't contain arrays
-        seen.add(id(x))  # pyright: ignore[reportUnknownArgumentType]
-
-        if isinstance(x, list) or type(x) is tuple:  # pylint: disable=unidiomatic-typecheck  # pyright: ignore[reportUnknownArgumentType]
-            return type(x)(recursion(i) for i in x)  # pyright: ignore[reportUnknownArgumentType]
-        if isinstance(x, tuple):  # namedtuple
-            return type(x)(*(recursion(i) for i in x))  # pyright: ignore[reportUnknownArgumentType]
-        # dict
-        return {k: recursion(v) for k, v in x.items()}
-
-    return recursion(x)
-
-
 def _lazy_apply_wrapper(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR01,RT01
     func: Callable[..., Array | ArrayLike | Sequence[Array | ArrayLike]],
     as_numpy: bool,
@@ -390,14 +336,22 @@ def _lazy_apply_wrapper(  # type: ignore[no-any-explicit]  # numpydoc ignore=PR0
     # On Dask, @wraps causes the graph key to contain the wrapped function's name
     @wraps(func)
     def wrapper(  # type: ignore[no-any-decorated,no-any-explicit]
-        *args: Array, **kwargs: Any
+        *args: Array | complex | None, **kwargs: Any
     ) -> tuple[Array, ...]:  # numpydoc ignore=GL08
-        device = _compat.device(args[0]) if args else None
+        import numpy as np
 
-        if as_numpy:
-            args = _as_numpy(args)
-            kwargs = _as_numpy(kwargs)
-        out = func(*args, **kwargs)
+        args_list = []
+        device = None
+        for arg in args:
+            if arg is not None and not is_python_scalar(arg):
+                if device is None:
+                    device = _compat.device(arg)
+                if as_numpy:
+                    arg = cast(Array, np.asarray(arg))  # type: ignore[bad-cast]  # noqa: PLW2901  # pyright: ignore[reportInvalidCast]
+            args_list.append(arg)
+        assert device is not None
+
+        out = func(*args_list, **kwargs)
 
         if multi_output:
             assert isinstance(out, Sequence)

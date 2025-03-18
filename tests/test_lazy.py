@@ -1,5 +1,5 @@
 from types import ModuleType
-from typing import NamedTuple, cast
+from typing import cast
 
 import numpy as np
 import pytest
@@ -300,8 +300,19 @@ def test_lazy_apply_arraylike(xp: ModuleType):
     xp_assert_equal(actual2[1], xp.asarray([3]))
 
 
-class NT(NamedTuple):
-    a: Array
+def test_lazy_apply_scalars_and_nones(xp: ModuleType, library: Backend):
+    def f(x: Array, y: None, z: int | Array) -> Array:
+        mxp = array_namespace(x, y, z)
+        mtyp = type(mxp.asarray(0))
+        assert isinstance(x, mtyp)
+        assert y is None
+        # jax.pure_callback wraps scalar args
+        assert isinstance(z, mtyp if library is Backend.JAX else int)
+        return x + z
+
+    x = xp.asarray([1, 2])
+    w = lazy_apply(f, x, None, 3)
+    xp_assert_equal(w, x + 3)
 
 
 def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array:
@@ -312,7 +323,7 @@ def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array
 
     def eager(
         x: Array,
-        z: dict[str, list[Array] | tuple[Array, ...] | NT],
+        z: dict[int, list[int]],
         msg: str,
         msgs: list[str],
         scalar: int,
@@ -323,10 +334,7 @@ def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array
         assert int(x) == 0
         # Did we re-wrap the namedtuple correctly, or did it get
         # accidentally changed to a basic tuple?
-        assert isinstance(z["foo"], NT)
-        assert isinstance(z["foo"].a, expect_cls)
-        assert isinstance(z["bar"][0], expect_cls)  # list
-        assert isinstance(z["baz"][0], expect_cls)  # tuple
+        assert z == {0: [1, 2]}
         assert msg == "Hello World"  # must be hidden from JAX
         assert msgs[0] == "Hello World"  # must be hidden from JAX
         assert isinstance(msg, str)
@@ -342,9 +350,7 @@ def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array
     return xpx.lazy_apply(  # pyright: ignore[reportCallIssue]
         eager,
         x,
-        # These kwargs can and should be passed through jax.pure_callback
-        z={"foo": NT(x), "bar": [x], "baz": (x,)},
-        # These can't
+        z={0: [1, 2]},
         msg="Hello World",
         msgs=["Hello World"],
         # This will be automatically cast to jax.Array if we don't wrap it
@@ -409,13 +415,15 @@ def test_invalid_args():
 
     x = np.asarray(1)
 
-    with pytest.raises(ValueError, match="at least one argument"):
+    with pytest.raises(ValueError, match="at least one argument array"):
         _ = lazy_apply(f, shape=(1,), dtype=np.int32, xp=np)
-    with pytest.raises(ValueError, match="at least one argument"):
+    with pytest.raises(ValueError, match="at least one argument array"):
+        _ = lazy_apply(f, 1, shape=(1,), dtype=np.int32, xp=np)
+    with pytest.raises(ValueError, match="at least one argument array"):
         _ = lazy_apply(f, shape=(1,), dtype=np.int32)
     with pytest.raises(ValueError, match="multiple shapes but only one dtype"):
         _ = lazy_apply(f, x, shape=[(1,), (2,)], dtype=np.int32)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
     with pytest.raises(ValueError, match="single shape but multiple dtypes"):
-        _ = lazy_apply(f, x, shape=(1,), dtype=[np.int32, np.int64])  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
+        _ = lazy_apply(f, x, shape=(1,), dtype=[np.int32, np.int64])  # type: ignore[call-overload]
     with pytest.raises(ValueError, match="2 shapes and 1 dtypes"):
         _ = lazy_apply(f, x, shape=[(1,), (2,)], dtype=[np.int32])  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
