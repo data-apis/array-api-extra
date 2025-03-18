@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="array_api_extra.setdiff1d" href="array_api_extra.setdiff1d.html" /><link rel="prev" title="array_api_extra.nunique" href="array_api_extra.nunique.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="array_api_extra.at" href="array_api_extra.at.html" /><link rel="prev" title="API Reference" href="../api-reference.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>array_api_extra.pad - array-api-extra 0.7.0.dev0 documentation</title>
+        <title>array_api_extra.apply_where - array-api-extra 0.7.0.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -202,7 +202,7 @@
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">array-api-extra</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api-reference.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.apply_where.html">array_api_extra.apply_where</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.apply_where</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.at.html">array_api_extra.at</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.atleast_nd.html">array_api_extra.atleast_nd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.broadcast_shapes.html">array_api_extra.broadcast_shapes</a></li>
@@ -212,7 +212,7 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.isclose.html">array_api_extra.isclose</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.kron.html">array_api_extra.kron</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.nunique.html">array_api_extra.nunique</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.pad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.pad.html">array_api_extra.pad</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.setdiff1d.html">array_api_extra.setdiff1d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.sinc.html">array_api_extra.sinc</a></li>
 </ul>
@@ -244,12 +244,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.pad.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.apply_where.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.pad.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.apply_where.rst" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -268,35 +268,58 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="array-api-extra-pad">
-<h1>array_api_extra.pad<a class="headerlink" href="#array-api-extra-pad" title="Link to this heading">¶</a></h1>
+          <section id="array-api-extra-apply-where">
+<h1>array_api_extra.apply_where<a class="headerlink" href="#array-api-extra-apply-where" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.pad">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">pad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">constant_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.pad" title="Link to this definition">¶</a></dt>
-<dd><p>Pad the input array.</p>
+<dt class="sig sig-object py" id="array_api_extra.apply_where">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">apply_where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cond</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.apply_where" title="Link to this definition">¶</a></dt>
+<dd><p>Run one of two elementwise functions depending on a condition.</p>
+<p>Equivalent to <code class="docutils literal notranslate"><span class="pre">f1(*args)</span> <span class="pre">if</span> <span class="pre">cond</span> <span class="pre">else</span> <span class="pre">fill_value</span></code> performed elementwise
+when <cite>fill_value</cite> is defined, otherwise to <code class="docutils literal notranslate"><span class="pre">f1(*args)</span> <span class="pre">if</span> <span class="pre">cond</span> <span class="pre">else</span> <span class="pre">f2(*args)</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>array</em>) – Input array.</p></li>
-<li><p><strong>pad_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em> of </em><em>ints</em><em> or </em><em>sequence</em><em> of </em><em>pairs</em><em> of </em><em>ints</em>) – Pad the input array with this many elements from each side.
-If a sequence of tuples, <code class="docutils literal notranslate"><span class="pre">[(before_0,</span> <span class="pre">after_0),</span> <span class="pre">...</span> <span class="pre">(before_N,</span> <span class="pre">after_N)]</span></code>,
-each pair applies to the corresponding axis of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
-A single tuple, <code class="docutils literal notranslate"><span class="pre">(before,</span> <span class="pre">after)</span></code>, is equivalent to a list of <code class="docutils literal notranslate"><span class="pre">x.ndim</span></code>
-copies of this tuple.</p></li>
-<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – Only “constant” mode is currently supported, which pads with
-the value passed to <cite>constant_values</cite>.</p></li>
-<li><p><strong>constant_values</strong> (<em>python scalar</em><em>, </em><em>optional</em>) – Use this value to pad the input. Default is zero.</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>x</cite>. Default: infer.</p></li>
+<li><p><strong>cond</strong> (<em>array</em>) – The condition, expressed as a boolean array.</p></li>
+<li><p><strong>args</strong> (<em>Array</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em> of </em><em>Arrays</em>) – Argument(s) to <cite>f1</cite> (and <cite>f2</cite>). Must be broadcastable with <cite>cond</cite>.</p></li>
+<li><p><strong>f1</strong> (<em>callable</em>) – Elementwise function of <cite>args</cite>, returning a single array.
+Where <cite>cond</cite> is True, output will be <code class="docutils literal notranslate"><span class="pre">f1(arg0[cond],</span> <span class="pre">arg1[cond],</span> <span class="pre">...)</span></code>.</p></li>
+<li><p><strong>f2</strong> (<em>callable</em><em>, </em><em>optional</em>) – Elementwise function of <cite>args</cite>, returning a single array.
+Where <cite>cond</cite> is False, output will be <code class="docutils literal notranslate"><span class="pre">f2(arg0[cond],</span> <span class="pre">arg1[cond],</span> <span class="pre">...)</span></code>.
+Mutually exclusive with <cite>fill_value</cite>.</p></li>
+<li><p><strong>fill_value</strong> (<em>Array</em><em> or </em><em>scalar</em><em>, </em><em>optional</em>) – If provided, value with which to fill output array where <cite>cond</cite> is False.
+It does not need to be scalar; it needs however to be broadcastable with
+<cite>cond</cite> and <cite>args</cite>.
+Mutually exclusive with <cite>f2</cite>. You must provide one or the other.</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>cond</cite> and <cite>args</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The input array,
-padded with <code class="docutils literal notranslate"><span class="pre">pad_width</span></code> elements equal to <code class="docutils literal notranslate"><span class="pre">constant_values</span></code>.</p>
+<dd class="field-even"><p>An array with elements from the output of <cite>f1</cite> where <cite>cond</cite> is True and either
+the output of <cite>f2</cite> or <cite>fill_value</cite> where <cite>cond</cite> is False. The returned array has
+data type determined by type promotion rules between the output of <cite>f1</cite> and
+either <cite>fill_value</cite> or the output of <cite>f2</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p>Array</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p><code class="docutils literal notranslate"><span class="pre">xp.where(cond,</span> <span class="pre">f1(*args),</span> <span class="pre">f2(*args))</span></code> requires explicitly evaluating <cite>f1</cite> even
+when <cite>cond</cite> is False, and <cite>f2</cite> when cond is True. This function evaluates each
+function only for their matching condition, if the backend allows for it.</p>
+<p>On Dask, <cite>f1</cite> and <cite>f2</cite> are applied to the individual chunks and should use functions
+from the namespace of the chunks.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_strict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">a</span> <span class="o">//</span> <span class="n">b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">apply_where</span><span class="p">(</span><span class="n">b</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">f</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="go">array([ nan,  2., 1.])</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -306,23 +329,23 @@ padded with <code class="docutils literal notranslate"><span class="pre">pad_wid
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="array_api_extra.setdiff1d.html">
+          <a class="next-page" href="array_api_extra.at.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">array_api_extra.setdiff1d</div>
+                <div class="title">array_api_extra.at</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.nunique.html">
+          <a class="prev-page" href="../api-reference.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">array_api_extra.nunique</div>
+                <div class="title">API Reference</div>
                 
               </div>
             </a>
@@ -363,8 +386,8 @@ padded with <code class="docutils literal notranslate"><span class="pre">pad_wid
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">array_api_extra.pad</a><ul>
-<li><a class="reference internal" href="#array_api_extra.pad"><code class="docutils literal notranslate"><span class="pre">pad()</span></code></a></li>
+<li><a class="reference internal" href="#">array_api_extra.apply_where</a><ul>
+<li><a class="reference internal" href="#array_api_extra.apply_where"><code class="docutils literal notranslate"><span class="pre">apply_where()</span></code></a></li>
 </ul>
 </li>
 </ul>
