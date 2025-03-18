@@ -48,6 +48,9 @@ lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp
 lazy_xp_function(sinc, static_argnames="xp")
 
 
+@pytest.mark.skip_xp_backend(
+    Backend.SPARSE, reason="read-only backend without .at support"
+)
 class TestApplyWhere:
     @staticmethod
     def f1(x: Array, y: Array | int = 10) -> Array:
@@ -57,7 +60,6 @@ class TestApplyWhere:
     def f2(x: Array, y: Array | int = 10) -> Array:
         return x - y
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
     def test_f1_f2(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3, 4])
         cond = x % 2 == 0
@@ -65,7 +67,6 @@ class TestApplyWhere:
         expect = xp.where(cond, self.f1(x), self.f2(x))
         xp_assert_equal(actual, expect)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
     def test_fill_value(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3, 4])
         cond = x % 2 == 0
@@ -76,7 +77,6 @@ class TestApplyWhere:
         actual = apply_where(x % 2 == 0, x, self.f1, fill_value=xp.asarray(0))
         xp_assert_equal(actual, expect)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
     def test_args_tuple(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3, 4])
         y = xp.asarray([10, 20, 30, 40])
@@ -85,7 +85,6 @@ class TestApplyWhere:
         expect = xp.where(cond, self.f1(x, y), self.f2(x, y))
         xp_assert_equal(actual, expect)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
     def test_broadcast(self, xp: ModuleType):
         x = xp.asarray([1, 2])
         y = xp.asarray([[10], [20], [30]])
@@ -109,7 +108,6 @@ class TestApplyWhere:
         expect = xp.where(cond, self.f1(x), y)
         xp_assert_equal(actual, expect)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
     def test_dtype_propagation(self, xp: ModuleType, library: Backend):
         x = xp.asarray([1, 2], dtype=xp.int8)
         y = xp.asarray([3, 4], dtype=xp.int16)
@@ -127,7 +125,6 @@ class TestApplyWhere:
         actual = apply_where(cond, y, self.f1, fill_value=5)
         assert actual.dtype == xp.int16
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
     @pytest.mark.parametrize("fill_value_raw", [3, [3, 4]])
     @pytest.mark.parametrize(
         ("fill_value_dtype", "expect_dtype"), [("int32", "int32"), ("int8", "int16")]
@@ -146,7 +143,6 @@ class TestApplyWhere:
         actual = apply_where(cond, x, self.f1, fill_value=fill_value)
         assert actual.dtype == getattr(xp, expect_dtype)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
     def test_dont_overwrite_fill_value(self, xp: ModuleType):
         x = xp.asarray([1, 2])
         fill_value = xp.asarray([100, 200])
@@ -154,7 +150,6 @@ class TestApplyWhere:
         xp_assert_equal(actual, xp.asarray([100, 12]))
         xp_assert_equal(fill_value, xp.asarray([100, 200]))
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
     def test_dont_run_on_false(self, xp: ModuleType):
         x = xp.asarray([1.0, 2.0, 0.0])
         y = xp.asarray([0.0, 3.0, 4.0])
@@ -178,7 +173,6 @@ class TestApplyWhere:
             apply_where(cond, x, self.f1, self.f2, fill_value=0)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue]
 
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
     def test_xp(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3, 4])
         cond = x % 2 == 0
@@ -186,7 +180,6 @@ class TestApplyWhere:
         expect = xp.where(cond, self.f1(x), self.f2(x))
         xp_assert_equal(actual, expect)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="read-only without .at")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3, 4], device=device)
         y = apply_where(x % 2 == 0, x, self.f1, self.f2)
@@ -196,8 +189,6 @@ class TestApplyWhere:
         y = apply_where(x % 2 == 0, x, self.f1, fill_value=x)
         assert get_device(y) == device
 
-    # skip instead of xfail in order not to waste time
-    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="read-only without .at")
     @pytest.mark.filterwarnings("ignore::RuntimeWarning")  # overflows, etc.
     @hypothesis.settings(  # pyright: ignore[reportArgumentType]
         # The xp and library fixtures are not regenerated between hypothesis iterations
