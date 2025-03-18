@@ -26,10 +26,8 @@ np_compat = array_namespace(np.empty(0))  # type: ignore[arg-type]  # pyright: i
 lazy_xp_function(in1d, jax_jit=False, static_argnames=("assume_unique", "invert", "xp"))
 
 
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no unique_inverse")
 class TestIn1D:
-    @pytest.mark.xfail_xp_backend(
-        Backend.SPARSE, reason="no unique_inverse, no device kwarg in asarray()"
-    )
     # cover both code paths
     @pytest.mark.parametrize(
         "n",
@@ -51,19 +49,15 @@ class TestIn1D:
         actual = in1d(x1, x2)
         xp_assert_equal(actual, expected)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in asarray")
     def test_device(self, xp: ModuleType, device: Device):
         x1 = xp.asarray([3, 8, 20], device=device)
         x2 = xp.asarray([2, 3, 4], device=device)
         assert get_device(in1d(x1, x2)) == device
 
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
-    @pytest.mark.xfail_xp_backend(
-        Backend.SPARSE, reason="no arange, no device kwarg in asarray"
-    )
     def test_xp(self, xp: ModuleType):
         x1 = xp.asarray([1, 6])
-        x2 = xp.arange(5)
+        x2 = xp.asarray([0, 1, 2, 3, 4])
         expected = xp.asarray([True, False])
         actual = in1d(x1, x2, xp=xp)
         xp_assert_equal(actual, expected)
@@ -99,7 +93,7 @@ class TestAsArrays:
         ],
     )
     def test_array_vs_scalar(
-        self, dtype: str, b: int | float | complex, defined: bool, xp: ModuleType
+        self, dtype: str, b: complex, defined: bool, xp: ModuleType
     ):
         a = xp.asarray(1, dtype=getattr(xp, dtype))
 
@@ -167,7 +161,7 @@ def test_ndindex(shape: tuple[int, ...]):
     assert tuple(ndindex(*shape)) == tuple(np.ndindex(*shape))
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
 def test_eager_shape(xp: ModuleType, library: Backend):
     a = xp.asarray([1, 2, 3])
     # Lazy arrays, like Dask, have an eager shape until you slice them with

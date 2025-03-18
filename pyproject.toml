@@ -126,22 +126,21 @@ python = "~=3.10.0"
 python = "~=3.13.0"
 
 # Backends that can run on CPU-only hosts
-[tool.pixi.feature.backends.target.linux-64.dependencies]
+[tool.pixi.feature.backends.dependencies]
 pytorch = "*"
 dask = "*"
-sparse = ">=0.15"
+numba = "*"  # sparse dependency
+
+[tool.pixi.feature.backends.pypi-dependencies]
+sparse = { version = ">= 0.16.0b3" }
+
+[tool.pixi.feature.backends.target.linux-64.dependencies]
 jax = "*"
 
 [tool.pixi.feature.backends.target.osx-arm64.dependencies]
-pytorch = "*"
-dask = "*"
-sparse = ">=0.15"
 jax = "*"
 
 [tool.pixi.feature.backends.target.win-64.dependencies]
-pytorch = "*"
-dask = "*"
-sparse = ">=0.15"
 # jax = "*"  # unavailable
 
 # Backends that require a GPU host and a CUDA driver

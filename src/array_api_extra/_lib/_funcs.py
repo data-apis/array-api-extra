@@ -726,7 +726,7 @@ def pad(
     x: Array,
     pad_width: int | tuple[int, int] | Sequence[tuple[int, int]],
     *,
-    constant_values: bool | int | float | complex = 0,
+    constant_values: complex = 0,
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
