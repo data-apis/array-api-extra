@@ -277,18 +277,7 @@ def test_bool_mask_nd(xp: ModuleType):
     xp_assert_equal(z, xp.asarray([[0, 2, 3], [4, 0, 0]]))
 
 
-@pytest.mark.parametrize(
-    "bool_mask",
-    [
-        False,
-        pytest.param(
-            True,
-            marks=pytest.mark.xfail_xp_backend(
-                Backend.DASK, reason="FIXME need scipy's lazywhere"
-            ),
-        ),
-    ],
-)
+@pytest.mark.parametrize("bool_mask", [False, True])
 def test_no_inf_warnings(xp: ModuleType, bool_mask: bool):
     x = xp.asarray([math.inf, 1.0, 2.0])
     idx = ~xp.isinf(x) if bool_mask else slice(1, None)

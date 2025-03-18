@@ -15,6 +15,7 @@ from ._utils._compat import (
     is_jax_array,
     is_writeable_array,
 )
+from ._utils._helpers import meta_namespace
 from ._utils._typing import Array, SetIndex
 
 
@@ -263,6 +264,8 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         Array
             Updated `x`.
         """
+        from ._funcs import apply_where  # pylint: disable=cyclic-import
+
         x, idx = self._x, self._idx
         xp = array_namespace(x, y) if xp is None else xp
 
@@ -295,8 +298,10 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             y_xp = xp.asarray(y, dtype=x.dtype)
             if y_xp.ndim == 0:
                 if out_of_place_op:  # add(), subtract(), ...
-                    # FIXME: suppress inf warnings on dask with lazywhere
-                    out = xp.where(idx, out_of_place_op(x, y_xp), x)
+                    # suppress inf warnings on Dask
+                    out = apply_where(
+                        idx, (x, y_xp), out_of_place_op, fill_value=x, xp=xp
+                    )
                     # Undo int->float promotion on JAX after _AtOp.DIVIDE
                     out = xp.astype(out, x.dtype, copy=False)
                 else:  # set()
@@ -420,9 +425,16 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] = minimum(x[idx], y)`` and return the updated array."""
+        # On Dask, this function runs on the chunks, so we need to determine the
+        # namespace that Dask is wrapping.
+        # Note that da.minimum _incidentally_ works on numpy, cupy, and sparse
+        # thanks to all these meta-namespaces implementing the __array_ufunc__
+        # interface, but there's no guarantee that it will work for other
+        # wrapped libraries in the future.
         xp = array_namespace(self._x) if xp is None else xp
+        mxp = meta_namespace(self._x, xp=xp)
         y = xp.asarray(y)
-        return self._op(_AtOp.MIN, xp.minimum, xp.minimum, y, copy=copy, xp=xp)
+        return self._op(_AtOp.MIN, mxp.minimum, mxp.minimum, y, copy=copy, xp=xp)
 
     def max(
         self,
@@ -432,6 +444,8 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] = maximum(x[idx], y)`` and return the updated array."""
+        # See note on min()
         xp = array_namespace(self._x) if xp is None else xp
+        mxp = meta_namespace(self._x, xp=xp)
         y = xp.asarray(y)
-        return self._op(_AtOp.MAX, xp.maximum, xp.maximum, y, copy=copy, xp=xp)
+        return self._op(_AtOp.MAX, mxp.maximum, mxp.maximum, y, copy=copy, xp=xp)

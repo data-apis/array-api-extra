@@ -3,6 +3,7 @@
 from ._delegation import isclose, pad
 from ._lib._at import at
 from ._lib._funcs import (
+    apply_where,
     atleast_nd,
     broadcast_shapes,
     cov,
@@ -20,6 +21,7 @@ __version__ = "0.7.0.dev0"
 # pylint: disable=duplicate-code
 __all__ = [
     "__version__",
+    "apply_where",
     "at",
     "atleast_nd",
     "broadcast_shapes",
