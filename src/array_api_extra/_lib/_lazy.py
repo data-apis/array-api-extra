@@ -107,7 +107,7 @@ def lazy_apply(  # type: ignore[valid-type]  # numpydoc ignore=GL07,SA04
     as_numpy : bool, optional
         If True, convert the input arrays to NumPy before passing them to `func`.
         This is particularly useful to make numpy-only functions, e.g. written in Cython
-        or Numba, work transparently API arrays.
+       or Numba, work transparently with array API-compliant arrays.
         Default: False.
     xp : array_namespace, optional
         The standard-compatible namespace for `args`. Default: infer.
