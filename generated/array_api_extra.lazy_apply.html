@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Contributing" href="../contributing.html" /><link rel="prev" title="array_api_extra.testing.lazy_xp_function" href="array_api_extra.testing.lazy_xp_function.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="array_api_extra.testing.lazy_xp_function" href="array_api_extra.testing.lazy_xp_function.html" /><link rel="prev" title="Tools for lazy backends" href="../api-lazy.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>array_api_extra.testing.patch_lazy_xp_functions - array-api-extra 0.7.0.dev0 documentation</title>
+        <title>array_api_extra.lazy_apply - array-api-extra 0.7.0.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -218,9 +218,9 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api-lazy.html">Tools for lazy backends</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Tools for lazy backends</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.lazy_apply.html">array_api_extra.lazy_apply</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.lazy_apply</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html">array_api_extra.testing.lazy_xp_function</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.testing.patch_lazy_xp_functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.patch_lazy_xp_functions.html">array_api_extra.testing.patch_lazy_xp_functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
@@ -245,12 +245,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.testing.patch_lazy_xp_functions.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.lazy_apply.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.testing.patch_lazy_xp_functions.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.lazy_apply.rst" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -269,48 +269,117 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="array-api-extra-testing-patch-lazy-xp-functions">
-<h1>array_api_extra.testing.patch_lazy_xp_functions<a class="headerlink" href="#array-api-extra-testing-patch-lazy-xp-functions" title="Link to this heading">¶</a></h1>
+          <section id="array-api-extra-lazy-apply">
+<h1>array_api_extra.lazy_apply<a class="headerlink" href="#array-api-extra-lazy-apply" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.testing.patch_lazy_xp_functions">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.testing.</span></span><span class="sig-name descname"><span class="pre">patch_lazy_xp_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monkeypatch</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.testing.patch_lazy_xp_functions" title="Link to this definition">¶</a></dt>
-<dd><p>Test lazy execution of functions tagged with <a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-func docutils literal notranslate"><span class="pre">lazy_xp_function()</span></code></a>.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">xp==jax.numpy</span></code>, search for all functions which have been tagged with
-<a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-func docutils literal notranslate"><span class="pre">lazy_xp_function()</span></code></a> in the globals of the module that defines the current test,
-as well as in the <code class="docutils literal notranslate"><span class="pre">lazy_xp_modules</span></code> list in the globals of the same module,
-and wrap them with <a class="reference external" href="https://docs.jax.dev/en/latest/_autosummary/jax.jit.html#jax.jit" title="(in JAX)"><code class="xref py py-func docutils literal notranslate"><span class="pre">jax.jit()</span></code></a>. Unwrap them at the end of the test.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">xp==dask.array</span></code>, wrap the functions with a decorator that disables
-<code class="docutils literal notranslate"><span class="pre">compute()</span></code> and <code class="docutils literal notranslate"><span class="pre">persist()</span></code> and ensures that exceptions and warnings are raised
-eagerly.</p>
-<p>This function should be typically called by your library’s <cite>xp</cite> fixture that runs
-tests on multiple backends:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="n">numpy</span><span class="p">,</span> <span class="n">array_api_strict</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">numpy</span><span class="p">,</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="p">])</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">xp</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">monkeypatch</span><span class="p">):</span>
-    <span class="n">patch_lazy_xp_functions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">monkeypatch</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">param</span>
-</pre></div>
-</div>
-<p>but it can be otherwise be called by the test itself too.</p>
+<dt class="sig sig-object py" id="array_api_extra.lazy_apply">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">lazy_apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_numpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.lazy_apply" title="Link to this definition">¶</a></dt>
+<dd><p>Lazily apply an eager function.</p>
+<p>If the backend of the input arrays is lazy, e.g. Dask or jitted JAX, the execution
+of the function is delayed until the graph is materialized; if it’s eager, the
+function is executed immediately.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>request</strong> (<em>pytest.FixtureRequest</em>) – Pytest fixture, as acquired by the test itself or by one of its fixtures.</p></li>
-<li><p><strong>monkeypatch</strong> (<em>pytest.MonkeyPatch</em>) – Pytest fixture, as acquired by the test itself or by one of its fixtures.</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em>) – Array namespace to be tested.</p></li>
+<li><p><strong>func</strong> (<em>callable</em>) – <p>The function to apply.</p>
+<p>It must accept one or more array API compliant arrays as positional arguments.
+If <cite>as_numpy=True</cite>, inputs are converted to NumPy before they are passed to
+<cite>func</cite>.
+It must return either a single array-like or a sequence of array-likes.</p>
+<p><cite>func</cite> must be a pure function, i.e. without side effects, as depending on the
+backend it may be executed more than once or never.</p>
+</p></li>
+<li><p><strong>*args</strong> (<em>Array</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.13)"><em>complex</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em> | </em><em>None</em>) – <p>One or more Array API compliant arrays, Python scalars, or None’s.</p>
+<p>If <cite>as_numpy=True</cite>, you need to be able to apply <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="(in NumPy v2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.asarray()</span></code></a> to
+non-None args to convert them to numpy; read notes below about specific
+backends.</p>
+</p></li>
+<li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em><em>, </em><em>...</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em><em>, </em><em>...</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – Output shape or sequence of output shapes, one for each output of <cite>func</cite>.
+Default: assume single output and broadcast shapes of the input arrays.</p></li>
+<li><p><strong>dtype</strong> (<em>DType</em><em> | </em><em>Sequence</em><em>[</em><em>DType</em><em>]</em><em>, </em><em>optional</em>) – Output dtype or sequence of output dtypes, one for each output of <cite>func</cite>.
+dtype(s) must belong to the same array namespace as the input arrays.
+Default: infer the result type(s) from the input arrays.</p></li>
+<li><p><strong>as_numpy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>If True, convert the input arrays to NumPy before passing them to <cite>func</cite>.</dt><dd><p>This is particularly useful to make numpy-only functions, e.g. written in Cython</p>
+</dd>
+<dt>or Numba, work transparently with array API-compliant arrays.</dt><dd><p>Default: False.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>args</cite>. Default: infer.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass verbatim to <cite>func</cite>.
+They cannot contain Array objects.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result(s) of <cite>func</cite> applied to the input arrays, wrapped in the same
+array namespace as the inputs.
+If shape is omitted or a single <cite>tuple[int | None, …]</cite>, return a single array.
+Otherwise, return a tuple of arrays.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Array | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[Array, …]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl>
+<dt>JAX</dt><dd><p>This allows applying eager functions to jitted JAX arrays, which are lazy.
+The function won’t be applied until the JAX array is materialized.
+When running inside <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>, <cite>shape</cite> must be fully known, i.e. it cannot
+contain any <cite>None</cite> elements.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><cite>func</cite> must never raise inside <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>, as the resulting behavior is
+undefined.</p>
+</div>
+<p>Using this with <cite>as_numpy=False</cite> is particularly useful to apply non-jittable
+JAX functions to arrays on GPU devices.
+If <code class="docutils literal notranslate"><span class="pre">as_numpy=True</span></code>, the <a class="reference external" href="https://docs.jax.dev/en/latest/transfer_guard.html" title="(in JAX)"><span>Transfer guard</span></a> may prevent arrays on a GPU
+device from being transferred back to CPU. This is treated as an implicit
+transfer.</p>
+</dd>
+<dt>PyTorch, CuPy</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">as_numpy=True</span></code>, these backends raise by default if you attempt to convert
+arrays on a GPU device to NumPy.</p>
+</dd>
+<dt>Sparse</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">as_numpy=True</span></code>, by default sparse prevents implicit densification through
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="(in NumPy v2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.asarray()</span></code></a>. <a class="reference external" href="https://sparse.pydata.org/en/stable/operations.html#package-configuration">This safety mechanism can be disabled</a>.</p>
+</dd>
+<dt>Dask</dt><dd><p>This allows applying eager functions to dask arrays.
+The dask graph won’t be computed.</p>
+<p><cite>lazy_apply</cite> doesn’t know if <cite>func</cite> reduces along any axes; also, shape
+changes are non-trivial in chunked Dask arrays. For these reasons, all inputs
+will be rechunked into a single chunk.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The whole operation needs to fit in memory all at once on a single worker.</p>
+</div>
+<p>The outputs will also be returned as a single chunk and you should consider
+rechunking them into smaller chunks afterwards.</p>
+<p>If you want to distribute the calculation across multiple workers, you
+should use <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.map_blocks.html#dask.array.map_blocks" title="(in Dask)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dask.array.map_blocks()</span></code></a>, <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.map_overlap.html#dask.array.map_overlap" title="(in Dask)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dask.array.map_overlap()</span></code></a>,
+<a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.blockwise.html#dask.array.blockwise" title="(in Dask)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dask.array.blockwise()</span></code></a>, or a native Dask wrapper instead of
+<cite>lazy_apply</cite>.</p>
+</dd>
+<dt>Dask wrapping around other backends</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">as_numpy=False</span></code>, <cite>func</cite> will receive in input eager arrays of the meta
+namespace, as defined by the <code class="docutils literal notranslate"><span class="pre">._meta</span></code> attribute of the input Dask arrays.
+The outputs of <cite>func</cite> will be wrapped by the meta namespace, and then wrapped
+again by Dask.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – When <code class="docutils literal notranslate"><span class="pre">xp=jax.numpy</span></code>, the output <cite>shape</cite> is unknown (it contains <code class="docutils literal notranslate"><span class="pre">None</span></code> on
+    one or more axes) and this function was called inside <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.13)"><strong>RuntimeError</strong></a> – When <code class="docutils literal notranslate"><span class="pre">xp=sparse</span></code> and auto-densification is disabled.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><strong>Exception</strong></a><strong> (</strong><strong>backend-specific</strong><strong>)</strong> – When the backend disallows implicit device to host transfers and the input
+    arrays are on a non-CPU device, e.g. on GPU.</p></li>
+</ul>
 </dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lazy_xp_function</span></code></a></dt><dd><p>Tag a function to be tested on lazy backends.</p>
-</dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest.FixtureRequest</span></code></dt><dd><p><cite>request</cite> test function parameter.</p>
-</dd>
-</dl>
+<p><a class="reference external" href="https://docs.jax.dev/en/latest/_autosummary/jax.transfer_guard.html#jax.transfer_guard" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.transfer_guard</span></code></a>, <a class="reference external" href="https://docs.jax.dev/en/latest/_autosummary/jax.pure_callback.html#jax.pure_callback" title="(in JAX)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jax.pure_callback</span></code></a>, <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.map_blocks.html#dask.array.map_blocks" title="(in Dask)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dask.array.map_blocks</span></code></a>, <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.map_overlap.html#dask.array.map_overlap" title="(in Dask)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dask.array.map_overlap</span></code></a>, <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.blockwise.html#dask.array.blockwise" title="(in Dask)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dask.array.blockwise</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -321,23 +390,23 @@ tests on multiple backends:</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../contributing.html">
+          <a class="next-page" href="array_api_extra.testing.lazy_xp_function.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Contributing</div>
+                <div class="title">array_api_extra.testing.lazy_xp_function</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.testing.lazy_xp_function.html">
+          <a class="prev-page" href="../api-lazy.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">array_api_extra.testing.lazy_xp_function</div>
+                <div class="title">Tools for lazy backends</div>
                 
               </div>
             </a>
@@ -378,8 +447,8 @@ tests on multiple backends:</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">array_api_extra.testing.patch_lazy_xp_functions</a><ul>
-<li><a class="reference internal" href="#array_api_extra.testing.patch_lazy_xp_functions"><code class="docutils literal notranslate"><span class="pre">patch_lazy_xp_functions()</span></code></a></li>
+<li><a class="reference internal" href="#">array_api_extra.lazy_apply</a><ul>
+<li><a class="reference internal" href="#array_api_extra.lazy_apply"><code class="docutils literal notranslate"><span class="pre">lazy_apply()</span></code></a></li>
 </ul>
 </li>
 </ul>

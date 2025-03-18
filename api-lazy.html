@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="array_api_extra.testing.lazy_xp_function" href="generated/array_api_extra.testing.lazy_xp_function.html" /><link rel="prev" title="array_api_extra.sinc" href="generated/array_api_extra.sinc.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="array_api_extra.lazy_apply" href="generated/array_api_extra.lazy_apply.html" /><link rel="prev" title="array_api_extra.sinc" href="generated/array_api_extra.sinc.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Testing Utilities - array-api-extra 0.7.0.dev0 documentation</title>
+        <title>Tools for lazy backends - array-api-extra 0.7.0.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -217,7 +217,8 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/array_api_extra.sinc.html">array_api_extra.sinc</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Testing Utilities</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Testing Utilities</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Tools for lazy backends</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Tools for lazy backends</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/array_api_extra.lazy_apply.html">array_api_extra.lazy_apply</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/array_api_extra.testing.lazy_xp_function.html">array_api_extra.testing.lazy_xp_function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/array_api_extra.testing.patch_lazy_xp_functions.html">array_api_extra.testing.patch_lazy_xp_functions</a></li>
 </ul>
@@ -244,12 +245,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/testing-utils.md?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/api-lazy.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/testing-utils.md" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/api-lazy.md" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -268,18 +269,21 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="testing-utilities">
-<h1>Testing Utilities<a class="headerlink" href="#testing-utilities" title="Link to this heading">¶</a></h1>
-<p>These additional functions are meant to be used while unit testing Array API
-compliant packages:</p>
+          <section id="tools-for-lazy-backends">
+<h1>Tools for lazy backends<a class="headerlink" href="#tools-for-lazy-backends" title="Link to this heading">¶</a></h1>
+<p>These additional functions are meant to be used to support compatibility with
+lazy backends, e.g. Dask or JAX:</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lazy_xp_function</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/array_api_extra.lazy_apply.html#array_api_extra.lazy_apply" title="array_api_extra.lazy_apply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lazy_apply</span></code></a></p></td>
+<td><p>Lazily apply an eager function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testing.lazy_xp_function</span></code></a></p></td>
 <td><p>Tag a function to be tested on lazy backends.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/array_api_extra.testing.patch_lazy_xp_functions.html#array_api_extra.testing.patch_lazy_xp_functions" title="array_api_extra.testing.patch_lazy_xp_functions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">patch_lazy_xp_functions</span></code></a></p></td>
-<td><p>Test lazy execution of functions tagged with <a class="reference internal" href="generated/array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-func docutils literal notranslate"><span class="pre">lazy_xp_function()</span></code></a>.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/array_api_extra.testing.patch_lazy_xp_functions.html#array_api_extra.testing.patch_lazy_xp_functions" title="array_api_extra.testing.patch_lazy_xp_functions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testing.patch_lazy_xp_functions</span></code></a></p></td>
+<td><p>Test lazy execution of functions tagged with <code class="xref py py-func docutils literal notranslate"><span class="pre">lazy_xp_function()</span></code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -291,12 +295,12 @@ compliant packages:</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="generated/array_api_extra.testing.lazy_xp_function.html">
+          <a class="next-page" href="generated/array_api_extra.lazy_apply.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">array_api_extra.testing.lazy_xp_function</div>
+                <div class="title">array_api_extra.lazy_apply</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
