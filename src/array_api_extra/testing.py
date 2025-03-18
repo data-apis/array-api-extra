@@ -42,10 +42,10 @@ else:
 
 T = TypeVar("T")
 
-_ufuncs_tags: dict[object, dict[str, Any]] = {}  # type: ignore[no-any-explicit]
+_ufuncs_tags: dict[object, dict[str, Any]] = {}  # type: ignore[explicit-any]
 
 
-def lazy_xp_function(  # type: ignore[no-any-explicit]
+def lazy_xp_function(  # type: ignore[explicit-any]
     func: Callable[..., Any],
     *,
     allow_dask_compute: int = 0,
@@ -227,12 +227,12 @@ def patch_lazy_xp_functions(
     mod = cast(ModuleType, request.module)
     mods = [mod, *cast(list[ModuleType], getattr(mod, "lazy_xp_modules", []))]
 
-    def iter_tagged() -> (  # type: ignore[no-any-explicit]
+    def iter_tagged() -> (  # type: ignore[explicit-any]
         Iterator[tuple[ModuleType, str, Callable[..., Any], dict[str, Any]]]
     ):
         for mod in mods:
             for name, func in mod.__dict__.items():
-                tags: dict[str, Any] | None = None  # type: ignore[no-any-explicit]
+                tags: dict[str, Any] | None = None  # type: ignore[explicit-any]
                 with contextlib.suppress(AttributeError):
                     tags = func._lazy_xp_function  # pylint: disable=protected-access
                 if tags is None:
@@ -253,7 +253,7 @@ def patch_lazy_xp_functions(
         for mod, name, func, tags in iter_tagged():
             if tags["jax_jit"]:
                 # suppress unused-ignore to run mypy in -e lint as well as -e dev
-                wrapped = cast(  # type: ignore[no-any-explicit]
+                wrapped = cast(  # type: ignore[explicit-any]
                     Callable[..., Any],
                     jax.jit(
                         func,
@@ -289,7 +289,7 @@ class CountingDaskScheduler(SchedulerGetCallable):
         self.msg = msg
 
     @override
-    def __call__(self, dsk: Graph, keys: Sequence[Key] | Key, **kwargs: Any) -> Any:  # type: ignore[no-any-decorated,no-any-explicit] # numpydoc ignore=GL08
+    def __call__(self, dsk: Graph, keys: Sequence[Key] | Key, **kwargs: Any) -> Any:  # type: ignore[decorated-any,explicit-any] # numpydoc ignore=GL08
         import dask
 
         self.count += 1

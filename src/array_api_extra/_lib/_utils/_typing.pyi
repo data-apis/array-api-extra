@@ -95,10 +95,10 @@ class DType(Protocol):  # pylint: disable=missing-class-docstring
 class Device(Protocol):  # pylint: disable=missing-class-docstring
     pass
 
-SetIndex: TypeAlias = (  # type: ignore[no-any-explicit]
+SetIndex: TypeAlias = (  # type: ignore[explicit-any]
     int | slice | EllipsisType | Array | tuple[int | slice | EllipsisType | Array, ...]
 )
-GetIndex: TypeAlias = (  # type: ignore[no-any-explicit]
+GetIndex: TypeAlias = (  # type: ignore[explicit-any]
     SetIndex | None | tuple[int | slice | EllipsisType | None | Array, ...]
 )
 
