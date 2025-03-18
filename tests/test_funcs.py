@@ -41,7 +41,6 @@ lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp
 lazy_xp_function(sinc, static_argnames="xp")
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
 class TestAtLeastND:
     def test_0D(self, xp: ModuleType):
         x = xp.asarray(1.0)
@@ -68,7 +67,7 @@ class TestAtLeastND:
         xp_assert_equal(y, xp.asarray([[0, 1]]))
 
         y = atleast_nd(x, ndim=5)
-        xp_assert_equal(y, xp.reshape(xp.arange(2), (1, 1, 1, 1, 2)))
+        xp_assert_equal(y, xp.asarray([[[[[0, 1]]]]]))
 
     def test_2D(self, xp: ModuleType):
         x = xp.asarray([[3.0]])
@@ -217,8 +216,10 @@ class TestCov:
         )
 
 
+@pytest.mark.skip_xp_backend(
+    Backend.SPARSE, reason="read-only backend without .at support"
+)
 class TestCreateDiagonal:
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_1d_from_numpy(self, xp: ModuleType):
         # from np.diag tests
         vals = 100 * xp.arange(5, dtype=xp.float64)
@@ -234,7 +235,6 @@ class TestCreateDiagonal:
         xp_assert_equal(create_diagonal(vals, offset=2), b)
         xp_assert_equal(create_diagonal(vals, offset=-2), c)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     @pytest.mark.parametrize("n", range(1, 10))
     @pytest.mark.parametrize("offset", range(1, 10))
     def test_1d_from_scipy(self, xp: ModuleType, n: int, offset: int):
@@ -250,7 +250,6 @@ class TestCreateDiagonal:
         with pytest.raises(ValueError, match="1-dimensional"):
             _ = create_diagonal(xp.asarray(1))
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     @pytest.mark.parametrize(
         "shape",
         [
@@ -276,12 +275,10 @@ class TestCreateDiagonal:
         for i in ndindex(*eager_shape(c)):
             xp_assert_equal(c[i], b[i[:-1]] if i[-2] == i[-1] else zero)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(create_diagonal(x)) == device
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_xp(self, xp: ModuleType):
         x = xp.asarray([1, 2])
         y = create_diagonal(x, xp=xp)
@@ -289,7 +286,6 @@ class TestCreateDiagonal:
 
 
 class TestExpandDims:
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_single_axis(self, xp: ModuleType):
         """Trivial case where xpx.expand_dims doesn't add anything to xp.expand_dims"""
         a = xp.empty((2, 3, 4, 5))
@@ -297,7 +293,6 @@ class TestExpandDims:
             b = expand_dims(a, axis=axis)
             xp_assert_equal(b, xp.expand_dims(a, axis=axis))
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_axis_tuple(self, xp: ModuleType):
         a = xp.empty((3, 3, 3))
         assert expand_dims(a, axis=(0, 1, 2)).shape == (1, 1, 1, 3, 3, 3)
@@ -329,12 +324,10 @@ class TestExpandDims:
         with pytest.raises(ValueError, match="Duplicate dimensions"):
             _ = expand_dims(a, axis=(3, -3))
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(expand_dims(x, axis=0)) == device
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_xp(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3])
         y = expand_dims(x, axis=(0, 1, 2), xp=xp)
@@ -501,7 +494,6 @@ class TestIsClose:
         xp_assert_equal(isclose(a, b, xp=xp), xp.asarray([True, False]))
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
 class TestKron:
     def test_basic(self, xp: ModuleType):
         # Using 0-dimensional array
@@ -560,6 +552,7 @@ class TestKron:
         k = kron(a, b)
         assert k.shape == expected_shape
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
     def test_python_scalar(self, xp: ModuleType):
         a = 1
         # Test no dtype promotion to xp.asarray(a); use b.dtype
@@ -602,25 +595,27 @@ class TestNUnique:
         xp_assert_equal(nunique(a, xp=xp), xp.asarray(3))
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange, no device")
 class TestPad:
     def test_simple(self, xp: ModuleType):
-        a = xp.arange(1, 4)
+        a = xp.asarray([1, 2, 3])
         padded = pad(a, 2)
         xp_assert_equal(padded, xp.asarray([0, 0, 1, 2, 3, 0, 0]))
 
+    @pytest.mark.xfail_xp_backend(
+        Backend.SPARSE, reason="constant_values can only be equal to fill value"
+    )
     def test_fill_value(self, xp: ModuleType):
-        a = xp.arange(1, 4)
+        a = xp.asarray([1, 2, 3])
         padded = pad(a, 2, constant_values=42)
         xp_assert_equal(padded, xp.asarray([42, 42, 1, 2, 3, 42, 42]))
 
     def test_ndim(self, xp: ModuleType):
-        a = xp.reshape(xp.arange(2 * 3 * 4), (2, 3, 4))
+        a = xp.asarray(np.reshape(np.arange(2 * 3 * 4), (2, 3, 4)))
         padded = pad(a, 2)
         assert padded.shape == (6, 7, 8)
 
     def test_mode_not_implemented(self, xp: ModuleType):
-        a = xp.arange(3)
+        a = xp.asarray([1, 2, 3])
         with pytest.raises(NotImplementedError, match="Only `'constant'`"):
             _ = pad(a, 2, mode="edge")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
@@ -633,7 +628,7 @@ class TestPad:
         xp_assert_equal(padded, xp.asarray(0))
 
     def test_tuple_width(self, xp: ModuleType):
-        a = xp.reshape(xp.arange(12), (3, 4))
+        a = xp.asarray(np.reshape(np.arange(12), (3, 4)))
         padded = pad(a, (1, 0))
         assert padded.shape == (4, 5)
 
@@ -644,7 +639,7 @@ class TestPad:
             _ = pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
 
     def test_sequence_of_tuples_width(self, xp: ModuleType):
-        a = xp.reshape(xp.arange(12), (3, 4))
+        a = xp.asarray(np.reshape(np.arange(12), (3, 4)))
 
         padded = pad(a, ((1, 0), (0, 2)))
         assert padded.shape == (4, 6)
@@ -666,7 +661,7 @@ assume_unique = pytest.mark.parametrize(
 )
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in asarray()")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no argsort")
 class TestSetDiff1D:
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="NaN-shaped arrays")
     @pytest.mark.xfail_xp_backend(
