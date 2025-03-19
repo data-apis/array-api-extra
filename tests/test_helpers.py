@@ -18,9 +18,9 @@ from array_api_extra._lib._utils._helpers import (
 from array_api_extra._lib._utils._typing import Array, Device, DType
 from array_api_extra.testing import lazy_xp_function
 
-# mypy: disable-error-code=no-untyped-usage
+from .conftest import np_compat
 
-np_compat = array_namespace(np.empty(0))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+# mypy: disable-error-code=no-untyped-usage
 
 # FIXME calls xp.unique_values without size
 lazy_xp_function(in1d, jax_jit=False, static_argnames=("assume_unique", "invert", "xp"))
@@ -149,7 +149,7 @@ class TestAsArrays:
         which are subclasses of float and complex.
         """
         a = cast(Array, dtype(0))  # type: ignore[operator]  # pyright: ignore[reportCallIssue]
-        xa, xb = asarrays(a, 0, xp=np)
+        xa, xb = asarrays(a, 0, xp=np_compat)
         assert xa.dtype == dtype
         assert xb.dtype == dtype
 

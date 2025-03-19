@@ -94,12 +94,7 @@ def test_lazy_apply_multi_output(xp: ModuleType, as_numpy: bool):
 @pytest.mark.parametrize(
     "as_numpy",
     [
-        pytest.param(
-            False,
-            marks=pytest.mark.xfail_xp_backend(
-                Backend.TORCH, reason="illegal dtype promotion"
-            ),
-        ),
+        False,
         pytest.param(
             True,
             marks=[
@@ -119,7 +114,7 @@ def test_lazy_apply_multi_output_broadcast_dtype(xp: ModuleType, as_numpy: bool)
         return x + y, x - y
 
     x = xp.asarray([1, 2], dtype=xp.float32)
-    y = xp.asarray(3, dtype=xp.float64)
+    y = xp.asarray([3], dtype=xp.float64)
     expect = (
         xp.asarray([4, 5], dtype=xp.float64),
         xp.asarray([-2, -1], dtype=xp.float64),

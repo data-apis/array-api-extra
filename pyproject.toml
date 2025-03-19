@@ -126,6 +126,9 @@ python = "~=3.10.0"
 [tool.pixi.feature.py313.dependencies]
 python = "~=3.13.0"
 
+[tool.pixi.feature.numpy1.dependencies]
+numpy = "<2"
+
 # Backends that can run on CPU-only hosts
 [tool.pixi.feature.backends.dependencies]
 pytorch = "*"
@@ -167,6 +170,8 @@ tests = { features = ["tests"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
 dev = { features = ["lint", "tests", "docs", "dev", "backends"], solve-group = "default" }
 dev-cuda = { features = ["lint", "tests", "docs", "dev", "backends", "cuda-backends"] }
+dev-numpy1 = { features = ["lint", "tests", "dev", "numpy1"] }
+tests-numpy1 = ["py310", "tests", "numpy1"]
 tests-py310 = ["py310", "tests"]
 tests-py313 = ["py313", "tests"]
 # CUDA not available on free github actions and on some developers' PCs

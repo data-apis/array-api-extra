@@ -48,6 +48,9 @@ lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp
 lazy_xp_function(sinc, static_argnames="xp")
 
 
+NUMPY_GE2 = int(np.__version__.split(".")[0]) >= 2
+
+
 @pytest.mark.skip_xp_backend(
     Backend.SPARSE, reason="read-only backend without .at support"
 )
@@ -213,6 +216,13 @@ class TestApplyWhere:
         xp: ModuleType,
         library: Backend,
     ):
+        if (
+            library in (Backend.NUMPY, Backend.NUMPY_READONLY)
+            and not NUMPY_GE2
+            and dtype is np.float32
+        ):
+            pytest.xfail(reason="NumPy 1.x dtype promotion for scalars")
+
         mbs = npst.mutually_broadcastable_shapes(num_shapes=n_arrays + 1, min_side=0)
         input_shapes, _ = data.draw(mbs)
         cond_shape, *shapes = input_shapes
