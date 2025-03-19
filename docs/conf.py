@@ -4,6 +4,8 @@ import importlib.metadata
 from typing import Any
 
 project = "array-api-extra"
+copyright = "Consortium for Python Data API Standards"
+author = "Consortium for Python Data API Standards"
 version = release = importlib.metadata.version("array_api_extra")
 
 extensions = [
