@@ -127,7 +127,8 @@ python = "~=3.10.0"
 python = "~=3.13.0"
 
 [tool.pixi.feature.numpy1.dependencies]
-numpy = "<2"
+# Oldest SPEC 0 NumPy at the moment of writing
+numpy = "=1.25.0"
 
 # Backends that can run on CPU-only hosts
 [tool.pixi.feature.backends.dependencies]
