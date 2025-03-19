@@ -1,5 +1,8 @@
 name: Docs Deploy
 
+permissions:
+  contents: read
+
 on:
   workflow_run:
     workflows: ["Docs Build"]
