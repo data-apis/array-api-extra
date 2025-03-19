@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        environment: [tests-py310, tests-py313, tests-backends]
+        environment: [tests-py310, tests-py313, tests-numpy1, tests-backends]
         runs-on: [ubuntu-latest]
 
     steps:
