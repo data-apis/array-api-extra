@@ -689,7 +689,6 @@ class TestIsClose:
         xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
 
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
-    @pytest.mark.xfail_xp_backend(Backend.TORCH, reason="Array API 2024.12 support")
     def test_python_scalar(self, xp: ModuleType):
         a = xp.asarray([0.0, 0.1], dtype=xp.float32)
         xp_assert_equal(isclose(a, 0.0), xp.asarray([True, False]))
