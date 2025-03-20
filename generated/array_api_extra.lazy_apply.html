@@ -291,7 +291,7 @@ backend it may be executed more than once or never.</p>
 </p></li>
 <li><p><strong>*args</strong> (<em>Array</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.13)"><em>complex</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em> | </em><em>None</em>) – <p>One or more Array API compliant arrays, Python scalars, or None’s.</p>
 <p>If <cite>as_numpy=True</cite>, you need to be able to apply <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="(in NumPy v2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.asarray()</span></code></a> to
-non-None args to convert them to numpy; read notes below about specific
+non-None args to convert them to NumPy; read notes below about specific
 backends.</p>
 </p></li>
 <li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em><em>, </em><em>...</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em><em>, </em><em>...</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – Output shape or sequence of output shapes, one for each output of <cite>func</cite>.
@@ -300,7 +300,7 @@ Default: assume single output and broadcast shapes of the input arrays.</p></li>
 dtype(s) must belong to the same array namespace as the input arrays.
 Default: infer the result type(s) from the input arrays.</p></li>
 <li><p><strong>as_numpy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – <dl class="simple">
-<dt>If True, convert the input arrays to NumPy before passing them to <cite>func</cite>.</dt><dd><p>This is particularly useful to make numpy-only functions, e.g. written in Cython</p>
+<dt>If True, convert the input arrays to NumPy before passing them to <cite>func</cite>.</dt><dd><p>This is particularly useful to make NumPy-only functions, e.g. written in Cython</p>
 </dd>
 <dt>or Numba, work transparently with array API-compliant arrays.</dt><dd><p>Default: False.</p>
 </dd>
@@ -344,8 +344,8 @@ arrays on a GPU device to NumPy.</p>
 <dt>Sparse</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">as_numpy=True</span></code>, by default sparse prevents implicit densification through
 <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="(in NumPy v2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.asarray()</span></code></a>. <a class="reference external" href="https://sparse.pydata.org/en/stable/operations.html#package-configuration">This safety mechanism can be disabled</a>.</p>
 </dd>
-<dt>Dask</dt><dd><p>This allows applying eager functions to dask arrays.
-The dask graph won’t be computed.</p>
+<dt>Dask</dt><dd><p>This allows applying eager functions to Dask arrays.
+The Dask graph won’t be computed.</p>
 <p><cite>lazy_apply</cite> doesn’t know if <cite>func</cite> reduces along any axes; also, shape
 changes are non-trivial in chunked Dask arrays. For these reasons, all inputs
 will be rechunked into a single chunk.</p>

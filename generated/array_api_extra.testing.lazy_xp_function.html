@@ -287,11 +287,11 @@ This will be later expanded to provide test coverage for other lazy backends.</p
 <li><p><strong>func</strong> (<em>callable</em>) – Function to be tested.</p></li>
 <li><p><strong>allow_dask_compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Number of times <cite>func</cite> is allowed to internally materialize the Dask graph. This
 is typically triggered by <code class="docutils literal notranslate"><span class="pre">bool()</span></code>, <code class="docutils literal notranslate"><span class="pre">float()</span></code>, or <code class="docutils literal notranslate"><span class="pre">np.asarray()</span></code>.</p>
-<p>Set to 1 if you are aware that <cite>func</cite> converts the input parameters to numpy and
+<p>Set to 1 if you are aware that <cite>func</cite> converts the input parameters to NumPy and
 want to let it do so at least for the time being, knowing that it is going to be
 extremely detrimental for performance.</p>
 <p>If a test needs values higher than 1 to pass, it is a canary that the conversion
-to numpy/bool/float is happening multiple times, which translates to multiple
+to NumPy/bool/float is happening multiple times, which translates to multiple
 computations of the whole graph. Short of making the function fully lazy, you
 should at least add explicit calls to <code class="docutils literal notranslate"><span class="pre">np.asarray()</span></code> early in the function.
 <em>Note:</em> the counter of <cite>allow_dask_compute</cite> resets after each call to <cite>func</cite>, so
