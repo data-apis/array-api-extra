@@ -1,13 +1,12 @@
 """Update operations for read-only arrays."""
 
-# https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
 
 import operator
 from collections.abc import Callable
 from enum import Enum
 from types import ModuleType
-from typing import ClassVar, cast
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from ._utils._compat import (
     array_namespace,
@@ -17,6 +16,10 @@ from ._utils._compat import (
 )
 from ._utils._helpers import meta_namespace
 from ._utils._typing import Array, SetIndex
+
+if TYPE_CHECKING:  # pragma: no cover
+    # TODO import from typing (requires Python >=3.11)
+    from typing_extensions import Self
 
 
 class _AtOp(Enum):
@@ -204,7 +207,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self._x = x
         self._idx = idx
 
-    def __getitem__(self, idx: SetIndex, /) -> at:  # numpydoc ignore=PR01,RT01
+    def __getitem__(self, idx: SetIndex, /) -> Self:  # numpydoc ignore=PR01,RT01
         """
         Allow for the alternate syntax ``at(x)[start:stop:step]``.
 
@@ -214,7 +217,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         if self._idx is not _undef:
             msg = "Index has already been set"
             raise ValueError(msg)
-        return at(self._x, idx)
+        return type(self)(self._x, idx)
 
     def _op(
         self,

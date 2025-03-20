@@ -111,7 +111,7 @@ typing-extensions = "*"
 numpy = "*"
 
 [tool.pixi.feature.docs.tasks]
-docs = { cmd = "sphinx-build . build/", cwd = "docs" }
+docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs" }
 open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"] }
 
 [tool.pixi.feature.dev.dependencies]

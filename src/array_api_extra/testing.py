@@ -4,42 +4,33 @@ Public testing utilities.
 See also _lib._testing for additional private testing utilities.
 """
 
-# https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
 
 import contextlib
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from functools import wraps
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar, cast
 
 from ._lib._utils._compat import is_dask_namespace, is_jax_namespace
 
 __all__ = ["lazy_xp_function", "patch_lazy_xp_functions"]
 
 if TYPE_CHECKING:  # pragma: no cover
-    # TODO move ParamSpec outside TYPE_CHECKING
-    # depends on scikit-learn abandoning Python 3.9
-    # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
-    from typing import ParamSpec
-
+    # TODO import override from typing (requires Python >=3.12)
     import pytest
     from dask.typing import Graph, Key, SchedulerGetCallable
     from typing_extensions import override
 
-    P = ParamSpec("P")
 else:
+    # Sphinx hacks
     SchedulerGetCallable = object
 
-    # Sphinx hacks
-    class P:  # pylint: disable=missing-class-docstring
-        args: tuple
-        kwargs: dict
-
-    def override(func: Callable[P, T]) -> Callable[P, T]:
+    def override(func: object) -> object:
         return func
 
 
+P = ParamSpec("P")
 T = TypeVar("T")
 
 _ufuncs_tags: dict[object, dict[str, Any]] = {}  # type: ignore[explicit-any]

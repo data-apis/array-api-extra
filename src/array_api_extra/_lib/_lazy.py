@@ -1,13 +1,12 @@
 """Public API Functions."""
 
-# https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
 
 import math
 from collections.abc import Callable, Sequence
 from functools import partial, wraps
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, cast, overload
+from typing import TYPE_CHECKING, Any, ParamSpec, TypeAlias, cast, overload
 
 from ._funcs import broadcast_shapes
 from ._utils import _compat
@@ -20,23 +19,15 @@ from ._utils._helpers import is_python_scalar
 from ._utils._typing import Array, DType
 
 if TYPE_CHECKING:  # pragma: no cover
-    # TODO move outside TYPE_CHECKING
-    # depends on scikit-learn abandoning Python 3.9
-    # https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
-    from typing import ParamSpec, TypeAlias
-
     import numpy as np
     from numpy.typing import ArrayLike
 
     NumPyObject: TypeAlias = np.ndarray[Any, Any] | np.generic  # type: ignore[explicit-any]
-    P = ParamSpec("P")
 else:
-    # Sphinx hacks
+    # Sphinx hack
     NumPyObject = Any
 
-    class P:  # pylint: disable=missing-class-docstring
-        args: tuple
-        kwargs: dict
+P = ParamSpec("P")
 
 
 @overload
