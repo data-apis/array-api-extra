@@ -47,7 +47,7 @@ def test_lazy_apply_simple(
             assert xp2 is xp
 
         y = xp2.broadcast_to(xp2.astype(x + 1, getattr(xp2, dtype)), shape)
-        return xp2.asarray(y, copy=True)  # Torch: ensure writeable numpy array
+        return xp2.asarray(y, copy=True)  # PyTorch: ensure writeable NumPy array
 
     x = xp.asarray([1, 2], dtype=xp.int16)
     expect = xp.broadcast_to(xp.astype(x + 1, getattr(xp, dtype)), shape)
@@ -74,7 +74,7 @@ def test_lazy_apply_multi_output(xp: ModuleType, as_numpy: bool):
         xp2 = array_namespace(x)
         y = x + xp2.asarray(2, dtype=xp2.int8)  # Sparse: bad dtype propagation
         z = xp2.broadcast_to(xp2.astype(x + 1, xp2.int16), (3, 2))
-        z = xp2.asarray(z, copy=True)  # Torch: ensure writeable numpy array
+        z = xp2.asarray(z, copy=True)  # PyTorch: ensure writeable NumPy array
         return y, z
 
     x = xp.asarray([1, 2], dtype=xp.int8)
@@ -166,8 +166,8 @@ def test_lazy_apply_dont_run_on_meta(da: ModuleType):
 
 
 def test_lazy_apply_dask_non_numpy_meta(da: ModuleType):
-    """Test dask wrapping around a meta-namespace other than numpy."""
-    # At the moment of writing, of all Array API namespaces cupy is
+    """Test Dask wrapping around a meta-namespace other than numpy."""
+    # At the moment of writing, of all Array API namespaces CuPy is
     # the only one that Dask supports.
     # For this reason, we can only test as_numpy=False since
     # np.asarray(cp.Array) is blocked by the transfer guard.

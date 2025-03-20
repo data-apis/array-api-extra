@@ -318,7 +318,7 @@ def test_gh134(xp: ModuleType, bool_mask: bool, copy: bool | None):
     """
     x = xp.zeros(1)
 
-    # In numpy, we have a writeable np.ndarray in input and a read-only np.generic in
+    # In NumPy, we have a writeable np.ndarray in input and a read-only np.generic in
     # output. As both are Arrays, this behaviour is Array API compliant.
     # In Dask, we have a writeable da.Array on both sides, and if you call __setitem__
     # on it all seems fine, but when you compute() your graph is corrupted.

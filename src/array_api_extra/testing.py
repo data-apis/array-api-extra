@@ -63,12 +63,12 @@ def lazy_xp_function(  # type: ignore[explicit-any]
         Number of times `func` is allowed to internally materialize the Dask graph. This
         is typically triggered by ``bool()``, ``float()``, or ``np.asarray()``.
 
-        Set to 1 if you are aware that `func` converts the input parameters to numpy and
+        Set to 1 if you are aware that `func` converts the input parameters to NumPy and
         want to let it do so at least for the time being, knowing that it is going to be
         extremely detrimental for performance.
 
         If a test needs values higher than 1 to pass, it is a canary that the conversion
-        to numpy/bool/float is happening multiple times, which translates to multiple
+        to NumPy/bool/float is happening multiple times, which translates to multiple
         computations of the whole graph. Short of making the function fully lazy, you
         should at least add explicit calls to ``np.asarray()`` early in the function.
         *Note:* the counter of `allow_dask_compute` resets after each call to `func`, so

@@ -187,7 +187,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
       >>> x = x.at[1].add(2)
 
-    If x is a read-only numpy array, they are the same as::
+    If x is a read-only NumPy array, they are the same as::
 
       >>> x = x.copy()
       >>> x[1] += 2
@@ -430,7 +430,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         """Apply ``x[idx] = minimum(x[idx], y)`` and return the updated array."""
         # On Dask, this function runs on the chunks, so we need to determine the
         # namespace that Dask is wrapping.
-        # Note that da.minimum _incidentally_ works on numpy, cupy, and sparse
+        # Note that da.minimum _incidentally_ works on NumPy, CuPy, and sparse
         # thanks to all these meta-namespaces implementing the __array_ufunc__
         # interface, but there's no guarantee that it will work for other
         # wrapped libraries in the future.
