@@ -260,7 +260,7 @@ def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...
     (4, 2, 3)
     """
     if not shapes:
-        return ()  # Match numpy output
+        return ()  # Match NumPy output
 
     ndim = max(len(shape) for shape in shapes)
     out: list[int | None] = []
@@ -538,7 +538,7 @@ def isclose(
     a_inexact = xp.isdtype(a.dtype, ("real floating", "complex floating"))
     b_inexact = xp.isdtype(b.dtype, ("real floating", "complex floating"))
     if a_inexact or b_inexact:
-        # prevent warnings on numpy and dask on inf - inf
+        # prevent warnings on NumPy and Dask on inf - inf
         mxp = meta_namespace(a, b, xp=xp)
         out = apply_where(
             xp.isinf(a) | xp.isinf(b),

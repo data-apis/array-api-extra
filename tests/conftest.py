@@ -55,7 +55,7 @@ class NumPyReadOnly:
     """
     Variant of array_api_compat.numpy producing read-only arrays.
 
-    Read-only numpy arrays fail on `__iadd__` etc., whereas read-only libraries such as
+    Read-only NumPy arrays fail on `__iadd__` etc., whereas read-only libraries such as
     JAX and Sparse simply don't define those methods, which makes calls to `+=` fall
     back to `__add__`.
 

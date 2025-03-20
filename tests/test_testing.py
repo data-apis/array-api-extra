@@ -74,7 +74,7 @@ def test_assert_close_tolerance(xp: ModuleType):
 @param_assert_equal_close
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
 def test_assert_close_equal_none_shape(xp: ModuleType, func: Callable[..., None]):  # type: ignore[explicit-any]
-    """On dask and other lazy backends, test that a shape with NaN's or None's
+    """On Dask and other lazy backends, test that a shape with NaN's or None's
     can be compared to a real shape.
     """
     a = xp.asarray([1, 2])
@@ -99,18 +99,18 @@ def test_assert_close_equal_none_shape(xp: ModuleType, func: Callable[..., None]
 
 
 def good_lazy(x: Array) -> Array:
-    """A function that behaves well in dask and jax.jit"""
+    """A function that behaves well in Dask and jax.jit"""
     return x * 2.0
 
 
 def non_materializable(x: Array) -> Array:
     """
     This function materializes the input array, so it will fail when wrapped in jax.jit
-    and it will trigger an expensive computation in dask.
+    and it will trigger an expensive computation in Dask.
     """
     xp = array_namespace(x)
     # Crashes inside jax.jit
-    # On dask, this triggers two computations of the whole graph
+    # On Dask, this triggers two computations of the whole graph
     if xp.any(x < 0.0) or xp.any(x > 10.0):
         msg = "Values must be in the [0, 10] range"
         raise ValueError(msg)
@@ -217,20 +217,20 @@ except ImportError:
     erf = None
 
 
-@pytest.mark.filterwarnings("ignore:__array_wrap__:DeprecationWarning")  # torch
+@pytest.mark.filterwarnings("ignore:__array_wrap__:DeprecationWarning")  # PyTorch
 def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
     pytest.importorskip("scipy")
     assert erf is not None
     x = xp.asarray([6.0, 7.0])
     if library in (Backend.ARRAY_API_STRICT, Backend.JAX):
-        # array-api-strict arrays are auto-converted to numpy
+        # array-api-strict arrays are auto-converted to NumPy
         # which results in an assertion error for mismatched namespaces
-        # eager jax arrays are auto-converted to numpy in eager jax
+        # eager JAX arrays are auto-converted to NumPy in eager JAX
         # and fail in jax.jit (which lazy_xp_function tests here)
         with pytest.raises((TypeError, AssertionError)):
             xp_assert_equal(cast(Array, erf(x)), xp.asarray([1.0, 1.0]))
     else:
-        # cupy, dask and sparse define __array_ufunc__ and dispatch accordingly
+        # CuPy, Dask and sparse define __array_ufunc__ and dispatch accordingly
         # note that when sparse reduces to scalar it returns a np.generic, which
         # would make xp_assert_equal fail.
         xp_assert_equal(cast(Array, erf(x)), xp.asarray([1.0, 1.0]))
@@ -271,7 +271,7 @@ naked = ModuleType("naked")
 
 def f(x: Array) -> Array:
     xp = array_namespace(x)
-    # Crash in jax.jit and trigger compute() on dask
+    # Crash in jax.jit and trigger compute() on Dask
     if not xp.all(x):
         msg = "Values must be non-zero"
         raise ValueError(msg)
