@@ -1,8 +1,5 @@
 """Array-agnostic implementations for the public API."""
 
-# https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
-from __future__ import annotations
-
 import math
 import warnings
 from collections.abc import Callable, Sequence
