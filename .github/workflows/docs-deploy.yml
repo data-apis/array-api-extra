@@ -1,5 +1,8 @@
 name: Docs Deploy
 
+permissions:
+  contents: read
+
 on:
   workflow_run:
     workflows: ["Docs Build"]
@@ -14,9 +17,9 @@ jobs:
     environment:
       name: docs-deploy
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Download Artifact
-        uses: dawidd6/action-download-artifact@v9
+        uses: dawidd6/action-download-artifact@07ab29fd4a977ae4d2b275087cf67563dfdf0295 # v9
         with:
           workflow: docs-build.yml
           name: docs-build
@@ -26,7 +29,7 @@ jobs:
       # See
       # https://github.com/JamesIves/github-pages-deploy-action/tree/dev#using-an-ssh-deploy-key-
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: JamesIves/github-pages-deploy-action@6c2d9db40f9296374acc17b90404b6e8864128c8 # v4.7.3
         with:
           folder: docs/build/
           ssh-key: ${{ secrets.DEPLOY_KEY }}
