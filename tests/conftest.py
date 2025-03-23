@@ -122,6 +122,9 @@ def xp(
     # in the global scope of the module containing the test function.
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)
 
+    if library == Backend.ARRAY_API_STRICT and np.__version__ < "1.26":
+        pytest.skip("array_api_strict is untested on NumPy <1.26")
+
     if library == Backend.JAX:
         import jax
 
