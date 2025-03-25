@@ -28,7 +28,7 @@ from array_api_extra import (
 from array_api_extra._lib import Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
-from array_api_extra._lib._utils._helpers import asarrays, eager_shape, ndindex
+from array_api_extra._lib._utils._helpers import eager_shape, ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
@@ -193,7 +193,7 @@ class TestApplyWhere:
         assert get_device(y) == device
 
     @pytest.mark.filterwarnings("ignore::RuntimeWarning")  # overflows, etc.
-    @hypothesis.settings(  # pyright: ignore[reportArgumentType]
+    @hypothesis.settings(
         # The xp and library fixtures are not regenerated between hypothesis iterations
         suppress_health_check=[hypothesis.HealthCheck.function_scoped_fixture],
         # JAX can take a long time to initialize on the first call
@@ -262,11 +262,7 @@ class TestApplyWhere:
 
         ref1 = xp.where(cond, f1(*arrays), fill_value)
         ref2 = xp.where(cond, f1(*arrays), f2(*arrays))
-        if library is Backend.ARRAY_API_STRICT:
-            # FIXME https://github.com/data-apis/array-api-strict/issues/131
-            ref3 = xp.where(cond, *asarrays(f1(*arrays), float_fill_value, xp=xp))
-        else:
-            ref3 = xp.where(cond, f1(*arrays), float_fill_value)
+        ref3 = xp.where(cond, f1(*arrays), float_fill_value)
 
         xp_assert_close(res1, ref1, rtol=2e-16)
         xp_assert_equal(res2, ref2)

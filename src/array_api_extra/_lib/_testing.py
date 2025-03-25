@@ -106,7 +106,7 @@ def xp_assert_equal(actual: Array, desired: Array, err_msg: str = "") -> None:
             desired = desired.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
         # JAX uses `np.testing`
-        np.testing.assert_array_equal(actual, desired, err_msg=err_msg)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        np.testing.assert_array_equal(actual, desired, err_msg=err_msg)  # pyright: ignore[reportUnknownArgumentType]
 
 
 def xp_assert_close(

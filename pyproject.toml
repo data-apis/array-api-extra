@@ -136,6 +136,7 @@ numpy = "=1.22.0"
 pytorch = "*"
 dask = "*"
 numba = "*"  # sparse dependency
+llvmlite = "*"  # sparse dependency
 
 [tool.pixi.feature.backends.pypi-dependencies]
 sparse = { version = ">= 0.16.0b3" }
@@ -166,19 +167,23 @@ cupy = "*"
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
 
 [tool.pixi.environments]
-default = { solve-group = "default" }
-lint = { features = ["lint"], solve-group = "default" }
-tests = { features = ["tests"], solve-group = "default" }
-docs = { features = ["docs"], solve-group = "default" }
-dev = { features = ["lint", "tests", "docs", "dev", "backends"], solve-group = "default" }
-dev-cuda = { features = ["lint", "tests", "docs", "dev", "backends", "cuda-backends"] }
-dev-numpy1 = { features = ["lint", "tests", "dev", "numpy1"] }
+default = { features = ["py313"], solve-group = "py313" }
+lint = { features = ["py313", "lint"], solve-group = "py313" }
+docs = { features = ["py313", "docs"], solve-group = "py313" }
+tests = { features = ["py313", "tests"], solve-group = "py313" }
+tests-py313 = { features = ["py313", "tests"], solve-group = "py313" }  # alias of tests
+
+# Some backends may pin numpy; use separate solve-group
+dev = { features = ["py310", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
+tests-backends = { features = ["py310", "tests", "backends"], solve-group = "backends" }
+
+# CUDA not available on free github actions and on some developers' PCs
+dev-cuda = { features = ["py310", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
+tests-cuda = { features = ["py310", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
+
+# Ungrouped environments
 tests-numpy1 = ["py310", "tests", "numpy1"]
 tests-py310 = ["py310", "tests"]
-tests-py313 = ["py313", "tests"]
-# CUDA not available on free github actions and on some developers' PCs
-tests-backends = ["py310", "tests", "backends"]
-tests-cuda = ["py310", "tests", "backends", "cuda-backends"]
 
 
 # pytest
