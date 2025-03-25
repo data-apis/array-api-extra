@@ -8,13 +8,14 @@ from typing import cast, overload
 
 from ._at import at
 from ._utils import _compat, _helpers
-from ._utils._compat import (
-    array_namespace,
-    is_dask_namespace,
-    is_jax_array,
-    is_jax_namespace,
+from ._utils._compat import array_namespace, is_dask_namespace, is_jax_array
+from ._utils._helpers import (
+    asarrays,
+    capabilities,
+    eager_shape,
+    meta_namespace,
+    ndindex,
 )
-from ._utils._helpers import asarrays, eager_shape, meta_namespace, ndindex
 from ._utils._typing import Array
 
 __all__ = [
@@ -152,7 +153,7 @@ def _apply_where(  # type: ignore[explicit-any]  # numpydoc ignore=PR01,RT01
 ) -> Array:
     """Helper of `apply_where`. On Dask, this runs on a single chunk."""
 
-    if is_jax_namespace(xp):
+    if not capabilities(xp)["boolean indexing"]:
         # jax.jit does not support assignment by boolean mask
         return xp.where(cond, f1(*args), f2(*args) if f2 is not None else fill_value)
 
@@ -708,14 +709,34 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
         # size= is JAX-specific
         # https://github.com/data-apis/array-api/issues/883
         _, counts = xp.unique_counts(x, size=_compat.size(x))
-        return xp.astype(counts, xp.bool).sum()
+        return (counts > 0).sum()
 
-    _, counts = xp.unique_counts(x)
-    n = _compat.size(counts)
-    # FIXME https://github.com/data-apis/array-api-compat/pull/231
-    if n is None:  # e.g. Dask, ndonnx
-        return xp.astype(counts, xp.bool).sum()
-    return xp.asarray(n, device=_compat.device(x))
+    # There are 3 general use cases:
+    # 1. backend has unique_counts and it returns an array with known shape
+    # 2. backend has unique_counts and it returns a None-sized array;
+    #    e.g. Dask, ndonnx
+    # 3. backend does not have unique_counts; e.g. wrapped JAX
+    if capabilities(xp)["data-dependent shapes"]:
+        # xp has unique_counts; O(n) complexity
+        _, counts = xp.unique_counts(x)
+        n = _compat.size(counts)
+        if n is None:
+            return xp.sum(xp.ones_like(counts))
+        return xp.asarray(n, device=_compat.device(x))
+
+    # xp does not have unique_counts; O(n*logn) complexity
+    x = xp.sort(xp.reshape(x, -1))
+    mask = x != xp.roll(x, -1)
+    default_int = xp.__array_namespace_info__().default_dtypes(
+        device=_compat.device(x)
+    )["integral"]
+    return xp.maximum(
+        # Special cases:
+        # - array is size 0
+        # - array has all elements equal to each other
+        xp.astype(xp.any(~mask), default_int),
+        xp.sum(xp.astype(mask, default_int)),
+    )
 
 
 def pad(

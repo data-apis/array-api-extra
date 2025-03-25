@@ -20,7 +20,8 @@ from array_api_extra.testing import lazy_xp_function
 pytestmark = [
     pytest.mark.skip_xp_backend(
         Backend.SPARSE, reason="read-only backend without .at support"
-    )
+    ),
+    pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing"),
 ]
 
 
@@ -256,7 +257,10 @@ def test_incompatible_dtype(
     elif library is Backend.DASK:
         z = at_op(x, idx, op, 1.1, copy=copy)
 
-    elif library is Backend.ARRAY_API_STRICT and op is not _AtOp.SET:
+    elif (
+        library in (Backend.ARRAY_API_STRICT, Backend.ARRAY_API_STRICTEST)
+        and op is not _AtOp.SET
+    ):
         with pytest.raises(Exception, match=r"cast|promote|dtype"):
             _ = at_op(x, idx, op, 1.1, copy=copy)
 

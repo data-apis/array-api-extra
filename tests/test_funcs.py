@@ -48,12 +48,9 @@ lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp
 lazy_xp_function(sinc, static_argnames="xp")
 
 
-NUMPY_GE2 = int(np.__version__.split(".")[0]) >= 2
+NUMPY_VERSION = tuple(int(v) for v in np.__version__.split(".")[2])
 
 
-@pytest.mark.skip_xp_backend(
-    Backend.SPARSE, reason="read-only backend without .at support"
-)
 class TestApplyWhere:
     @staticmethod
     def f1(x: Array, y: Array | int = 10) -> Array:
@@ -153,6 +150,14 @@ class TestApplyWhere:
         xp_assert_equal(actual, xp.asarray([100, 12]))
         xp_assert_equal(fill_value, xp.asarray([100, 200]))
 
+    @pytest.mark.skip_xp_backend(
+        Backend.ARRAY_API_STRICTEST,
+        reason="no boolean indexing -> run everywhere",
+    )
+    @pytest.mark.skip_xp_backend(
+        Backend.SPARSE,
+        reason="no indexing by sparse array -> run everywhere",
+    )
     def test_dont_run_on_false(self, xp: ModuleType):
         x = xp.asarray([1.0, 2.0, 0.0])
         y = xp.asarray([0.0, 3.0, 4.0])
@@ -192,6 +197,7 @@ class TestApplyWhere:
         y = apply_where(x % 2 == 0, x, self.f1, fill_value=x)
         assert get_device(y) == device
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
     @pytest.mark.filterwarnings("ignore::RuntimeWarning")  # overflows, etc.
     @hypothesis.settings(
         # The xp and library fixtures are not regenerated between hypothesis iterations
@@ -218,7 +224,7 @@ class TestApplyWhere:
     ):
         if (
             library in (Backend.NUMPY, Backend.NUMPY_READONLY)
-            and not NUMPY_GE2
+            and NUMPY_VERSION < (2, 0)
             and dtype is np.float32
         ):
             pytest.xfail(reason="NumPy 1.x dtype promotion for scalars")
@@ -562,6 +568,9 @@ class TestExpandDims:
         assert y.shape == (1, 1, 1, 3)
 
 
+@pytest.mark.filterwarnings(  # array_api_strictest
+    "ignore:invalid value encountered:RuntimeWarning:array_api_strict"
+)
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestIsClose:
     @pytest.mark.parametrize("swap", [False, True])
@@ -680,6 +689,7 @@ class TestIsClose:
             isclose(xp.asarray(True), b, atol=1), xp.asarray([True, True, True])
         )
 
+    @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
     def test_none_shape(self, xp: ModuleType):
         a = xp.asarray([1, 5, 0])
         b = xp.asarray([1, 4, 2])
@@ -687,6 +697,7 @@ class TestIsClose:
         a = a[a < 5]
         xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
 
+    @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
     def test_none_shape_bool(self, xp: ModuleType):
         a = xp.asarray([True, True, False])
         b = xp.asarray([True, False, True])
@@ -819,8 +830,30 @@ class TestNUnique:
         a = xp.asarray([])
         xp_assert_equal(nunique(a), xp.asarray(0))
 
-    def test_device(self, xp: ModuleType, device: Device):
-        a = xp.asarray(0.0, device=device)
+    def test_size1(self, xp: ModuleType):
+        a = xp.asarray([123])
+        xp_assert_equal(nunique(a), xp.asarray(1))
+
+    def test_all_equal(self, xp: ModuleType):
+        a = xp.asarray([123, 123, 123])
+        xp_assert_equal(nunique(a), xp.asarray(1))
+
+    @pytest.mark.xfail_xp_backend(Backend.DASK, reason="No equal_nan kwarg in unique")
+    @pytest.mark.xfail_xp_backend(
+        Backend.SPARSE, reason="Non-compliant equal_nan=True behaviour"
+    )
+    def test_nan(self, xp: ModuleType, library: Backend):
+        is_numpy = library in (Backend.NUMPY, Backend.NUMPY_READONLY)
+        if is_numpy and NUMPY_VERSION < (1, 24):
+            pytest.xfail("NumPy <1.24 has no equal_nan kwarg in unique")
+
+        # Each NaN is counted separately
+        a = xp.asarray([xp.nan, 123.0, xp.nan])
+        xp_assert_equal(nunique(a), xp.asarray(3))
+
+    @pytest.mark.parametrize("size", [0, 1, 2])
+    def test_device(self, xp: ModuleType, device: Device, size: int):
+        a = xp.asarray([0.0] * size, device=device)
         assert get_device(nunique(a)) == device
 
     def test_xp(self, xp: ModuleType):
@@ -895,6 +928,7 @@ assume_unique = pytest.mark.parametrize(
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no argsort")
+@pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="no unique_values")
 class TestSetDiff1D:
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="NaN-shaped arrays")
     @pytest.mark.xfail_xp_backend(

@@ -1,6 +1,6 @@
 """Pytest fixtures."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 from contextlib import suppress
 from functools import partial, wraps
 from types import ModuleType
@@ -104,7 +104,7 @@ class NumPyReadOnly:
 @pytest.fixture
 def xp(
     library: Backend, request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
-) -> ModuleType:  # numpydoc ignore=PR01,RT03
+) -> Generator[ModuleType]:  # numpydoc ignore=PR01,RT03
     """
     Parameterized fixture that iterates on all libraries.
 
@@ -113,7 +113,27 @@ def xp(
     The current array namespace.
     """
     if library == Backend.NUMPY_READONLY:
-        return NumPyReadOnly()  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
+        yield NumPyReadOnly()  # type: ignore[misc]  # pyright: ignore[reportReturnType]
+        return
+
+    if (
+        library in (Backend.ARRAY_API_STRICT, Backend.ARRAY_API_STRICTEST)
+        and np.__version__ < "1.26"
+    ):
+        pytest.skip("array_api_strict is untested on NumPy <1.26")
+
+    if library == Backend.ARRAY_API_STRICTEST:
+        xp = pytest.importorskip("array_api_strict")
+        with xp.ArrayAPIStrictFlags(
+            boolean_indexing=False,
+            data_dependent_shapes=False,
+            # writeable=False,  # TODO implement in array-api-strict
+            # lazy=True,  # TODO implement in array-api-strict
+            enabled_extensions=(),
+        ):
+            yield xp
+        return
+
     xp = pytest.importorskip(library.value)
     # Possibly wrap module with array_api_compat
     xp = array_namespace(xp.empty(0))
@@ -122,16 +142,15 @@ def xp(
     # in the global scope of the module containing the test function.
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)
 
-    if library == Backend.ARRAY_API_STRICT and np.__version__ < "1.26":
-        pytest.skip("array_api_strict is untested on NumPy <1.26")
-
     if library == Backend.JAX:
         import jax
 
         # suppress unused-ignore to run mypy in -e lint as well as -e dev
         jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call,unused-ignore]
+        yield xp
+        return
 
-    return xp
+    yield xp
 
 
 @pytest.fixture(params=[Backend.DASK])  # Can select the test with `pytest -k dask`

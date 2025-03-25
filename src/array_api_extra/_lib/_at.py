@@ -344,6 +344,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             msg = f"Can't update read-only array {x}"
             raise ValueError(msg)
 
+        # Backends without boolean indexing (other than JAX) crash here
         if in_place_op:  # add(), subtract(), ...
             x[idx] = in_place_op(x[idx], y)
         else:  # set()
