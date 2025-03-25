@@ -13,6 +13,7 @@ import pytest
 
 from ._utils._compat import (
     array_namespace,
+    is_array_api_strict_namespace,
     is_cupy_namespace,
     is_dask_namespace,
     is_pydata_sparse_namespace,
@@ -104,6 +105,12 @@ def xp_assert_equal(actual: Array, desired: Array, err_msg: str = "") -> None:
         if is_pydata_sparse_namespace(xp):
             actual = actual.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
             desired = desired.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+
+        if is_array_api_strict_namespace(xp):
+            # __array__ doesn't work on array-api-strict device arrays
+            # We need to convert to the CPU device first
+            actual = np.asarray(xp.asarray(actual, device=xp.Device("CPU_DEVICE")))
+            desired = np.asarray(xp.asarray(actual, device=xp.Device("CPU_DEVICE")))
 
         # JAX uses `np.testing`
         if is_array_api_strict_namespace(xp):

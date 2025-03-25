@@ -720,6 +720,8 @@ class TestIsClose:
     def test_device(self, xp: ModuleType, device: Device, equal_nan: bool):
         a = xp.asarray([0.0, 0.0, xp.nan], device=device)
         b = xp.asarray([1e-9, 1e-4, xp.nan], device=device)
+        res = isclose(a, b, equal_nan=equal_nan)
+        assert get_device(res) == device
         xp_assert_equal(
             isclose(a, b, equal_nan=equal_nan), xp.asarray([True, False, equal_nan])
         )
