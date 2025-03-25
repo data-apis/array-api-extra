@@ -113,7 +113,7 @@ def xp(
     The current array namespace.
     """
     if library == Backend.NUMPY_READONLY:
-        return NumPyReadOnly()  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
+        return NumPyReadOnly(), None  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
     xp = pytest.importorskip(library.value)
     # Possibly wrap module with array_api_compat
     xp = array_namespace(xp.empty(0))
@@ -131,7 +131,12 @@ def xp(
         # suppress unused-ignore to run mypy in -e lint as well as -e dev
         jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call,unused-ignore]
 
-    return xp
+    device = None
+    if library == Backend.ARRAY_API_STRICT_DEVICE1:
+        import array_api_strict
+
+        device = array_api_strict.Device("device1")
+    return xp, device
 
 
 @pytest.fixture(params=[Backend.DASK])  # Can select the test with `pytest -k dask`

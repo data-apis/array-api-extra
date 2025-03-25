@@ -10,6 +10,7 @@ from types import ModuleType
 from typing import cast
 
 import pytest
+from array_api_compat import is_array_api_strict_namespace
 
 from ._utils._compat import (
     array_namespace,
@@ -106,6 +107,11 @@ def xp_assert_equal(actual: Array, desired: Array, err_msg: str = "") -> None:
             desired = desired.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
         # JAX uses `np.testing`
+        if is_array_api_strict_namespace(xp):
+            # Have to move to CPU for array API strict devices before
+            # we're allowed to convert into numpy
+            actual = np.asarray(xp.asarray(actual, device=xp.Device("CPU_DEVICE")))
+            desired = np.asarray(xp.asarray(actual, device=xp.Device("CPU_DEVICE")))
         np.testing.assert_array_equal(actual, desired, err_msg=err_msg)  # pyright: ignore[reportUnknownArgumentType]
 
 

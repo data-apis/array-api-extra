@@ -24,6 +24,7 @@ class Backend(Enum):  # numpydoc ignore=PR01,PR02  # type: ignore[no-subclass-an
     """
 
     ARRAY_API_STRICT = "array_api_strict", _compat.is_array_api_strict_namespace
+    ARRAY_API_STRICT_DEVICE1 = "array_api_strict", _compat.is_array_api_strict_namespace
     NUMPY = "numpy", _compat.is_numpy_namespace
     NUMPY_READONLY = "numpy_readonly", _compat.is_numpy_namespace
     CUPY = "cupy", _compat.is_cupy_namespace
