@@ -112,7 +112,7 @@ def xp_assert_equal(actual: Array, desired: Array, err_msg: str = "") -> None:
             # __array__ doesn't work on array-api-strict device arrays
             # We need to convert to the CPU device first
             actual_np = np.asarray(xp.asarray(actual, device=xp.Device("CPU_DEVICE")))
-            desired_np = np.asarray(xp.asarray(actual, device=xp.Device("CPU_DEVICE")))
+            desired_np = np.asarray(xp.asarray(desired, device=xp.Device("CPU_DEVICE")))
 
         # JAX/Dask arrays work with `np.testing`
         actual_np = actual if actual_np is None else actual_np
@@ -186,7 +186,7 @@ def xp_assert_close(
             # __array__ doesn't work on array-api-strict device arrays
             # We need to convert to the CPU device first
             actual_np = np.asarray(xp.asarray(actual, device=xp.Device("CPU_DEVICE")))
-            desired_np = np.asarray(xp.asarray(actual, device=xp.Device("CPU_DEVICE")))
+            desired_np = np.asarray(xp.asarray(desired, device=xp.Device("CPU_DEVICE")))
 
         # JAX/Dask arrays work with `np.testing`
         actual_np = actual if actual_np is None else actual_np
