@@ -4,7 +4,7 @@
 [![docs - here!][docs-badge]][docs-link]
 [![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
 [![All Contributors](https://img.shields.io/github/all-contributors/data-apis/array-api-extra?color=ee8449&style=flat-square)](#contributors)
-[![Scientific Python Ecosystem Coordination](https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&color=%235CA038)](https://scientific-python.org/specs/)
+[![Typing](https://img.shields.io/pypi/types/array-api-extra)](https://typing.python.org/)
 [![codecov](https://codecov.io/github/data-apis/array-api-extra/graph/badge.svg)](https://codecov.io/github/data-apis/array-api-extra)
 
 [![PyPI version][pypi-version]][pypi-link]
@@ -33,8 +33,10 @@ Extra array functions built on top of the array API standard.
 
 Used by:
 
-- [SciPy](https://github.com/scipy/scipy) - Fundamental algorithms for
+- [SciPy](https://github.com/scipy/scipy) — Fundamental algorithms for
   scientific computing.
+- [scikit-learn](https://github.com/scikit-learn/scikit-learn) — Machine
+  Learning in Python.
 - _your library? Let us know!_
 
 ## Installation
