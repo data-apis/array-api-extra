@@ -89,6 +89,9 @@ This project exists thanks to the following contributors
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/DetachHead"><img src="https://avatars.githubusercontent.com/u/57028336?v=4?s=100" width="100px;" alt="detachhead"/><br /><sub><b>detachhead</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/pulls?q=is%3Apr+reviewed-by%3Adetachhead" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/NeilGirdhar"><img src="https://avatars.githubusercontent.com/u/730137?v=4?s=100" width="100px;" alt="Neil Girdhar"/><br /><sub><b>Neil Girdhar</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=NeilGirdhar" title="Code">💻</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=NeilGirdhar" title="Tests">⚠️</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lithomas1"><img src="https://avatars.githubusercontent.com/u/47963215?v=4?s=100" width="100px;" alt="Thomas Li"/><br /><sub><b>Thomas Li</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/issues?q=author%3Alithomas1" title="Bug reports">🐛</a></td>
+    </tr>
   </tbody>
 </table>
 
