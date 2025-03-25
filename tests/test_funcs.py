@@ -629,9 +629,8 @@ class TestIsClose:
         xp_assert_equal(actual, xp.asarray([True, True, True, False, False]))
 
     def test_equal_nan(self, xp: ModuleType):
-        xp, device = xp
-        a = xp.asarray([xp.nan, xp.nan, 1.0], device=device)
-        b = xp.asarray([xp.nan, 1.0, xp.nan], device=device)
+        a = xp.asarray([xp.nan, xp.nan, 1.0])
+        b = xp.asarray([xp.nan, 1.0, xp.nan])
         xp_assert_equal(isclose(a, b), xp.asarray([False, False, False]))
         xp_assert_equal(isclose(a, b, equal_nan=True), xp.asarray([True, False, False]))
 
@@ -717,6 +716,11 @@ class TestIsClose:
         b = xp.asarray([1e-9, 1e-4])
         xp_assert_equal(isclose(a, b, xp=xp), xp.asarray([True, False]))
 
+    @pytest.mark.parametrize("equal_nan", [True, False])
+    def test_device(self, xp: ModuleType, device: Device, equal_nan: bool):
+        a = xp.asarray([0.0, 0.0, xp.nan], device=device)
+        b = xp.asarray([1e-9, 1e-4, xp.nan], device=device)
+        xp_assert_equal(isclose(a, b, equal_nan=equal_nan), xp.asarray([True, False, equal_nan]))
 
 class TestKron:
     def test_basic(self, xp: ModuleType):
