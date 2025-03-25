@@ -136,7 +136,7 @@ def test_lazy_apply_core_indices(da: ModuleType):
         xp = array_namespace(x)
         return xp.sum(x, axis=0) + x
 
-    x_np = cast(Array, np.arange(15).reshape(5, 3))  # type: ignore[bad-cast]   # pyright: ignore[reportInvalidCast]
+    x_np = cast(Array, np.arange(15).reshape(5, 3))  # type: ignore[bad-cast]
     expect = da.asarray(f(x_np))
     x_da = da.asarray(x_np).rechunk(3)
 
@@ -419,6 +419,6 @@ def test_invalid_args():
     with pytest.raises(ValueError, match="multiple shapes but only one dtype"):
         _ = lazy_apply(f, x, shape=[(1,), (2,)], dtype=np.int32)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
     with pytest.raises(ValueError, match="single shape but multiple dtypes"):
-        _ = lazy_apply(f, x, shape=(1,), dtype=[np.int32, np.int64])
+        _ = lazy_apply(f, x, shape=(1,), dtype=[np.int32, np.int64])  # pyright: ignore[reportCallIssue,reportArgumentType]
     with pytest.raises(ValueError, match="2 shapes and 1 dtypes"):
         _ = lazy_apply(f, x, shape=[(1,), (2,)], dtype=[np.int32])  # type: ignore[arg-type]  # pyright: ignore[reportCallIssue,reportArgumentType]
