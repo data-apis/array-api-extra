@@ -23,8 +23,10 @@ themselves.
 
 It is currently used by:
 
-- [SciPy](https://github.com/scipy/scipy) - Fundamental algorithms for
+- [SciPy](https://github.com/scipy/scipy) — Fundamental algorithms for
   scientific computing.
+- [scikit-learn](https://github.com/scikit-learn/scikit-learn) — Machine
+  Learning in Python.
 - _your library? Let us know!_
 
 (installation)=
