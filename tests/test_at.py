@@ -257,10 +257,7 @@ def test_incompatible_dtype(
     elif library is Backend.DASK:
         z = at_op(x, idx, op, 1.1, copy=copy)
 
-    elif (
-        library in (Backend.ARRAY_API_STRICT, Backend.ARRAY_API_STRICTEST)
-        and op is not _AtOp.SET
-    ):
+    elif library.like(Backend.ARRAY_API_STRICT) and op is not _AtOp.SET:
         with pytest.raises(Exception, match=r"cast|promote|dtype"):
             _ = at_op(x, idx, op, 1.1, copy=copy)
 

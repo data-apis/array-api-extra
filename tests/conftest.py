@@ -19,6 +19,7 @@ from array_api_extra.testing import patch_lazy_xp_functions
 T = TypeVar("T")
 P = ParamSpec("P")
 
+NUMPY_VERSION = tuple(int(v) for v in np.__version__.split(".")[2])
 np_compat = array_namespace(np.empty(0))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
@@ -43,7 +44,7 @@ def library(request: pytest.FixtureRequest) -> Backend:  # numpydoc ignore=PR01,
                 msg = f"argument of {marker_name} must be a Backend enum"
                 raise TypeError(msg)
             if library == elem:
-                reason = library.value
+                reason = str(library)
                 with suppress(KeyError):
                     reason += ":" + cast(str, marker.kwargs["reason"])
                 skip_or_xfail(reason=reason)
@@ -116,14 +117,14 @@ def xp(
         yield NumPyReadOnly()  # type: ignore[misc]  # pyright: ignore[reportReturnType]
         return
 
-    if (
-        library in (Backend.ARRAY_API_STRICT, Backend.ARRAY_API_STRICTEST)
-        and np.__version__ < "1.26"
-    ):
+    if library.like(Backend.ARRAY_API_STRICT) and NUMPY_VERSION < (1, 26):
         pytest.skip("array_api_strict is untested on NumPy <1.26")
 
+    xp = pytest.importorskip(library.modname)
+    # Possibly wrap module with array_api_compat
+    xp = array_namespace(xp.empty(0))
+
     if library == Backend.ARRAY_API_STRICTEST:
-        xp = pytest.importorskip("array_api_strict")
         with xp.ArrayAPIStrictFlags(
             boolean_indexing=False,
             data_dependent_shapes=False,
@@ -134,10 +135,6 @@ def xp(
             yield xp
         return
 
-    xp = pytest.importorskip(library.value)
-    # Possibly wrap module with array_api_compat
-    xp = array_namespace(xp.empty(0))
-
     # On Dask and JAX, monkey-patch all functions tagged by `lazy_xp_function`
     # in the global scope of the module containing the test function.
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)
@@ -147,8 +144,6 @@ def xp(
 
         # suppress unused-ignore to run mypy in -e lint as well as -e dev
         jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call,unused-ignore]
-        yield xp
-        return
 
     yield xp
 

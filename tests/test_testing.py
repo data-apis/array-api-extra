@@ -223,7 +223,7 @@ def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
     pytest.importorskip("scipy")
     assert erf is not None
     x = xp.asarray([6.0, 7.0])
-    if library in (Backend.ARRAY_API_STRICT, Backend.ARRAY_API_STRICTEST, Backend.JAX):
+    if library.like(Backend.ARRAY_API_STRICT, Backend.JAX):
         # array-api-strict arrays are auto-converted to NumPy
         # which results in an assertion error for mismatched namespaces
         # eager JAX arrays are auto-converted to NumPy in eager JAX

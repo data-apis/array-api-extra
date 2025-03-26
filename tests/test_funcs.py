@@ -32,6 +32,8 @@ from array_api_extra._lib._utils._helpers import eager_shape, ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
+from .conftest import NUMPY_VERSION
+
 # some xp backends are untyped
 # mypy: disable-error-code=no-untyped-def
 
@@ -46,9 +48,6 @@ lazy_xp_function(pad, static_argnames=("pad_width", "mode", "constant_values", "
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp"))
 lazy_xp_function(sinc, static_argnames="xp")
-
-
-NUMPY_VERSION = tuple(int(v) for v in np.__version__.split(".")[2])
 
 
 class TestApplyWhere:
@@ -197,7 +196,7 @@ class TestApplyWhere:
         y = apply_where(x % 2 == 0, x, self.f1, fill_value=x)
         assert get_device(y) == device
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
     @pytest.mark.filterwarnings("ignore::RuntimeWarning")  # overflows, etc.
     @hypothesis.settings(
         # The xp and library fixtures are not regenerated between hypothesis iterations
@@ -223,7 +222,7 @@ class TestApplyWhere:
         library: Backend,
     ):
         if (
-            library in (Backend.NUMPY, Backend.NUMPY_READONLY)
+            library.like(Backend.NUMPY)
             and NUMPY_VERSION < (2, 0)
             and dtype is np.float32
         ):
@@ -843,8 +842,7 @@ class TestNUnique:
         Backend.SPARSE, reason="Non-compliant equal_nan=True behaviour"
     )
     def test_nan(self, xp: ModuleType, library: Backend):
-        is_numpy = library in (Backend.NUMPY, Backend.NUMPY_READONLY)
-        if is_numpy and NUMPY_VERSION < (1, 24):
+        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
             pytest.xfail("NumPy <1.24 has no equal_nan kwarg in unique")
 
         # Each NaN is counted separately
