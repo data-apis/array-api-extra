@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
+from scipy import special
 
 from array_api_extra import (
     apply_where,
@@ -26,6 +27,7 @@ from array_api_extra import (
     sinc,
 )
 from array_api_extra._lib import Backend
+from array_api_extra._lib._funcs import expit
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._helpers import eager_shape, ndindex
@@ -1003,3 +1005,12 @@ class TestSinc:
 
     def test_xp(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0), xp=xp), xp.asarray(1.0))
+
+
+class TestExpit:
+    def test_simple(self, xp: ModuleType):
+        x = xp.asarray([2, 3, 4, 5])
+        np_x = np.asarray([2, 3, 4, 5])
+        actual = expit(x)
+        expected = special.expit(np_x)
+        xp_assert_close(actual, expected)

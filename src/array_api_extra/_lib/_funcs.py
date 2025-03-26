@@ -913,3 +913,29 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
         xp.asarray(xp.finfo(x.dtype).eps, dtype=x.dtype, device=_compat.device(x)),
     )
     return xp.sin(y) / y
+
+
+def expit(x: Array, /, *, xp: ModuleType | None = None) -> Array:
+    """
+    Return the expit function.
+
+    The expit function, also known as the logistic sigmoid function.
+    It is the inverse of the logit function.
+
+    Parameters
+    ----------
+    x : array
+        Input array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array of the same shape as x. Its entries are expit of the
+        corresponding entry of x.
+    """
+    if xp is None:
+        xp = array_namespace(x)
+
+    return 1.0 / (1.0 + xp.exp(-x))
