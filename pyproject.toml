@@ -132,6 +132,7 @@ python = "~=3.13.0"
 numpy = "=1.22.0"
 
 # Backends that can run on CPU-only hosts
+# Note: JAX and PyTorch will install CPU variants.
 [tool.pixi.feature.backends.dependencies]
 pytorch = "*"
 dask = "*"
@@ -153,25 +154,34 @@ jax = "*"
 [tool.pixi.feature.backends.target.win-64.dependencies]
 # jax = "*"  # unavailable
 
-# Backends that require a GPU host and a CUDA driver
+# Backends that require a GPU host and a CUDA driver.
+# Note that JAX and PyTorch automatically prefer CUDA variants
+# thanks to the `system-requirements` below, *if available*.
+# We request them explicitly below to ensure that we don't
+# quietly revert to CPU-only in the future, e.g. when CUDA 13
+# is released and CUDA 12 builds are dropped upstream.
 [tool.pixi.feature.cuda-backends]
 system-requirements = { cuda = "12" }
 
 [tool.pixi.feature.cuda-backends.target.linux-64.dependencies]
 cupy = "*"
 jaxlib = { version = "*", build = "cuda12*" }
+pytorch = { version = "*", build = "cuda12*" }
 
 [tool.pixi.feature.cuda-backends.target.osx-64.dependencies]
 # cupy = "*"  # unavailable
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
+# pytorch = { version = "*", build = "cuda12*" }  # unavailable
 
 [tool.pixi.feature.cuda-backends.target.osx-arm64.dependencies]
 # cupy = "*"  # unavailable
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
+# pytorch = { version = "*", build = "cuda12*" }  # unavailable
 
 [tool.pixi.feature.cuda-backends.target.win-64.dependencies]
 cupy = "*"
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
+pytorch = { version = "*", build = "cuda12*" }
 
 [tool.pixi.environments]
 default = { features = ["py313"], solve-group = "py313" }
