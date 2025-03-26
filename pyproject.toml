@@ -144,6 +144,9 @@ sparse = { version = ">= 0.16.0b3" }
 [tool.pixi.feature.backends.target.linux-64.dependencies]
 jax = "*"
 
+[tool.pixi.feature.backends.target.osx-64.dependencies]
+jax = "*"
+
 [tool.pixi.feature.backends.target.osx-arm64.dependencies]
 jax = "*"
 
@@ -157,6 +160,10 @@ system-requirements = { cuda = "12" }
 [tool.pixi.feature.cuda-backends.target.linux-64.dependencies]
 cupy = "*"
 jaxlib = { version = "*", build = "cuda12*" }
+
+[tool.pixi.feature.cuda-backends.target.osx-64.dependencies]
+# cupy = "*"  # unavailable
+# jaxlib = { version = "*", build = "cuda12*" }  # unavailable
 
 [tool.pixi.feature.cuda-backends.target.osx-arm64.dependencies]
 # cupy = "*"  # unavailable
