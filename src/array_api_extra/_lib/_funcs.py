@@ -919,8 +919,8 @@ def expit(x: Array, /, *, xp: ModuleType | None = None) -> Array:
     """
     Return the expit function.
 
-    The expit function, also known as the logistic sigmoid function.
-    It is the inverse of the logit function.
+    The expit function, also known as the logistic sigmoid function,
+    is the inverse of the logit function.
 
     Parameters
     ----------
