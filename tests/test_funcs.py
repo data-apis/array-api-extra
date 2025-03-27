@@ -838,9 +838,7 @@ class TestNUnique:
         xp_assert_equal(nunique(a), xp.asarray(1))
 
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="No equal_nan kwarg in unique")
-    @pytest.mark.xfail_xp_backend(
-        Backend.SPARSE, reason="Non-compliant equal_nan=True behaviour"
-    )
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="sparse#855")
     def test_nan(self, xp: ModuleType, library: Backend):
         if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
             pytest.xfail("NumPy <1.24 has no equal_nan kwarg in unique")

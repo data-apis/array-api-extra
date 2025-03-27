@@ -279,6 +279,9 @@ def capabilities(xp: ModuleType) -> dict[str, int]:
     """
     Return patched ``xp.__array_namespace_info__().capabilities()``.
 
+    TODO this helper should be eventually removed once all the special cases
+    it handles are fixed in the respective backends.
+
     Parameters
     ----------
     xp : array_namespace
