@@ -186,6 +186,27 @@ def test_lazy_apply_dask_non_numpy_meta(da: ModuleType):
     xp_assert_equal(y.compute(), x_cp + 1)  # type: ignore[attr-defined]  # pyright: ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
 
 
+def test_dask_key(da: ModuleType):
+    """Test that the function name is visible on the Dask dashboard and in metrics."""
+
+    def helloworld(x: Array) -> Array:
+        return x + 1
+
+    x = da.asarray([1, 2])
+    # Use full namespace to bypass monkey-patching by lazy_xp_function,
+    # which calls persist() to materialize exceptions and warnings and in
+    # doing so squashes the graph.
+    y = xpx.lazy_apply(helloworld, x)
+
+    prefixes = set()
+    for key in y.__dask_graph__():  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+        name = key[0] if isinstance(key, tuple) else key
+        assert isinstance(name, str)
+        prefixes.add(name.split("-")[0])
+
+    assert "helloworld" in prefixes
+
+
 def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
     x = xp.asarray([1, 1, 2, 2, 2])
 
