@@ -345,7 +345,11 @@ arrays on a GPU device to NumPy.</p>
 <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="(in NumPy v2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.asarray()</span></code></a>. <a class="reference external" href="https://sparse.pydata.org/en/stable/operations.html#package-configuration">This safety mechanism can be disabled</a>.</p>
 </dd>
 <dt>Dask</dt><dd><p>This allows applying eager functions to Dask arrays.
-The Dask graph won’t be computed.</p>
+The Dask graph won’t be computed until the user calls <code class="docutils literal notranslate"><span class="pre">compute()</span></code> or
+<code class="docutils literal notranslate"><span class="pre">persist()</span></code> down the line.</p>
+<p>The function name will be prominently visible on the user-facing Dask
+dashboard and on Prometheus metrics, so it is recommended for it to be
+meaningful.</p>
 <p><cite>lazy_apply</cite> doesn’t know if <cite>func</cite> reduces along any axes; also, shape
 changes are non-trivial in chunked Dask arrays. For these reasons, all inputs
 will be rechunked into a single chunk.</p>
