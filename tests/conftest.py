@@ -1,6 +1,6 @@
 """Pytest fixtures."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 from contextlib import suppress
 from functools import partial, wraps
 from types import ModuleType
@@ -19,6 +19,7 @@ from array_api_extra.testing import patch_lazy_xp_functions
 T = TypeVar("T")
 P = ParamSpec("P")
 
+NUMPY_VERSION = tuple(int(v) for v in np.__version__.split(".")[2])
 np_compat = array_namespace(np.empty(0))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
@@ -43,7 +44,7 @@ def library(request: pytest.FixtureRequest) -> Backend:  # numpydoc ignore=PR01,
                 msg = f"argument of {marker_name} must be a Backend enum"
                 raise TypeError(msg)
             if library == elem:
-                reason = library.value
+                reason = str(library)
                 with suppress(KeyError):
                     reason += ":" + cast(str, marker.kwargs["reason"])
                 skip_or_xfail(reason=reason)
@@ -104,7 +105,7 @@ class NumPyReadOnly:
 @pytest.fixture
 def xp(
     library: Backend, request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
-) -> ModuleType:  # numpydoc ignore=PR01,RT03
+) -> Generator[ModuleType]:  # numpydoc ignore=PR01,RT03
     """
     Parameterized fixture that iterates on all libraries.
 
@@ -113,17 +114,30 @@ def xp(
     The current array namespace.
     """
     if library == Backend.NUMPY_READONLY:
-        return NumPyReadOnly()  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
-    xp = pytest.importorskip(library.value)
+        yield NumPyReadOnly()  # type: ignore[misc]  # pyright: ignore[reportReturnType]
+        return
+
+    if library.like(Backend.ARRAY_API_STRICT) and NUMPY_VERSION < (1, 26):
+        pytest.skip("array_api_strict is untested on NumPy <1.26")
+
+    xp = pytest.importorskip(library.modname)
     # Possibly wrap module with array_api_compat
     xp = array_namespace(xp.empty(0))
+
+    if library == Backend.ARRAY_API_STRICTEST:
+        with xp.ArrayAPIStrictFlags(
+            boolean_indexing=False,
+            data_dependent_shapes=False,
+            # writeable=False,  # TODO implement in array-api-strict
+            # lazy=True,  # TODO implement in array-api-strict
+            enabled_extensions=(),
+        ):
+            yield xp
+        return
 
     # On Dask and JAX, monkey-patch all functions tagged by `lazy_xp_function`
     # in the global scope of the module containing the test function.
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)
-
-    if library == Backend.ARRAY_API_STRICT and np.__version__ < "1.26":
-        pytest.skip("array_api_strict is untested on NumPy <1.26")
 
     if library == Backend.JAX:
         import jax
@@ -131,7 +145,7 @@ def xp(
         # suppress unused-ignore to run mypy in -e lint as well as -e dev
         jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call,unused-ignore]
 
-    return xp
+    yield xp
 
 
 @pytest.fixture(params=[Backend.DASK])  # Can select the test with `pytest -k dask`

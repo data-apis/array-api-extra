@@ -10,6 +10,7 @@ from array_api_extra._lib._utils._compat import array_namespace
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._helpers import (
     asarrays,
+    capabilities,
     eager_shape,
     in1d,
     meta_namespace,
@@ -27,6 +28,7 @@ lazy_xp_function(in1d, jax_jit=False, static_argnames=("assume_unique", "invert"
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no unique_inverse")
+@pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="no unique_inverse")
 class TestIn1D:
     # cover both code paths
     @pytest.mark.parametrize(
@@ -161,7 +163,8 @@ def test_ndindex(shape: tuple[int, ...]):
     assert tuple(ndindex(*shape)) == tuple(np.ndindex(*shape))
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
+@pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
 def test_eager_shape(xp: ModuleType, library: Backend):
     a = xp.asarray([1, 2, 3])
     # Lazy arrays, like Dask, have an eager shape until you slice them with
@@ -194,3 +197,10 @@ class TestMetaNamespace:
     def test_xp(self, xp: ModuleType):
         args = None, xp.asarray(0), 1
         assert meta_namespace(*args, xp=xp) in (xp, np_compat)
+
+
+def test_capabilities(xp: ModuleType):
+    expect = {"boolean indexing", "data-dependent shapes"}
+    if xp.__array_api_version__ >= "2024.12":
+        expect.add("max dimensions")
+    assert capabilities(xp).keys() == expect

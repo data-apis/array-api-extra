@@ -1,9 +1,10 @@
 """Backends with which array-api-extra interacts in delegation and testing."""
 
+from __future__ import annotations
+
 from collections.abc import Callable
 from enum import Enum
 from types import ModuleType
-from typing import cast
 
 from ._utils import _compat
 
@@ -23,9 +24,14 @@ class Backend(Enum):  # numpydoc ignore=PR01,PR02  # type: ignore[no-subclass-an
         corresponding to the backend.
     """
 
+    # Use :<tag> to prevent Enum from deduplicating items with the same value
     ARRAY_API_STRICT = "array_api_strict", _compat.is_array_api_strict_namespace
+    ARRAY_API_STRICTEST = (
+        "array_api_strict:strictest",
+        _compat.is_array_api_strict_namespace,
+    )
     NUMPY = "numpy", _compat.is_numpy_namespace
-    NUMPY_READONLY = "numpy_readonly", _compat.is_numpy_namespace
+    NUMPY_READONLY = "numpy:readonly", _compat.is_numpy_namespace
     CUPY = "cupy", _compat.is_cupy_namespace
     TORCH = "torch", _compat.is_torch_namespace
     DASK = "dask.array", _compat.is_dask_namespace
@@ -48,4 +54,13 @@ class Backend(Enum):  # numpydoc ignore=PR01,PR02  # type: ignore[no-subclass-an
 
     def __str__(self) -> str:  # type: ignore[explicit-override]  # pyright: ignore[reportImplicitOverride]  # numpydoc ignore=RT01
         """Pretty-print parameterized test names."""
-        return cast(str, self.value)
+        return self.name.lower()
+
+    @property
+    def modname(self) -> str:  # numpydoc ignore=RT01
+        """Module name to be imported."""
+        return self.value.split(":")[0]
+
+    def like(self, *others: Backend) -> bool:  # numpydoc ignore=PR01,RT01
+        """Check if this backend uses the same module as others."""
+        return any(self.modname == other.modname for other in others)

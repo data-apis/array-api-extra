@@ -72,7 +72,8 @@ def test_assert_close_tolerance(xp: ModuleType):
 
 
 @param_assert_equal_close
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
+@pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
 def test_assert_close_equal_none_shape(xp: ModuleType, func: Callable[..., None]):  # type: ignore[explicit-any]
     """On Dask and other lazy backends, test that a shape with NaN's or None's
     can be compared to a real shape.
@@ -222,7 +223,7 @@ def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
     pytest.importorskip("scipy")
     assert erf is not None
     x = xp.asarray([6.0, 7.0])
-    if library in (Backend.ARRAY_API_STRICT, Backend.JAX):
+    if library.like(Backend.ARRAY_API_STRICT, Backend.JAX):
         # array-api-strict arrays are auto-converted to NumPy
         # which results in an assertion error for mismatched namespaces
         # eager JAX arrays are auto-converted to NumPy in eager JAX

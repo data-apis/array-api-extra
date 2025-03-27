@@ -12,7 +12,9 @@ from ._compat import (
     array_namespace,
     is_array_api_obj,
     is_dask_namespace,
+    is_jax_namespace,
     is_numpy_array,
+    is_pydata_sparse_namespace,
 )
 from ._typing import Array
 
@@ -23,6 +25,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 __all__ = [
     "asarrays",
+    "capabilities",
     "eager_shape",
     "in1d",
     "is_python_scalar",
@@ -270,3 +273,36 @@ def meta_namespace(
     # Quietly skip scalars and None's
     metas = [cast(Array | None, getattr(a, "_meta", None)) for a in arrays]
     return array_namespace(*metas)
+
+
+def capabilities(xp: ModuleType) -> dict[str, int]:
+    """
+    Return patched ``xp.__array_namespace_info__().capabilities()``.
+
+    TODO this helper should be eventually removed once all the special cases
+    it handles are fixed in the respective backends.
+
+    Parameters
+    ----------
+    xp : array_namespace
+        The standard-compatible namespace.
+
+    Returns
+    -------
+    dict
+        Capabilities of the namespace.
+    """
+    if is_pydata_sparse_namespace(xp):
+        # No __array_namespace_info__(); no indexing by sparse arrays
+        return {"boolean indexing": False, "data-dependent shapes": True}
+    out = xp.__array_namespace_info__().capabilities()
+    if is_jax_namespace(xp):
+        # FIXME https://github.com/jax-ml/jax/issues/27418
+        out = out.copy()
+        out["boolean indexing"] = False
+    if is_dask_namespace(xp):
+        # FIXME https://github.com/data-apis/array-api-compat/pull/290
+        out = out.copy()
+        out["boolean indexing"] = True
+        out["data-dependent shapes"] = True
+    return out

@@ -1,3 +1,4 @@
+import contextlib
 from types import ModuleType
 from typing import cast
 
@@ -214,24 +215,20 @@ def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
     mxp = np if library is Backend.DASK else xp
     int_type = xp.asarray(0).dtype
 
+    ctx: contextlib.AbstractContextManager[object]
     if library is Backend.JAX:
-        # Single output
-        with pytest.raises(ValueError, match="Output shape must be fully known"):
-            _ = lazy_apply(mxp.unique_values, x, shape=(None,))
-
-        # Multi output
-        with pytest.raises(ValueError, match="Output shape must be fully known"):
-            _ = lazy_apply(
-                mxp.unique_counts,
-                x,
-                shape=((None,), (None,)),
-                dtype=(x.dtype, int_type),
-            )
+        ctx = pytest.raises(ValueError, match="Output shape must be fully known")
+    elif library is Backend.ARRAY_API_STRICTEST:
+        ctx = pytest.raises(RuntimeError, match="data-dependent shapes")
     else:
-        # Single output
+        ctx = contextlib.nullcontext()
+
+    # Single output
+    with ctx:
         values = lazy_apply(mxp.unique_values, x, shape=(None,))
         xp_assert_equal(values, xp.asarray([1, 2]))
 
+    with ctx:
         # Multi output
         values, counts = lazy_apply(
             mxp.unique_counts,
@@ -255,8 +252,9 @@ def check_lazy_apply_none_shape_broadcast(x: Array) -> Array:
 lazy_xp_function(check_lazy_apply_none_shape_broadcast)
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="bool mask")
-@pytest.mark.xfail_xp_backend(Backend.JAX, reason="unknown shape")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
+@pytest.mark.skip_xp_backend(Backend.JAX, reason="boolean indexing")
+@pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
 def test_lazy_apply_none_shape_broadcast(xp: ModuleType):
     """Broadcast from input array with unknown shape"""
     x = xp.asarray([1, 2, 2])
