@@ -3,7 +3,9 @@
   "extends": ["config:recommended"],
   "dependencyDashboardTitle": "META: Dependency Dashboard",
   "rangeStrategy": "bump",
-  "constraints.pixi": ">=0.45.0",
+  "constraints": {
+    "pixi": ">=0.45.0"
+  },
   "packageRules": [
     {
       "matchManagers": ["pixi"],
