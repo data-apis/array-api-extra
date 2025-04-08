@@ -57,7 +57,7 @@ array-api-extra = { path = ".", editable = true }
 typing-extensions = "*"
 pre-commit = "*"
 pylint = "*"
-basedmypy = "*"
+basedmypy = ">=2.10.0"
 basedpyright = "*"
 numpydoc = ">=1.8.0,<2"
 # import dependencies for mypy:
