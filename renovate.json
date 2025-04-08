@@ -16,13 +16,17 @@
       "enabled": false
     },
     {
-      "matchPackageNames": [
-        "/myst-parser|myst_parser|sphinx|sphinx-autodoc-typehints|sphinx-copybutton/"
-      ],
+      "matchPackageNames": ["/myst-parser|myst_parser/"],
       "groupName": "docs"
     },
     {
-      "matchPackageNames": ["/pytest-cov|hypothesis|ipython|jax|pytorch/"],
+      "matchPackageNames": [
+        "/sphinx|sphinx-autodoc-typehints|sphinx-copybutton/"
+      ],
+      "groupName": "sphinx"
+    },
+    {
+      "matchPackageNames": ["/pytest-cov|hypothesis/"],
       "groupName": "tests"
     }
   ]
