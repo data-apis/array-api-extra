@@ -5232,9 +5232,9 @@ packages:
 - pypi: .
   name: array-api-extra
   version: 0.7.2.dev0
-  sha256: 0a4bc34e8dd37b621bf159e2ced23c938dabdd5deac52a5e79656cbb28e7c302
+  sha256: 671006024258074a30f40b61e94dadf3280234c2645ee4d0791fdcf445d919a8
   requires_dist:
-  - array-api-compat>=1.11,<2
+  - array-api-compat>=1.11.2,<2
   requires_python: '>=3.10'
   editable: true
 - conda: https://prefix.dev/conda-forge/noarch/array-api-strict-2.3.1-pyhd8ed1ab_0.conda
