@@ -135,7 +135,7 @@ numpy = "=1.22.0"
 # Note: JAX and PyTorch will install CPU variants.
 [tool.pixi.feature.backends.dependencies]
 pytorch = "*"
-dask = "*"
+dask = ">=2025.3.0"
 numba = "*"  # sparse dependency
 llvmlite = "*"  # sparse dependency
 
