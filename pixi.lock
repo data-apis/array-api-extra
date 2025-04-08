@@ -5232,7 +5232,7 @@ packages:
 - pypi: .
   name: array-api-extra
   version: 0.7.2.dev0
-  sha256: dec3f5c0e283642441e3d0d2d24133e081494bb26fc1b8b4e33e1cc5eae06162
+  sha256: 3fad55a80a112d7bbf96ef291d9d500be2a20e5b72f3f17159f6cdb9d083e40a
   requires_dist:
   - array-api-compat>=1.11.2,<2
   requires_python: '>=3.10'
