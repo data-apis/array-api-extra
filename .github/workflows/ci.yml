@@ -33,7 +33,7 @@ jobs:
       - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
         with:
           extra_args: --hook-stage manual --all-files
-      - uses: prefix-dev/setup-pixi@8eaba7c61d661f73d558b0b477156b7b62667fa4 # v0.8.4
+      - uses: prefix-dev/setup-pixi@dbaed5efa0bd33d6bd6d162bec8a06d8fc43c807 # v0.8.5
         with:
           pixi-version: v0.42.1
           cache: true
@@ -59,7 +59,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: prefix-dev/setup-pixi@8eaba7c61d661f73d558b0b477156b7b62667fa4 # v0.8.4
+      - uses: prefix-dev/setup-pixi@dbaed5efa0bd33d6bd6d162bec8a06d8fc43c807 # v0.8.5
         with:
           pixi-version: v0.42.1
           cache: true
