@@ -2,6 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "dependencyDashboardTitle": "META: Dependency Dashboard",
+  "rangeStrategy": "bump",
   "packageRules": [
     {
       "matchManagers": ["pixi"],
