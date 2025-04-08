@@ -61,7 +61,7 @@ basedmypy = ">=2.10.0"
 basedpyright = "*"
 numpydoc = ">=1.8.0,<2"
 # import dependencies for mypy:
-array-api-strict = "*"
+array-api-strict = ">=1.1.1"
 numpy = "*"
 pytest = "*"
 hypothesis = "*"
@@ -81,7 +81,7 @@ lint = { depends-on = ["pre-commit", "pylint", "mypy", "pyright"] }
 pytest = ">=6"
 pytest-cov = ">=3"
 hypothesis = "*"
-array-api-strict = "*"
+array-api-strict = ">=1.1.1"
 numpy = "*"
 
 [tool.pixi.feature.tests.tasks]
