@@ -58,7 +58,7 @@ typing-extensions = "*"
 pre-commit = "*"
 pylint = "*"
 basedmypy = ">=2.10.0"
-basedpyright = "*"
+basedpyright = ">=1.28.3"
 numpydoc = ">=1.8.0,<2"
 # import dependencies for mypy:
 array-api-strict = ">=2.3.1"
