@@ -65,7 +65,7 @@ array-api-strict = ">=2.3.1"
 numpy = "*"
 pytest = "*"
 hypothesis = "*"
-dask-core = "*"  # No distributed, tornado, etc.
+dask-core = ">=2025.3.0"  # No distributed, tornado, etc.
 # NOTE: don't add jax, pytorch, sparse, cupy here
 # as they slow down mypy and are not portable across target OSs
 
@@ -105,7 +105,7 @@ myst-parser = ">=0.13"
 sphinx-copybutton = "*"
 sphinx-autodoc-typehints = "*"
 # Needed to import parsed modules with autodoc
-dask-core = "*"
+dask-core = ">=2025.3.0"
 pytest = "*"
 typing-extensions = "*"
 numpy = "*"
