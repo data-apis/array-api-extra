@@ -2,7 +2,7 @@
 
 from collections.abc import Callable, Generator
 from contextlib import suppress
-from functools import partial, wraps
+from functools import cache, partial, wraps
 from types import ModuleType
 from typing import ParamSpec, TypeVar, cast
 
@@ -102,6 +102,28 @@ class NumPyReadOnly:
         return wrapper
 
 
+@cache
+def _jax_cuda_device() -> Device | None:
+    """Return a CUDA device for JAX, if available."""
+    import jax
+
+    try:
+        return jax.devices("cuda")[0]
+    except Exception:
+        return None
+
+
+@cache
+def _torch_cuda_device() -> Device | None:
+    """Return a CUDA device for PyTorch, if available."""
+    import torch
+
+    try:
+        return torch.empty((0,), device=torch.device("cuda")).device
+    except Exception:
+        return None
+
+
 @pytest.fixture
 def xp(
     library: Backend, request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
@@ -139,11 +161,27 @@ def xp(
     # in the global scope of the module containing the test function.
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)
 
-    if library == Backend.JAX:
+    if library.like(Backend.JAX):
         import jax
 
         # suppress unused-ignore to run mypy in -e lint as well as -e dev
         jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call,unused-ignore]
+
+        if library == Backend.JAX_GPU:
+            device = _jax_cuda_device()
+            if device is None:
+                pytest.skip("no cuda device available")
+        else:
+            device = jax.devices("cpu")[0]
+        jax.config.update("jax_default_device", device)
+
+    elif library == Backend.TORCH_GPU:
+        if _torch_cuda_device() is None:
+            pytest.skip("no cuda device available")
+        xp.set_default_device("cuda")
+
+    elif library == Backend.TORCH:  # CPU
+        xp.set_default_device("cpu")
 
     yield xp
 

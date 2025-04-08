@@ -27,6 +27,9 @@ as_numpy = pytest.mark.parametrize(
             True,
             marks=[
                 pytest.mark.skip_xp_backend(Backend.CUPY, reason="device->host copy"),
+                pytest.mark.skip_xp_backend(
+                    Backend.TORCH_GPU, reason="device->host copy"
+                ),
                 pytest.mark.skip_xp_backend(Backend.SPARSE, reason="densification"),
             ],
         ),
@@ -100,6 +103,9 @@ def test_lazy_apply_multi_output(xp: ModuleType, as_numpy: bool):
             True,
             marks=[
                 pytest.mark.skip_xp_backend(Backend.CUPY, reason="device->host copy"),
+                pytest.mark.skip_xp_backend(
+                    Backend.TORCH_GPU, reason="device->host copy"
+                ),
                 pytest.mark.skip_xp_backend(Backend.SPARSE, reason="densification"),
             ],
         ),
@@ -216,7 +222,7 @@ def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
     int_type = xp.asarray(0).dtype
 
     ctx: contextlib.AbstractContextManager[object]
-    if library is Backend.JAX:
+    if library.like(Backend.JAX):
         ctx = pytest.raises(ValueError, match="Output shape must be fully known")
     elif library is Backend.ARRAY_API_STRICTEST:
         ctx = pytest.raises(RuntimeError, match="data-dependent shapes")
@@ -254,6 +260,7 @@ lazy_xp_function(check_lazy_apply_none_shape_broadcast)
 
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
 @pytest.mark.skip_xp_backend(Backend.JAX, reason="boolean indexing")
+@pytest.mark.skip_xp_backend(Backend.JAX_GPU, reason="boolean indexing")
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
 def test_lazy_apply_none_shape_broadcast(xp: ModuleType):
     """Broadcast from input array with unknown shape"""
@@ -273,6 +280,9 @@ def test_lazy_apply_none_shape_broadcast(xp: ModuleType):
                     Backend.ARRAY_API_STRICT, reason="device->host copy"
                 ),
                 pytest.mark.skip_xp_backend(Backend.CUPY, reason="device->host copy"),
+                pytest.mark.skip_xp_backend(
+                    Backend.TORCH_GPU, reason="device->host copy"
+                ),
                 pytest.mark.skip_xp_backend(Backend.SPARSE, reason="densification"),
             ],
         ),
@@ -321,7 +331,7 @@ def test_lazy_apply_scalars_and_nones(xp: ModuleType, library: Backend):
         assert isinstance(x, mtyp)
         assert y is None
         # jax.pure_callback wraps scalar args
-        assert isinstance(z, mtyp if library is Backend.JAX else int)
+        assert isinstance(z, mtyp if library.like(Backend.JAX) else int)
         return x + z
 
     x = xp.asarray([1, 2])

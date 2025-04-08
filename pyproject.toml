@@ -238,7 +238,7 @@ disable_error_code = ["redundant-expr", "unreachable", "no-any-return"]
 
 [[tool.mypy.overrides]]
 # slow/unavailable on Windows; do not add to the lint env
-module = ["dask.*", "jax.*"]
+module = ["dask.*", "jax.*", "torch.*"]
 ignore_missing_imports = true
 
 # pyright
