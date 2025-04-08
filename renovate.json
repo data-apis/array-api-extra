@@ -8,6 +8,20 @@
       "matchManagers": ["pixi"],
       "matchCurrentValue": "/^~?=/",
       "enabled": false
+    },
+    {
+      "matchPackageNames": [
+        "/myst-parser|myst_parser|sphinx|sphinx-autodoc-typehints|sphinx-copybutton/"
+      ],
+      "groupName": "docs"
+    },
+    {
+      "matchPackageNames": ["/pylint|pre-commit|typing-extensions/"],
+      "groupName": "lint"
+    },
+    {
+      "matchPackageNames": ["/pytest-cov|hypothesis|ipython|jax|pytorch/"],
+      "groupName": "tests"
     }
   ]
 }
