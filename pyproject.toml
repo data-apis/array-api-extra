@@ -140,7 +140,7 @@ numba = "*"  # sparse dependency
 llvmlite = "*"  # sparse dependency
 
 [tool.pixi.feature.backends.pypi-dependencies]
-sparse = { version = ">= 0.16.0b3" }
+sparse = { version = ">=0.16.0" }
 
 [tool.pixi.feature.backends.target.linux-64.dependencies]
 jax = "*"
