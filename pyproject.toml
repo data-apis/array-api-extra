@@ -121,7 +121,7 @@ ipython = "*"
 ipython = { cmd = "ipython" }
 
 [tool.pixi.feature.py310.dependencies]
-python = "~=3.10.0"
+python = "~=3.13.2"
 
 [tool.pixi.feature.py313.dependencies]
 python = "~=3.13.0"
