@@ -3,6 +3,7 @@
   "extends": ["config:recommended"],
   "dependencyDashboardTitle": "META: Dependency Dashboard",
   "rangeStrategy": "bump",
+  "constraints.pixi": ">=0.45.0",
   "packageRules": [
     {
       "matchManagers": ["pixi"],
@@ -10,17 +11,22 @@
       "enabled": false
     },
     {
-      "matchPackageNames": [
-        "/myst-parser|myst_parser|sphinx|sphinx-autodoc-typehints|sphinx-copybutton/"
-      ],
+      "matchManagers": ["pixi"],
+      "matchPackageNames": ["python"],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["/myst-parser|myst_parser/"],
       "groupName": "docs"
     },
     {
-      "matchPackageNames": ["/pylint|pre-commit|typing-extensions/"],
-      "groupName": "lint"
+      "matchPackageNames": [
+        "/sphinx|sphinx-autodoc-typehints|sphinx-copybutton/"
+      ],
+      "groupName": "sphinx"
     },
     {
-      "matchPackageNames": ["/pytest-cov|hypothesis|ipython|jax|pytorch/"],
+      "matchPackageNames": ["/pytest-cov|hypothesis/"],
       "groupName": "tests"
     }
   ]
