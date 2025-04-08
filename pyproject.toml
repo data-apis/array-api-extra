@@ -100,7 +100,7 @@ open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"] }
 
 [tool.pixi.feature.docs.dependencies]
 sphinx = ">=7.0"
-furo = ">=2023.08.17"
+furo = ">=2024.8.6"
 myst-parser = ">=0.13"
 sphinx-copybutton = "*"
 sphinx-autodoc-typehints = "*"
