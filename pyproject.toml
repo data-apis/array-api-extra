@@ -54,9 +54,9 @@ array-api-compat = ">=1.11.2,<2"
 array-api-extra = { path = ".", editable = true }
 
 [tool.pixi.feature.lint.dependencies]
-typing-extensions = "*"
-pre-commit = "*"
-pylint = "*"
+typing-extensions = ">=4.13.1"
+pre-commit = ">=4.2.0"
+pylint = ">=3.3.6"
 basedmypy = ">=2.10.0"
 basedpyright = ">=1.28.3"
 numpydoc = ">=1.8.0,<2"
@@ -107,7 +107,7 @@ sphinx-autodoc-typehints = "*"
 # Needed to import parsed modules with autodoc
 dask-core = ">=2025.3.0"
 pytest = ">=8.3.5"
-typing-extensions = "*"
+typing-extensions = ">=4.13.1"
 numpy = "*"
 
 [tool.pixi.feature.docs.tasks]
