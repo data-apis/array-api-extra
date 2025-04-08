@@ -137,7 +137,7 @@ numpy = "=1.22.0"
 pytorch = "*"
 dask = ">=2025.3.0"
 numba = "*"  # sparse dependency
-llvmlite = "*"  # sparse dependency
+llvmlite = ">=0.44.0"  # sparse dependency
 
 [tool.pixi.feature.backends.pypi-dependencies]
 sparse = { version = ">=0.16.0" }
