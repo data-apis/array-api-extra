@@ -1,5 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "dependencyDashboardTitle": "META: Dependency Dashboard"
+  "dependencyDashboardTitle": "META: Dependency Dashboard",
+  "packageRules": [
+    {
+      "matchManager": ["pixi"],
+      "matchCurrentValue": "/^~?=/",
+      "enabled": false
+    }
+  ]
 }
