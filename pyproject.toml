@@ -129,7 +129,7 @@ python = "~=3.13.0"
 [tool.pixi.feature.numpy1.dependencies]
 # Oldest NumPy version supported by scikit-learn.
 # Note that this is older than what SPEC0 recommends.
-numpy = "=1.22.0"
+numpy = "1.26.4.*"
 
 # Backends that can run on CPU-only hosts
 # Note: JAX and PyTorch will install CPU variants.
