@@ -115,7 +115,7 @@ docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs" }
 open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"] }
 
 [tool.pixi.feature.dev.dependencies]
-ipython = ">=4.2.1"
+ipython = ">=7.33.0"
 
 [tool.pixi.feature.dev.tasks]
 ipython = { cmd = "ipython" }
