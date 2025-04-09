@@ -1,35 +1,37 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":automergeMinor"
+  ],
   "dependencyDashboardTitle": "META: Dependency Dashboard",
+  "commitMessagePrefix": "deps:",
+  "labels": ["dependencies"],
   "rangeStrategy": "bump",
   "constraints": {
-    "pixi": ">=0.45.0"
+    "pixi": ">=v0.45.0"
   },
+  "minimumReleaseAge": "14 days",
   "packageRules": [
     {
+      "description": "Do not bump deps pinned with '~=' or '='.",
       "matchManagers": ["pixi"],
       "matchCurrentValue": "/^~?=/",
       "enabled": false
     },
     {
+      "description": "Do not bump Python deps in the manifest.",
       "matchManagers": ["pixi"],
       "matchPackageNames": ["python"],
       "enabled": false
     },
     {
-      "matchPackageNames": ["/myst-parser|myst_parser/"],
-      "groupName": "docs"
-    },
-    {
-      "matchPackageNames": [
-        "/sphinx|sphinx-autodoc-typehints|sphinx-copybutton/"
-      ],
-      "groupName": "sphinx"
-    },
-    {
-      "matchPackageNames": ["/pytest-cov|hypothesis/"],
-      "groupName": "tests"
+      "description": "Schedule automerged GHA updates for the 15th of each month.",
+      "matchManagers": ["github-actions"],
+      "groupName": "gha",
+      "schedule": ["* * 15 * *"],
+      "automerge": true
     }
   ]
 }
