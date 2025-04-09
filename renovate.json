@@ -32,6 +32,24 @@
       "groupName": "gha",
       "schedule": ["* * 15 * *"],
       "automerge": true
+    },
+    {
+      "description": "Block PRs for updates blocked on dropping Python 3.10.",
+      "matchManagers": ["pixi"],
+      "matchPackageNames": ["sphinx", "ipython", "sphinx-autodoc-typehints"],
+      "enabled": false
+    },
+    {
+      "description": "Waiting for Numba to support NumPy 2.2.",
+      "matchManagers": ["pixi"],
+      "matchPackageNames": ["numpy"],
+      "enabled": false
+    },
+    {
+      "description": "Block Python CI updates as setup-python lags behind (gh-194).",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["python"],
+      "enabled": false
     }
   ]
 }
