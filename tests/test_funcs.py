@@ -234,7 +234,7 @@ class TestApplyWhere:
 
         # cupy/cupy#8382
         # https://github.com/jax-ml/jax/issues/26658
-        elements = {"allow_subnormal": library not in (Backend.CUPY, Backend.JAX)}
+        elements = {"allow_subnormal": not library.like(Backend.CUPY, Backend.JAX)}
 
         fill_value = xp.asarray(
             data.draw(npst.arrays(dtype=dtype, shape=(), elements=elements))
@@ -929,6 +929,9 @@ class TestSetDiff1D:
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="NaN-shaped arrays")
     @pytest.mark.xfail_xp_backend(
         Backend.TORCH, reason="index_select not implemented for uint32"
+    )
+    @pytest.mark.xfail_xp_backend(
+        Backend.TORCH_GPU, reason="index_select not implemented for uint32"
     )
     def test_setdiff1d(self, xp: ModuleType):
         x1 = xp.asarray([6, 5, 4, 7, 1, 2, 7, 4])

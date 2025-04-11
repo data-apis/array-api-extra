@@ -118,6 +118,9 @@ def assert_copy(
                 pytest.mark.skip_xp_backend(  # test passes when copy=False
                     Backend.JAX, reason="bool mask update with shaped rhs"
                 ),
+                pytest.mark.skip_xp_backend(  # test passes when copy=False
+                    Backend.JAX_GPU, reason="bool mask update with shaped rhs"
+                ),
                 pytest.mark.xfail_xp_backend(
                     Backend.DASK, reason="bool mask update with shaped rhs"
                 ),
@@ -247,14 +250,14 @@ def test_incompatible_dtype(
     idx = xp.asarray([True, False]) if bool_mask else slice(None)
     z = None
 
-    if library is Backend.JAX:
+    if library.like(Backend.JAX):
         if bool_mask:
             z = at_op(x, idx, op, 1.1, copy=copy)
         else:
             with pytest.warns(FutureWarning, match="cannot safely cast"):
                 z = at_op(x, idx, op, 1.1, copy=copy)
 
-    elif library is Backend.DASK:
+    elif library.like(Backend.DASK):
         z = at_op(x, idx, op, 1.1, copy=copy)
 
     elif library.like(Backend.ARRAY_API_STRICT) and op is not _AtOp.SET:
@@ -302,6 +305,9 @@ def test_no_inf_warnings(xp: ModuleType, bool_mask: bool):
                     Backend.NUMPY_READONLY, reason="read-only backend"
                 ),
                 pytest.mark.skip_xp_backend(Backend.JAX, reason="read-only backend"),
+                pytest.mark.skip_xp_backend(
+                    Backend.JAX_GPU, reason="read-only backend"
+                ),
                 pytest.mark.skip_xp_backend(Backend.SPARSE, reason="read-only backend"),
             ],
         ),

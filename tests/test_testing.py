@@ -218,6 +218,7 @@ except ImportError:
     erf = None
 
 
+@pytest.mark.skip_xp_backend(Backend.TORCH_GPU, reason="device->host copy")
 @pytest.mark.filterwarnings("ignore:__array_wrap__:DeprecationWarning")  # PyTorch
 def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
     pytest.importorskip("scipy")
@@ -293,12 +294,12 @@ def test_lazy_xp_modules(xp: ModuleType, library: Backend):
     y = naked.f(x)
     xp_assert_equal(y, x)
 
-    if library is Backend.JAX:
+    if library.like(Backend.JAX):
         with pytest.raises(
             TypeError, match="Attempted boolean conversion of traced array"
         ):
             wrapped.f(x)
-    elif library is Backend.DASK:
+    elif library.like(Backend.DASK):
         with pytest.raises(AssertionError, match=r"dask\.compute"):
             wrapped.f(x)
     else:
