@@ -149,7 +149,7 @@ def xp(
             try:
                 device = jax.devices("cuda")[0]
             except RuntimeError:
-                pytest.skip("no cuda device available")
+                pytest.skip("no CUDA device available")
         else:
             device = jax.devices("cpu")[0]
         jax.config.update("jax_default_device", device)
@@ -158,7 +158,7 @@ def xp(
         import torch.cuda
 
         if not torch.cuda.is_available():
-            pytest.skip("no cuda device available")
+            pytest.skip("no CUDA device available")
         xp.set_default_device("cuda")
 
     elif library == Backend.TORCH:  # CPU
