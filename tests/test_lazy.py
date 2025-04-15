@@ -7,7 +7,7 @@ import pytest
 
 import array_api_extra as xpx  # Let some tests bypass lazy_xp_function
 from array_api_extra import lazy_apply
-from array_api_extra._lib import Backend
+from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils import _compat
 from array_api_extra._lib._utils._compat import array_namespace, is_dask_array

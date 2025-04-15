@@ -9,8 +9,8 @@ import numpy as np
 import pytest
 
 from array_api_extra import at
-from array_api_extra._lib import Backend
 from array_api_extra._lib._at import _AtOp
+from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import array_namespace, is_writeable_array
 from array_api_extra._lib._utils._compat import device as get_device

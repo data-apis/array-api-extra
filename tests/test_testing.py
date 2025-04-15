@@ -5,7 +5,7 @@ from typing import cast
 import numpy as np
 import pytest
 
-from array_api_extra._lib import Backend
+from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import (
     array_namespace,
