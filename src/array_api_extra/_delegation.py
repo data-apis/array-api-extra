@@ -4,31 +4,20 @@ from collections.abc import Sequence
 from types import ModuleType
 from typing import Literal
 
-from ._lib import Backend, _funcs
-from ._lib._utils._compat import array_namespace
+from ._lib import _funcs
+from ._lib._utils._compat import (
+    array_namespace,
+    is_cupy_namespace,
+    is_dask_namespace,
+    is_jax_namespace,
+    is_numpy_namespace,
+    is_pydata_sparse_namespace,
+    is_torch_namespace,
+)
 from ._lib._utils._helpers import asarrays
 from ._lib._utils._typing import Array
 
 __all__ = ["isclose", "pad"]
-
-
-def _delegate(xp: ModuleType, *backends: Backend) -> bool:
-    """
-    Check whether `xp` is one of the `backends` to delegate to.
-
-    Parameters
-    ----------
-    xp : array_namespace
-        Array namespace to check.
-    *backends : IsNamespace
-        Arbitrarily many backends (from the ``IsNamespace`` enum) to check.
-
-    Returns
-    -------
-    bool
-        ``True`` if `xp` matches one of the `backends`, ``False`` otherwise.
-    """
-    return any(backend.is_namespace(xp) for backend in backends)
 
 
 def isclose(
@@ -108,10 +97,15 @@ def isclose(
     """
     xp = array_namespace(a, b) if xp is None else xp
 
-    if _delegate(xp, Backend.NUMPY, Backend.CUPY, Backend.DASK, Backend.JAX):
+    if (
+        is_numpy_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_dask_namespace(xp)
+        or is_jax_namespace(xp)
+    ):
         return xp.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan)
 
-    if _delegate(xp, Backend.TORCH):
+    if is_torch_namespace(xp):
         a, b = asarrays(a, b, xp=xp)  # Array API 2024.12 support
         return xp.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan)
 
@@ -159,14 +153,19 @@ def pad(
         msg = "Only `'constant'` mode is currently supported"
         raise NotImplementedError(msg)
 
+    if (
+        is_numpy_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_jax_namespace(xp)
+        or is_pydata_sparse_namespace(xp)
+    ):
+        return xp.pad(x, pad_width, mode, constant_values=constant_values)
+
     # https://github.com/pytorch/pytorch/blob/cf76c05b4dc629ac989d1fb8e789d4fac04a095a/torch/_numpy/_funcs_impl.py#L2045-L2056
-    if _delegate(xp, Backend.TORCH):
+    if is_torch_namespace(xp):
         pad_width = xp.asarray(pad_width)
         pad_width = xp.broadcast_to(pad_width, (x.ndim, 2))
         pad_width = xp.flip(pad_width, axis=(0,)).flatten()
         return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
-
-    if _delegate(xp, Backend.NUMPY, Backend.JAX, Backend.CUPY, Backend.SPARSE):
-        return xp.pad(x, pad_width, mode, constant_values=constant_values)
 
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)
