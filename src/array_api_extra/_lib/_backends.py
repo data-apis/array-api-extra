@@ -1,4 +1,4 @@
-"""Backends with which array-api-extra runs its tests against."""
+"""Backends against which array-api-extra runs its tests."""
 
 from __future__ import annotations
 
