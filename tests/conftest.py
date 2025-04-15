@@ -139,11 +139,30 @@ def xp(
     # in the global scope of the module containing the test function.
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)
 
-    if library == Backend.JAX:
+    if library.like(Backend.JAX):
         import jax
 
         # suppress unused-ignore to run mypy in -e lint as well as -e dev
         jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call,unused-ignore]
+
+        if library == Backend.JAX_GPU:
+            try:
+                device = jax.devices("cuda")[0]
+            except RuntimeError:
+                pytest.skip("no CUDA device available")
+        else:
+            device = jax.devices("cpu")[0]
+        jax.config.update("jax_default_device", device)
+
+    elif library == Backend.TORCH_GPU:
+        import torch.cuda
+
+        if not torch.cuda.is_available():
+            pytest.skip("no CUDA device available")
+        xp.set_default_device("cuda")
+
+    elif library == Backend.TORCH:  # CPU
+        xp.set_default_device("cpu")
 
     yield xp
 

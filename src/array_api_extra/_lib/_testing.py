@@ -65,6 +65,24 @@ def _check_ns_shape_dtype(
     return desired_xp
 
 
+def _prepare_for_test(array: Array, xp: ModuleType) -> Array:
+    """
+    Ensure that the array can be compared with xp.testing or np.testing.
+
+    This involves transferring it from GPU to CPU memory, densifying it, etc.
+    """
+    if is_torch_namespace(xp):
+        return array.cpu()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+    if is_pydata_sparse_namespace(xp):
+        return array.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+    if is_array_api_strict_namespace(xp):
+        # Note: we deliberately did not add a `.to_device` method in _typing.pyi
+        # even if it is required by the standard as many backends don't support it
+        return array.to_device(xp.Device("CPU_DEVICE"))  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+    # Note: nothing to do for CuPy, because it uses a bespoke test function
+    return array
+
+
 def xp_assert_equal(actual: Array, desired: Array, err_msg: str = "") -> None:
     """
     Array-API compatible version of `np.testing.assert_array_equal`.
@@ -84,6 +102,8 @@ def xp_assert_equal(actual: Array, desired: Array, err_msg: str = "") -> None:
     numpy.testing.assert_array_equal : Similar function for NumPy arrays.
     """
     xp = _check_ns_shape_dtype(actual, desired)
+    actual = _prepare_for_test(actual, xp)
+    desired = _prepare_for_test(desired, xp)
 
     if is_cupy_namespace(xp):
         xp.testing.assert_array_equal(actual, desired, err_msg=err_msg)
@@ -102,22 +122,7 @@ def xp_assert_equal(actual: Array, desired: Array, err_msg: str = "") -> None:
     else:
         import numpy as np  # pylint: disable=import-outside-toplevel
 
-        if is_pydata_sparse_namespace(xp):
-            actual = actual.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-            desired = desired.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-
-        actual_np = None
-        desired_np = None
-        if is_array_api_strict_namespace(xp):
-            # __array__ doesn't work on array-api-strict device arrays
-            # We need to convert to the CPU device first
-            actual_np = np.asarray(xp.asarray(actual, device=xp.Device("CPU_DEVICE")))
-            desired_np = np.asarray(xp.asarray(desired, device=xp.Device("CPU_DEVICE")))
-
-        # JAX/Dask arrays work with `np.testing`
-        actual_np = actual if actual_np is None else actual_np
-        desired_np = desired if desired_np is None else desired_np
-        np.testing.assert_array_equal(actual_np, desired_np, err_msg=err_msg)  # pyright: ignore[reportUnknownArgumentType]
+        np.testing.assert_array_equal(actual, desired, err_msg=err_msg)
 
 
 def xp_assert_close(
@@ -165,6 +170,9 @@ def xp_assert_close(
     elif rtol is None:
         rtol = 1e-7
 
+    actual = _prepare_for_test(actual, xp)
+    desired = _prepare_for_test(desired, xp)
+
     if is_cupy_namespace(xp):
         xp.testing.assert_allclose(
             actual, desired, rtol=rtol, atol=atol, err_msg=err_msg
@@ -176,26 +184,11 @@ def xp_assert_close(
     else:
         import numpy as np  # pylint: disable=import-outside-toplevel
 
-        if is_pydata_sparse_namespace(xp):
-            actual = actual.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-            desired = desired.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-
-        actual_np = None
-        desired_np = None
-        if is_array_api_strict_namespace(xp):
-            # __array__ doesn't work on array-api-strict device arrays
-            # We need to convert to the CPU device first
-            actual_np = np.asarray(xp.asarray(actual, device=xp.Device("CPU_DEVICE")))
-            desired_np = np.asarray(xp.asarray(desired, device=xp.Device("CPU_DEVICE")))
-
-        # JAX/Dask arrays work with `np.testing`
-        actual_np = actual if actual_np is None else actual_np
-        desired_np = desired if desired_np is None else desired_np
-
+        # JAX/Dask arrays work directly with `np.testing`
         assert isinstance(rtol, float)
-        np.testing.assert_allclose(  # pyright: ignore[reportCallIssue]
-            actual_np,  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
-            desired_np,  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        np.testing.assert_allclose(  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue]
+            actual,  # pyright: ignore[reportArgumentType]
+            desired,  # pyright: ignore[reportArgumentType]
             rtol=rtol,
             atol=atol,
             err_msg=err_msg,
