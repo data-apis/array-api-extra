@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from contextlib import nullcontext
 from types import ModuleType
 from typing import cast
 
@@ -24,7 +25,9 @@ param_assert_equal_close = pytest.mark.parametrize(
         xp_assert_equal,
         pytest.param(
             xp_assert_close,
-            marks=pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype"),
+            marks=pytest.mark.xfail_xp_backend(
+                Backend.SPARSE, reason="no isdtype", strict=False
+            ),
         ),
     ],
 )
@@ -58,6 +61,53 @@ def test_assert_close_equal_namespace(xp: ModuleType, func: Callable[..., None])
         func(xp.asarray(0), 0)
     with pytest.raises(TypeError, match="list is not a supported array type"):
         func(xp.asarray([0]), [0])
+
+
+@param_assert_equal_close
+@pytest.mark.parametrize("check_shape", [False, True])
+def test_assert_close_equal_shape(  # type: ignore[explicit-any]
+    xp: ModuleType,
+    func: Callable[..., None],
+    check_shape: bool,
+):
+    context = (
+        pytest.raises(AssertionError, match="shapes do not match")
+        if check_shape
+        else nullcontext()
+    )
+    with context:
+        func(xp.asarray([0, 0]), xp.asarray(0), check_shape=check_shape)
+
+
+@param_assert_equal_close
+@pytest.mark.parametrize("check_dtype", [False, True])
+def test_assert_close_equal_dtype(  # type: ignore[explicit-any]
+    xp: ModuleType,
+    func: Callable[..., None],
+    check_dtype: bool,
+):
+    context = (
+        pytest.raises(AssertionError, match="dtypes do not match")
+        if check_dtype
+        else nullcontext()
+    )
+    with context:
+        func(xp.asarray(0.0), xp.asarray(0), check_dtype=check_dtype)
+
+
+@pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close])
+@pytest.mark.parametrize("check_scalar", [False, True])
+def test_assert_close_equal_scalar(  # type: ignore[explicit-any]
+    func: Callable[..., None],
+    check_scalar: bool,
+):
+    context = (
+        pytest.raises(AssertionError, match="array-ness does not match")
+        if check_scalar
+        else nullcontext()
+    )
+    with context:
+        func(np.asarray(0), np.asarray(0)[()], check_scalar=check_scalar)
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
