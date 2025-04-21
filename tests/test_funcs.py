@@ -196,7 +196,7 @@ class TestApplyWhere:
         y = apply_where(x % 2 == 0, x, self.f1, fill_value=x)
         assert get_device(y) == device
 
-    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no isdtype")
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
     @pytest.mark.filterwarnings("ignore::RuntimeWarning")  # overflows, etc.
     @hypothesis.settings(
         # The xp and library fixtures are not regenerated between hypothesis iterations

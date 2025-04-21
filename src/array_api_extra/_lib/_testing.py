@@ -206,7 +206,9 @@ def xp_assert_close(
     )
 
 
-def xfail(request: pytest.FixtureRequest, reason: str) -> None:
+def xfail(
+    request: pytest.FixtureRequest, *, reason: str, strict: bool | None = None
+) -> None:
     """
     XFAIL the currently running test.
 
@@ -220,5 +222,13 @@ def xfail(request: pytest.FixtureRequest, reason: str) -> None:
         ``request`` argument of the test function.
     reason : str
         Reason for the expected failure.
+    strict: bool, optional
+        If True, the test will be marked as failed if it passes.
+        If False, the test will be marked as passed if it fails.
+        Default: ``xfail_strict`` value in ``pyproject.toml``, or False if absent.
     """
-    request.node.add_marker(pytest.mark.xfail(reason=reason))
+    if strict is not None:
+        marker = pytest.mark.xfail(reason=reason, strict=strict)
+    else:
+        marker = pytest.mark.xfail(reason=reason)
+    request.node.add_marker(marker)
