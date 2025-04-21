@@ -76,9 +76,7 @@ def _check_ns_shape_dtype(
             "array-ness does not match:\n Actual: "
             f"{type(actual)}\n Desired: {type(desired)}"
         )
-        assert (np.isscalar(actual) and np.isscalar(desired)) or (
-            not np.isscalar(actual) and not np.isscalar(desired)
-        ), _msg
+        assert np.isscalar(actual) == np.isscalar(desired), _msg
 
     return desired_xp
 
@@ -139,6 +137,41 @@ def xp_assert_equal(
     np.testing.assert_array_equal(actual, desired, err_msg=err_msg)
 
 
+def xp_assert_less(
+    x: Array,
+    y: Array,
+    *,
+    err_msg: str = "",
+    check_dtype: bool = True,
+    check_shape: bool = True,
+    check_scalar: bool = False,
+) -> None:
+    """
+    Array-API compatible version of `np.testing.assert_array_less`.
+
+    Parameters
+    ----------
+    x, y : Array
+        The arrays to compare according to ``x < y`` (elementwise).
+    err_msg : str, optional
+        Error message to display on failure.
+    check_dtype, check_shape : bool, default: True
+        Whether to check agreement between actual and desired dtypes and shapes
+    check_scalar : bool, default: False
+        NumPy only: whether to check agreement between actual and desired types -
+        0d array vs scalar.
+
+    See Also
+    --------
+    xp_assert_close : Similar function for inexact equality checks.
+    numpy.testing.assert_array_equal : Similar function for NumPy arrays.
+    """
+    xp = _check_ns_shape_dtype(x, y, check_dtype, check_shape, check_scalar)
+    x = _prepare_for_test(x, xp)
+    y = _prepare_for_test(y, xp)
+    np.testing.assert_array_less(x, y, err_msg=err_msg)  # type: ignore[call-overload]
+
+
 def xp_assert_close(
     actual: Array,
     desired: Array,
@@ -196,7 +229,6 @@ def xp_assert_close(
     desired = _prepare_for_test(desired, xp)
 
     # JAX/Dask arrays work directly with `np.testing`
-    assert isinstance(rtol, float)
     np.testing.assert_allclose(  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue]
         actual,  # pyright: ignore[reportArgumentType]
         desired,  # pyright: ignore[reportArgumentType]

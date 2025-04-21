@@ -7,7 +7,11 @@ import numpy as np
 import pytest
 
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
+from array_api_extra._lib._testing import (
+    xp_assert_close,
+    xp_assert_equal,
+    xp_assert_less,
+)
 from array_api_extra._lib._utils._compat import (
     array_namespace,
     is_dask_namespace,
@@ -23,6 +27,7 @@ param_assert_equal_close = pytest.mark.parametrize(
     "func",
     [
         xp_assert_equal,
+        xp_assert_less,
         pytest.param(
             xp_assert_close,
             marks=pytest.mark.xfail_xp_backend(
@@ -33,7 +38,8 @@ param_assert_equal_close = pytest.mark.parametrize(
 )
 
 
-@param_assert_equal_close
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype", strict=False)
+@pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close])
 def test_assert_close_equal_basic(xp: ModuleType, func: Callable[..., None]):  # type: ignore[explicit-any]
     func(xp.asarray(0), xp.asarray(0))
     func(xp.asarray([1, 2]), xp.asarray([1, 2]))
@@ -53,8 +59,8 @@ def test_assert_close_equal_basic(xp: ModuleType, func: Callable[..., None]):  #
 
 @pytest.mark.skip_xp_backend(Backend.NUMPY, reason="test other ns vs. numpy")
 @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="test other ns vs. numpy")
-@pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close])
-def test_assert_close_equal_namespace(xp: ModuleType, func: Callable[..., None]):  # type: ignore[explicit-any]
+@pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
+def test_assert_close_equal_less_namespace(xp: ModuleType, func: Callable[..., None]):  # type: ignore[explicit-any]
     with pytest.raises(AssertionError, match="namespaces do not match"):
         func(xp.asarray(0), np.asarray(0))
     with pytest.raises(TypeError, match="Unrecognized array input"):
@@ -65,7 +71,7 @@ def test_assert_close_equal_namespace(xp: ModuleType, func: Callable[..., None])
 
 @param_assert_equal_close
 @pytest.mark.parametrize("check_shape", [False, True])
-def test_assert_close_equal_shape(  # type: ignore[explicit-any]
+def test_assert_close_equal_less_shape(  # type: ignore[explicit-any]
     xp: ModuleType,
     func: Callable[..., None],
     check_shape: bool,
@@ -76,12 +82,12 @@ def test_assert_close_equal_shape(  # type: ignore[explicit-any]
         else nullcontext()
     )
     with context:
-        func(xp.asarray([0, 0]), xp.asarray(0), check_shape=check_shape)
+        func(xp.asarray([xp.nan, xp.nan]), xp.asarray(xp.nan), check_shape=check_shape)
 
 
 @param_assert_equal_close
 @pytest.mark.parametrize("check_dtype", [False, True])
-def test_assert_close_equal_dtype(  # type: ignore[explicit-any]
+def test_assert_close_equal_less_dtype(  # type: ignore[explicit-any]
     xp: ModuleType,
     func: Callable[..., None],
     check_dtype: bool,
@@ -92,12 +98,17 @@ def test_assert_close_equal_dtype(  # type: ignore[explicit-any]
         else nullcontext()
     )
     with context:
-        func(xp.asarray(0.0), xp.asarray(0), check_dtype=check_dtype)
+        func(
+            xp.asarray(xp.nan, dtype=xp.float32),
+            xp.asarray(xp.nan, dtype=xp.float64),
+            check_dtype=check_dtype,
+        )
 
 
-@pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close])
+@pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
 @pytest.mark.parametrize("check_scalar", [False, True])
-def test_assert_close_equal_scalar(  # type: ignore[explicit-any]
+def test_assert_close_equal_less_scalar(  # type: ignore[explicit-any]
+    xp: ModuleType,
     func: Callable[..., None],
     check_scalar: bool,
 ):
@@ -107,7 +118,7 @@ def test_assert_close_equal_scalar(  # type: ignore[explicit-any]
         else nullcontext()
     )
     with context:
-        func(np.asarray(0), np.asarray(0)[()], check_scalar=check_scalar)
+        func(np.asarray(xp.nan), np.asarray(xp.nan)[()], check_scalar=check_scalar)
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
@@ -121,9 +132,18 @@ def test_assert_close_tolerance(xp: ModuleType):
         xp_assert_close(xp.asarray([100.0]), xp.asarray([102.0]), atol=1)
 
 
-@param_assert_equal_close
+def test_assert_less_basic(xp: ModuleType):
+    xp_assert_less(xp.asarray(-1), xp.asarray(0))
+    xp_assert_less(xp.asarray([1, 2]), xp.asarray([2, 3]))
+    with pytest.raises(AssertionError):
+        xp_assert_less(xp.asarray([1, 1]), xp.asarray([2, 1]))
+    with pytest.raises(AssertionError, match="hello"):
+        xp_assert_less(xp.asarray([1, 1]), xp.asarray([2, 1]), err_msg="hello")
+
+
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
+@pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close])
 def test_assert_close_equal_none_shape(xp: ModuleType, func: Callable[..., None]):  # type: ignore[explicit-any]
     """On Dask and other lazy backends, test that a shape with NaN's or None's
     can be compared to a real shape.
