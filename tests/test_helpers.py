@@ -27,7 +27,7 @@ from .conftest import np_compat
 lazy_xp_function(in1d, jax_jit=False, static_argnames=("assume_unique", "invert", "xp"))
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no unique_inverse")
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no unique_inverse")
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="no unique_inverse")
 class TestIn1D:
     # cover both code paths

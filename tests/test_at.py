@@ -115,11 +115,15 @@ def assert_copy(
         pytest.param(
             *(True, 1, 1),
             marks=(
-                pytest.mark.skip_xp_backend(  # test passes when copy=False
-                    Backend.JAX, reason="bool mask update with shaped rhs"
+                pytest.mark.xfail_xp_backend(
+                    Backend.JAX,
+                    reason="bool mask update with shaped rhs",
+                    strict=False,  # test passes when copy=False
                 ),
-                pytest.mark.skip_xp_backend(  # test passes when copy=False
-                    Backend.JAX_GPU, reason="bool mask update with shaped rhs"
+                pytest.mark.xfail_xp_backend(
+                    Backend.JAX_GPU,
+                    reason="bool mask update with shaped rhs",
+                    strict=False,  # test passes when copy=False
                 ),
                 pytest.mark.xfail_xp_backend(
                     Backend.DASK, reason="bool mask update with shaped rhs"
