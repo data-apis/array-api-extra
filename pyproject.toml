@@ -213,8 +213,8 @@ filterwarnings = ["error"]
 log_cli_level = "INFO"
 testpaths = ["tests"]
 markers = [
-  "skip_xp_backend(library, *, reason=None): Skip test for a specific backend",
-  "xfail_xp_backend(library, *, reason=None): Xfail test for a specific backend",
+  "skip_xp_backend(library, /, *, reason=None): Skip test for a specific backend",
+  "xfail_xp_backend(library, /, *, reason=None, strict=None): Xfail test for a specific backend",
 ]
 
 

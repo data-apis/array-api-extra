@@ -1,7 +1,6 @@
 """Pytest fixtures."""
 
 from collections.abc import Callable, Generator
-from contextlib import suppress
 from functools import partial, wraps
 from types import ModuleType
 from typing import ParamSpec, TypeVar, cast
@@ -34,20 +33,29 @@ def library(request: pytest.FixtureRequest) -> Backend:  # numpydoc ignore=PR01,
     """
     elem = cast(Backend, request.param)
 
-    for marker_name, skip_or_xfail in (
-        ("skip_xp_backend", pytest.skip),
-        ("xfail_xp_backend", partial(xfail, request)),
+    for marker_name, skip_or_xfail, allow_kwargs in (
+        ("skip_xp_backend", pytest.skip, {"reason"}),
+        ("xfail_xp_backend", partial(xfail, request), {"reason", "strict"}),
     ):
         for marker in request.node.iter_markers(marker_name):
-            library = marker.kwargs.get("library") or marker.args[0]  # type: ignore[no-untyped-usage]
-            if not isinstance(library, Backend):
-                msg = f"argument of {marker_name} must be a Backend enum"
+            if len(marker.args) != 1:  # pyright: ignore[reportUnknownArgumentType]
+                msg = f"Expected exactly one positional argument; got {marker.args}"
                 raise TypeError(msg)
+            if not isinstance(marker.args[0], Backend):
+                msg = f"Argument of {marker_name} must be a Backend enum"
+                raise TypeError(msg)
+            if invalid_kwargs := set(marker.kwargs) - allow_kwargs:  # pyright: ignore[reportUnknownArgumentType]
+                msg = f"Unexpected kwarg(s): {invalid_kwargs}"
+                raise TypeError(msg)
+
+            library: Backend = marker.args[0]
+            reason: str | None = marker.kwargs.get("reason", None)
+            strict: bool | None = marker.kwargs.get("strict", None)
+
             if library == elem:
-                reason = str(library)
-                with suppress(KeyError):
-                    reason += ":" + cast(str, marker.kwargs["reason"])
-                skip_or_xfail(reason=reason)
+                reason = f"{library}: {reason}" if reason else str(library)  # pyright: ignore[reportUnknownArgumentType]
+                kwargs = {"strict": strict} if strict is not None else {}
+                skip_or_xfail(reason=reason, **kwargs)  # pyright: ignore[reportUnknownArgumentType]
 
     return elem
 
