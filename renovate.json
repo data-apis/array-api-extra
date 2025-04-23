@@ -50,6 +50,14 @@
       "matchManagers": ["github-actions"],
       "matchPackageNames": ["python"],
       "enabled": false
+    },
+    {
+      "matchPackageNames": ["dask", "dask-core"],
+      "groupName": "dask"
+    },
+    {
+      "matchPackageNames": ["jax", "jaxlib"],
+      "groupName": "jax"
     }
   ]
 }
