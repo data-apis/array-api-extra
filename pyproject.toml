@@ -64,7 +64,7 @@ numpydoc = ">=1.8.0,<2"
 array-api-strict = ">=2.3.1"
 numpy = ">=2.1.3"
 pytest = ">=8.3.5"
-hypothesis = ">=6.131.0"
+hypothesis = ">=6.131.8"
 dask-core = ">=2025.3.0"     # No distributed, tornado, etc.
 # NOTE: don't add jax, pytorch, sparse, cupy here
 # as they slow down mypy and are not portable across target OSs
@@ -80,7 +80,7 @@ lint = { depends-on = ["pre-commit", "pylint", "mypy", "pyright"] , description 
 [tool.pixi.feature.tests.dependencies]
 pytest = ">=8.3.5"
 pytest-cov = ">=6.1.1"
-hypothesis = ">=6.131.0"
+hypothesis = ">=6.131.8"
 array-api-strict = ">=2.3.1"
 numpy = ">=1.22.0"
 
