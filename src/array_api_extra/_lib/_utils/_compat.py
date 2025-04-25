@@ -23,6 +23,7 @@ try:
         is_torch_namespace,
         is_writeable_array,
         size,
+        to_device,
     )
 except ImportError:
     from array_api_compat import (
@@ -45,6 +46,7 @@ except ImportError:
         is_torch_namespace,
         is_writeable_array,
         size,
+        to_device,
     )
 
 __all__ = [
@@ -67,4 +69,5 @@ __all__ = [
     "is_torch_namespace",
     "is_writeable_array",
     "size",
+    "to_device",
 ]
