@@ -5,6 +5,8 @@ Note that this is private API; don't expect it to be stable.
 See also ..testing for public testing utilities.
 """
 
+from __future__ import annotations
+
 import math
 from types import ModuleType
 from typing import Any, cast
