@@ -273,7 +273,7 @@
 <h1>array_api_extra.testing.lazy_xp_function<a class="headerlink" href="#array-api-extra-testing-lazy-xp-function" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="array_api_extra.testing.lazy_xp_function">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.testing.</span></span><span class="sig-name descname"><span class="pre">lazy_xp_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_dask_compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jax_jit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_argnums</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_argnames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.testing.lazy_xp_function" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.testing.</span></span><span class="sig-name descname"><span class="pre">lazy_xp_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_dask_compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jax_jit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_argnums</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_argnames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.testing.lazy_xp_function" title="Link to this definition">¶</a></dt>
 <dd><p>Tag a function to be tested on lazy backends.</p>
 <p>Tag a function so that when any tests are executed with <code class="docutils literal notranslate"><span class="pre">xp=jax.numpy</span></code> the
 function is replaced with a jitted version of itself, and when it is executed with
@@ -285,8 +285,9 @@ This will be later expanded to provide test coverage for other lazy backends.</p
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>func</strong> (<em>callable</em>) – Function to be tested.</p></li>
-<li><p><strong>allow_dask_compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Number of times <cite>func</cite> is allowed to internally materialize the Dask graph. This
-is typically triggered by <code class="docutils literal notranslate"><span class="pre">bool()</span></code>, <code class="docutils literal notranslate"><span class="pre">float()</span></code>, or <code class="docutils literal notranslate"><span class="pre">np.asarray()</span></code>.</p>
+<li><p><strong>allow_dask_compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Whether <cite>func</cite> is allowed to internally materialize the Dask graph, or maximum
+number of times it is allowed to do so. This is typically triggered by
+<code class="docutils literal notranslate"><span class="pre">bool()</span></code>, <code class="docutils literal notranslate"><span class="pre">float()</span></code>, or <code class="docutils literal notranslate"><span class="pre">np.asarray()</span></code>.</p>
 <p>Set to 1 if you are aware that <cite>func</cite> converts the input parameters to NumPy and
 want to let it do so at least for the time being, knowing that it is going to be
 extremely detrimental for performance.</p>
@@ -297,7 +298,9 @@ should at least add explicit calls to <code class="docutils literal notranslate"
 <em>Note:</em> the counter of <cite>allow_dask_compute</cite> resets after each call to <cite>func</cite>, so
 a test function that invokes <cite>func</cite> multiple times should still work with this
 parameter set to 1.</p>
-<p>Default: 0, meaning that <cite>func</cite> must be fully lazy and never materialize the
+<p>Set to True to allow <cite>func</cite> to materialize the graph an unlimited number
+of times.</p>
+<p>Default: False, meaning that <cite>func</cite> must be fully lazy and never materialize the
 graph.</p>
 </p></li>
 <li><p><strong>jax_jit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – Set to True to replace <cite>func</cite> with <code class="docutils literal notranslate"><span class="pre">jax.jit(func)</span></code> after calling the
