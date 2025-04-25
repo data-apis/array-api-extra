@@ -39,7 +39,7 @@ _ufuncs_tags: dict[object, dict[str, Any]] = {}  # type: ignore[explicit-any]
 def lazy_xp_function(  # type: ignore[explicit-any]
     func: Callable[..., Any],
     *,
-    allow_dask_compute: int = 0,
+    allow_dask_compute: bool | int = False,
     jax_jit: bool = True,
     static_argnums: int | Sequence[int] | None = None,
     static_argnames: str | Iterable[str] | None = None,
@@ -59,9 +59,10 @@ def lazy_xp_function(  # type: ignore[explicit-any]
     ----------
     func : callable
         Function to be tested.
-    allow_dask_compute : int, optional
-        Number of times `func` is allowed to internally materialize the Dask graph. This
-        is typically triggered by ``bool()``, ``float()``, or ``np.asarray()``.
+    allow_dask_compute : bool | int, optional
+        Whether `func` is allowed to internally materialize the Dask graph, or maximum
+        number of times it is allowed to do so. This is typically triggered by
+        ``bool()``, ``float()``, or ``np.asarray()``.
 
         Set to 1 if you are aware that `func` converts the input parameters to NumPy and
         want to let it do so at least for the time being, knowing that it is going to be
@@ -75,7 +76,10 @@ def lazy_xp_function(  # type: ignore[explicit-any]
         a test function that invokes `func` multiple times should still work with this
         parameter set to 1.
 
-        Default: 0, meaning that `func` must be fully lazy and never materialize the
+        Set to True to allow `func` to materialize the graph an unlimited number
+        of times.
+
+        Default: False, meaning that `func` must be fully lazy and never materialize the
         graph.
     jax_jit : bool, optional
         Set to True to replace `func` with ``jax.jit(func)`` after calling the
@@ -235,6 +239,10 @@ def patch_lazy_xp_functions(
     if is_dask_namespace(xp):
         for mod, name, func, tags in iter_tagged():
             n = tags["allow_dask_compute"]
+            if n is True:
+                n = 1_000_000
+            elif n is False:
+                n = 0
             wrapped = _dask_wrap(func, n)
             monkeypatch.setattr(mod, name, wrapped)
 
