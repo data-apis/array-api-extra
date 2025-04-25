@@ -8,6 +8,7 @@ import pytest
 
 from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._testing import (
+    as_numpy_array,
     xp_assert_close,
     xp_assert_equal,
     xp_assert_less,
@@ -17,7 +18,7 @@ from array_api_extra._lib._utils._compat import (
     is_dask_namespace,
     is_jax_namespace,
 )
-from array_api_extra._lib._utils._typing import Array
+from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
 # mypy: disable-error-code=decorated-any
@@ -36,6 +37,12 @@ param_assert_equal_close = pytest.mark.parametrize(
         ),
     ],
 )
+
+
+def test_as_numpy_array(xp: ModuleType, device: Device):
+    x = xp.asarray([1, 2, 3], device=device)
+    y = as_numpy_array(x, xp=xp)
+    assert isinstance(y, np.ndarray)
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype", strict=False)
