@@ -50,6 +50,22 @@
       "matchManagers": ["github-actions"],
       "matchPackageNames": ["python"],
       "enabled": false
+    },
+    {
+      "description": "Group Dask packages.",
+      "matchPackageNames": ["dask", "dask-core"],
+      "groupName": "dask"
+    },
+    {
+      "description": "Group JAX packages.",
+      "matchPackageNames": ["jax", "jaxlib"],
+      "groupName": "jax"
+    },
+    {
+      "description": "Schedule hypothesis monthly as releases are frequent.",
+      "matchManagers": ["pixi"],
+      "matchPackageNames": ["hypothesis"],
+      "schedule": ["* * 10 * *"]
     }
   ]
 }

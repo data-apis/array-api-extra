@@ -200,13 +200,18 @@ def non_materializable4(x: Array) -> Array:
     return non_materializable(x)
 
 
+def non_materializable5(x: Array) -> Array:
+    return non_materializable(x)
+
+
 lazy_xp_function(good_lazy)
 # Works on JAX and Dask
 lazy_xp_function(non_materializable2, jax_jit=False, allow_dask_compute=2)
+lazy_xp_function(non_materializable3, jax_jit=False, allow_dask_compute=True)
 # Works on JAX, but not Dask
-lazy_xp_function(non_materializable3, jax_jit=False, allow_dask_compute=1)
+lazy_xp_function(non_materializable4, jax_jit=False, allow_dask_compute=1)
 # Works neither on Dask nor JAX
-lazy_xp_function(non_materializable4)
+lazy_xp_function(non_materializable5)
 
 
 def test_lazy_xp_function(xp: ModuleType):
@@ -217,29 +222,30 @@ def test_lazy_xp_function(xp: ModuleType):
     xp_assert_equal(non_materializable(x), xp.asarray([1.0, 2.0]))
     # Wrapping explicitly disabled
     xp_assert_equal(non_materializable2(x), xp.asarray([1.0, 2.0]))
+    xp_assert_equal(non_materializable3(x), xp.asarray([1.0, 2.0]))
 
     if is_jax_namespace(xp):
-        xp_assert_equal(non_materializable3(x), xp.asarray([1.0, 2.0]))
+        xp_assert_equal(non_materializable4(x), xp.asarray([1.0, 2.0]))
         with pytest.raises(
             TypeError, match="Attempted boolean conversion of traced array"
         ):
-            _ = non_materializable4(x)  # Wrapped
+            _ = non_materializable5(x)  # Wrapped
 
     elif is_dask_namespace(xp):
         with pytest.raises(
             AssertionError,
             match=r"dask\.compute.* 2 times, but only up to 1 calls are allowed",
         ):
-            _ = non_materializable3(x)
+            _ = non_materializable4(x)
         with pytest.raises(
             AssertionError,
             match=r"dask\.compute.* 1 times, but no calls are allowed",
         ):
-            _ = non_materializable4(x)
+            _ = non_materializable5(x)
 
     else:
-        xp_assert_equal(non_materializable3(x), xp.asarray([1.0, 2.0]))
         xp_assert_equal(non_materializable4(x), xp.asarray([1.0, 2.0]))
+        xp_assert_equal(non_materializable5(x), xp.asarray([1.0, 2.0]))
 
 
 def static_params(x: Array, n: int, flag: bool = False) -> Array:
