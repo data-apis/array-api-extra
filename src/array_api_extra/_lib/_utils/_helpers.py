@@ -428,7 +428,7 @@ def pickle_flatten(
             try:
                 # Note: a class that defines __slots__ without defining __getstate__
                 # cannot be pickled with __reduce__(), but can with __reduce_ex__(5)
-                _ = obj.__reduce_ex__(5)
+                _ = obj.__reduce_ex__(pickle.HIGHEST_PROTOCOL)
             except Exception:  # pylint: disable=broad-exception-caught
                 rest.append(obj)
                 return 1
