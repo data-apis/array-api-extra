@@ -23,11 +23,12 @@ def test_vendor_compat():
         is_torch_namespace,
         is_writeable_array,
         size,
+        to_device,
     )
 
     x = xp.asarray([1, 2, 3])
     assert array_namespace(x) is xp
-    device(x)
+    to_device(x, device(x))
     assert is_array_api_obj(x)
     assert is_array_api_strict_namespace(xp)
     assert not is_cupy_array(x)
