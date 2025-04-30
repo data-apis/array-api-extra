@@ -21,8 +21,8 @@
       "enabled": false
     },
     {
-      "description": "Do not bump Python deps in the manifest.",
-      "matchManagers": ["pixi"],
+      "description": "Do not bump Python deps in the manifest or requires-python.",
+      "matchManagers": ["pixi", "pep621"],
       "matchPackageNames": ["python"],
       "enabled": false
     },
