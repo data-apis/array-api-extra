@@ -7,12 +7,15 @@ See also _lib._testing for additional private testing utilities.
 from __future__ import annotations
 
 import contextlib
-from collections.abc import Callable, Iterable, Iterator, Sequence
+import enum
+import warnings
+from collections.abc import Callable, Iterator, Sequence
 from functools import wraps
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar, cast
 
 from ._lib._utils._compat import is_dask_namespace, is_jax_namespace
+from ._lib._utils._helpers import jax_autojit, pickle_flatten, pickle_unflatten
 
 __all__ = ["lazy_xp_function", "patch_lazy_xp_functions"]
 
@@ -26,7 +29,7 @@ else:
     # Sphinx hacks
     SchedulerGetCallable = object
 
-    def override(func: object) -> object:
+    def override(func):
         return func
 
 
@@ -36,13 +39,22 @@ T = TypeVar("T")
 _ufuncs_tags: dict[object, dict[str, Any]] = {}  # type: ignore[explicit-any]
 
 
+class Deprecated(enum.Enum):
+    """Unique type for deprecated parameters."""
+
+    DEPRECATED = 1
+
+
+DEPRECATED = Deprecated.DEPRECATED
+
+
 def lazy_xp_function(  # type: ignore[explicit-any]
     func: Callable[..., Any],
     *,
     allow_dask_compute: bool | int = False,
     jax_jit: bool = True,
-    static_argnums: int | Sequence[int] | None = None,
-    static_argnames: str | Iterable[str] | None = None,
+    static_argnums: Deprecated = DEPRECATED,
+    static_argnames: Deprecated = DEPRECATED,
 ) -> None:  # numpydoc ignore=GL07
     """
     Tag a function to be tested on lazy backends.
@@ -82,16 +94,30 @@ def lazy_xp_function(  # type: ignore[explicit-any]
         Default: False, meaning that `func` must be fully lazy and never materialize the
         graph.
     jax_jit : bool, optional
-        Set to True to replace `func` with ``jax.jit(func)`` after calling the
-        :func:`patch_lazy_xp_functions` test helper with ``xp=jax.numpy``. Set to False
-        if `func` is only compatible with eager (non-jitted) JAX. Default: True.
-    static_argnums : int | Sequence[int], optional
-        Passed to jax.jit. Positional arguments to treat as static (compile-time
-        constant). Default: infer from `static_argnames` using
-        `inspect.signature(func)`.
-    static_argnames : str | Iterable[str], optional
-        Passed to jax.jit. Named arguments to treat as static (compile-time constant).
-        Default: infer from `static_argnums` using `inspect.signature(func)`.
+        Set to True to replace `func` with a smart variant of ``jax.jit(func)`` after
+        calling the :func:`patch_lazy_xp_functions` test helper with ``xp=jax.numpy``.
+        Set to False if `func` is only compatible with eager (non-jitted) JAX.
+
+        Unlike with vanilla ``jax.jit``, all arguments and return types that are not JAX
+        arrays are treated as static; the function can accept and return arbitrary
+        wrappers around JAX arrays. This difference is because, in real life, most users
+        won't wrap the function directly with ``jax.jit`` but rather they will use it
+        within their own code, which is itself then wrapped by ``jax.jit``, and
+        internally consume the function's outputs.
+
+        In other words, the pattern that is being tested is::
+
+            >>> @jax.jit
+            ... def user_func(x):
+            ...     y = user_prepares_inputs(x)
+            ...     z = func(y, some_static_arg=True)
+            ...     return user_consumes(z)
+
+        Default: True.
+    static_argnums :
+        Deprecated; ignored
+    static_argnames :
+        Deprecated; ignored
 
     See Also
     --------
@@ -108,7 +134,7 @@ def lazy_xp_function(  # type: ignore[explicit-any]
 
       def test_myfunc(xp):
           a = xp.asarray([1, 2])
-          # When xp=jax.numpy, this is the same as `b = jax.jit(myfunc)(a)`
+          # When xp=jax.numpy, this is similar to `b = jax.jit(myfunc)(a)`
           # When xp=dask.array, crash on compute() or persist()
           b = myfunc(a)
 
@@ -168,12 +194,20 @@ def lazy_xp_function(  # type: ignore[explicit-any]
           b = mymodule.myfunc(a)  # This is wrapped when xp=jax.numpy or xp=dask.array
           c = naked.myfunc(a)  # This is not
     """
+    if static_argnums is not DEPRECATED or static_argnames is not DEPRECATED:
+        warnings.warn(
+            (
+                "The `static_argnums` and `static_argnames` parameters are deprecated "
+                "and ignored. They will be removed in a future version."
+            ),
+            DeprecationWarning,
+            stacklevel=2,
+        )
     tags = {
         "allow_dask_compute": allow_dask_compute,
         "jax_jit": jax_jit,
-        "static_argnums": static_argnums,
-        "static_argnames": static_argnames,
     }
+
     try:
         func._lazy_xp_function = tags  # type: ignore[attr-defined]  # pylint: disable=protected-access  # pyright: ignore[reportFunctionMemberAccess]
     except AttributeError:  # @cython.vectorize
@@ -247,19 +281,9 @@ def patch_lazy_xp_functions(
             monkeypatch.setattr(mod, name, wrapped)
 
     elif is_jax_namespace(xp):
-        import jax
-
         for mod, name, func, tags in iter_tagged():
             if tags["jax_jit"]:
-                # suppress unused-ignore to run mypy in -e lint as well as -e dev
-                wrapped = cast(  # type: ignore[explicit-any]
-                    Callable[..., Any],
-                    jax.jit(
-                        func,
-                        static_argnums=tags["static_argnums"],
-                        static_argnames=tags["static_argnames"],
-                    ),
-                )
+                wrapped = jax_autojit(func)
                 monkeypatch.setattr(mod, name, wrapped)
 
 
@@ -308,6 +332,7 @@ def _dask_wrap(
     After the function returns, materialize the graph in order to re-raise exceptions.
     """
     import dask
+    import dask.array as da
 
     func_name = getattr(func, "__name__", str(func))
     n_str = f"only up to {n}" if n else "no"
@@ -327,6 +352,8 @@ def _dask_wrap(
         # Block until the graph materializes and reraise exceptions. This allows
         # `pytest.raises` and `pytest.warns` to work as expected. Note that this would
         # not work on scheduler='distributed', as it would not block.
-        return dask.persist(out, scheduler="threads")[0]  # type: ignore[attr-defined,no-untyped-call,func-returns-value,index]  # pyright: ignore[reportPrivateImportUsage]
+        arrays, rest = pickle_flatten(out, da.Array)
+        arrays = dask.persist(arrays, scheduler="threads")[0]  # type: ignore[attr-defined,no-untyped-call,func-returns-value,index]  # pyright: ignore[reportPrivateImportUsage]
+        return pickle_unflatten(arrays, rest)  # pyright: ignore[reportUnknownArgumentType]
 
     return wrapper

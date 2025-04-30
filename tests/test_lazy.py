@@ -15,9 +15,7 @@ from array_api_extra._lib._utils._helpers import eager_shape
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
-lazy_xp_function(
-    lazy_apply, static_argnames=("func", "shape", "dtype", "as_numpy", "xp")
-)
+lazy_xp_function(lazy_apply)
 
 as_numpy = pytest.mark.parametrize(
     "as_numpy",
@@ -386,7 +384,7 @@ def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array
     )
 
 
-lazy_xp_function(check_lazy_apply_kwargs, static_argnames=("expect_cls", "as_numpy"))
+lazy_xp_function(check_lazy_apply_kwargs)
 
 
 @as_numpy

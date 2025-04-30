@@ -148,19 +148,7 @@ def xp(
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)
 
     if library.like(Backend.JAX):
-        import jax
-
-        # suppress unused-ignore to run mypy in -e lint as well as -e dev
-        jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call,unused-ignore]
-
-        if library == Backend.JAX_GPU:
-            try:
-                device = jax.devices("cuda")[0]
-            except RuntimeError:
-                pytest.skip("no CUDA device available")
-        else:
-            device = jax.devices("cpu")[0]
-        jax.config.update("jax_default_device", device)
+        _setup_jax(library)
 
     elif library == Backend.TORCH_GPU:
         import torch.cuda
@@ -175,6 +163,22 @@ def xp(
     yield xp
 
 
+def _setup_jax(library: Backend) -> None:
+    import jax
+
+    # suppress unused-ignore to run mypy in -e lint as well as -e dev
+    jax.config.update("jax_enable_x64", True)  # type: ignore[no-untyped-call,unused-ignore]
+
+    if library == Backend.JAX_GPU:
+        try:
+            device = jax.devices("cuda")[0]
+        except RuntimeError:
+            pytest.skip("no CUDA device available")
+    else:
+        device = jax.devices("cpu")[0]
+    jax.config.update("jax_default_device", device)
+
+
 @pytest.fixture(params=[Backend.DASK])  # Can select the test with `pytest -k dask`
 def da(
     request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
@@ -182,6 +186,17 @@ def da(
     """Variant of the `xp` fixture that only yields dask.array."""
     xp = pytest.importorskip("dask.array")
     xp = array_namespace(xp.empty(0))
+    patch_lazy_xp_functions(request, monkeypatch, xp=xp)
+    return xp
+
+
+@pytest.fixture(params=[Backend.JAX, Backend.JAX_GPU])
+def jnp(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> ModuleType:  # numpydoc ignore=PR01,RT01
+    """Variant of the `xp` fixture that only yields jax.numpy."""
+    xp = pytest.importorskip("jax.numpy")
+    _setup_jax(request.param)
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)
     return xp
 

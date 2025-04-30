@@ -37,17 +37,17 @@ from .conftest import NUMPY_VERSION
 # some xp backends are untyped
 # mypy: disable-error-code=no-untyped-def
 
-lazy_xp_function(apply_where, static_argnums=(2, 3), static_argnames="xp")
-lazy_xp_function(atleast_nd, static_argnames=("ndim", "xp"))
-lazy_xp_function(cov, static_argnames="xp")
-lazy_xp_function(create_diagonal, static_argnames=("offset", "xp"))
-lazy_xp_function(expand_dims, static_argnames=("axis", "xp"))
-lazy_xp_function(kron, static_argnames="xp")
-lazy_xp_function(nunique, static_argnames="xp")
-lazy_xp_function(pad, static_argnames=("pad_width", "mode", "constant_values", "xp"))
+lazy_xp_function(apply_where)
+lazy_xp_function(atleast_nd)
+lazy_xp_function(cov)
+lazy_xp_function(create_diagonal)
+lazy_xp_function(expand_dims)
+lazy_xp_function(kron)
+lazy_xp_function(nunique)
+lazy_xp_function(pad)
 # FIXME calls in1d which calls xp.unique_values without size
-lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp"))
-lazy_xp_function(sinc, static_argnames="xp")
+lazy_xp_function(setdiff1d, jax_jit=False)
+lazy_xp_function(sinc)
 
 
 class TestApplyWhere:
