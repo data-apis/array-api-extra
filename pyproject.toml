@@ -65,7 +65,7 @@ array-api-strict = ">=2.3.1"
 numpy = ">=2.1.3"
 pytest = ">=8.3.5"
 hypothesis = ">=6.131.8"
-dask-core = ">=2025.3.0"     # No distributed, tornado, etc.
+dask-core = ">=2025.4.1"     # No distributed, tornado, etc.
 # NOTE: don't add jax, pytorch, sparse, cupy here
 # as they slow down mypy and are not portable across target OSs
 
@@ -105,7 +105,7 @@ myst-parser = ">=4.0.1"
 sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
-dask-core = ">=2025.3.0"
+dask-core = ">=2025.4.1"
 pytest = ">=8.3.5"
 typing-extensions = ">=4.13.2"
 numpy = ">=2.1.3"
@@ -135,7 +135,7 @@ numpy = "=1.22.0"
 # Note: JAX and PyTorch will install CPU variants.
 [tool.pixi.feature.backends.dependencies]
 pytorch = ">=2.6.0"
-dask = ">=2025.3.0"
+dask = ">=2025.4.1"
 numba = ">=0.61.2"    # sparse dependency
 llvmlite = ">=0.44.0" # sparse dependency
 
