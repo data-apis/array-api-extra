@@ -46,6 +46,11 @@ def _check_ns_shape_dtype(
         The array produced by the tested function.
     desired : Array
         The expected array (typically hardcoded).
+    check_dtype, check_shape : bool, default: True
+        Whether to check agreement between actual and desired dtypes and shapes
+    check_scalar : bool, default: False
+        NumPy only: whether to check agreement between actual and desired types -
+        0d array vs scalar.
 
     Returns
     -------
