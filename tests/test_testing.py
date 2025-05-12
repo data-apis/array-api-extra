@@ -89,6 +89,7 @@ def test_assert_close_equal_less_shape(  # type: ignore[explicit-any]
         else nullcontext()
     )
     with context:
+        # note: NaNs are handled by all 3 checks
         func(xp.asarray([xp.nan, xp.nan]), xp.asarray(xp.nan), check_shape=check_shape)
 
 
