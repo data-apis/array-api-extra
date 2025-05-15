@@ -2,6 +2,7 @@
 # Allow packages that vendor both `array-api-extra` and
 # `array-api-compat` to override the import location
 
+# pylint: disable=duplicate-code
 try:
     from ...._array_api_compat_vendor import (
         array_namespace,
