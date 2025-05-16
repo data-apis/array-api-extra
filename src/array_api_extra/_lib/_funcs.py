@@ -725,7 +725,8 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
         return xp.asarray(n, device=_compat.device(x))
 
     # xp does not have unique_counts; O(n*logn) complexity
-    x = xp.sort(xp.reshape(x, -1))
+    x = xp.reshape(x, (-1,))
+    x = xp.sort(x)
     mask = x != xp.roll(x, -1)
     default_int = xp.__array_namespace_info__().default_dtypes(
         device=_compat.device(x)
