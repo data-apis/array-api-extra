@@ -1,5 +1,4 @@
 import math
-import pickle
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from types import ModuleType
@@ -41,28 +40,11 @@ def at_op(
     just a workaround for when one wants to apply jax.jit to `at()` directly,
     which is not a common use case.
     """
-    if isinstance(idx, (slice | tuple)):
-        return _at_op(x, None, pickle.dumps(idx), op, y, copy=copy, xp=xp)
-    return _at_op(x, idx, None, op, y, copy=copy, xp=xp)
-
-
-def _at_op(
-    x: Array,
-    idx: SetIndex | None,
-    idx_pickle: bytes | None,
-    op: _AtOp,
-    y: Array | object,
-    copy: bool | None,
-    xp: ModuleType | None = None,
-) -> Array:
-    """jitted helper of at_op"""
-    if idx_pickle:
-        idx = pickle.loads(idx_pickle)
-    meth = cast(Callable[..., Array], getattr(at(x, cast(SetIndex, idx)), op.value))  # type: ignore[explicit-any]
+    meth = cast(Callable[..., Array], getattr(at(x, idx), op.value))  # type: ignore[explicit-any]
     return meth(y, copy=copy, xp=xp)
 
 
-lazy_xp_function(_at_op, static_argnames=("op", "idx_pickle", "copy", "xp"))
+lazy_xp_function(at_op)
 
 
 @contextmanager

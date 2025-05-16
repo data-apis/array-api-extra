@@ -263,32 +263,24 @@ def static_params(x: Array, n: int, flag: bool = False) -> Array:
     return x * 3.0
 
 
-def static_params1(x: Array, n: int, flag: bool = False) -> Array:
-    return static_params(x, n, flag)
+lazy_xp_function(static_params)
 
 
-def static_params2(x: Array, n: int, flag: bool = False) -> Array:
-    return static_params(x, n, flag)
-
-
-def static_params3(x: Array, n: int, flag: bool = False) -> Array:
-    return static_params(x, n, flag)
-
-
-lazy_xp_function(static_params1, static_argnums=(1, 2))
-lazy_xp_function(static_params2, static_argnames=("n", "flag"))
-lazy_xp_function(static_params3, static_argnums=1, static_argnames="flag")
-
-
-@pytest.mark.parametrize("func", [static_params1, static_params2, static_params3])
-def test_lazy_xp_function_static_params(xp: ModuleType, func: Callable[..., Array]):  # type: ignore[explicit-any]
+def test_lazy_xp_function_static_params(xp: ModuleType):
     x = xp.asarray([1.0, 2.0])
-    xp_assert_equal(func(x, 1), xp.asarray([3.0, 6.0]))
-    xp_assert_equal(func(x, 1, True), xp.asarray([2.0, 4.0]))
-    xp_assert_equal(func(x, 1, False), xp.asarray([3.0, 6.0]))
-    xp_assert_equal(func(x, 0, False), xp.asarray([3.0, 6.0]))
-    xp_assert_equal(func(x, 1, flag=True), xp.asarray([2.0, 4.0]))
-    xp_assert_equal(func(x, n=1, flag=True), xp.asarray([2.0, 4.0]))
+    xp_assert_equal(static_params(x, 1), xp.asarray([3.0, 6.0]))
+    xp_assert_equal(static_params(x, 1, True), xp.asarray([2.0, 4.0]))
+    xp_assert_equal(static_params(x, 1, False), xp.asarray([3.0, 6.0]))
+    xp_assert_equal(static_params(x, 0, False), xp.asarray([3.0, 6.0]))
+    xp_assert_equal(static_params(x, 1, flag=True), xp.asarray([2.0, 4.0]))
+    xp_assert_equal(static_params(x, n=1, flag=True), xp.asarray([2.0, 4.0]))
+
+
+def test_lazy_xp_function_deprecated_static_argnames():
+    with pytest.warns(DeprecationWarning, match="static_argnames"):
+        lazy_xp_function(static_params, static_argnames=["flag"])  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+    with pytest.warns(DeprecationWarning, match="static_argnums"):
+        lazy_xp_function(static_params, static_argnums=[1])  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
 try:
@@ -349,6 +341,66 @@ def test_lazy_xp_function_eagerly_raises(da: ModuleType):
     x = da.arange(3)
     with pytest.raises(ValueError, match="Hello world"):
         _ = dask_raises(x)
+
+
+class Wrapper:
+    """Trivial opaque wrapper. Must be pickleable."""
+
+    x: Array
+
+    def __init__(self, x: Array):
+        self.x = x
+
+
+def check_opaque_wrapper(w: Wrapper, xp: ModuleType) -> Wrapper:
+    assert isinstance(w, Wrapper)
+    assert array_namespace(w.x) == xp
+    return Wrapper(w.x + 1)
+
+
+lazy_xp_function(check_opaque_wrapper)
+
+
+def test_lazy_xp_function_opaque_wrappers(xp: ModuleType):
+    """
+    Test that function input and output can be wrapped into arbitrary
+    serializable Python objects, even if jax.jit does not support them.
+    """
+    x = xp.asarray([1, 2])
+    xp2 = array_namespace(x)  # Revert NUMPY_READONLY to array_api_compat.numpy
+    res = check_opaque_wrapper(Wrapper(x), xp2)
+    xp_assert_equal(res.x, xp.asarray([2, 3]))
+
+
+def test_lazy_xp_function_opaque_wrappers_eagerly_raise(da: ModuleType):
+    """
+    Like `test_lazy_xp_function_eagerly_raises`, but the returned object is
+    wrapped in an opaque wrapper.
+    """
+    x = da.arange(3)
+    with pytest.raises(ValueError, match="Hello world"):
+        _ = Wrapper(dask_raises(x))
+
+
+def check_recursive(x: list[object]) -> list[object]:
+    assert isinstance(x, list)
+    assert x[1] is x
+    y: list[object] = [cast(Array, x[0]) + 1]
+    y.append(y)
+    return y
+
+
+lazy_xp_function(check_recursive)
+
+
+def test_lazy_xp_function_recursive(xp: ModuleType):
+    """Test that inputs and outputs can be recursive data structures."""
+    x: list[object] = [xp.asarray([1, 2])]
+    x.append(x)
+    y = check_recursive(x)
+    assert isinstance(y, list)
+    xp_assert_equal(cast(Array, y[0]), xp.asarray([2, 3]))
+    assert y[1] is y
 
 
 wrapped = ModuleType("wrapped")
