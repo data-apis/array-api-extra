@@ -540,6 +540,25 @@ def jax_autojit(
     See Also
     --------
     jax.jit : JAX JIT compilation function.
+
+    Notes
+    -----
+    These are useful choices *for testing purposes only*, which is how this function is
+    intended to be used. The output of ``jax.jit`` is a C++ level callable, that
+    directly dispatches to the compiled kernel after the initial call. In comparison,
+    ``jax_autojit`` incurs in a much higher dispatch time.
+
+    Additionally, consider::
+
+        def f(x: Array, y: float, plus: bool) -> Array:
+            return x + y if plus else x - y
+
+        j1 = jax.jit(f, static_argnames="plus")
+        j2 = jax_autojit(f)
+
+    In the above example, ``j2`` requires a lot less setup to be tested effectively than
+    ``j1``, but on the flip side it means that it will be re-traced for every different
+    value of ``y``, which likely makes it not fit for purpose in production.
     """
     import jax
 

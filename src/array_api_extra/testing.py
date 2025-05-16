@@ -96,6 +96,7 @@ def lazy_xp_function(  # type: ignore[explicit-any]
     jax_jit : bool, optional
         Set to True to replace `func` with a smart variant of ``jax.jit(func)`` after
         calling the :func:`patch_lazy_xp_functions` test helper with ``xp=jax.numpy``.
+        This is the default behaviour.
         Set to False if `func` is only compatible with eager (non-jitted) JAX.
 
         Unlike with vanilla ``jax.jit``, all arguments and return types that are not JAX
