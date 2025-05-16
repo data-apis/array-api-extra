@@ -463,7 +463,7 @@ def pickle_unflatten(instances: Iterable[object], rest: FlattenRest) -> Any:  # 
     Notes
     -----
     The `instances` iterable must yield at least the same number of elements as the ones
-    returned by ``pickle_without``, but the elements do not need to be the same objects
+    returned by ``pickle_flatten``, but the elements do not need to be the same objects
     or even the same types of objects. Excess elements, if any, will be left untouched.
     """
     iters = iter(instances), iter(rest)
