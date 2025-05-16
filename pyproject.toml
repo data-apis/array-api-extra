@@ -26,7 +26,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = ["array-api-compat>=1.11.2,<2"]
+dependencies = ["array-api-compat>=1.12.0,<2"]
 
 [project.urls]
 Homepage = "https://github.com/data-apis/array-api-extra"
@@ -48,7 +48,7 @@ platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [tool.pixi.dependencies]
 python = ">=3.10,<3.14"
-array-api-compat = ">=1.11.2,<2"
+array-api-compat = ">=1.12.0,<2"
 
 [tool.pixi.pypi-dependencies]
 array-api-extra = { path = ".", editable = true }

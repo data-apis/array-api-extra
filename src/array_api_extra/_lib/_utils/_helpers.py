@@ -296,13 +296,9 @@ def capabilities(xp: ModuleType) -> dict[str, int]:
         # No __array_namespace_info__(); no indexing by sparse arrays
         return {"boolean indexing": False, "data-dependent shapes": True}
     out = xp.__array_namespace_info__().capabilities()
-    if is_jax_namespace(xp):
+    if is_jax_namespace(xp) and out["boolean indexing"]:
         # FIXME https://github.com/jax-ml/jax/issues/27418
+        # Fixed in jax >=0.6.0
         out = out.copy()
         out["boolean indexing"] = False
-    if is_dask_namespace(xp):
-        # FIXME https://github.com/data-apis/array-api-compat/pull/290
-        out = out.copy()
-        out["boolean indexing"] = True
-        out["data-dependent shapes"] = True
     return out
