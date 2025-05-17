@@ -305,6 +305,7 @@ graph.</p>
 </p></li>
 <li><p><strong>jax_jit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>Set to True to replace <cite>func</cite> with a smart variant of <code class="docutils literal notranslate"><span class="pre">jax.jit(func)</span></code> after
 calling the <a class="reference internal" href="array_api_extra.testing.patch_lazy_xp_functions.html#array_api_extra.testing.patch_lazy_xp_functions" title="array_api_extra.testing.patch_lazy_xp_functions"><code class="xref py py-func docutils literal notranslate"><span class="pre">patch_lazy_xp_functions()</span></code></a> test helper with <code class="docutils literal notranslate"><span class="pre">xp=jax.numpy</span></code>.
+This is the default behaviour.
 Set to False if <cite>func</cite> is only compatible with eager (non-jitted) JAX.</p>
 <p>Unlike with vanilla <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>, all arguments and return types that are not JAX
 arrays are treated as static; the function can accept and return arbitrary
