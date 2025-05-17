@@ -546,7 +546,7 @@ def jax_autojit(
     These are useful choices *for testing purposes only*, which is how this function is
     intended to be used. The output of ``jax.jit`` is a C++ level callable, that
     directly dispatches to the compiled kernel after the initial call. In comparison,
-    ``jax_autojit`` incurs in a much higher dispatch time.
+    ``jax_autojit`` incurs a much higher dispatch time.
 
     Additionally, consider::
 
