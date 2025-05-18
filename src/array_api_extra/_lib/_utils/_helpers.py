@@ -332,7 +332,7 @@ def capabilities(xp: ModuleType, *, device: Device | None = None) -> dict[str, i
     if is_torch_namespace(xp):
         # FIXME https://github.com/data-apis/array-api/issues/945
         device = xp.get_default_device() if device is None else xp.device(device)
-        if cast(Any, device).type == "meta":  # type: ignore[explicit-any]
+        if device.type == "meta":  # type: ignore[union-attr]  # pyright: ignore[reportAttributeAccessIssue,reportOptionalMemberAccess]
             out = out.copy()
             out["boolean indexing"] = False
             out["data-dependent shapes"] = False
