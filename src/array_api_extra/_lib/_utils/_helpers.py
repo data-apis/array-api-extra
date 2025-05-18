@@ -29,8 +29,9 @@ from ._compat import (
     is_jax_namespace,
     is_numpy_array,
     is_pydata_sparse_namespace,
+    is_torch_namespace,
 )
-from ._typing import Array
+from ._typing import Array, Device
 
 if TYPE_CHECKING:  # pragma: no cover
     # TODO import from typing (requires Python >=3.12 and >=3.13)
@@ -300,7 +301,7 @@ def meta_namespace(
     return array_namespace(*metas)
 
 
-def capabilities(xp: ModuleType) -> dict[str, int]:
+def capabilities(xp: ModuleType, *, device: Device | None = None) -> dict[str, int]:
     """
     Return patched ``xp.__array_namespace_info__().capabilities()``.
 
@@ -311,6 +312,8 @@ def capabilities(xp: ModuleType) -> dict[str, int]:
     ----------
     xp : array_namespace
         The standard-compatible namespace.
+    device : Device, optional
+        The device to use.
 
     Returns
     -------
@@ -326,6 +329,13 @@ def capabilities(xp: ModuleType) -> dict[str, int]:
         # Fixed in jax >=0.6.0
         out = out.copy()
         out["boolean indexing"] = False
+    if is_torch_namespace(xp):
+        # FIXME https://github.com/data-apis/array-api/issues/945
+        device = xp.get_default_device() if device is None else xp.device(device)
+        if cast(Any, device).type == "meta":  # type: ignore[explicit-any]
+            out = out.copy()
+            out["boolean indexing"] = False
+            out["data-dependent shapes"] = False
     return out
 
 

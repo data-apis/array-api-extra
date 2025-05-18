@@ -279,6 +279,9 @@ def test_lazy_apply_none_shape_broadcast(xp: ModuleType):
                 ),
                 pytest.mark.skip_xp_backend(Backend.CUPY, reason="device->host copy"),
                 pytest.mark.skip_xp_backend(
+                    Backend.TORCH, reason="materialize 'meta' device"
+                ),
+                pytest.mark.skip_xp_backend(
                     Backend.TORCH_GPU, reason="device->host copy"
                 ),
                 pytest.mark.skip_xp_backend(Backend.SPARSE, reason="densification"),

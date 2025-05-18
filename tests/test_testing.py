@@ -39,10 +39,22 @@ param_assert_equal_close = pytest.mark.parametrize(
 )
 
 
-def test_as_numpy_array(xp: ModuleType, device: Device):
-    x = xp.asarray([1, 2, 3], device=device)
-    y = as_numpy_array(x, xp=xp)
-    assert isinstance(y, np.ndarray)
+class TestAsNumPyArray:
+    def test_basic(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3])
+        y = as_numpy_array(x, xp=xp)
+        xp_assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+
+    def test_device(self, xp: ModuleType, library: Backend, device: Device):
+        x = xp.asarray([1, 2, 3], device=device)
+        actual = as_numpy_array(x, xp=xp)
+        if library is Backend.TORCH:
+            assert device.type == "meta"  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+            expect = np.asarray([0, 0, 0])
+        else:
+            expect = np.asarray([1, 2, 3])
+
+        xp_assert_equal(actual, expect)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype", strict=False)

@@ -100,7 +100,11 @@ def as_numpy_array(array: Array, *, xp: ModuleType) -> np.typing.NDArray[Any]:  
         return array.todense()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
     if is_torch_namespace(xp):
-        array = to_device(array, "cpu")
+        if array.device.type == "meta":  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+            # Can't materialize; generate dummy data instead
+            array = xp.zeros_like(array, device="cpu")
+        else:
+            array = to_device(array, "cpu")
     if is_array_api_strict_namespace(xp):
         cpu: Device = xp.Device("CPU_DEVICE")
         array = to_device(array, cpu)

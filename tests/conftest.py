@@ -211,7 +211,9 @@ def device(
     Where possible, return a device that is not the default one.
     """
     if library == Backend.ARRAY_API_STRICT:
-        d = xp.Device("device1")
-        assert get_device(xp.empty(0)) != d
-        return d
+        return xp.Device("device1")
+    if library == Backend.TORCH:
+        return xp.device("meta")
+    if library == Backend.TORCH_GPU:
+        return xp.device("cpu")
     return get_device(xp.empty(0))

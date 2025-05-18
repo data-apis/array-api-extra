@@ -212,11 +212,31 @@ class TestMetaNamespace:
         assert meta_namespace(*args, xp=xp) in (xp, np_compat)
 
 
-def test_capabilities(xp: ModuleType):
-    expect = {"boolean indexing", "data-dependent shapes"}
-    if xp.__array_api_version__ >= "2024.12":
-        expect.add("max dimensions")
-    assert capabilities(xp).keys() == expect
+class TestCapabilities:
+    def test_basic(self, xp: ModuleType):
+        expect = {"boolean indexing", "data-dependent shapes"}
+        if xp.__array_api_version__ >= "2024.12":
+            expect.add("max dimensions")
+        assert capabilities(xp).keys() == expect
+
+    def test_device(self, xp: ModuleType, library: Backend, device: Device):
+        expect_keys = {"boolean indexing", "data-dependent shapes"}
+        if xp.__array_api_version__ >= "2024.12":
+            expect_keys.add("max dimensions")
+        assert capabilities(xp, device=device).keys() == expect_keys
+
+        if library.like(Backend.TORCH):
+            # The output of capabilities is device-specific.
+
+            # Test that device=None gets the current default device.
+            expect = capabilities(xp, device=device)
+            with xp.device(device):
+                actual = capabilities(xp)
+            assert actual == expect
+
+            # Test that we're accepting anything that is accepted by the
+            # device= parameter in other functions
+            actual = capabilities(xp, device=device.type)  # type: ignore[attr-defined]  # pyright: ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
 
 
 class Wrapper(Generic[T]):
