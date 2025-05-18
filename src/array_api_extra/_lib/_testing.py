@@ -103,9 +103,7 @@ def _check_ns_shape_dtype(
 
 def _is_materializable(x: Array) -> bool:
     """
-    Check if the array is materializable, e.g. `as_numpy_array` can be called on it
-    and one can assume that `__dlpack__` will succeed (if implemented, and given a
-    compatible device).
+    Return True if you can call `as_numpy_array(x)`; False otherwise.
     """
     # Important: here we assume that we're not tracing -
     # e.g. we're not inside `jax.jit`` nor `cupy.cuda.Stream.begin_capture`.
