@@ -153,7 +153,7 @@ def _apply_where(  # type: ignore[explicit-any]  # numpydoc ignore=PR01,RT01
 ) -> Array:
     """Helper of `apply_where`. On Dask, this runs on a single chunk."""
 
-    if not capabilities(xp)["boolean indexing"]:
+    if not capabilities(xp, device=_compat.device(cond))["boolean indexing"]:
         # jax.jit does not support assignment by boolean mask
         return xp.where(cond, f1(*args), f2(*args) if f2 is not None else fill_value)
 
@@ -716,7 +716,7 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
     # 2. backend has unique_counts and it returns a None-sized array;
     #    e.g. Dask, ndonnx
     # 3. backend does not have unique_counts; e.g. wrapped JAX
-    if capabilities(xp)["data-dependent shapes"]:
+    if capabilities(xp, device=_compat.device(x))["data-dependent shapes"]:
         # xp has unique_counts; O(n) complexity
         _, counts = xp.unique_counts(x)
         n = _compat.size(counts)

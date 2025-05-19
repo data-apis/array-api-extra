@@ -731,9 +731,6 @@ class TestIsClose:
         b = xp.asarray([1e-9, 1e-4, xp.nan], device=device)
         res = isclose(a, b, equal_nan=equal_nan)
         assert get_device(res) == device
-        xp_assert_equal(
-            isclose(a, b, equal_nan=equal_nan), xp.asarray([True, False, equal_nan])
-        )
 
 
 class TestKron:
@@ -996,6 +993,9 @@ class TestSetDiff1D:
             _ = setdiff1d(0, 0, assume_unique=assume_unique)
 
     @assume_unique
+    @pytest.mark.skip_xp_backend(
+        Backend.TORCH, reason="device='meta' does not support unknown shapes"
+    )
     def test_device(self, xp: ModuleType, device: Device, assume_unique: bool):
         x1 = xp.asarray([3, 8, 20], device=device)
         x2 = xp.asarray([2, 3, 4], device=device)

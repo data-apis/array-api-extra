@@ -24,10 +24,17 @@ from array_api_extra.testing import lazy_xp_function
 # pyright: reportUnknownParameterType=false,reportMissingParameterType=false
 
 
-def test_as_numpy_array(xp: ModuleType, device: Device):
-    x = xp.asarray([1, 2, 3], device=device)
-    y = as_numpy_array(x, xp=xp)
-    assert isinstance(y, np.ndarray)
+class TestAsNumPyArray:
+    def test_basic(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3])
+        y = as_numpy_array(x, xp=xp)
+        xp_assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+
+    @pytest.mark.skip_xp_backend(Backend.TORCH, reason="materialize 'meta' device")
+    def test_device(self, xp: ModuleType, device: Device):
+        x = xp.asarray([1, 2, 3], device=device)
+        y = as_numpy_array(x, xp=xp)
+        xp_assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
 class TestAssertEqualCloseLess:
@@ -80,7 +87,7 @@ class TestAssertEqualCloseLess:
         func(a, b, check_shape=False)
         with pytest.raises(AssertionError, match="Mismatched elements"):
             func(a, c, check_shape=False)
-        with pytest.raises(AssertionError, match=r"shapes \(1,\), \(2,\) mismatch"):
+        with pytest.raises(AssertionError, match="sizes do not match"):
             func(a, d, check_shape=False)
 
     @pytest.mark.parametrize("func", [xp_assert_equal, pr_assert_close, xp_assert_less])
@@ -168,6 +175,20 @@ class TestAssertEqualCloseLess:
             func(xp.asarray([2, 3]), a)
         with pytest.raises(AssertionError, match="Mismatched elements"):
             func(xp.asarray([4]), a)
+
+    @pytest.mark.parametrize("func", [xp_assert_equal, pr_assert_close, xp_assert_less])
+    def test_device(self, xp: ModuleType, device: Device, func: Callable[..., None]):
+        a = xp.asarray([1] if func is xp_assert_less else [2], device=device)
+        b = xp.asarray([2], device=device)
+        c = xp.asarray([2, 2], device=device)
+
+        func(a, b)
+        with pytest.raises(AssertionError, match="shapes do not match"):
+            func(a, c)
+        # This is normally performed by np.testing.assert_array_equal etc.
+        # but in case of torch device='meta' we have to do it manually
+        with pytest.raises(AssertionError, match="sizes do not match"):
+            func(a, c, check_shape=False)
 
 
 def good_lazy(x: Array) -> Array:

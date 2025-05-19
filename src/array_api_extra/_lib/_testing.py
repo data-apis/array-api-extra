@@ -22,6 +22,7 @@ from ._utils._compat import (
     is_jax_namespace,
     is_numpy_namespace,
     is_pydata_sparse_namespace,
+    is_torch_array,
     is_torch_namespace,
     to_device,
 )
@@ -62,18 +63,28 @@ def _check_ns_shape_dtype(
     msg = f"namespaces do not match: {actual_xp} != f{desired_xp}"
     assert actual_xp == desired_xp, msg
 
-    if check_shape:
-        actual_shape = actual.shape
-        desired_shape = desired.shape
-        if is_dask_namespace(desired_xp):
-            # Dask uses nan instead of None for unknown shapes
-            if any(math.isnan(i) for i in cast(tuple[float, ...], actual_shape)):
-                actual_shape = actual.compute().shape  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-            if any(math.isnan(i) for i in cast(tuple[float, ...], desired_shape)):
-                desired_shape = desired.compute().shape  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+    # Dask uses nan instead of None for unknown shapes
+    actual_shape = cast(tuple[float, ...], actual.shape)
+    desired_shape = cast(tuple[float, ...], desired.shape)
+    assert None not in actual_shape  # Requires explicit support
+    assert None not in desired_shape
+    if is_dask_namespace(desired_xp):
+        if any(math.isnan(i) for i in actual_shape):
+            actual_shape = actual.compute().shape  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+        if any(math.isnan(i) for i in desired_shape):
+            desired_shape = desired.compute().shape  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
+    if check_shape:
         msg = f"shapes do not match: {actual_shape} != f{desired_shape}"
         assert actual_shape == desired_shape, msg
+    else:
+        # Ignore shape, but check flattened size. This is normally done by
+        # np.testing.assert_array_equal etc even when strict=False, but not for
+        # non-materializable arrays.
+        actual_size = math.prod(actual_shape)  # pyright: ignore[reportUnknownArgumentType]
+        desired_size = math.prod(desired_shape)  # pyright: ignore[reportUnknownArgumentType]
+        msg = f"sizes do not match: {actual_size} != f{desired_size}"
+        assert actual_size == desired_size, msg
 
     if check_dtype:
         msg = f"dtypes do not match: {actual.dtype} != {desired.dtype}"
@@ -88,6 +99,15 @@ def _check_ns_shape_dtype(
         assert np.isscalar(actual) == np.isscalar(desired), _msg
 
     return desired_xp
+
+
+def _is_materializable(x: Array) -> bool:
+    """
+    Return True if you can call `as_numpy_array(x)`; False otherwise.
+    """
+    # Important: here we assume that we're not tracing -
+    # e.g. we're not inside `jax.jit`` nor `cupy.cuda.Stream.begin_capture`.
+    return not is_torch_array(x) or x.device.type != "meta"  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
 
 def as_numpy_array(array: Array, *, xp: ModuleType) -> np.typing.NDArray[Any]:  # type: ignore[explicit-any]
@@ -146,6 +166,8 @@ def xp_assert_equal(
     numpy.testing.assert_array_equal : Similar function for NumPy arrays.
     """
     xp = _check_ns_shape_dtype(actual, desired, check_dtype, check_shape, check_scalar)
+    if not _is_materializable(actual):
+        return
     actual_np = as_numpy_array(actual, xp=xp)
     desired_np = as_numpy_array(desired, xp=xp)
     np.testing.assert_array_equal(actual_np, desired_np, err_msg=err_msg)
@@ -181,6 +203,8 @@ def xp_assert_less(
     numpy.testing.assert_array_equal : Similar function for NumPy arrays.
     """
     xp = _check_ns_shape_dtype(x, y, check_dtype, check_shape, check_scalar)
+    if not _is_materializable(x):
+        return
     x_np = as_numpy_array(x, xp=xp)
     y_np = as_numpy_array(y, xp=xp)
     np.testing.assert_array_less(x_np, y_np, err_msg=err_msg)
@@ -229,6 +253,8 @@ def xp_assert_close(
     The default `atol` and `rtol` differ from `xp.all(xpx.isclose(a, b))`.
     """
     xp = _check_ns_shape_dtype(actual, desired, check_dtype, check_shape, check_scalar)
+    if not _is_materializable(actual):
+        return
 
     if rtol is None:
         if xp.isdtype(actual.dtype, ("real floating", "complex floating")):
