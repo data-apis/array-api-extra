@@ -9,15 +9,17 @@ from ._lib._utils._compat import (
     array_namespace,
     is_cupy_namespace,
     is_dask_namespace,
+    is_jax_array,
     is_jax_namespace,
     is_numpy_namespace,
     is_pydata_sparse_namespace,
+    is_torch_array,
     is_torch_namespace,
 )
 from ._lib._utils._helpers import asarrays
-from ._lib._utils._typing import Array
+from ._lib._utils._typing import Array, DType
 
-__all__ = ["isclose", "pad"]
+__all__ = ["isclose", "one_hot", "pad"]
 
 
 def isclose(
@@ -110,6 +112,90 @@ def isclose(
         return xp.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan)
 
     return _funcs.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan, xp=xp)
+
+
+def one_hot(
+    x: Array,
+    /,
+    num_classes: int,
+    *,
+    dtype: DType | None = None,
+    axis: int = -1,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    One-hot encode the given indices.
+
+    Each index in the input ``x`` is encoded as a vector of zeros of length
+    ``num_classes`` with the element at the given index set to one.
+
+    Parameters
+    ----------
+    x : array
+        An array with integral dtype having shape ``batch_dims``.
+    num_classes : int
+        Number of classes in the one-hot dimension.
+    dtype : DType, optional
+        The dtype of the return value.  Defaults to the default float dtype (usually
+        float64).
+    axis : int or tuple of ints, optional
+        Position(s) in the expanded axes where the new axis is placed.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array having the same shape as `x` except for a new axis at the position
+        given by `axis` having size `num_classes`.
+
+        If ``x < 0`` or ``x >= num_classes``, then the result is undefined, may raise
+        an exception, or may even cause a bad state.  `x` is not checked.
+
+    Examples
+    --------
+    >>> xp.one_hot(jnp.array([1, 2, 0]), 3)
+    Array([[0., 1., 0.],
+           [0., 0., 1.],
+           [1., 0., 0.]], dtype=float64)
+    """
+    # Validate inputs.
+    if xp is None:
+        xp = array_namespace(x)
+    if not xp.isdtype(x.dtype, "integral"):
+        msg = "x must have an integral dtype."
+        raise TypeError(msg)
+    if dtype is None:
+        dtype = xp.empty(()).dtype  # Default float dtype
+    # Delegate where possible.
+    if is_jax_namespace(xp):
+        assert is_jax_array(x)
+        from jax.nn import one_hot as jax_one_hot
+
+        return jax_one_hot(x, num_classes, dtype=dtype, axis=axis)
+    if is_torch_namespace(xp):
+        assert is_torch_array(x)
+        from torch.nn.functional import one_hot as torch_one_hot
+
+        x = xp.astype(x, xp.int64)  # PyTorch only supports int64 here.
+        try:
+            out = torch_one_hot(x, num_classes)
+        except RuntimeError as e:
+            raise IndexError from e
+        out = xp.astype(out, dtype)
+    else:
+        out = _funcs.one_hot(
+            x,
+            num_classes,
+            dtype=dtype,
+            xp=xp,
+            supports_fancy_indexing=is_numpy_namespace(xp),
+            supports_array_indexing=is_dask_namespace(xp),
+        )
+
+    if axis != -1:
+        out = xp.moveaxis(out, -1, axis)
+    return out
 
 
 def pad(
