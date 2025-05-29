@@ -1,6 +1,6 @@
 """Extra array functions built on top of the array API standard."""
 
-from ._delegation import isclose, pad
+from ._delegation import isclose, one_hot, pad
 from ._lib._at import at
 from ._lib._funcs import (
     apply_where,
@@ -34,6 +34,7 @@ __all__ = [
     "kron",
     "lazy_apply",
     "nunique",
+    "one_hot",
     "pad",
     "setdiff1d",
     "sinc",

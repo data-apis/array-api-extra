@@ -375,6 +375,23 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     return xp.squeeze(c, axis=axes)
 
 
+def one_hot(
+    x: Array,
+    /,
+    num_classes: int,
+    *,
+    xp: ModuleType,
+) -> Array:  # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._delegation.py`."""
+    # TODO: Benchmark whether this is faster on the NumPy backend:
+    # if is_numpy_array(x):
+    #     out = xp.zeros((x.size, num_classes), dtype=dtype)
+    #     out[xp.arange(x.size), xp.reshape(x, (-1,))] = 1
+    #     return xp.reshape(out, (*x.shape, num_classes))
+    range_num_classes = xp.arange(num_classes, dtype=x.dtype, device=_compat.device(x))
+    return x[..., xp.newaxis] == range_num_classes
+
+
 def create_diagonal(
     x: Array, /, *, offset: int = 0, xp: ModuleType | None = None
 ) -> Array:
