@@ -126,13 +126,13 @@ def one_hot(
     """
     One-hot encode the given indices.
 
-    Each index in the input ``x`` is encoded as a vector of zeros of length
-    ``num_classes`` with the element at the given index set to one.
+    Each index in the input `x` is encoded as a vector of zeros of length `num_classes`
+    with the element at the given index set to one.
 
     Parameters
     ----------
     x : array
-        An array with integral dtype having shape ``batch_dims``.
+        An array with integral dtype and concrete size (``x.size`` cannot be `None`).
     num_classes : int
         Number of classes in the one-hot dimension.
     dtype : DType, optional
@@ -147,17 +147,20 @@ def one_hot(
     -------
     array
         An array having the same shape as `x` except for a new axis at the position
-        given by `axis` having size `num_classes`.
+        given by `axis` having size `num_classes`.  If `axis` is unspecified, it
+        defaults to -1, which appends a new axis.
 
         If ``x < 0`` or ``x >= num_classes``, then the result is undefined, may raise
         an exception, or may even cause a bad state.  `x` is not checked.
 
     Examples
     --------
-    >>> xp.one_hot(jnp.array([1, 2, 0]), 3)
+    >>> import array_api_extra as xpx
+    >>> import array-api-strict as xp
+    >>> xpx.one_hot(xp.asarray([1, 2, 0]), 3)
     Array([[0., 1., 0.],
-           [0., 0., 1.],
-           [1., 0., 0.]], dtype=float64)
+          [0., 0., 1.],
+          [1., 0., 0.]], dtype=array_api_strict.float64)
     """
     # Validate inputs.
     if xp is None:

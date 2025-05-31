@@ -8,11 +8,7 @@ from typing import cast, overload
 
 from ._at import at
 from ._utils import _compat, _helpers
-from ._utils._compat import (
-    array_namespace,
-    is_dask_namespace,
-    is_jax_array,
-)
+from ._utils._compat import array_namespace, is_dask_namespace, is_jax_array
 from ._utils._helpers import (
     asarrays,
     capabilities,
@@ -392,6 +388,10 @@ def one_hot(
     """See docstring in `array_api_extra._delegation.py`."""
     x_size = x.size
     if x_size is None:  # pragma: no cover
+        # This cannot be tested because there is no way to create an array with abstract
+        # size today.  However, it must be blocked for the sake of type-checking and
+        # future-proofing since x.size is allowed to None according to the
+        # specification.
         msg = "x must have a concrete size."
         raise TypeError(msg)
     out = xp.zeros((x.size, num_classes), dtype=dtype)
