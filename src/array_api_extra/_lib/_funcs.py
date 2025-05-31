@@ -389,8 +389,8 @@ def one_hot(
     x_size = x.size
     if x_size is None:  # pragma: no cover
         # This cannot be tested because there is no way to create an array with abstract
-        # size today.  However, it must be blocked for the sake of type-checking and
-        # future-proofing since x.size is allowed to None according to the
+        # size today.  However, it is blocked for the sake of type-checking and
+        # future-proofing since x.size is allowed to be None according to the
         # specification.
         msg = "x must have a concrete size."
         raise TypeError(msg)
