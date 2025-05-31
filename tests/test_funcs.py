@@ -21,6 +21,7 @@ from array_api_extra import (
     isclose,
     kron,
     nunique,
+    one_hot,
     pad,
     setdiff1d,
     sinc,
@@ -44,6 +45,7 @@ lazy_xp_function(create_diagonal)
 lazy_xp_function(expand_dims)
 lazy_xp_function(kron)
 lazy_xp_function(nunique)
+lazy_xp_function(one_hot)
 lazy_xp_function(pad)
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False)
@@ -446,6 +448,78 @@ class TestCov:
             cov(xp.asarray([[0.0, 2.0], [1.0, 1.0], [2.0, 0.0]]).T, xp=xp),
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
+
+
+@pytest.mark.skip_xp_backend(
+    Backend.SPARSE, reason="read-only backend without .at support"
+)
+@pytest.mark.skip_xp_backend(
+    Backend.DASK, reason="backend does not yet support indexed assignment"
+)
+class TestOneHot:
+    @pytest.mark.parametrize("n_dim", range(4))
+    @pytest.mark.parametrize("num_classes", [1, 3, 10])
+    def test_dims_and_classes(self, xp: ModuleType, n_dim: int, num_classes: int):
+        shape = tuple(range(2, 2 + n_dim))
+        rng = np.random.default_rng(2347823)
+        np_x = rng.integers(num_classes, size=shape)
+        x = xp.asarray(np_x)
+        y = one_hot(x, num_classes)
+        assert y.shape == (*x.shape, num_classes)
+        for *i_list, j in ndindex(*shape, num_classes):
+            i = tuple(i_list)
+            assert float(y[(*i, j)]) == (int(x[i]) == j)
+
+    def test_basic(self, xp: ModuleType):
+        actual = one_hot(xp.asarray([0, 1, 2]), 3)
+        expected = xp.asarray([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+        xp_assert_equal(actual, expected)
+
+        actual = one_hot(xp.asarray([1, 2, 0]), 3)
+        expected = xp.asarray([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]])
+        xp_assert_equal(actual, expected)
+
+    @pytest.mark.skip_xp_backend(
+        Backend.TORCH_GPU, reason="Puts Pytorch into a bad state."
+    )
+    def test_out_of_bound(self, xp: ModuleType):
+        # Undefined behavior.  Either return zero, or raise.
+        try:
+            actual = one_hot(xp.asarray([-1, 3]), 3)
+        except IndexError:
+            return
+        expected = xp.asarray([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+        xp_assert_equal(actual, expected)
+
+    @pytest.mark.parametrize(
+        "int_dtype",
+        ["int8", "int16", "int32", "int64", "uint8", "uint16", "uint32", "uint64"],
+    )
+    def test_int_types(self, xp: ModuleType, int_dtype: str):
+        dtype = getattr(xp, int_dtype)
+        x = xp.asarray([0, 1, 2], dtype=dtype)
+        actual = one_hot(x, 3)
+        expected = xp.asarray([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+        xp_assert_equal(actual, expected)
+
+    def test_custom_dtype(self, xp: ModuleType):
+        actual = one_hot(xp.asarray([0, 1, 2], dtype=xp.int32), 3, dtype=xp.bool)
+        expected = xp.asarray(
+            [[True, False, False], [False, True, False], [False, False, True]]
+        )
+        xp_assert_equal(actual, expected)
+
+    def test_axis(self, xp: ModuleType):
+        expected = xp.asarray([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]).T
+        actual = one_hot(xp.asarray([1, 2, 0]), 3, axis=0)
+        xp_assert_equal(actual, expected)
+
+        actual = one_hot(xp.asarray([1, 2, 0]), 3, axis=-2)
+        xp_assert_equal(actual, expected)
+
+    def test_non_integer(self, xp: ModuleType):
+        with pytest.raises(TypeError):
+            _ = one_hot(xp.asarray([1.0]), 3)
 
 
 @pytest.mark.skip_xp_backend(

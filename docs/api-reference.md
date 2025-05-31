@@ -15,6 +15,7 @@
     expand_dims
     isclose
     kron
+    one_hot
     nunique
     pad
     setdiff1d

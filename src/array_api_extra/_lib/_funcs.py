@@ -16,7 +16,7 @@ from ._utils._helpers import (
     meta_namespace,
     ndindex,
 )
-from ._utils._typing import Array
+from ._utils._typing import Array, DType
 
 __all__ = [
     "apply_where",
@@ -373,6 +373,40 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     c /= fact
     axes = tuple(axis for axis, length in enumerate(c.shape) if length == 1)
     return xp.squeeze(c, axis=axes)
+
+
+def one_hot(
+    x: Array,
+    /,
+    num_classes: int,
+    *,
+    supports_fancy_indexing: bool = False,
+    supports_array_indexing: bool = False,
+    dtype: DType,
+    xp: ModuleType,
+) -> Array:  # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._delegation.py`."""
+    x_size = x.size
+    if x_size is None:  # pragma: no cover
+        # This cannot be tested because there is no way to create an array with abstract
+        # size today.  However, it is blocked for the sake of type-checking and
+        # future-proofing since x.size is allowed to be None according to the
+        # specification.
+        msg = "x must have a concrete size."
+        raise TypeError(msg)
+    out = xp.zeros((x.size, num_classes), dtype=dtype)
+    x_flattened = xp.reshape(x, (-1,))
+    if supports_fancy_indexing:
+        out = at(out)[xp.arange(x_size), x_flattened].set(1)
+    else:
+        for i in range(x_size):
+            x_i = x_flattened[i]
+            if not supports_array_indexing:
+                x_i = int(x_i)
+            out = at(out)[i, x_i].set(1)
+    if x.ndim != 1:
+        out = xp.reshape(out, (*x.shape, num_classes))
+    return out
 
 
 def create_diagonal(
