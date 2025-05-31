@@ -794,7 +794,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/cuda-nvtx-12.9.19-h5888daf_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cuda-nvvm-tools-12.9.41-he02047a_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/cuda-version-12.9-h4f385c5_3.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/cudnn-9.10.0.56-hcd2ec93_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/cudnn-9.10.1.4-h7646684_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cupy-13.4.1-py310hab14140_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cupy-core-13.4.1-py310h4564b94_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.5.0-pyhd8ed1ab_0.conda
@@ -822,8 +822,8 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/iniconfig-2.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/ipython-8.36.0-pyh907856f_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/isort-6.0.1-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/jax-0.5.2-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/jaxlib-0.5.2-cuda126py310hec873cc_202.conda
+      - conda: https://prefix.dev/conda-forge/noarch/jax-0.6.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/jaxlib-0.6.0-cuda126py310hec873cc_200.conda
       - conda: https://prefix.dev/conda-forge/noarch/jedi-0.19.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/ld_impl_linux-64-2.43-h712a8e2_4.conda
@@ -833,8 +833,8 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/libcblas-3.9.0-31_h372d94f_mkl.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libcublas-12.9.0.13-h9ab20c4_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libcublas-dev-12.9.0.13-h9ab20c4_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/libcudnn-9.10.0.56-h4840ae0_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/libcudnn-dev-9.10.0.56-hcd2ec93_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libcudnn-9.10.1.4-h4840ae0_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libcudnn-dev-9.10.1.4-hcd2ec93_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libcudss-0.5.0.16-h14340ca_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libcufft-11.4.0.6-h5888daf_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libcufft-dev-11.4.0.6-h5888daf_0.conda
@@ -892,7 +892,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/mpmath-1.3.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/mypy_extensions-1.1.0-pyha770c72_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/myst-parser-4.0.1-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/nccl-2.26.5.1-ha44e49d_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/nccl-2.26.6.1-ha44e49d_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/ncurses-6.5-h2d0b736_3.conda
       - conda: https://prefix.dev/conda-forge/noarch/networkx-3.4.2-pyh267e887_2.conda
       - conda: https://prefix.dev/conda-forge/noarch/nodeenv-1.9.1-pyhd8ed1ab_1.conda
@@ -2875,7 +2875,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/cuda-nvtx-12.9.19-h5888daf_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cuda-nvvm-tools-12.9.41-he02047a_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/cuda-version-12.9-h4f385c5_3.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/cudnn-9.10.0.56-hcd2ec93_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/cudnn-9.10.1.4-h7646684_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cupy-13.4.1-py310hab14140_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cupy-core-13.4.1-py310h4564b94_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/dask-core-2025.5.0-pyhd8ed1ab_0.conda
@@ -2889,8 +2889,8 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/icu-75.1-he02047a_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/importlib-metadata-8.6.1-pyha770c72_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/iniconfig-2.0.0-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/jax-0.5.2-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/jaxlib-0.5.2-cuda126py310hec873cc_202.conda
+      - conda: https://prefix.dev/conda-forge/noarch/jax-0.6.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/jaxlib-0.6.0-cuda126py310hec873cc_200.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/ld_impl_linux-64-2.43-h712a8e2_4.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libabseil-20250127.1-cxx17_hbbce691_0.conda
@@ -2899,8 +2899,8 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/libcblas-3.9.0-31_h372d94f_mkl.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libcublas-12.9.0.13-h9ab20c4_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libcublas-dev-12.9.0.13-h9ab20c4_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/libcudnn-9.10.0.56-h4840ae0_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/libcudnn-dev-9.10.0.56-hcd2ec93_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libcudnn-9.10.1.4-h4840ae0_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libcudnn-dev-9.10.1.4-hcd2ec93_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libcudss-0.5.0.16-h14340ca_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libcufft-11.4.0.6-h5888daf_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libcufft-dev-11.4.0.6-h5888daf_0.conda
@@ -2951,7 +2951,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/mpc-1.3.1-h24ddda3_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/mpfr-4.2.1-h90cbb55_3.conda
       - conda: https://prefix.dev/conda-forge/noarch/mpmath-1.3.0-pyhd8ed1ab_1.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/nccl-2.26.5.1-ha44e49d_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/nccl-2.26.6.1-ha44e49d_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/ncurses-6.5-h2d0b736_3.conda
       - conda: https://prefix.dev/conda-forge/noarch/networkx-3.4.2-pyh267e887_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/numba-0.61.2-py310h699fe88_0.conda
@@ -3915,7 +3915,7 @@ packages:
 - pypi: ./
   name: array-api-extra
   version: 0.8.0.dev0
-  sha256: 3a4a70c9c4bbfdc6af7247ea160a1cd6eb9d0ece6b59f6a4acdf82fef1414af4
+  sha256: a3296bd31e0640360736388accc9305ee606fe6cafb22b8fdd7492fa96a57cf8
   requires_dist:
   - array-api-compat>=1.12.0,<2
   requires_python: '>=3.10'
@@ -4956,21 +4956,21 @@ packages:
   purls: []
   size: 21578
   timestamp: 1746134436166
-- conda: https://prefix.dev/conda-forge/linux-64/cudnn-9.10.0.56-hcd2ec93_0.conda
-  sha256: 77ad964a70402885989a32824c5d626b78978a0d0b9a2453f350d3a57fada44f
-  md5: 5539c6138d1cb5f91acb1da3673b9e88
+- conda: https://prefix.dev/conda-forge/linux-64/cudnn-9.10.1.4-h7646684_0.conda
+  sha256: 746cfa7c0e9b9eba3429465cf9a70786a63da2f4b2c322c33d74b5ff2db6d8ae
+  md5: 5aa5b04b995ebe10fe44de6fe93b1850
   depends:
   - __glibc >=2.28,<3.0.a0
   - cuda-version >=12,<13.0a0
-  - libcudnn-dev 9.10.0.56 hcd2ec93_0
+  - libcudnn-dev 9.10.1.4 hcd2ec93_0
   - libgcc >=13
   - libstdcxx >=13
   constrains:
   - cudnn-jit <0a
   license: LicenseRef-cuDNN-Software-License-Agreement
   purls: []
-  size: 19362
-  timestamp: 1747077048802
+  size: 19516
+  timestamp: 1747774432049
 - conda: https://prefix.dev/conda-forge/win-64/cudnn-9.10.1.4-h1361d0a_0.conda
   sha256: 55d225f9012cd145c5ccb9a1d72b9070d303b9657b8fd4c12fa5071e5ed118fa
   md5: faf9d123cfd4cd6d6b18484380cdbfb6
@@ -5546,6 +5546,25 @@ packages:
   - pkg:pypi/jax?source=hash-mapping
   size: 1556886
   timestamp: 1741182198677
+- conda: https://prefix.dev/conda-forge/noarch/jax-0.6.0-pyhd8ed1ab_0.conda
+  sha256: 573a5582dfba84a8f67c351b6218cb9579cb8d0f6d4b4186a806852111d4a6f1
+  md5: bd364feb12c744cf5c60e1e5b586171b
+  depends:
+  - importlib-metadata >=4.6
+  - jaxlib >=0.6.0,<=0.6.0
+  - ml_dtypes >=0.5.0
+  - numpy >=1.25
+  - opt_einsum
+  - python >=3.10
+  - scipy >=1.11.1
+  constrains:
+  - cudnn >=9.8,<10.0
+  license: Apache-2.0
+  license_family: APACHE
+  purls:
+  - pkg:pypi/jax?source=hash-mapping
+  size: 1538293
+  timestamp: 1748688029463
 - conda: https://prefix.dev/conda-forge/linux-64/jaxlib-0.5.2-cpu_py310hc96afab_2.conda
   sha256: bc9fc4a0bc9b43b0799c3320b62bd5e486e57ac70396ee5236a70a87018723b6
   md5: 2bbb84513ad8ff868dd21ef5e5661aaa
@@ -5571,9 +5590,9 @@ packages:
   - pkg:pypi/jaxlib?source=hash-mapping
   size: 69060155
   timestamp: 1747094262205
-- conda: https://prefix.dev/conda-forge/linux-64/jaxlib-0.5.2-cuda126py310hec873cc_202.conda
-  sha256: 227dac171d747f378ac1e0b14722f72bc7ab56976ea07d487bd796976ea0780e
-  md5: 9bf2096fc296cd6cc3392e00cea59b64
+- conda: https://prefix.dev/conda-forge/linux-64/jaxlib-0.6.0-cuda126py310hec873cc_200.conda
+  sha256: 5a52619f5e6d40d5c8e8223a5ec113d5bb097456656bc5668ab24df6b75f69ae
+  md5: 1b39986ae9b1bcfddc720ef10bb67420
   depends:
   - __cuda
   - __glibc >=2.17,<3.0.a0
@@ -5583,6 +5602,7 @@ packages:
   - cuda-nvcc-tools
   - cuda-nvtx >=12.6.77,<13.0a0
   - cuda-version >=12.6,<13
+  - cudnn >=9.10.1.4,<10.0a0
   - libabseil * cxx17*
   - libabseil >=20250127.1,<20250128.0a0
   - libcublas >=12.6.4.1,<13.0a0
@@ -5600,22 +5620,21 @@ packages:
   - libstdcxx >=13
   - libzlib >=1.3.1,<2.0a0
   - ml_dtypes >=0.2.0
-  - nccl >=2.26.5.1,<3.0a0
+  - nccl >=2.26.6.1,<3.0a0
   - numpy >=1.19,<3
   - openssl >=3.5.0,<4.0a0
   - python >=3.10,<3.11.0a0
   - python_abi 3.10.* *_cp310
   - scipy >=1.9
   constrains:
-  - jax >=0.5.2
+  - jax >=0.6.0
   license: Apache-2.0
-  license_family: APACHE
   purls:
   - pkg:pypi/jax-cuda12-pjrt?source=hash-mapping
   - pkg:pypi/jax-cuda12-plugin?source=hash-mapping
   - pkg:pypi/jaxlib?source=hash-mapping
-  size: 150779832
-  timestamp: 1747101156606
+  size: 146820753
+  timestamp: 1748663708635
 - conda: https://prefix.dev/conda-forge/osx-64/jaxlib-0.5.2-cpu_py310h22b337c_2.conda
   sha256: bb292699e4523002e868c9b56379574c74ef82f718ef574d27fefa0a882ae0e0
   md5: 2f10f0eb0ddf22befa0d8c750d2df551
@@ -6013,9 +6032,9 @@ packages:
   purls: []
   size: 91998
   timestamp: 1746203009003
-- conda: https://prefix.dev/conda-forge/linux-64/libcudnn-9.10.0.56-h4840ae0_0.conda
-  sha256: 5fee28ef7842402757b61263c9c2fc3757358b2ba81bec38eae60c9d1f629b7d
-  md5: df5d2581c6b951715b345495e37cafcd
+- conda: https://prefix.dev/conda-forge/linux-64/libcudnn-9.10.1.4-h4840ae0_0.conda
+  sha256: 5f21148b7bdfbcf5e40b4debaccd6d36b8a75405fdef1c66d75059a12d43bd0e
+  md5: c19f7281266ca77da5458d2ccf17ba82
   depends:
   - __glibc >=2.28,<3.0.a0
   - cuda-nvrtc
@@ -6028,8 +6047,8 @@ packages:
   - libcudnn-jit <0a
   license: LicenseRef-cuDNN-Software-License-Agreement
   purls: []
-  size: 526869792
-  timestamp: 1747076587395
+  size: 527020675
+  timestamp: 1747773945760
 - conda: https://prefix.dev/conda-forge/win-64/libcudnn-9.10.1.4-hffc9a7f_0.conda
   sha256: 26d399ecad571797b2600b0c6c955a6ce2f3372d71cca0c148c5867a4a52a377
   md5: 5f3f28dcfb3f8c8cc6f826079923377f
@@ -6046,21 +6065,21 @@ packages:
   purls: []
   size: 509841043
   timestamp: 1747774328068
-- conda: https://prefix.dev/conda-forge/linux-64/libcudnn-dev-9.10.0.56-hcd2ec93_0.conda
-  sha256: 655b21a1f32b82cd70bc2fcb0cc2b971cabe6ccce3cf328b96c110f2f5e69912
-  md5: c0f9074c58fa2a1aa32856076b626b22
+- conda: https://prefix.dev/conda-forge/linux-64/libcudnn-dev-9.10.1.4-hcd2ec93_0.conda
+  sha256: 34fb3c9fa9b67a18fd0b4d28518fdacf11dbed3ad3fbf24aec341d1b8490d3c0
+  md5: bce8ec010b35f2c1e5db441f3f396754
   depends:
   - __glibc >=2.28,<3.0.a0
   - cuda-version >=12,<13.0a0
-  - libcudnn 9.10.0.56 h4840ae0_0
+  - libcudnn 9.10.1.4 h4840ae0_0
   - libgcc >=13
   - libstdcxx >=13
   constrains:
   - libcudnn-jit-dev <0a
   license: LicenseRef-cuDNN-Software-License-Agreement
   purls: []
-  size: 43729
-  timestamp: 1747077027897
+  size: 44217
+  timestamp: 1747774406255
 - conda: https://prefix.dev/conda-forge/win-64/libcudnn-dev-9.10.1.4-hffc9a7f_0.conda
   sha256: 66ea382c3fa5b3a5fa448166865b154a7d6d263f981243a96ddb045278a75bb2
   md5: 81ae4771239f63d4f0aebad63de544f6
@@ -8046,9 +8065,9 @@ packages:
   - pkg:pypi/myst-parser?source=hash-mapping
   size: 73074
   timestamp: 1739381945342
-- conda: https://prefix.dev/conda-forge/linux-64/nccl-2.26.5.1-ha44e49d_0.conda
-  sha256: 3a715dab311d045ecd5811b06012ebc7a1b8ce9c899d40952d834bd713fe9ac9
-  md5: 45823c363ce0803d29c4a444e4309634
+- conda: https://prefix.dev/conda-forge/linux-64/nccl-2.26.6.1-ha44e49d_0.conda
+  sha256: b6a54445f2326b27707851ea590dae2ebcd1492ca41d039ddca3ec305d2189e2
+  md5: 62f23f8be42626cc7c15553a9e2e0ab8
   depends:
   - __glibc >=2.17,<3.0.a0
   - cuda-version >=12,<13.0a0
@@ -8057,8 +8076,8 @@ packages:
   license: BSD-3-Clause
   license_family: BSD
   purls: []
-  size: 180506014
-  timestamp: 1746010496065
+  size: 180500682
+  timestamp: 1747783682945
 - conda: https://prefix.dev/conda-forge/linux-64/ncurses-6.5-h2d0b736_3.conda
   sha256: 3fde293232fa3fca98635e1167de6b7c7fda83caf24b9d6c91ec9eefb4f4d586
   md5: 47e340acb35de30501a76c7c799c41d7
