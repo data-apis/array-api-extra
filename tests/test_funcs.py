@@ -17,6 +17,7 @@ from array_api_extra import (
     broadcast_shapes,
     cov,
     create_diagonal,
+    default_dtype,
     expand_dims,
     isclose,
     kron,
@@ -515,6 +516,39 @@ class TestCreateDiagonal:
         x = xp.asarray([1, 2])
         y = create_diagonal(x, xp=xp)
         xp_assert_equal(y, xp.asarray([[1, 0], [0, 2]]))
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no __array_namespace_info__")
+class TestDefaultDType:
+    def test_basic(self, xp: ModuleType):
+        assert default_dtype(xp) == xp.empty(0).dtype
+
+    def test_kind(self, xp: ModuleType):
+        assert default_dtype(xp, "real floating") == xp.empty(0).dtype
+        assert default_dtype(xp, "complex floating") == (xp.empty(0) * 1j).dtype
+        assert default_dtype(xp, "integral") == xp.int64
+        assert default_dtype(xp, "indexing") == xp.int64
+
+        with pytest.raises(ValueError, match="Unknown kind"):
+            _ = default_dtype(xp, "foo")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+
+    def test_device(self, xp: ModuleType, device: Device):
+        # Note: at the moment there are no known namespaces with
+        # device-specific default dtypes.
+        assert default_dtype(xp, device=None) == xp.empty(0).dtype
+        assert default_dtype(xp, device=device) == xp.empty(0).dtype
+
+    def test_torch(self, torch: ModuleType):
+        xp = torch
+        xp.set_default_dtype(xp.float64)
+        assert default_dtype(xp) == xp.float64
+        assert default_dtype(xp, "real floating") == xp.float64
+        assert default_dtype(xp, "complex floating") == xp.complex128
+
+        xp.set_default_dtype(xp.float32)
+        assert default_dtype(xp) == xp.float32
+        assert default_dtype(xp, "real floating") == xp.float32
+        assert default_dtype(xp, "complex floating") == xp.complex64
 
 
 class TestExpandDims:

@@ -149,16 +149,8 @@ def xp(
 
     if library.like(Backend.JAX):
         _setup_jax(library)
-
-    elif library == Backend.TORCH_GPU:
-        import torch.cuda
-
-        if not torch.cuda.is_available():
-            pytest.skip("no CUDA device available")
-        xp.set_default_device("cuda")
-
-    elif library == Backend.TORCH:  # CPU
-        xp.set_default_device("cpu")
+    elif library.like(Backend.TORCH):
+        _setup_torch(library)
 
     yield xp
 
@@ -177,6 +169,23 @@ def _setup_jax(library: Backend) -> None:
     else:
         device = jax.devices("cpu")[0]
     jax.config.update("jax_default_device", device)
+
+
+def _setup_torch(library: Backend) -> None:
+    import torch
+
+    # This is already the default, but some tests or env variables may change it.
+    # TODO test both float32 and float64, like in scipy.
+    torch.set_default_dtype(torch.float32)
+
+    if library == Backend.TORCH_GPU:
+        import torch.cuda
+
+        if not torch.cuda.is_available():
+            pytest.skip("no CUDA device available")
+        torch.set_default_device("cuda")
+    else:  # TORCH
+        torch.set_default_device("cpu")
 
 
 @pytest.fixture(params=[Backend.DASK])  # Can select the test with `pytest -k dask`
@@ -198,6 +207,15 @@ def jnp(
     xp = pytest.importorskip("jax.numpy")
     _setup_jax(request.param)
     patch_lazy_xp_functions(request, monkeypatch, xp=xp)
+    return xp
+
+
+@pytest.fixture(params=[Backend.TORCH, Backend.TORCH_GPU])
+def torch(request: pytest.FixtureRequest) -> ModuleType:  # numpydoc ignore=PR01,RT01
+    """Variant of the `xp` fixture that only yields torch."""
+    xp = pytest.importorskip("torch")
+    xp = array_namespace(xp.empty(0))
+    _setup_torch(request.param)
     return xp
 
 

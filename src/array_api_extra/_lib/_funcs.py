@@ -4,7 +4,7 @@ import math
 import warnings
 from collections.abc import Callable, Sequence
 from types import ModuleType, NoneType
-from typing import cast, overload
+from typing import Literal, cast, overload
 
 from ._at import at
 from ._utils import _compat, _helpers
@@ -16,7 +16,7 @@ from ._utils._helpers import (
     meta_namespace,
     ndindex,
 )
-from ._utils._typing import Array
+from ._utils._typing import Array, Device, DType
 
 __all__ = [
     "apply_where",
@@ -438,6 +438,44 @@ def create_diagonal(
     return xp.reshape(diag, (*batch_dims, n, n))
 
 
+def default_dtype(
+    xp: ModuleType,
+    kind: Literal[
+        "real floating", "complex floating", "integral", "indexing"
+    ] = "real floating",
+    *,
+    device: Device | None = None,
+) -> DType:
+    """
+    Return the default dtype for the given namespace and device.
+
+    This is a convenience shorthand for
+    ``xp.__array_namespace_info__().default_dtypes(device=device)[kind]``.
+
+    Parameters
+    ----------
+    xp : array_namespace
+        The standard-compatible namespace for which to get the default dtype.
+    kind : {'real floating', 'complex floating', 'integral', 'indexing'}, optional
+        The kind of dtype to return. Default is 'real floating'.
+    device : Device, optional
+        The device for which to get the default dtype. Default: current device.
+
+    Returns
+    -------
+    dtype
+        The default dtype for the given namespace, kind, and device.
+    """
+    dtypes = xp.__array_namespace_info__().default_dtypes(device=device)
+    try:
+        return dtypes[kind]
+    except KeyError as e:
+        domain = ("real floating", "complex floating", "integral", "indexing")
+        assert set(dtypes) == set(domain), f"Non-compliant namespace: {dtypes}"
+        msg = f"Unknown kind '{kind}'. Expected one of {domain}."
+        raise ValueError(msg) from e
+
+
 def expand_dims(
     a: Array, /, *, axis: int | tuple[int, ...] = (0,), xp: ModuleType | None = None
 ) -> Array:
@@ -728,9 +766,7 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
     x = xp.reshape(x, (-1,))
     x = xp.sort(x)
     mask = x != xp.roll(x, -1)
-    default_int = xp.__array_namespace_info__().default_dtypes(
-        device=_compat.device(x)
-    )["integral"]
+    default_int = default_dtype(xp, "integral", device=_compat.device(x))
     return xp.maximum(
         # Special cases:
         # - array is size 0

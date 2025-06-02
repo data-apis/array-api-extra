@@ -12,6 +12,7 @@
     broadcast_shapes
     cov
     create_diagonal
+    default_dtype
     expand_dims
     isclose
     kron
