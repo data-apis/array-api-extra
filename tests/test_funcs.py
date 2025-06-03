@@ -404,7 +404,6 @@ class TestBroadcastShapes:
         assert actual == expect
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestCov:
     def test_basic(self, xp: ModuleType):
         xp_assert_close(
@@ -697,7 +696,6 @@ class TestExpandDims:
 @pytest.mark.filterwarnings(  # array_api_strictest
     "ignore:invalid value encountered:RuntimeWarning:array_api_strict"
 )
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestIsClose:
     @pytest.mark.parametrize("swap", [False, True])
     @pytest.mark.parametrize(
@@ -919,7 +917,6 @@ class TestKron:
         k = kron(a, b)
         assert k.shape == expected_shape
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
     def test_python_scalar(self, xp: ModuleType):
         a = 1
         # Test no dtype promotion to xp.asarray(a); use b.dtype
@@ -1138,7 +1135,6 @@ class TestSetDiff1D:
         xp_assert_equal(actual, expected)
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestSinc:
     def test_simple(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0)), xp.asarray(1.0))

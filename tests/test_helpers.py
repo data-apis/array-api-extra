@@ -79,7 +79,6 @@ class TestIn1D:
 
 
 class TestAsArrays:
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
     @pytest.mark.parametrize(
         ("dtype", "b", "defined"),
         [

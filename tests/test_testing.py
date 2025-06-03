@@ -38,12 +38,7 @@ class TestAsNumPyArray:
 
 
 class TestAssertEqualCloseLess:
-    pr_assert_close = pytest.param(  # pyright: ignore[reportUnannotatedClassAttribute]
-        xp_assert_close,
-        marks=pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype"),
-    )
-
-    @pytest.mark.parametrize("func", [xp_assert_equal, pr_assert_close])
+    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close])
     def test_assert_equal_close_basic(self, xp: ModuleType, func: Callable[..., None]):
         func(xp.asarray(0), xp.asarray(0))
         func(xp.asarray([1, 2]), xp.asarray([1, 2]))
@@ -75,7 +70,7 @@ class TestAssertEqualCloseLess:
         with pytest.raises(TypeError, match="list is not a supported array type"):
             func(xp.asarray([0]), [0])
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, pr_assert_close, xp_assert_less])
+    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
     def test_check_shape(self, xp: ModuleType, func: Callable[..., None]):
         a = xp.asarray([1] if func is xp_assert_less else [2])
         b = xp.asarray(2)
@@ -90,7 +85,7 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="sizes do not match"):
             func(a, d, check_shape=False)
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, pr_assert_close, xp_assert_less])
+    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
     def test_check_dtype(self, xp: ModuleType, func: Callable[..., None]):
         a = xp.asarray(1 if func is xp_assert_less else 2)
         b = xp.asarray(2, dtype=xp.int16)
@@ -102,7 +97,7 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="Mismatched elements"):
             func(a, c, check_dtype=False)
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, pr_assert_close, xp_assert_less])
+    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
     @pytest.mark.xfail_xp_backend(
         Backend.SPARSE, reason="sparse [()] returns np.generic"
     )
@@ -122,7 +117,6 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="Mismatched elements"):
             func(a, c, check_scalar=True)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
     @pytest.mark.parametrize("dtype", ["int64", "float64"])
     def test_assert_close_tolerance(self, dtype: str, xp: ModuleType):
         a = xp.asarray([100], dtype=getattr(xp, dtype))
@@ -145,7 +139,7 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="Mismatched elements"):
             xp_assert_less(xp.asarray([1, 1]), xp.asarray([2, 1]))
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, pr_assert_close, xp_assert_less])
+    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
     def test_none_shape(self, xp: ModuleType, func: Callable[..., None]):
@@ -176,7 +170,7 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="Mismatched elements"):
             func(xp.asarray([4]), a)
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, pr_assert_close, xp_assert_less])
+    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
     def test_device(self, xp: ModuleType, device: Device, func: Callable[..., None]):
         a = xp.asarray([1] if func is xp_assert_less else [2], device=device)
         b = xp.asarray([2], device=device)
