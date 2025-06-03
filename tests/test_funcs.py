@@ -416,6 +416,7 @@ class TestCov:
         expect = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]], dtype=xp.complex128)
         xp_assert_close(actual, expect)
 
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="matmul with nan fillvalue")
     def test_empty(self, xp: ModuleType):
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
@@ -611,7 +612,6 @@ class TestCreateDiagonal:
         xp_assert_equal(y, xp.asarray([[1, 0], [0, 2]]))
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no __array_namespace_info__")
 class TestDefaultDType:
     def test_basic(self, xp: ModuleType):
         assert default_dtype(xp) == xp.empty(0).dtype
@@ -695,6 +695,9 @@ class TestExpandDims:
 
 @pytest.mark.filterwarnings(  # array_api_strictest
     "ignore:invalid value encountered:RuntimeWarning:array_api_strict"
+)
+@pytest.mark.filterwarnings(  # sparse
+    "ignore:invalid value encountered:RuntimeWarning:sparse"
 )
 class TestIsClose:
     @pytest.mark.parametrize("swap", [False, True])
@@ -813,6 +816,7 @@ class TestIsClose:
             isclose(xp.asarray(True), b, atol=1), xp.asarray([True, True, True])
         )
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
     def test_none_shape(self, xp: ModuleType):
         a = xp.asarray([1, 5, 0])
@@ -821,6 +825,7 @@ class TestIsClose:
         a = a[a < 5]
         xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
     def test_none_shape_bool(self, xp: ModuleType):
         a = xp.asarray([True, True, False])
@@ -1136,6 +1141,7 @@ class TestSetDiff1D:
 
 
 class TestSinc:
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no linspace")
     def test_simple(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0)), xp.asarray(1.0))
         w = sinc(xp.linspace(-1, 1, 100))
@@ -1147,6 +1153,7 @@ class TestSinc:
         with pytest.raises(ValueError, match="real floating data type"):
             _ = sinc(xp.asarray(x))
 
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange")
     def test_3d(self, xp: ModuleType):
         x = xp.reshape(xp.arange(18, dtype=xp.float64), (3, 3, 2))
         expected = xp.zeros((3, 3, 2), dtype=xp.float64)

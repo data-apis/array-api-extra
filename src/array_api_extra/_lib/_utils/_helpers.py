@@ -322,7 +322,11 @@ def capabilities(xp: ModuleType, *, device: Device | None = None) -> dict[str, i
     """
     if is_pydata_sparse_namespace(xp):
         # No __array_namespace_info__(); no indexing by sparse arrays
-        return {"boolean indexing": False, "data-dependent shapes": True}
+        return {
+            "boolean indexing": False,
+            "data-dependent shapes": True,
+            "max dimensions": None,
+        }
     out = xp.__array_namespace_info__().capabilities()
     if is_jax_namespace(xp) and out["boolean indexing"]:
         # FIXME https://github.com/jax-ml/jax/issues/27418
