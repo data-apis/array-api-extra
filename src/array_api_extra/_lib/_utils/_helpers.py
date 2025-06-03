@@ -418,7 +418,9 @@ def pickle_flatten(
         """
 
         @override
-        def persistent_id(self, obj: object) -> Literal[0, 1, None]:  # pyright: ignore[reportIncompatibleMethodOverride]  # numpydoc ignore=GL08
+        def persistent_id(
+            self, obj: object
+        ) -> Literal[0, 1, None]:  # numpydoc ignore=GL08
             if isinstance(obj, cls):
                 instances.append(obj)  # type: ignore[arg-type]
                 return 0
@@ -483,7 +485,7 @@ def pickle_unflatten(instances: Iterable[object], rest: FlattenRest) -> Any:  # 
         """Mirror of the overridden Pickler in pickle_flatten."""
 
         @override
-        def persistent_load(self, pid: Literal[0, 1]) -> object:  # pyright: ignore[reportIncompatibleMethodOverride]  # numpydoc ignore=GL08
+        def persistent_load(self, pid: Literal[0, 1]) -> object:  # numpydoc ignore=GL08
             try:
                 return next(iters[pid])
             except StopIteration as e:
