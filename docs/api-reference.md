@@ -17,6 +17,7 @@
     isclose
     kron
     nunique
+    one_hot
     pad
     setdiff1d
     sinc
