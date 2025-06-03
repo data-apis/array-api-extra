@@ -301,7 +301,9 @@ def meta_namespace(
     return array_namespace(*metas)
 
 
-def capabilities(xp: ModuleType, *, device: Device | None = None) -> dict[str, int]:
+def capabilities(
+    xp: ModuleType, *, device: Device | None = None
+) -> dict[str, int | None]:
     """
     Return patched ``xp.__array_namespace_info__().capabilities()``.
 
