@@ -184,7 +184,8 @@ def _setup_torch(library: Backend) -> None:
         if not torch.cuda.is_available():
             pytest.skip("no CUDA device available")
         torch.set_default_device("cuda")
-    else:  # TORCH
+    else:
+        assert library == Backend.TORCH
         torch.set_default_device("cpu")
 
 
