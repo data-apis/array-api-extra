@@ -136,7 +136,7 @@ numpy = "=1.22.0"
 [tool.pixi.feature.backends.dependencies]
 pytorch = ">=2.7.0"
 dask-core = ">=2025.5.1"  # No distributed, tornado, etc.
-sparse = ">=0.16.0"
+sparse = ">=0.17.0"
 
 [tool.pixi.feature.backends.target.linux-64.dependencies]
 jax = ">=0.5.3"
