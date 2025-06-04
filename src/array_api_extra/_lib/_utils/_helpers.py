@@ -331,7 +331,7 @@ def capabilities(
             out = out.copy()
             out["boolean indexing"] = False
     elif is_jax_namespace(xp):
-        if out["boolean indexing"]:
+        if out["boolean indexing"]:  # pragma: no cover
             # Backwards compatibility with jax <0.6.0
             # https://github.com/jax-ml/jax/issues/27418
             out = out.copy()
