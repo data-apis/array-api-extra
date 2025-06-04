@@ -140,7 +140,7 @@ class TestAssertEqualCloseLess:
             xp_assert_less(xp.asarray([1, 1]), xp.asarray([2, 1]))
 
     @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
     def test_none_shape(self, xp: ModuleType, func: Callable[..., None]):
         """On Dask and other lazy backends, test that a shape with NaN's or None's
