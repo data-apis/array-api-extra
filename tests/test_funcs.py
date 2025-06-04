@@ -416,7 +416,7 @@ class TestCov:
         expect = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]], dtype=xp.complex128)
         xp_assert_close(actual, expect)
 
-    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="matmul with nan fillvalue")
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="matmul with nan fillvalue")
     def test_empty(self, xp: ModuleType):
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
@@ -451,7 +451,7 @@ class TestCov:
         )
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="backend doesn't have arange")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
 class TestOneHot:
     @pytest.mark.parametrize("n_dim", range(4))
     @pytest.mark.parametrize("num_classes", [1, 3, 10])
@@ -816,7 +816,7 @@ class TestIsClose:
             isclose(xp.asarray(True), b, atol=1), xp.asarray([True, True, True])
         )
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
     def test_none_shape(self, xp: ModuleType):
         a = xp.asarray([1, 5, 0])
@@ -825,7 +825,7 @@ class TestIsClose:
         a = a[a < 5]
         xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="index by sparse array")
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
     def test_none_shape_bool(self, xp: ModuleType):
         a = xp.asarray([True, True, False])
@@ -1141,10 +1141,10 @@ class TestSetDiff1D:
 
 
 class TestSinc:
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no linspace")
     def test_simple(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0)), xp.asarray(1.0))
-        w = sinc(xp.linspace(-1, 1, 100))
+        x = xp.asarray(np.linspace(-1, 1, 100))
+        w = sinc(x)
         # check symmetry
         xp_assert_close(w, xp.flip(w, axis=0))
 
@@ -1153,11 +1153,12 @@ class TestSinc:
         with pytest.raises(ValueError, match="real floating data type"):
             _ = sinc(xp.asarray(x))
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange")
     def test_3d(self, xp: ModuleType):
-        x = xp.reshape(xp.arange(18, dtype=xp.float64), (3, 3, 2))
-        expected = xp.zeros((3, 3, 2), dtype=xp.float64)
-        expected = at(expected)[0, 0, 0].set(1.0)
+        x = np.arange(18, dtype=np.float64).reshape((3, 3, 2))
+        expected = np.zeros_like(x)
+        expected[0, 0, 0] = 1
+        x = xp.asarray(x)
+        expected = xp.asarray(expected)
         xp_assert_close(sinc(x), expected, atol=1e-15)
 
     def test_device(self, xp: ModuleType, device: Device):
