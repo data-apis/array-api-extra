@@ -16,11 +16,15 @@ from ._lib._funcs import (
     sinc,
 )
 from ._lib._lazy import lazy_apply
+from ._random import Generator, JaxGenerator, TorchGenerator
 
 __version__ = "0.8.1.dev0"
 
 # pylint: disable=duplicate-code
 __all__ = [
+    "Generator",
+    "JaxGenerator",
+    "TorchGenerator",
     "__version__",
     "apply_where",
     "at",
