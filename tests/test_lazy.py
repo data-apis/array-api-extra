@@ -141,7 +141,7 @@ def test_lazy_apply_core_indices(da: ModuleType):
         xp = array_namespace(x)
         return xp.sum(x, axis=0) + x
 
-    x_np = cast(Array, np.arange(15).reshape(5, 3))  # type: ignore[bad-cast]
+    x_np = cast(Array, np.arange(15).reshape(5, 3))  # type: ignore[bad-cast]  # pyright: ignore[reportInvalidCast]
     expect = da.asarray(f(x_np))
     x_da = da.asarray(x_np).rechunk(3)
 
@@ -230,7 +230,7 @@ def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
     # Single output
     with ctx:
         values = lazy_apply(mxp.unique_values, x, shape=(None,))
-        xp_assert_equal(values, xp.asarray([1, 2]))
+        xp_assert_equal(xp.sort(values), xp.asarray([1, 2]))
 
     with ctx:
         # Multi output

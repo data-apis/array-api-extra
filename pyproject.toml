@@ -47,7 +47,6 @@ channels = ["https://prefix.dev/conda-forge"]
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [tool.pixi.dependencies]
-python = ">=3.10,<3.14"
 array-api-compat = ">=1.12.0,<2"
 
 [tool.pixi.pypi-dependencies]
@@ -179,6 +178,15 @@ cupy = ">=13.4.1"
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
 pytorch = { version = ">=2.7.0", build = "cuda12*" }
 
+[tool.pixi.feature.nogil.dependencies]
+python-freethreading = "~=3.13.0"
+pytest-run-parallel = ">=0.4.3"
+numpy = ">=2.3.0"
+# pytorch = "*"  # Not available on Python 3.13t yet
+dask-core = ">=2025.5.1"  # No distributed, tornado, etc.
+# sparse = "*"  # numba not available on Python 3.13t yet
+# jax = "*"  # ml_dtypes not available on Python 3.13t yet
+
 [tool.pixi.environments]
 default = { features = ["py313"], solve-group = "py313" }
 lint = { features = ["py313", "lint"], solve-group = "py313" }
@@ -197,7 +205,7 @@ tests-cuda = { features = ["py310", "tests", "backends", "cuda-backends"], solve
 # Ungrouped environments
 tests-numpy1 = ["py310", "tests", "numpy1"]
 tests-py310 = ["py310", "tests"]
-
+tests-nogil = ["nogil", "tests"]
 
 # pytest
 
