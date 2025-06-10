@@ -30,7 +30,7 @@ class Backend(Enum):  # numpydoc ignore=PR02
     JAX = "jax.numpy"
     JAX_GPU = "jax.numpy:gpu"
 
-    def __str__(self) -> str:  # type: ignore[explicit-override]  # pyright: ignore[reportImplicitOverride]  # numpydoc ignore=RT01
+    def __str__(self) -> str:  # pyright: ignore[reportImplicitOverride]  # numpydoc ignore=RT01
         """Pretty-print parameterized test names."""
         return (
             self.name.lower().replace("_gpu", ":gpu").replace("_readonly", ":readonly")
