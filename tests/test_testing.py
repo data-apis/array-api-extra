@@ -18,7 +18,7 @@ from array_api_extra._lib._utils._compat import (
     is_jax_namespace,
 )
 from array_api_extra._lib._utils._typing import Array, Device
-from array_api_extra.testing import lazy_xp_function
+from array_api_extra.testing import lazy_xp_function, patch_lazy_xp_functions
 
 # pyright: reportUnknownParameterType=false,reportMissingParameterType=false
 
@@ -448,3 +448,23 @@ def test_lazy_xp_modules(xp: ModuleType, library: Backend):
     else:
         y = wrapped.f(x)
         xp_assert_equal(y, x)
+
+
+def test_patch_lazy_xp_functions_deprecated_monkeypatch(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+):
+    xp = pytest.importorskip("dask.array")
+
+    x = xp.asarray([1.0, 2.0])
+    y = non_materializable5(x)
+    xp_assert_equal(y, x)
+
+    with pytest.warns(DeprecationWarning):
+        _ = patch_lazy_xp_functions(request, monkeypatch, xp=xp)
+
+    with pytest.raises(AssertionError, match=r"dask\.compute.* 1 times"):
+        _ = non_materializable5(x)
+
+    monkeypatch.undo()
+    y = non_materializable5(x)
+    xp_assert_equal(y, x)

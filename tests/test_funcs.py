@@ -27,14 +27,12 @@ from array_api_extra import (
     setdiff1d,
     sinc,
 )
-from array_api_extra._lib._backends import Backend
+from array_api_extra._lib._backends import NUMPY_VERSION, Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._helpers import eager_shape, ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
-
-from .conftest import NUMPY_VERSION
 
 lazy_xp_function(apply_where)
 lazy_xp_function(atleast_nd)
