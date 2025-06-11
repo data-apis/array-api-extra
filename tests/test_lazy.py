@@ -141,7 +141,7 @@ def test_lazy_apply_core_indices(da: ModuleType):
         xp = array_namespace(x)
         return xp.sum(x, axis=0) + x
 
-    x_np = cast(Array, np.arange(15).reshape(5, 3))  # type: ignore[bad-cast]  # pyright: ignore[reportInvalidCast]
+    x_np = cast(Array, np.arange(15).reshape(5, 3))  # pyright: ignore[reportInvalidCast]
     expect = da.asarray(f(x_np))
     x_da = da.asarray(x_np).rechunk(3)
 

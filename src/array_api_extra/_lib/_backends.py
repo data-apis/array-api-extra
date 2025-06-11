@@ -45,7 +45,7 @@ class Backend(Enum):  # numpydoc ignore=PR02
         """Check if this backend uses the same module as others."""
         return any(self.modname == other.modname for other in others)
 
-    def pytest_param(self) -> Any:  # type: ignore[explicit-any]
+    def pytest_param(self) -> Any:
         """
         Backend as a pytest parameter
 

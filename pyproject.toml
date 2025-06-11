@@ -57,7 +57,7 @@ array-api-extra = { path = ".", editable = true }
 typing-extensions = ">=4.13.2"
 pre-commit = ">=4.2.0"
 pylint = ">=3.3.7"
-basedmypy = ">=2.10.0"
+mypy = ">=1.16.0"
 basedpyright = ">=1.29.2"
 numpydoc = ">=1.8.0,<2"
 # import dependencies for mypy:
@@ -236,15 +236,16 @@ python_version = "3.10"
 warn_unused_configs = true
 strict = true
 enable_error_code = ["ignore-without-code", "truthy-bool"]
-# https://github.com/data-apis/array-api-typing
-disallow_any_expr = false
-# false positives with input validation
-disable_error_code = ["redundant-expr", "unreachable", "no-any-return"]
+disable_error_code = ["no-any-return"]
 
 [[tool.mypy.overrides]]
 # slow or unavailable on Windows; do not add to the lint env
 module = ["cupy.*", "jax.*", "sparse.*", "torch.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["tests/*"]
+disable_error_code = ["no-untyped-def"]  # test(...) without -> None
 
 # pyright
 
