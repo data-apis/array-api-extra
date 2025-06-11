@@ -32,7 +32,6 @@ else:
     def override(func):
         return func
 
-# mypy: disable-error-code=no-untyped-usage
 
 T = TypeVar("T")
 
@@ -387,7 +386,7 @@ class TestJAXAutoJIT:
         """Static argument/return value is hashable, but not serializable"""
 
         class C:
-            def __reduce__(self) -> object:  # type: ignore[explicit-override,override]  # pyright: ignore[reportIncompatibleMethodOverride,reportImplicitOverride]
+            def __reduce__(self) -> object:  # type: ignore[override]  # pyright: ignore[reportIncompatibleMethodOverride,reportImplicitOverride]
                 raise Exception()
 
         @jax_autojit
@@ -399,12 +398,12 @@ class TestJAXAutoJIT:
         assert out is inp
 
         # Serializable opaque input contains non-serializable object plus array
-        inp = Wrapper((C(), jnp.asarray([1, 2])))
-        out = f(inp)
+        winp = Wrapper((C(), jnp.asarray([1, 2])))
+        out = f(winp)
         assert isinstance(out, Wrapper)
-        assert out.x[0] is inp.x[0]
-        assert out.x[1] is not inp.x[1]
-        xp_assert_equal(out.x[1], inp.x[1])  # pyright: ignore[reportUnknownArgumentType]
+        assert out.x[0] is winp.x[0]
+        assert out.x[1] is not winp.x[1]
+        xp_assert_equal(out.x[1], winp.x[1])  # pyright: ignore[reportUnknownArgumentType]
 
     def test_arraylikes_are_static(self):
         pytest.importorskip("jax")

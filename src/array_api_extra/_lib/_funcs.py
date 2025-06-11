@@ -34,7 +34,7 @@ __all__ = [
 
 
 @overload
-def apply_where(  # type: ignore[explicit-any,decorated-any] # numpydoc ignore=GL08
+def apply_where(  # numpydoc ignore=GL08
     cond: Array,
     args: Array | tuple[Array, ...],
     f1: Callable[..., Array],
@@ -46,7 +46,7 @@ def apply_where(  # type: ignore[explicit-any,decorated-any] # numpydoc ignore=G
 
 
 @overload
-def apply_where(  # type: ignore[explicit-any,decorated-any] # numpydoc ignore=GL08
+def apply_where(  # numpydoc ignore=GL08
     cond: Array,
     args: Array | tuple[Array, ...],
     f1: Callable[..., Array],
@@ -57,7 +57,7 @@ def apply_where(  # type: ignore[explicit-any,decorated-any] # numpydoc ignore=G
 ) -> Array: ...
 
 
-def apply_where(  # type: ignore[explicit-any] # numpydoc ignore=PR01,PR02
+def apply_where(  # numpydoc ignore=PR01,PR02
     cond: Array,
     args: Array | tuple[Array, ...],
     f1: Callable[..., Array],
@@ -143,7 +143,7 @@ def apply_where(  # type: ignore[explicit-any] # numpydoc ignore=PR01,PR02
     return _apply_where(cond, f1, f2, fill_value, *args_, xp=xp)
 
 
-def _apply_where(  # type: ignore[explicit-any]  # numpydoc ignore=PR01,RT01
+def _apply_where(  # numpydoc ignore=PR01,RT01
     cond: Array,
     f1: Callable[..., Array],
     f2: Callable[..., Array] | None,
@@ -813,8 +813,7 @@ def pad(
     else:
         pad_width_seq = cast(list[tuple[int, int]], list(pad_width))
 
-    # https://github.com/python/typeshed/issues/13376
-    slices: list[slice] = []  # type: ignore[explicit-any]
+    slices: list[slice] = []
     newshape: list[int] = []
     for ax, w_tpl in enumerate(pad_width_seq):
         if len(w_tpl) != 2:
@@ -826,6 +825,7 @@ def pad(
         if w_tpl[0] == 0 and w_tpl[1] == 0:
             sl = slice(None, None, None)
         else:
+            stop: int | None
             start, stop = w_tpl
             stop = None if stop == 0 else -stop
 

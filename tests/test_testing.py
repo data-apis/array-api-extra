@@ -20,7 +20,6 @@ from array_api_extra._lib._utils._compat import (
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
-# mypy: disable-error-code="decorated-any, explicit-any"
 # pyright: reportUnknownParameterType=false,reportMissingParameterType=false
 
 
@@ -295,7 +294,7 @@ try:
     # Test an arbitrary Cython ufunc (@cython.vectorize).
     # When SCIPY_ARRAY_API is not set, this is the same as
     # scipy.special.erf.
-    from scipy.special._ufuncs import erf  # type: ignore[import-not-found]
+    from scipy.special._ufuncs import erf  # type: ignore[import-untyped]
 
     lazy_xp_function(erf)  # pyright: ignore[reportUnknownArgumentType]
 except ImportError:

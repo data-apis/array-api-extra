@@ -36,9 +36,6 @@ from array_api_extra.testing import lazy_xp_function
 
 from .conftest import NUMPY_VERSION
 
-# some xp backends are untyped
-# mypy: disable-error-code=no-untyped-def
-
 lazy_xp_function(apply_where)
 lazy_xp_function(atleast_nd)
 lazy_xp_function(cov)
@@ -213,7 +210,7 @@ class TestApplyWhere:
         p=st.floats(min_value=0, max_value=1),
         data=st.data(),
     )
-    def test_hypothesis(  # type: ignore[explicit-any,decorated-any]
+    def test_hypothesis(
         self,
         n_arrays: int,
         rng_seed: int,

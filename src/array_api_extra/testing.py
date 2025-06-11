@@ -36,7 +36,7 @@ else:
 P = ParamSpec("P")
 T = TypeVar("T")
 
-_ufuncs_tags: dict[object, dict[str, Any]] = {}  # type: ignore[explicit-any]
+_ufuncs_tags: dict[object, dict[str, Any]] = {}
 
 
 class Deprecated(enum.Enum):
@@ -48,7 +48,7 @@ class Deprecated(enum.Enum):
 DEPRECATED = Deprecated.DEPRECATED
 
 
-def lazy_xp_function(  # type: ignore[explicit-any]
+def lazy_xp_function(
     func: Callable[..., Any],
     *,
     allow_dask_compute: bool | int = False,
@@ -257,12 +257,12 @@ def patch_lazy_xp_functions(
     mod = cast(ModuleType, request.module)
     mods = [mod, *cast(list[ModuleType], getattr(mod, "lazy_xp_modules", []))]
 
-    def iter_tagged() -> (  # type: ignore[explicit-any]
+    def iter_tagged() -> (
         Iterator[tuple[ModuleType, str, Callable[..., Any], dict[str, Any]]]
     ):
         for mod in mods:
             for name, func in mod.__dict__.items():
-                tags: dict[str, Any] | None = None  # type: ignore[explicit-any]
+                tags: dict[str, Any] | None = None
                 with contextlib.suppress(AttributeError):
                     tags = func._lazy_xp_function  # pylint: disable=protected-access
                 if tags is None:
@@ -313,7 +313,9 @@ class CountingDaskScheduler(SchedulerGetCallable):
         self.msg = msg
 
     @override
-    def __call__(self, dsk: Graph, keys: Sequence[Key] | Key, **kwargs: Any) -> Any:  # type: ignore[decorated-any,explicit-any] # numpydoc ignore=GL08
+    def __call__(
+        self, dsk: Graph, keys: Sequence[Key] | Key, **kwargs: Any
+    ) -> Any:  # numpydoc ignore=GL08
         import dask
 
         self.count += 1
@@ -321,7 +323,7 @@ class CountingDaskScheduler(SchedulerGetCallable):
         # offending line in the user's code
         assert self.count <= self.max_count, self.msg
 
-        return dask.get(dsk, keys, **kwargs)  # type: ignore[attr-defined,no-untyped-call] # pyright: ignore[reportPrivateImportUsage]
+        return dask.get(dsk, keys, **kwargs)  # type: ignore[attr-defined]  # pyright: ignore[reportPrivateImportUsage]
 
 
 def _dask_wrap(
@@ -354,7 +356,7 @@ def _dask_wrap(
         # `pytest.raises` and `pytest.warns` to work as expected. Note that this would
         # not work on scheduler='distributed', as it would not block.
         arrays, rest = pickle_flatten(out, da.Array)
-        arrays = dask.persist(arrays, scheduler="threads")[0]  # type: ignore[attr-defined,no-untyped-call,func-returns-value,index]  # pyright: ignore[reportPrivateImportUsage]
+        arrays = dask.persist(arrays, scheduler="threads")[0]  # type: ignore[attr-defined,no-untyped-call]  # pyright: ignore[reportPrivateImportUsage]
         return pickle_unflatten(arrays, rest)  # pyright: ignore[reportUnknownArgumentType]
 
     return wrapper

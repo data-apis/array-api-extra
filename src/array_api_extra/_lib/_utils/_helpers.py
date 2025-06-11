@@ -210,7 +210,7 @@ def asarrays(
             float: ("real floating", "complex floating"),
             complex: "complex floating",
         }
-        kind = same_dtype[type(cast(complex, b))]  # type: ignore[index]
+        kind = same_dtype[type(cast(complex, b))]
         if xp.isdtype(a.dtype, kind):
             xb = xp.asarray(b, dtype=a.dtype)
         else:
@@ -458,7 +458,7 @@ def pickle_flatten(
     return instances, (f.getvalue(), *rest)
 
 
-def pickle_unflatten(instances: Iterable[object], rest: FlattenRest) -> Any:  # type: ignore[explicit-any]
+def pickle_unflatten(instances: Iterable[object], rest: FlattenRest) -> Any:
     """
     Reverse of ``pickle_flatten``.
 
@@ -521,7 +521,7 @@ class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
         self.obj = obj
 
     @classmethod
-    def _register(cls):  # numpydoc ignore=SS06
+    def _register(cls) -> None:  # numpydoc ignore=SS06
         """
         Register upon first use instead of at import time, to avoid
         globally importing JAX.
@@ -583,7 +583,7 @@ def jax_autojit(
     import jax
 
     @jax.jit  # type: ignore[misc]  # pyright: ignore[reportUntypedFunctionDecorator]
-    def inner(  # type: ignore[decorated-any,explicit-any]  # numpydoc ignore=GL08
+    def inner(  # numpydoc ignore=GL08
         wargs: _AutoJITWrapper[Any],
     ) -> _AutoJITWrapper[T]:
         args, kwargs = wargs.obj
