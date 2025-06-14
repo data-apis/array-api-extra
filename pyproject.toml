@@ -139,13 +139,13 @@ dask-core = ">=2025.5.1"  # No distributed, tornado, etc.
 sparse = ">=0.17.0"
 
 [tool.pixi.feature.backends.target.linux-64.dependencies]
-jax = ">=0.5.3"
+jax = ">=0.6.0"
 
 [tool.pixi.feature.backends.target.osx-64.dependencies]
-jax = ">=0.5.3"
+jax = ">=0.6.0"
 
 [tool.pixi.feature.backends.target.osx-arm64.dependencies]
-jax = ">=0.5.3"
+jax = ">=0.6.0"
 
 [tool.pixi.feature.backends.target.win-64.dependencies]
 # jax = "*"  # unavailable
@@ -161,7 +161,7 @@ system-requirements = { cuda = "12" }
 
 [tool.pixi.feature.cuda-backends.target.linux-64.dependencies]
 cupy = ">=13.4.1"
-jaxlib = { version = ">=0.5.3", build = "cuda12*" }
+jaxlib = { version = ">=0.6.0", build = "cuda12*" }
 pytorch = { version = ">=2.7.0", build = "cuda12*" }
 
 [tool.pixi.feature.cuda-backends.target.osx-64.dependencies]
