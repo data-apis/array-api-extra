@@ -63,7 +63,7 @@ numpydoc = ">=1.8.0,<2"
 # import dependencies for mypy:
 array-api-strict = ">=2.3.1"
 numpy = ">=2.1.3"
-pytest = ">=8.3.5"
+pytest = ">=8.4.0"
 hypothesis = ">=6.131.28"
 dask-core = ">=2025.5.1"  # No distributed, tornado, etc.
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
@@ -78,7 +78,7 @@ pyright = { cmd = "basedpyright", description = "Type check with basedpyright"}
 lint = { depends-on = ["pre-commit", "pylint", "mypy", "pyright"] , description = "Run pre-commit, pylint, mypy, and pyright"}
 
 [tool.pixi.feature.tests.dependencies]
-pytest = ">=8.3.5"
+pytest = ">=8.4.0"
 pytest-cov = ">=6.1.1"
 hypothesis = ">=6.131.28"
 array-api-strict = ">=2.3.1"
@@ -106,7 +106,7 @@ sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
 dask-core = ">=2025.5.1"  # No distributed, tornado, etc.
-pytest = ">=8.3.5"
+pytest = ">=8.4.0"
 typing-extensions = ">=4.13.2"
 numpy = ">=2.1.3"
 
