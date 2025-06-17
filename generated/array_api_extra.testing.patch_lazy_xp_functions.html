@@ -275,7 +275,7 @@
 <h1>array_api_extra.testing.patch_lazy_xp_functions<a class="headerlink" href="#array-api-extra-testing-patch-lazy-xp-functions" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="array_api_extra.testing.patch_lazy_xp_functions">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.testing.</span></span><span class="sig-name descname"><span class="pre">patch_lazy_xp_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monkeypatch</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.testing.patch_lazy_xp_functions" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.testing.</span></span><span class="sig-name descname"><span class="pre">patch_lazy_xp_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monkeypatch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.testing.patch_lazy_xp_functions" title="Link to this definition">¶</a></dt>
 <dd><p>Test lazy execution of functions tagged with <a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-func docutils literal notranslate"><span class="pre">lazy_xp_function()</span></code></a>.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">xp==jax.numpy</span></code>, search for all functions which have been tagged with
 <a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-func docutils literal notranslate"><span class="pre">lazy_xp_function()</span></code></a> in the globals of the module that defines the current test,
@@ -286,10 +286,15 @@ and wrap them with <a class="reference external" href="https://docs.jax.dev/en/l
 eagerly.</p>
 <p>This function should be typically called by your library’s <cite>xp</cite> fixture that runs
 tests on multiple backends:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="n">numpy</span><span class="p">,</span> <span class="n">array_api_strict</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">numpy</span><span class="p">,</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="p">])</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">xp</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">monkeypatch</span><span class="p">):</span>
-    <span class="n">patch_lazy_xp_functions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">monkeypatch</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">param</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">numpy</span><span class="p">,</span>
+    <span class="n">array_api_strict</span><span class="p">,</span>
+    <span class="n">pytest</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">numpy</span><span class="p">,</span> <span class="n">marks</span><span class="o">=</span><span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">thread_unsafe</span><span class="p">),</span>
+    <span class="n">pytest</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">marks</span><span class="o">=</span><span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">thread_unsafe</span><span class="p">),</span>
+<span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">xp</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">patch_lazy_xp_functions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">param</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">request</span><span class="o">.</span><span class="n">param</span>
 </pre></div>
 </div>
 <p>but it can be otherwise be called by the test itself too.</p>
@@ -297,12 +302,12 @@ tests on multiple backends:</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>request</strong> (<em>pytest.FixtureRequest</em>) – Pytest fixture, as acquired by the test itself or by one of its fixtures.</p></li>
-<li><p><strong>monkeypatch</strong> (<em>pytest.MonkeyPatch</em>) – Pytest fixture, as acquired by the test itself or by one of its fixtures.</p></li>
+<li><p><strong>monkeypatch</strong> (<em>pytest.MonkeyPatch</em>) – Deprecated</p></li>
 <li><p><strong>xp</strong> (<em>array_namespace</em>) – Array namespace to be tested.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/contextlib.html#contextlib.AbstractContextManager" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractContextManager</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span></p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -314,6 +319,12 @@ tests on multiple backends:</p>
 </dd>
 </dl>
 </div>
+<p class="rubric">Notes</p>
+<p>This context manager monkey-patches modules and as such is thread unsafe
+on Dask and JAX. If you run your test suite with
+<a class="reference external" href="https://github.com/Quansight-Labs/pytest-run-parallel/">pytest-run-parallel</a>,
+you should mark these backends with <code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.thread_unsafe</span></code>, as shown in
+the example above.</p>
 </dd></dl>
 
 </section>
