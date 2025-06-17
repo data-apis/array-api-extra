@@ -178,7 +178,7 @@ def test_copy_invalid():
 
 
 def test_xp():
-    a = cast(Array, np.asarray([1, 2, 3]))
+    a = cast(Array, np.asarray([1, 2, 3]))  # pyright: ignore[reportInvalidCast]
     _ = at(a, 0).set(4, xp=np)
     _ = at(a, 0).add(4, xp=np)
     _ = at(a, 0).subtract(4, xp=np)

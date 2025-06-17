@@ -343,7 +343,7 @@ def _lazy_apply_wrapper(  # numpydoc ignore=PR01,RT01
                 if as_numpy:
                     import numpy as np
 
-                    arg = cast(Array, np.asarray(arg))  # noqa: PLW2901
+                    arg = cast(Array, np.asarray(arg))  # pyright: ignore[reportInvalidCast] # noqa: PLW2901
             args_list.append(arg)
         assert device is not None
 

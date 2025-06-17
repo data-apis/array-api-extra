@@ -24,7 +24,7 @@ from array_api_extra.testing import lazy_xp_function
 
 from .conftest import np_compat
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     # TODO import from typing (requires Python >=3.12)
     from typing_extensions import override
 else:

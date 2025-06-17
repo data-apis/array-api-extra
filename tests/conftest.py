@@ -18,11 +18,10 @@ from array_api_extra.testing import patch_lazy_xp_functions
 T = TypeVar("T")
 P = ParamSpec("P")
 
-NUMPY_VERSION = tuple(int(v) for v in np.__version__.split(".")[2])
 np_compat = array_namespace(np.empty(0))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
-@pytest.fixture(params=tuple(Backend))
+@pytest.fixture(params=[b.pytest_param() for b in Backend])
 def library(request: pytest.FixtureRequest) -> Backend:  # numpydoc ignore=PR01,RT03
     """
     Parameterized fixture that iterates on all libraries.
@@ -112,7 +111,7 @@ class NumPyReadOnly:
 
 @pytest.fixture
 def xp(
-    library: Backend, request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+    library: Backend, request: pytest.FixtureRequest
 ) -> Generator[ModuleType]:  # numpydoc ignore=PR01,RT03
     """
     Parameterized fixture that iterates on all libraries.
@@ -124,9 +123,6 @@ def xp(
     if library == Backend.NUMPY_READONLY:
         yield NumPyReadOnly()  # type: ignore[misc]  # pyright: ignore[reportReturnType]
         return
-
-    if library.like(Backend.ARRAY_API_STRICT) and NUMPY_VERSION < (1, 26):
-        pytest.skip("array_api_strict is untested on NumPy <1.26")
 
     xp = pytest.importorskip(library.modname)
     # Possibly wrap module with array_api_compat
@@ -143,16 +139,15 @@ def xp(
             yield xp
         return
 
-    # On Dask and JAX, monkey-patch all functions tagged by `lazy_xp_function`
-    # in the global scope of the module containing the test function.
-    patch_lazy_xp_functions(request, monkeypatch, xp=xp)
-
     if library.like(Backend.JAX):
         _setup_jax(library)
     elif library.like(Backend.TORCH):
         _setup_torch(library)
 
-    yield xp
+    # On Dask and JAX, monkey-patch all functions tagged by `lazy_xp_function`
+    # in the global scope of the module containing the test function.
+    with patch_lazy_xp_functions(request, xp=xp):
+        yield xp
 
 
 def _setup_jax(library: Backend) -> None:
@@ -189,26 +184,27 @@ def _setup_torch(library: Backend) -> None:
         torch.set_default_device("cpu")
 
 
-@pytest.fixture(params=[Backend.DASK])  # Can select the test with `pytest -k dask`
+# Can select the test with `pytest -k dask`
+@pytest.fixture(params=[Backend.DASK.pytest_param()])
 def da(
-    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
-) -> ModuleType:  # numpydoc ignore=PR01,RT01
+    request: pytest.FixtureRequest,
+) -> Generator[ModuleType]:  # numpydoc ignore=PR01,RT01
     """Variant of the `xp` fixture that only yields dask.array."""
     xp = pytest.importorskip("dask.array")
     xp = array_namespace(xp.empty(0))
-    patch_lazy_xp_functions(request, monkeypatch, xp=xp)
-    return xp
+    with patch_lazy_xp_functions(request, xp=xp):
+        yield xp
 
 
-@pytest.fixture(params=[Backend.JAX, Backend.JAX_GPU])
+@pytest.fixture(params=[Backend.JAX.pytest_param(), Backend.JAX_GPU.pytest_param()])
 def jnp(
-    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
-) -> ModuleType:  # numpydoc ignore=PR01,RT01
+    request: pytest.FixtureRequest,
+) -> Generator[ModuleType]:  # numpydoc ignore=PR01,RT01
     """Variant of the `xp` fixture that only yields jax.numpy."""
     xp = pytest.importorskip("jax.numpy")
     _setup_jax(request.param)
-    patch_lazy_xp_functions(request, monkeypatch, xp=xp)
-    return xp
+    with patch_lazy_xp_functions(request, xp=xp):
+        yield xp
 
 
 @pytest.fixture(params=[Backend.TORCH, Backend.TORCH_GPU])
