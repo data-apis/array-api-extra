@@ -79,7 +79,7 @@ lint = { depends-on = ["pre-commit", "pylint", "mypy", "pyright"] , description 
 
 [tool.pixi.feature.tests.dependencies]
 pytest = ">=8.4.0"
-pytest-cov = ">=6.1.1"
+pytest-cov = ">=6.2.1"
 hypothesis = ">=6.131.28"
 array-api-strict = ">=2.3.1"
 numpy = ">=1.22.0"
