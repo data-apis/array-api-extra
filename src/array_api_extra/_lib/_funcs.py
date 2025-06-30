@@ -1051,7 +1051,7 @@ def quantile(
 
     n = xp.asarray(y.shape[-1], dtype=dtype, device=_compat.device(y))
 
-    if method in {
+    if method in {  # pylint: disable=duplicate-code
         "inverted_cdf",
         "averaged_inverted_cdf",
         "closest_observation",
