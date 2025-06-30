@@ -14,7 +14,7 @@ def quantile(
     /,
     *,
     axis: int | None = None,
-    keepdims: bool = False,
+    keepdims: bool = None,  # noqa: RUF013
     method: str = "linear",
     xp: ModuleType | None = None,
 ) -> Array:  # numpydoc ignore=PR01,RT01
@@ -68,20 +68,7 @@ def quantile(
 
     n = xp.asarray(y.shape[-1], dtype=dtype, device=_compat.device(y))
 
-    if method in {  # pylint: disable=duplicate-code
-        "inverted_cdf",
-        "averaged_inverted_cdf",
-        "closest_observation",
-        "hazen",
-        "interpolated_inverted_cdf",
-        "linear",
-        "median_unbiased",
-        "normal_unbiased",
-        "weibull",
-    }:
-        res = _quantile_hf(y, q, n, method, xp)
-    else:
-        raise ValueError(f"Unknown method: {method}")  # noqa: EM102
+    res = _quantile_hf(y, q, n, method, xp)
 
     # Handle NaN output for invalid q values
     p_mask = (q > 1) | (q < 0) | xp.isnan(q)

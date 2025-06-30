@@ -256,7 +256,7 @@ def quantile(
     /,
     *,
     axis: int | None = None,
-    keepdims: bool = False,
+    keepdims: bool = None,  # noqa: RUF013
     method: str = "linear",
     xp: ModuleType | None = None,
 ) -> Array:
@@ -304,7 +304,7 @@ def quantile(
     """
     # We only support a subset of the methods supported by scipy.stats.quantile.
     # So we need to perform the validation here.
-    methods = {  # pylint: disable=duplicate-code
+    methods = {
         "inverted_cdf",
         "averaged_inverted_cdf",
         "closest_observation",
