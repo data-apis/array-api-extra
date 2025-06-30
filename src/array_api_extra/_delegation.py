@@ -256,7 +256,7 @@ def quantile(
     /,
     *,
     axis: int | None = None,
-    keepdims: bool = None,  # noqa: RUF013
+    keepdims: bool | None = None,
     method: str = "linear",
     xp: ModuleType | None = None,
 ) -> Array:
@@ -274,10 +274,14 @@ def quantile(
     axis : int or None, default: None
         Axis along which the quantiles are computed. ``None`` ravels both `x`
         and `q` before performing the calculation.
-    keepdims : bool, optional
-        If this is set to True, the axes which are reduced are left in the
+    keepdims : bool or None, default: None
+        By default, the axis will be reduced away if possible
+        (i.e. if there is exactly one element of `q` per axis-slice of `x`).
+        If `keepdims` is set to True, the axes which are reduced are left in the
         result as dimensions with size one. With this option, the result will
         broadcast correctly against the original array `x`.
+        If `keepdims` is set to False, the axis will be reduced away if possible,
+        and an error will be raised otherwise.
     method : str, default: 'linear'
         The method to use for estimating the quantile. The available options are:
         'inverted_cdf', 'averaged_inverted_cdf', 'closest_observation',
