@@ -1000,7 +1000,7 @@ def quantile(
     keepdims: bool = False,
     method: str = "linear",
     xp: ModuleType | None = None,
-) -> Array:
+) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
     if xp is None:
         xp = array_namespace(x, q)
@@ -1117,7 +1117,9 @@ def quantile(
     return res
 
 
-def _quantile_hf(y: Array, p: Array, n: Array, method: str, xp: ModuleType) -> Array:
+def _quantile_hf(
+    y: Array, p: Array, n: Array, method: str, xp: ModuleType
+) -> Array:  # numpydoc ignore=PR01,RT01
     """Helper function for Hyndman-Fan quantile methods."""
     ms = {
         "inverted_cdf": 0,
@@ -1162,7 +1164,9 @@ def _quantile_hf(y: Array, p: Array, n: Array, method: str, xp: ModuleType) -> A
     )
 
 
-def _quantile_hd(y: Array, p: Array, n: Array, xp: ModuleType) -> Array:
+def _quantile_hd(
+    y: Array, p: Array, n: Array, xp: ModuleType
+) -> Array:  # numpydoc ignore=PR01,RT01
     """Helper function for Harrell-Davis quantile method."""
     # For now, implement a simplified version that falls back to linear method
     # since betainc is not available in the array API standard
