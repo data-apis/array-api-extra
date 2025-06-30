@@ -297,9 +297,9 @@ def patch_lazy_xp_functions(
         # Enable using patch_lazy_xp_function not as a context manager
         temp_setattr = monkeypatch.setattr  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
 
-    def iter_tagged() -> (
-        Iterator[tuple[ModuleType, str, Callable[..., Any], dict[str, Any]]]
-    ):
+    def iter_tagged() -> Iterator[
+        tuple[ModuleType, str, Callable[..., Any], dict[str, Any]]
+    ]:
         for mod in mods:
             for name, func in mod.__dict__.items():
                 tags: dict[str, Any] | None = None

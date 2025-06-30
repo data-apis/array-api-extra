@@ -1,0 +1,40 @@
+lefthook: pixi run --environment=lint lefthook
+
+templates:
+  run: run --environment=lint
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: dprint
+      glob: "*.{json,jsonc,md,toml,yaml,yml}"
+      stage_fixed: true
+      run: pixi {run} dprint
+    - name: ruff
+      glob: "*.{py,pyi}"
+      stage_fixed: true
+      group:
+        piped: true
+        jobs:
+          - name: ruff check
+            run: pixi {run} ruff-check {staged_files}
+          - name: ruff format
+            run: pixi {run} ruff-format {staged_files}
+    - name: pyright
+      glob: "*.{py,pyi}"
+      run: pixi {run} pyright {staged_files}
+    - name: typos
+      stage_fixed: true
+      run: pixi {run} typos
+    - name: actionlint
+      run: pixi {run} actionlint
+    - name: blacken-docs
+      glob: "*.md"
+      stage_fixed: true
+      run: pixi {run} blacken-docs {staged_files}
+    - name: validate-pyproject
+      glob: "pyproject.toml"
+      run: pixi {run} validate-pyproject
+    - name: numpydoc
+      glob: "*.py"
+      run: pixi {run} numpydoc {staged_files}

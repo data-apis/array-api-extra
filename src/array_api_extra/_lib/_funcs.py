@@ -268,7 +268,7 @@ def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...
     for axis in range(-ndim, 0):
         sizes = {shape[axis] for shape in shapes if axis >= -len(shape)}
         # Dask uses NaN for unknown shape, which predates the Array API spec for None
-        none_size = None in sizes or math.nan in sizes
+        none_size = None in sizes or math.nan in sizes  # noqa: PLW0177
         sizes -= {1, None, math.nan}
         if len(sizes) > 1:
             msg = (

@@ -1,10 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    "helpers:pinGitHubActionDigests",
-    ":automergeMinor"
-  ],
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests", ":automergeMinor"],
   "dependencyDashboardTitle": "META: Dependency Dashboard",
   "commitMessagePrefix": "deps:",
   "labels": ["dependencies"],
@@ -13,59 +9,49 @@
     "pixi": ">=v0.45.0"
   },
   "minimumReleaseAge": "14 days",
-  "packageRules": [
-    {
-      "description": "Do not bump deps pinned with '~=' or '='.",
-      "matchManagers": ["pixi"],
-      "matchCurrentValue": "/^~?=/",
-      "enabled": false
-    },
-    {
-      "description": "Do not bump Python deps in the manifest or requires-python.",
-      "matchManagers": ["pixi", "pep621"],
-      "matchPackageNames": ["python"],
-      "enabled": false
-    },
-    {
-      "description": "Schedule automerged GHA updates for the 15th of each month.",
-      "matchManagers": ["github-actions"],
-      "groupName": "gha",
-      "schedule": ["* * 15 * *"],
-      "automerge": true
-    },
-    {
-      "description": "Block PRs for updates blocked on dropping Python 3.10.",
-      "matchManagers": ["pixi"],
-      "matchPackageNames": ["sphinx", "ipython", "sphinx-autodoc-typehints"],
-      "enabled": false
-    },
-    {
-      "description": "Waiting for Numba to support NumPy 2.2.",
-      "matchManagers": ["pixi"],
-      "matchPackageNames": ["numpy"],
-      "enabled": false
-    },
-    {
-      "description": "Block Python CI updates as setup-python lags behind (gh-194).",
-      "matchManagers": ["github-actions"],
-      "matchPackageNames": ["python"],
-      "enabled": false
-    },
-    {
-      "description": "Group Dask packages.",
-      "matchPackageNames": ["dask", "dask-core"],
-      "groupName": "dask"
-    },
-    {
-      "description": "Group JAX packages.",
-      "matchPackageNames": ["jax", "jaxlib"],
-      "groupName": "jax"
-    },
-    {
-      "description": "Schedule hypothesis monthly as releases are frequent.",
-      "matchManagers": ["pixi"],
-      "matchPackageNames": ["hypothesis"],
-      "schedule": ["* * 10 * *"]
-    }
-  ]
+  "packageRules": [{
+    "description": "Do not bump deps pinned with '~=' or '='.",
+    "matchManagers": ["pixi"],
+    "matchCurrentValue": "/^~?=/",
+    "enabled": false
+  }, {
+    "description": "Do not bump Python deps in the manifest or requires-python.",
+    "matchManagers": ["pixi", "pep621"],
+    "matchPackageNames": ["python"],
+    "enabled": false
+  }, {
+    "description": "Schedule automerged GHA updates for the 15th of each month.",
+    "matchManagers": ["github-actions"],
+    "groupName": "gha",
+    "schedule": ["* * 15 * *"],
+    "automerge": true
+  }, {
+    "description": "Block PRs for updates blocked on dropping Python 3.10.",
+    "matchManagers": ["pixi"],
+    "matchPackageNames": ["sphinx", "ipython", "sphinx-autodoc-typehints"],
+    "enabled": false
+  }, {
+    "description": "Waiting for Numba to support NumPy 2.2.",
+    "matchManagers": ["pixi"],
+    "matchPackageNames": ["numpy"],
+    "enabled": false
+  }, {
+    "description": "Block Python CI updates as setup-python lags behind (gh-194).",
+    "matchManagers": ["github-actions"],
+    "matchPackageNames": ["python"],
+    "enabled": false
+  }, {
+    "description": "Group Dask packages.",
+    "matchPackageNames": ["dask", "dask-core"],
+    "groupName": "dask"
+  }, {
+    "description": "Group JAX packages.",
+    "matchPackageNames": ["jax", "jaxlib"],
+    "groupName": "jax"
+  }, {
+    "description": "Schedule hypothesis monthly as releases are frequent.",
+    "matchManagers": ["pixi"],
+    "matchPackageNames": ["hypothesis"],
+    "schedule": ["* * 10 * *"]
+  }]
 }

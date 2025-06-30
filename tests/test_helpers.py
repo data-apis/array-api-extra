@@ -237,7 +237,7 @@ class TestCapabilities:
             actual = capabilities(xp, device=device.type)  # type: ignore[attr-defined]  # pyright: ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
 
 
-class Wrapper(Generic[T]):
+class Wrapper(Generic[T]):  # noqa: PLW1641
     """Trivial opaque wrapper. Must be pickleable."""
 
     x: T
@@ -263,7 +263,7 @@ class TestPickleFlatten:
 
         # Note: NotHashable() instances can be reduced to an
         # unserializable local class
-        class NotHashable:
+        class NotHashable:  # noqa: PLW1641
             @override
             def __eq__(self, other: object) -> bool:
                 return isinstance(other, type(self)) and other.__dict__ == self.__dict__

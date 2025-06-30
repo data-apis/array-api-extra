@@ -61,7 +61,7 @@ development of array-api-extra is made easy with
   at <https://github.com/data-apis/array-api-extra>.
 - `cd array-api-extra`.
 - [Install Pixi](https://pixi.sh/latest/#installation).
-- To enter a development environment:
+- To enter a development environment (if you prefer this to the `pixi run` interface):
 
 ```
 pixi shell -e dev
@@ -71,18 +71,6 @@ pixi shell -e dev
 
 ```
 pixi run tests
-```
-
-- To generate the coverage report:
-
-```
-pixi run coverage
-```
-
-- To generate and display the coverage report:
-
-```
-pixi run open-coverage
 ```
 
 - To build the docs locally:
@@ -97,16 +85,22 @@ pixi run docs
 pixi run open-docs
 ```
 
-- To install a [pre-commit](https://pre-commit.com) hook:
+- To install pre-commit hooks:
 
 ```
-pixi run pre-commit-install
+pixi run hooks
 ```
 
-- To run the lint suite:
+- To run pre-commit checks on staged files:
 
 ```
-pixi run -e lint lint
+pixi run pre-commit
+```
+
+- To run the full lint suite:
+
+```
+pixi run --environment=lint lint
 ```
 
 - To enter an interactive Python prompt:
@@ -115,29 +109,39 @@ pixi run -e lint lint
 pixi run ipython
 ```
 
-- To run individual parts of the lint suite separately:
+- To run individual parts of the lint suite separately (for example):
 
 ```
-pixi run -e lint pre-commit
-pixi run -e lint pylint
-pixi run -e lint mypy
-pixi run -e lint pyright
+pixi run --environment=lint pyright
+pixi run --environment=lint dprint
+```
+
+- To generate the coverage report:
+
+```
+pixi run coverage
+```
+
+- To generate and display the coverage report:
+
+```
+pixi run open-coverage
 ```
 
 Alternative environments are available with a subset of the dependencies and
 tasks available in the `dev` environment:
 
 ```
-pixi shell -e docs
-pixi shell -e tests
-pixi shell -e tests-backends
-pixi shell -e lint
+pixi shell --environment=docs
+pixi shell --environment=tests
+pixi shell --environment=tests-backends
+pixi shell --environment=lint
 ```
 
 If you run on a host with CUDA hardware, you can enable extra tests:
 
 ```
-pixi shell -e dev-cuda
-pixi shell -e tests-cuda
-pixi run -e tests-cuda tests
+pixi shell --environment=dev-cuda
+pixi shell --environment=tests-cuda
+pixi run --environment=tests-cuda tests
 ```
