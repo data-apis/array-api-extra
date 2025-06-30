@@ -1034,21 +1034,6 @@ def quantile(
     else:
         axis = int(axis)
 
-    methods = {
-        "inverted_cdf",
-        "averaged_inverted_cdf",
-        "closest_observation",
-        "hazen",
-        "interpolated_inverted_cdf",
-        "linear",
-        "median_unbiased",
-        "normal_unbiased",
-        "weibull",
-        "harrell-davis",
-    }
-    if method not in methods:
-        raise ValueError(f"`method` must be one of {methods}")  # noqa: EM102
-
     if keepdims not in {None, True, False}:
         raise ValueError("If specified, `keepdims` must be True or False.")  # noqa: EM101
 
@@ -1078,8 +1063,6 @@ def quantile(
         "weibull",
     }:
         res = _quantile_hf(y, q, n, method, xp)
-    elif method == "harrell-davis":
-        res = _quantile_hd(y, q, n, xp)
     else:
         raise ValueError(f"Unknown method: {method}")  # noqa: EM102
 
@@ -1112,7 +1095,7 @@ def quantile(
 def _quantile_hf(
     y: Array, p: Array, n: Array, method: str, xp: ModuleType
 ) -> Array:  # numpydoc ignore=PR01,RT01
-    """Helper function for Hyndman-Fan quantile methods."""
+    """Helper function for Hyndman-Fan quantile method."""
     ms = {
         "inverted_cdf": 0,
         "averaged_inverted_cdf": 0,
@@ -1154,12 +1137,3 @@ def _quantile_hf(
     return (1 - g) * xp.take_along_axis(y, j, axis=-1) + g * xp.take_along_axis(
         y, jp1, axis=-1
     )
-
-
-def _quantile_hd(
-    y: Array, p: Array, n: Array, xp: ModuleType
-) -> Array:  # numpydoc ignore=PR01,RT01
-    """Helper function for Harrell-Davis quantile method."""
-    # For now, implement a simplified version that falls back to linear method
-    # since betainc is not available in the array API standard
-    return _quantile_hf(y, p, n, "linear", xp)

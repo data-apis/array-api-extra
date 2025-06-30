@@ -281,7 +281,7 @@ def quantile(
         The method to use for estimating the quantile. The available options are:
         'inverted_cdf', 'averaged_inverted_cdf', 'closest_observation',
         'interpolated_inverted_cdf', 'hazen', 'weibull', 'linear' (default),
-        'median_unbiased', 'normal_unbiased', 'harrell-davis'.
+        'median_unbiased', 'normal_unbiased'.
     xp : array_namespace, optional
         The standard-compatible namespace for `x` and `q`. Default: infer.
 
@@ -301,6 +301,22 @@ def quantile(
     Array([[5., 8.],
            [1., 3.]], dtype=array_api_strict.float64)
     """
+    # We only support a subset of the methods supported by scipy.stats.quantile.
+    # So we need to perform the validation here.
+    methods = {
+        "inverted_cdf",
+        "averaged_inverted_cdf",
+        "closest_observation",
+        "hazen",
+        "interpolated_inverted_cdf",
+        "linear",
+        "median_unbiased",
+        "normal_unbiased",
+        "weibull",
+    }
+    if method not in methods:
+        raise ValueError(f"`method` must be one of {methods}")  # noqa: EM102
+
     xp = array_namespace(x, q) if xp is None else xp
 
     try:
