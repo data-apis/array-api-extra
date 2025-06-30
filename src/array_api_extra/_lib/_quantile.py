@@ -29,9 +29,11 @@ def quantile(
     q_arr = cast(Array, q)
 
     if not xp.isdtype(x.dtype, ("integral", "real floating")):
-        raise ValueError("`x` must have real dtype.")  # noqa: EM101
+        msg = "`x` must have real dtype."
+        raise ValueError(msg)
     if not xp.isdtype(q_arr.dtype, "real floating"):
-        raise ValueError("`q` must have real floating dtype.")  # noqa: EM101
+        msg = "`q` must have real floating dtype."
+        raise ValueError(msg)
 
     # Promote to common dtype
     x = xp.astype(x, xp.float64)
@@ -47,14 +49,17 @@ def quantile(
         q_arr = xp.reshape(q_arr, (-1,))
         axis = 0
     elif not isinstance(axis, int):  # pyright: ignore[reportUnnecessaryIsInstance]
-        raise ValueError("`axis` must be an integer or None.")  # noqa: EM101
+        msg = "`axis` must be an integer or None."
+        raise ValueError(msg)
     elif axis >= ndim or axis < -ndim:
-        raise ValueError("`axis` is not compatible with the shapes of the inputs.")  # noqa: EM101
+        msg = "`axis` is not compatible with the shapes of the inputs."
+        raise ValueError(msg)
     else:
         axis = int(axis)
 
     if keepdims not in {None, True, False}:
-        raise ValueError("If specified, `keepdims` must be True or False.")  # noqa: EM101
+        msg = "If specified, `keepdims` must be True or False."
+        raise ValueError(msg)
 
     if x.shape[axis] == 0:
         shape = list(x.shape)
@@ -135,7 +140,7 @@ def _quantile_hf(
     # Broadcast indices to match y shape except for the last axis
     if y.ndim > 1:
         # Create broadcast shape for indices
-        broadcast_shape = list(y.shape[:-1]) + [1]  # noqa: RUF005
+        broadcast_shape = list(y.shape[:-1]).append(1)
         j = xp.broadcast_to(j, broadcast_shape)
         jp1 = xp.broadcast_to(jp1, broadcast_shape)
         g = xp.broadcast_to(g, broadcast_shape)

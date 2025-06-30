@@ -320,7 +320,8 @@ def quantile(
         "weibull",
     }
     if method not in methods:
-        raise ValueError(f"`method` must be one of {methods}")  # noqa: EM102
+        msg = f"`method` must be one of {methods}"
+        raise ValueError(msg)
 
     xp = array_namespace(x, q) if xp is None else xp
 
