@@ -270,11 +270,6 @@ def quantile(
         Probability or sequence of probabilities of the quantiles to compute.
         Values must be between 0 and 1 (inclusive). Must have length 1 along
         `axis` unless ``keepdims=True``.
-    method : str, default: 'linear'
-        The method to use for estimating the quantile. The available options are:
-        'inverted_cdf', 'averaged_inverted_cdf', 'closest_observation',
-        'interpolated_inverted_cdf', 'hazen', 'weibull', 'linear' (default),
-        'median_unbiased', 'normal_unbiased', 'harrell-davis'.
     axis : int or None, default: None
         Axis along which the quantiles are computed. ``None`` ravels both `x`
         and `q` before performing the calculation.
@@ -282,6 +277,11 @@ def quantile(
         If this is set to True, the axes which are reduced are left in the
         result as dimensions with size one. With this option, the result will
         broadcast correctly against the original array `x`.
+    method : str, default: 'linear'
+        The method to use for estimating the quantile. The available options are:
+        'inverted_cdf', 'averaged_inverted_cdf', 'closest_observation',
+        'interpolated_inverted_cdf', 'hazen', 'weibull', 'linear' (default),
+        'median_unbiased', 'normal_unbiased', 'harrell-davis'.
     xp : array_namespace, optional
         The standard-compatible namespace for `x` and `q`. Default: infer.
 
@@ -306,9 +306,12 @@ def quantile(
     try:
         import scipy
         from packaging import version
-        # The quantile function in scipy 1.17 supports array API directly, no need to delegate
+
+        # The quantile function in scipy 1.17 supports array API directly, no need
+        # to delegate
         if version.parse(scipy.__version__) >= version.parse("1.17"):
             from scipy.stats import quantile as scipy_quantile
+
             return scipy_quantile(x, p=q, axis=axis, keepdims=keepdims, method=method)
     except (ImportError, AttributeError):
         pass

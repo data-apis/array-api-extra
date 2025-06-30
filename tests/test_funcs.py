@@ -1193,7 +1193,7 @@ class TestQuantile:
 
     def test_methods(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3, 4, 5])
-        methods = ['linear', 'hazen', 'weibull']
+        methods = ["linear", "hazen", "weibull"]
         for method in methods:
             actual = quantile(x, 0.5, method=method)
             # All methods should give reasonable results
@@ -1205,7 +1205,7 @@ class TestQuantile:
         actual = quantile(x, 0.0)
         expect = xp.asarray(1.0)
         xp_assert_close(actual, expect)
-        
+
         # q = 1 should give maximum
         actual = quantile(x, 1.0)
         expect = xp.asarray(5.0)
@@ -1216,7 +1216,7 @@ class TestQuantile:
         # q > 1 should return NaN
         actual = quantile(x, 1.5)
         assert xp.isnan(actual)
-        
+
         # q < 0 should return NaN
         actual = quantile(x, -0.5)
         assert xp.isnan(actual)
