@@ -5,6 +5,7 @@ from types import ModuleType
 from typing import Literal
 
 from ._lib import _funcs
+from ._lib._quantile import quantile as _quantile
 from ._lib._utils._compat import (
     array_namespace,
     is_cupy_namespace,
@@ -332,4 +333,4 @@ def quantile(
     except (ImportError, AttributeError):
         pass
 
-    return _funcs.quantile(x, q, axis=axis, keepdims=keepdims, method=method, xp=xp)
+    return _quantile(x, q, axis=axis, keepdims=keepdims, method=method, xp=xp)
