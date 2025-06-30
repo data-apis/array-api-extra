@@ -1005,12 +1005,10 @@ def quantile(
     if xp is None:
         xp = array_namespace(x, q)
 
-    # Convert q to array if it's a scalar
     q_is_scalar = isinstance(q, int | float)
     if q_is_scalar:
         q = xp.asarray(q, dtype=xp.float64, device=_compat.device(x))
 
-    # Validate inputs
     if not xp.isdtype(x.dtype, ("integral", "real floating")):
         raise ValueError("`x` must have real dtype.")  # noqa: EM101
     if not xp.isdtype(q.dtype, "real floating"):
@@ -1036,7 +1034,6 @@ def quantile(
     else:
         axis = int(axis)
 
-    # Validate method
     methods = {
         "inverted_cdf",
         "averaged_inverted_cdf",
@@ -1052,17 +1049,14 @@ def quantile(
     if method not in methods:
         raise ValueError(f"`method` must be one of {methods}")  # noqa: EM102
 
-    # Handle keepdims parameter
     if keepdims not in {None, True, False}:
         raise ValueError("If specified, `keepdims` must be True or False.")  # noqa: EM101
 
-    # Handle empty arrays
     if x.shape[axis] == 0:
         shape = list(x.shape)
         shape[axis] = 1
         x = xp.full(shape, xp.nan, dtype=dtype, device=_compat.device(x))
 
-    # Sort the data
     y = xp.sort(x, axis=axis)
 
     # Move axis to the end for easier processing
@@ -1070,10 +1064,8 @@ def quantile(
     if not (q_is_scalar or q.ndim == 0):
         q = xp.moveaxis(q, axis, -1)
 
-    # Get the number of elements along the axis
     n = xp.asarray(y.shape[-1], dtype=dtype, device=_compat.device(y))
 
-    # Apply quantile calculation based on method
     if method in {
         "inverted_cdf",
         "averaged_inverted_cdf",
