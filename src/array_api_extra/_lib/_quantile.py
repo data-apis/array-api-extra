@@ -1,6 +1,7 @@
 """Quantile implementation."""
 
 from types import ModuleType
+from typing import cast
 
 from ._at import at
 from ._utils import _compat
@@ -14,7 +15,7 @@ def quantile(
     /,
     *,
     axis: int | None = None,
-    keepdims: bool = None,  # noqa: RUF013
+    keepdims: bool | None = None,
     method: str = "linear",
     xp: ModuleType | None = None,
 ) -> Array:  # numpydoc ignore=PR01,RT01
@@ -25,26 +26,27 @@ def quantile(
     q_is_scalar = isinstance(q, int | float)
     if q_is_scalar:
         q = xp.asarray(q, dtype=xp.float64, device=_compat.device(x))
+    q_arr = cast(Array, q)
 
     if not xp.isdtype(x.dtype, ("integral", "real floating")):
         raise ValueError("`x` must have real dtype.")  # noqa: EM101
-    if not xp.isdtype(q.dtype, "real floating"):
+    if not xp.isdtype(q_arr.dtype, "real floating"):
         raise ValueError("`q` must have real floating dtype.")  # noqa: EM101
 
     # Promote to common dtype
     x = xp.astype(x, xp.float64)
-    q = xp.astype(q, xp.float64)
-    q = xp.asarray(q, device=_compat.device(x))
+    q_arr = xp.astype(q_arr, xp.float64)
+    q_arr = xp.asarray(q_arr, device=_compat.device(x))
 
     dtype = x.dtype
     axis_none = axis is None
-    ndim = max(x.ndim, q.ndim)
+    ndim = max(x.ndim, q_arr.ndim)
 
     if axis_none:
         x = xp.reshape(x, (-1,))
-        q = xp.reshape(q, (-1,))
+        q_arr = xp.reshape(q_arr, (-1,))
         axis = 0
-    elif not isinstance(axis, int):
+    elif not isinstance(axis, int):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError("`axis` must be an integer or None.")  # noqa: EM101
     elif axis >= ndim or axis < -ndim:
         raise ValueError("`axis` is not compatible with the shapes of the inputs.")  # noqa: EM101
@@ -63,15 +65,15 @@ def quantile(
 
     # Move axis to the end for easier processing
     y = xp.moveaxis(y, axis, -1)
-    if not (q_is_scalar or q.ndim == 0):
-        q = xp.moveaxis(q, axis, -1)
+    if not (q_is_scalar or q_arr.ndim == 0):
+        q_arr = xp.moveaxis(q_arr, axis, -1)
 
     n = xp.asarray(y.shape[-1], dtype=dtype, device=_compat.device(y))
 
-    res = _quantile_hf(y, q, n, method, xp)
+    res = _quantile_hf(y, q_arr, n, method, xp)
 
     # Handle NaN output for invalid q values
-    p_mask = (q > 1) | (q < 0) | xp.isnan(q)
+    p_mask = (q_arr > 1) | (q_arr < 0) | xp.isnan(q_arr)
     if xp.any(p_mask):
         res = xp.asarray(res, copy=True)
         res = at(res, p_mask).set(xp.nan)
@@ -100,7 +102,7 @@ def _quantile_hf(
     y: Array, p: Array, n: Array, method: str, xp: ModuleType
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """Helper function for Hyndman-Fan quantile method."""
-    ms = {
+    ms: dict[str, Array | int | float] = {
         "inverted_cdf": 0,
         "averaged_inverted_cdf": 0,
         "closest_observation": -0.5,
