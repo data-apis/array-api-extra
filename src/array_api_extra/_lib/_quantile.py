@@ -140,7 +140,7 @@ def _quantile_hf(
     # Broadcast indices to match y shape except for the last axis
     if y.ndim > 1:
         # Create broadcast shape for indices
-        broadcast_shape = list(y.shape[:-1]).append(1)
+        broadcast_shape = [*y.shape[:-1], 1]
         j = xp.broadcast_to(j, broadcast_shape)
         jp1 = xp.broadcast_to(jp1, broadcast_shape)
         g = xp.broadcast_to(g, broadcast_shape)
