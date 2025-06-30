@@ -24,6 +24,7 @@ from array_api_extra import (
     nunique,
     one_hot,
     pad,
+    quantile,
     setdiff1d,
     sinc,
 )
@@ -43,6 +44,7 @@ lazy_xp_function(kron)
 lazy_xp_function(nunique)
 lazy_xp_function(one_hot)
 lazy_xp_function(pad)
+lazy_xp_function(quantile)
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False)
 lazy_xp_function(sinc)
@@ -1162,3 +1164,70 @@ class TestSinc:
 
     def test_xp(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0), xp=xp), xp.asarray(1.0))
+
+
+class TestQuantile:
+    def test_basic(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        actual = quantile(x, 0.5)
+        expect = xp.asarray(3.0)
+        xp_assert_close(actual, expect)
+
+    def test_multiple_quantiles(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        actual = quantile(x, xp.asarray([0.25, 0.5, 0.75]))
+        expect = xp.asarray([2.0, 3.0, 4.0])
+        xp_assert_close(actual, expect)
+
+    def test_2d_axis(self, xp: ModuleType):
+        x = xp.asarray([[1, 2, 3], [4, 5, 6]])
+        actual = quantile(x, 0.5, axis=0)
+        expect = xp.asarray([2.5, 3.5, 4.5])
+        xp_assert_close(actual, expect)
+
+    def test_2d_axis_keepdims(self, xp: ModuleType):
+        x = xp.asarray([[1, 2, 3], [4, 5, 6]])
+        actual = quantile(x, 0.5, axis=0, keepdims=True)
+        expect = xp.asarray([[2.5, 3.5, 4.5]])
+        xp_assert_close(actual, expect)
+
+    def test_methods(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        methods = ['linear', 'hazen', 'weibull']
+        for method in methods:
+            actual = quantile(x, 0.5, method=method)
+            # All methods should give reasonable results
+            assert 2.5 <= float(actual) <= 3.5
+
+    def test_edge_cases(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        # q = 0 should give minimum
+        actual = quantile(x, 0.0)
+        expect = xp.asarray(1.0)
+        xp_assert_close(actual, expect)
+        
+        # q = 1 should give maximum
+        actual = quantile(x, 1.0)
+        expect = xp.asarray(5.0)
+        xp_assert_close(actual, expect)
+
+    def test_invalid_q(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        # q > 1 should return NaN
+        actual = quantile(x, 1.5)
+        assert xp.isnan(actual)
+        
+        # q < 0 should return NaN
+        actual = quantile(x, -0.5)
+        assert xp.isnan(actual)
+
+    def test_device(self, xp: ModuleType, device: Device):
+        x = xp.asarray([1, 2, 3, 4, 5], device=device)
+        actual = quantile(x, 0.5)
+        assert get_device(actual) == device
+
+    def test_xp(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        actual = quantile(x, 0.5, xp=xp)
+        expect = xp.asarray(3.0)
+        xp_assert_close(actual, expect)

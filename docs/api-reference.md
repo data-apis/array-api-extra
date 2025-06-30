@@ -19,6 +19,7 @@
     nunique
     one_hot
     pad
+    quantile
     setdiff1d
     sinc
 ```
