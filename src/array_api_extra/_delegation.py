@@ -307,9 +307,9 @@ def quantile(
         import scipy
         from packaging import version
 
-        # The quantile function in scipy 1.17 supports array API directly, no need
+        # The quantile function in scipy 1.16 supports array API directly, no need
         # to delegate
-        if version.parse(scipy.__version__) >= version.parse("1.17"):
+        if version.parse(scipy.__version__) >= version.parse("1.16"):
             from scipy.stats import quantile as scipy_quantile
 
             return scipy_quantile(x, p=q, axis=axis, keepdims=keepdims, method=method)
