@@ -23,6 +23,9 @@ pre-commit:
     - name: pyright
       glob: "*.{py,pyi}"
       run: pixi {run} pyright {staged_files}
+    - name: mypy
+      glob: "*.{py,pyi}"
+      run: pixi {run} mypy {staged_files}
     - name: typos
       stage_fixed: true
       run: pixi {run} typos
