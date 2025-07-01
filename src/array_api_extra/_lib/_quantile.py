@@ -147,4 +147,4 @@ def _quantile_hf(
     res = (1 - g) * xp.take_along_axis(y, j, axis=-1) + g * xp.take_along_axis(
         y, jp1, axis=-1
     )
-    return res
+    return res  # noqa: RET504
