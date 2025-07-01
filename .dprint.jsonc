@@ -13,7 +13,6 @@
   "yaml": {
     "printWidth": 100,
     "formatComments": true,
-    // "indentBlockSequenceInMap": false,
     "braceSpacing": false,
   },
   "excludes": ["**/*-lock.json", "**/*.lock", "**/node_modules/", "dist/"],
