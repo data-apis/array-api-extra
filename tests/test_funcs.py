@@ -1217,12 +1217,12 @@ class TestQuantile:
         with pytest.raises(
             ValueError, match="`q` must contain values between 0 and 1 inclusive"
         ):
-            quantile(x, 1.5)
+            _ = quantile(x, 1.5)
 
         with pytest.raises(
             ValueError, match="`q` must contain values between 0 and 1 inclusive"
         ):
-            quantile(x, -0.5)
+            _ = quantile(x, -0.5)
 
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3, 4, 5], device=device)
