@@ -1,3 +1,7 @@
+# pyright: reportAttributeAccessIssue=false
+
+from typing import Any
+
 import array_api_strict as xp
 from numpy.testing import assert_array_equal
 
@@ -53,13 +57,13 @@ def test_vendor_extra():
 
     x = xp.asarray(1)
     y = atleast_nd(x, ndim=0)
-    assert_array_equal(y, x)
+    assert_array_equal(y, x)  # pyright: ignore[reportUnknownArgumentType]
 
 
 def test_vendor_extra_testing():
     from .array_api_extra.testing import lazy_xp_function
 
-    def f(x):
+    def f(x: Any) -> Any:
         return x
 
     lazy_xp_function(f)
