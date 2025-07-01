@@ -91,13 +91,9 @@ def quantile(
     # Move axis back to original position
     res = xp.moveaxis(res, -1, axis)
 
-    # Handle keepdims
     if not keepdims and res.shape[axis] == 1:
         res = xp.squeeze(res, axis=axis)
 
-    # For scalar q, ensure we return a scalar result
-    # if q_is_scalar and hasattr(res, "shape") and res.shape != ():
-    #    res = res[()]
     if res.ndim == 0:
         return res[()]
     return res
@@ -148,6 +144,7 @@ def _quantile_hf(
         jp1 = xp.broadcast_to(jp1, broadcast_shape)
         g = xp.broadcast_to(g, broadcast_shape)
 
-    return (1 - g) * xp.take_along_axis(y, j, axis=-1) + g * xp.take_along_axis(
+    res = (1 - g) * xp.take_along_axis(y, j, axis=-1) + g * xp.take_along_axis(
         y, jp1, axis=-1
     )
+    return res
