@@ -91,7 +91,7 @@ actionlint = { cmd = "actionlint", description = "Lint actions with actionlint" 
 blacken-docs = { cmd = "blacken-docs", description = "Format Python markdown blocks with Black" }
 validate-pyproject = { cmd = "validate-pyproject pyproject.toml", description = "Validate pyproject.toml" }
 numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with numpydoc" }
-lint = { cmd = "lefthook run pre-commit --all-files", description = "Run all linters" }
+lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters" }
 
 [tool.pixi.feature.tests.dependencies]
 pytest = ">=8.4.0"

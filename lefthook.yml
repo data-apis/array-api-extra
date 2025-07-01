@@ -22,10 +22,10 @@ pre-commit:
             run: pixi {run} ruff-format {staged_files}
     - name: pyright
       glob: "*.{py,pyi}"
-      run: pixi {run} pyright {staged_files}
+      run: pixi {run} pyright
     - name: mypy
       glob: "*.{py,pyi}"
-      run: pixi {run} mypy {staged_files}
+      run: pixi {run} mypy
     - name: typos
       stage_fixed: true
       run: pixi {run} typos
