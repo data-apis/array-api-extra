@@ -96,8 +96,8 @@ class TestApplyWhere:
         actual = apply_where(
             cond,
             (x, y),
-            lambda x, _: x,  # pyright: ignore[reportUnknownArgumentType]
-            lambda _, y: y,  # pyright: ignore[reportUnknownArgumentType]
+            lambda x, _: x,
+            lambda _, y: y,
         )
         expect = xp.where(cond, x, y)
         xp_assert_equal(actual, expect)
@@ -117,7 +117,7 @@ class TestApplyWhere:
             cond,
             (x, y),
             self.f1,
-            lambda x, y: mxp.astype(x - y, xp.int64),  # pyright: ignore[reportArgumentType,reportUnknownArgumentType]
+            lambda x, y: mxp.astype(x - y, xp.int64),  # pyright: ignore[reportArgumentType]
         )
         assert actual.dtype == xp.int64
 
@@ -164,8 +164,8 @@ class TestApplyWhere:
         actual = apply_where(
             x == 0,
             (x, y),
-            lambda x, y: x / y,  # pyright: ignore[reportUnknownArgumentType]
-            lambda x, y: y / x,  # pyright: ignore[reportUnknownArgumentType]
+            lambda x, y: x / y,
+            lambda x, y: y / x,
         )
         xp_assert_equal(actual, xp.asarray([0.0, 1.5, 0.0]))
 

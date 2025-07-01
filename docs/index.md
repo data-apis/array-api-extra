@@ -17,7 +17,7 @@ well as delegation to existing implementations for known array library backends.
 The intended users of this library are "array-consuming" libraries which are
 using [array-api-compat](https://data-apis.org/array-api-compat/) to make their
 own library's functions array-agnostic. In this library, they will find a set of
-tools which provide _extra_ functionality on top of the array API standard,
+tools which provide *extra* functionality on top of the array API standard,
 which other array-consuming libraries in a similar position have found useful
 themselves.
 
@@ -27,7 +27,7 @@ It is currently used by:
   scientific computing.
 - [scikit-learn](https://github.com/scikit-learn/scikit-learn) — Machine
   Learning in Python.
-- _your library? Let us know!_
+- *your library? Let us know!*
 
 (installation)=
 
@@ -114,8 +114,7 @@ def array_namespace(*xs, **kwargs):
 See [an example of this in SciPy][scipy-vendor-example].
 ```
 
-[scipy-vendor-example]:
-  https://github.com/scipy/scipy/blob/main/scipy/_lib/_array_api_compat_vendor.py
+[scipy-vendor-example]: https://github.com/scipy/scipy/blob/main/scipy/_lib/_array_api_compat_vendor.py
 
 ## Versioning
 

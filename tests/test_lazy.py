@@ -187,8 +187,8 @@ def test_lazy_apply_dask_non_numpy_meta(da: ModuleType):
         return x + 1
 
     y = lazy_apply(f, x_da)
-    assert array_namespace(y._meta) is cp  # type: ignore[attr-defined]  # pyright: ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
-    xp_assert_equal(y.compute(), x_cp + 1)  # type: ignore[attr-defined]  # pyright: ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
+    assert array_namespace(y._meta) is cp  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+    xp_assert_equal(y.compute(), x_cp + 1)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
 
 def test_dask_key(da: ModuleType):
@@ -396,7 +396,7 @@ def test_lazy_apply_kwargs(xp: ModuleType, library: Backend, as_numpy: bool):
     with numpy arrays, and leave the rest untouched."""
     x = xp.asarray(0)
     expect_cls = np.ndarray if as_numpy or library is Backend.DASK else type(x)
-    actual = check_lazy_apply_kwargs(x, expect_cls, as_numpy)  # pyright: ignore[reportUnknownArgumentType]
+    actual = check_lazy_apply_kwargs(x, expect_cls, as_numpy)
     xp_assert_equal(actual, x + 1)
 
 
