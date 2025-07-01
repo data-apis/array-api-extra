@@ -16,17 +16,18 @@
 <!-- SPHINX-START -->
 
 <!-- prettier-ignore-start -->
-[actions-badge]:            https://github.com/data-apis/array-api-extra/workflows/CI/badge.svg
-[actions-link]:             https://github.com/data-apis/array-api-extra/actions
-[conda-badge]:              https://img.shields.io/conda/vn/conda-forge/array-api-extra
-[conda-link]:               https://github.com/conda-forge/array-api-extra-feedstock
+
+[actions-badge]: https://github.com/data-apis/array-api-extra/workflows/CI/badge.svg
+[actions-link]: https://github.com/data-apis/array-api-extra/actions
+[conda-badge]: https://img.shields.io/conda/vn/conda-forge/array-api-extra
+[conda-link]: https://github.com/conda-forge/array-api-extra-feedstock
 [github-discussions-badge]: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
-[github-discussions-link]:  https://github.com/data-apis/array-api-extra/discussions
-[pypi-link]:                https://pypi.org/project/array-api-extra/
-[pypi-platforms]:           https://img.shields.io/pypi/pyversions/array-api-extra
-[pypi-version]:             https://img.shields.io/pypi/v/array-api-extra
-[docs-badge]:               https://img.shields.io/badge/docs-here!-2ea44f
-[docs-link]:                https://data-apis.org/array-api-extra/index.html
+[github-discussions-link]: https://github.com/data-apis/array-api-extra/discussions
+[pypi-link]: https://pypi.org/project/array-api-extra/
+[pypi-platforms]: https://img.shields.io/pypi/pyversions/array-api-extra
+[pypi-version]: https://img.shields.io/pypi/v/array-api-extra
+[docs-badge]: https://img.shields.io/badge/docs-here!-2ea44f
+[docs-link]: https://data-apis.org/array-api-extra/index.html
 
 <!-- prettier-ignore-end -->
 
@@ -38,7 +39,7 @@ Used by:
   scientific computing.
 - [scikit-learn](https://github.com/scikit-learn/scikit-learn) — Machine
   Learning in Python.
-- _your library? Let us know!_
+- *your library? Let us know!*
 
 ## Installation
 

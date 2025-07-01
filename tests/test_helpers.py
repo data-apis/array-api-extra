@@ -234,10 +234,10 @@ class TestCapabilities:
 
             # Test that we're accepting anything that is accepted by the
             # device= parameter in other functions
-            actual = capabilities(xp, device=device.type)  # type: ignore[attr-defined]  # pyright: ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
+            actual = capabilities(xp, device=device.type)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
 
-class Wrapper(Generic[T]):
+class Wrapper(Generic[T]):  # noqa: PLW1641
     """Trivial opaque wrapper. Must be pickleable."""
 
     x: T
@@ -263,7 +263,7 @@ class TestPickleFlatten:
 
         # Note: NotHashable() instances can be reduced to an
         # unserializable local class
-        class NotHashable:
+        class NotHashable:  # noqa: PLW1641
             @override
             def __eq__(self, other: object) -> bool:
                 return isinstance(other, type(self)) and other.__dict__ == self.__dict__
@@ -331,16 +331,16 @@ class TestPickleFlatten:
         obj2 = [Wrapper(2), Wrapper(3)]
         instances1, rest1 = pickle_flatten(obj1, Wrapper)
         instances2, rest2 = pickle_flatten(obj2, Wrapper)
-        it = iter(instances1 + instances2 + [Wrapper(4)])  # pyright: ignore[reportUnknownArgumentType]
-        assert pickle_unflatten(it, rest1) == obj1  # pyright: ignore[reportUnknownArgumentType]
-        assert pickle_unflatten(it, rest2) == obj2  # pyright: ignore[reportUnknownArgumentType]
-        assert list(it) == [Wrapper(4)]  # pyright: ignore[reportUnknownArgumentType]
+        it = iter(instances1 + instances2 + [Wrapper(4)])
+        assert pickle_unflatten(it, rest1) == obj1
+        assert pickle_unflatten(it, rest2) == obj2
+        assert list(it) == [Wrapper(4)]
 
     def test_too_short(self):
         obj = [Wrapper(1), Wrapper(2)]
         instances, rest = pickle_flatten(obj, Wrapper)
         with pytest.raises(ValueError, match="Not enough"):
-            pickle_unflatten(instances[:1], rest)  # pyright: ignore[reportUnknownArgumentType]
+            pickle_unflatten(instances[:1], rest)
 
     def test_recursion(self):
         obj: list[object] = [Wrapper(1)]
@@ -349,7 +349,7 @@ class TestPickleFlatten:
         instances, rest = pickle_flatten(obj, Wrapper)
         assert instances == [Wrapper(1)]
 
-        obj2 = pickle_unflatten(instances, rest)  # pyright: ignore[reportUnknownArgumentType]
+        obj2 = pickle_unflatten(instances, rest)
         assert len(obj2) == 2
         assert obj2[0] is obj[0]
         assert obj2[1] is obj2
@@ -403,7 +403,7 @@ class TestJAXAutoJIT:
         assert isinstance(out, Wrapper)
         assert out.x[0] is winp.x[0]
         assert out.x[1] is not winp.x[1]
-        xp_assert_equal(out.x[1], winp.x[1])  # pyright: ignore[reportUnknownArgumentType]
+        xp_assert_equal(out.x[1], winp.x[1])
 
     def test_arraylikes_are_static(self):
         pytest.importorskip("jax")

@@ -296,7 +296,7 @@ try:
     # scipy.special.erf.
     from scipy.special._ufuncs import erf  # type: ignore[import-untyped]
 
-    lazy_xp_function(erf)  # pyright: ignore[reportUnknownArgumentType]
+    lazy_xp_function(erf)
 except ImportError:
     erf = None
 
@@ -459,7 +459,7 @@ def test_patch_lazy_xp_functions_deprecated_monkeypatch(
     y = non_materializable5(x)
     xp_assert_equal(y, x)
 
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`monkeypatch` parameter"):
         _ = patch_lazy_xp_functions(request, monkeypatch, xp=xp)
 
     with pytest.raises(AssertionError, match=r"dask\.compute.* 1 times"):

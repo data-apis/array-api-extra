@@ -34,14 +34,15 @@ Homepage = "https://github.com/data-apis/array-api-extra"
 "Bug Tracker" = "https://github.com/data-apis/array-api-extra/issues"
 Changelog = "https://github.com/data-apis/array-api-extra/releases"
 
-
 # Hatch
 
 [tool.hatch]
 version.path = "src/array_api_extra/__init__.py"
 
+[tool.hatch.build.targets.sdist]
+exclude = ["codecov.yml", "pixi.lock", "RELEASING.md", "renovate.json"]
 
-# Pixi
+#  Pixi
 
 [tool.pixi.project]
 channels = ["https://prefix.dev/conda-forge"]
@@ -55,7 +56,6 @@ array-api-extra = { path = ".", editable = true }
 
 [tool.pixi.feature.lint.dependencies]
 typing-extensions = ">=4.14.0"
-pre-commit = ">=4.2.0"
 pylint = ">=3.3.7"
 mypy = ">=1.16.1"
 basedpyright = ">=1.29.4"
@@ -63,19 +63,35 @@ numpydoc = ">=1.8.0,<2"
 # import dependencies for mypy:
 array-api-strict = ">=2.3.1,<2.4"
 numpy = ">=2.1.3"
-pytest = ">=8.4.0"
 hypothesis = ">=6.131.28"
-dask-core = ">=2025.5.1"          # No distributed, tornado, etc.
+dask-core = ">=2025.5.1" # No distributed, tornado, etc.
+dprint = ">=0.50.0,<0.51"
+lefthook = ">=1.11.14,<2"
+ruff = ">=0.12.1,<0.13"
+typos = ">=1.34.0,<2"
+actionlint = ">=1.7.7,<2"
+blacken-docs = ">=1.19.1,<2"
+pytest = ">=8.4.1,<9"
+validate-pyproject = ">=0.24.1,<0.25"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
 [tool.pixi.feature.lint.tasks]
-pre-commit-install = { cmd = "pre-commit install", description = "Install pre-commit" }
-pre-commit = { cmd = "pre-commit run --all-files", description = "Run pre-commit" }
+lefthook = { cmd = "lefthook", description = "Run lefthook" }
+hooks = { cmd = "lefthook install", description = "Install pre-commit hooks" }
+pre-commit = { cmd = "lefthook run pre-commit", description = "Run pre-commit checks" }
+pylint = { cmd = "pylint array_api_extra", cwd = "src", description = "Lint with pylint" }
 mypy = { cmd = "mypy", description = "Type check with mypy" }
-pylint = { cmd = "pylint array_api_extra", cwd = "src", description = "Lint using pylint" }
 pyright = { cmd = "basedpyright", description = "Type check with basedpyright" }
-lint = { depends-on = ["pre-commit", "pylint", "mypy", "pyright"], description = "Run pre-commit, pylint, mypy, and pyright" }
+ruff-check = { cmd = "ruff check --fix", description = "Lint with ruff" }
+ruff-format = { cmd = "ruff format", description = "Format with ruff" }
+dprint = { cmd = "dprint fmt", description = "Format with dprint" }
+typos = { cmd = "typos --write-changes --force-exclude", description = "Fix typos" }
+actionlint = { cmd = "actionlint", description = "Lint actions with actionlint" }
+blacken-docs = { cmd = "blacken-docs", description = "Format Python markdown blocks with Black" }
+validate-pyproject = { cmd = "validate-pyproject pyproject.toml", description = "Validate pyproject.toml" }
+numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with numpydoc" }
+lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters" }
 
 [tool.pixi.feature.tests.dependencies]
 pytest = ">=8.4.0"
@@ -105,7 +121,7 @@ myst-parser = ">=4.0.1"
 sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
-dask-core = ">=2025.5.1"       # No distributed, tornado, etc.
+dask-core = ">=2025.5.1" # No distributed, tornado, etc.
 pytest = ">=8.4.0"
 typing-extensions = ">=4.14.0"
 numpy = ">=2.1.3"
@@ -222,7 +238,6 @@ markers = [
   "xfail_xp_backend(library, /, *, reason=None, strict=None): Xfail test for a specific backend",
 ]
 
-
 # Coverage
 
 [tool.coverage]
@@ -275,10 +290,9 @@ reportImportCycles = false
 reportUnknownLambdaType = false
 
 executionEnvironments = [
-  { root = "tests", reportPrivateUsage = false },
+  { root = "tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
   { root = "src" },
 ]
-
 
 # Ruff
 
@@ -287,43 +301,43 @@ target-version = "py310"
 
 [tool.ruff.lint]
 extend-select = [
-  "B",   # flake8-bugbear
-  "F",   # Pyflakes
-  "I",   # isort
-  "E",   # Pycodestyle
-  "W",   # Pycodestyle
-  "N",   # pep8-naming
+  "B", # flake8-bugbear
+  "F", # Pyflakes
+  "I", # isort
+  "E", # Pycodestyle
+  "W", # Pycodestyle
+  "N", # pep8-naming
   "ARG", # flake8-unused-arguments
-  "C4",  # flake8-comprehensions
-  "EM",  # flake8-errmsg
+  "C4", # flake8-comprehensions
+  "EM", # flake8-errmsg
   "ICN", # flake8-import-conventions
   "ISC", # flake8-implicit-str-concat
-  "G",   # flake8-logging-format
+  "G", # flake8-logging-format
   "PGH", # pygrep-hooks
   "PIE", # flake8-pie
-  "PL",  # pylint
-  "PT",  # flake8-pytest-style
+  "PL", # pylint
+  "PT", # flake8-pytest-style
   "PTH", # flake8-use-pathlib
   "RET", # flake8-return
   "RUF", # Ruff-specific
   "SIM", # flake8-simplify
   "T20", # flake8-print
-  "UP",  # pyupgrade
+  "UP", # pyupgrade
   "YTT", # flake8-2020
   "EXE", # flake8-executable
   "NPY", # NumPy specific rules
-  "PD",  # pandas-vet
-  "UP",  # Pyupgrade
+  "PD", # pandas-vet
+  "UP", # Pyupgrade
 ]
 ignore = [
-  "PLR09",   # Too many <...>
+  "PLR09", # Too many <...>
   "PLR2004", # Magic value used in comparison
-  "ISC001",  # Conflicts with formatter
-  "N801",    # Class name should use CapWords convention
-  "N802",    # Function name should be lowercase
-  "N806",    # Variable in function should be lowercase
+  "ISC001", # Conflicts with formatter
+  "N801", # Class name should use CapWords convention
+  "N802", # Function name should be lowercase
+  "N806", # Variable in function should be lowercase
+  "PLC0415", # `import` should be at the top-level of a file
 ]
-
 
 # Pylint
 
@@ -331,21 +345,20 @@ ignore = [
 py-version = "3.10"
 reports.output-format = "colorized"
 messages_control.disable = [
-  "design",                     # ignore heavily opinionated design checks
-  "fixme",                      # allow FIXME comments
-  "line-too-long",              # ruff handles this
-  "unused-argument",            # ruff handles this
+  "design", # ignore heavily opinionated design checks
+  "fixme", #  allow FIXME comments
+  "line-too-long", # ruff handles this
+  "unused-argument", # ruff handles this
   "missing-function-docstring", # numpydoc handles this
-  "import-error",               # mypy handles this
-  "import-outside-toplevel",    # optional dependencies
+  "import-error", # mypy handles this
+  "import-outside-toplevel", # optional dependencies
 ]
-
 
 # numpydoc
 
 [tool.numpydoc_validation]
 checks = [
-  "all",  # report on all checks, except the below
+  "all", # report on all checks, except the below
   "EX01", # most docstrings do not need an example
   "SA01", # data-apis/array-api-extra#87
   "ES01", # most docstrings do not need an extended summary
