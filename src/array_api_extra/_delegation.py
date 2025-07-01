@@ -331,7 +331,7 @@ def quantile(
 
         # The quantile function in scipy 1.16 supports array API directly, no need
         # to delegate
-        if version.parse(scipy.__version__) >= version.parse("1.16"):  # pyright: ignore[reportUnknownArgumentType]
+        if version.parse(scipy.__version__) >= version.parse("1.17"):  # pyright: ignore[reportUnknownArgumentType]
             from scipy.stats import (  # type: ignore[import-untyped]
                 quantile as scipy_quantile,
             )

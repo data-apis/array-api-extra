@@ -75,13 +75,12 @@ def quantile(
 
     n = xp.asarray(y.shape[-1], dtype=dtype, device=_compat.device(y))
 
-    res = _quantile_hf(y, q_arr, n, method, xp)
+    # Validate that q values are in the range [0, 1]
+    if xp.any((q_arr < 0) | (q_arr > 1)):
+        msg = "`q` must contain values between 0 and 1 inclusive."
+        raise ValueError(msg)
 
-    # Handle NaN output for invalid q values
-    p_mask = (q_arr > 1) | (q_arr < 0) | xp.isnan(q_arr)
-    if xp.any(p_mask):
-        res = xp.asarray(res, copy=True)
-        res = at(res, p_mask).set(xp.nan)
+    res = _quantile_hf(y, q_arr, n, method, xp)
 
     # Reshape per axis/keepdims
     if axis_none and keepdims:
@@ -97,9 +96,10 @@ def quantile(
         res = xp.squeeze(res, axis=axis)
 
     # For scalar q, ensure we return a scalar result
-    if q_is_scalar and hasattr(res, "shape") and res.shape != ():
-        res = res[()]
-
+    # if q_is_scalar and hasattr(res, "shape") and res.shape != ():
+    #    res = res[()]
+    if res.ndim == 0:
+        return res[()]
     return res
 
 
@@ -121,7 +121,10 @@ def _quantile_hf(
     m = ms[method]
 
     jg = p * n + m - 1
-    j = xp.astype(jg // 1, xp.int64)  # Convert to integer
+    # Convert both to integers, the type of j and n must be the same
+    # for us to be able to `xp.clip` them.
+    j = xp.astype(jg // 1, xp.int64)
+    n = xp.astype(n, xp.int64)
     g = jg % 1
 
     if method == "inverted_cdf":

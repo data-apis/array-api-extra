@@ -1213,13 +1213,16 @@ class TestQuantile:
 
     def test_invalid_q(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3, 4, 5])
-        # q > 1 should return NaN
-        actual = quantile(x, 1.5)
-        assert xp.isnan(actual)
+        # q > 1 should raise
+        with pytest.raises(
+            ValueError, match="`q` must contain values between 0 and 1 inclusive"
+        ):
+            quantile(x, 1.5)
 
-        # q < 0 should return NaN
-        actual = quantile(x, -0.5)
-        assert xp.isnan(actual)
+        with pytest.raises(
+            ValueError, match="`q` must contain values between 0 and 1 inclusive"
+        ):
+            quantile(x, -0.5)
 
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3, 4, 5], device=device)
