@@ -290,7 +290,7 @@ reportImportCycles = false
 reportUnknownLambdaType = false
 
 executionEnvironments = [
-  { root = "tests", reportPrivateUsage = false },
+  { root = "tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
   { root = "src" },
 ]
 

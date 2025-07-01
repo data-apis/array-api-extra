@@ -296,7 +296,7 @@ try:
     # scipy.special.erf.
     from scipy.special._ufuncs import erf  # type: ignore[import-untyped]
 
-    lazy_xp_function(erf)  # pyright: ignore[reportUnknownArgumentType]
+    lazy_xp_function(erf)
 except ImportError:
     erf = None
 

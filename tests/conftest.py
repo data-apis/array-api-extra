@@ -37,13 +37,13 @@ def library(request: pytest.FixtureRequest) -> Backend:  # numpydoc ignore=PR01,
         ("xfail_xp_backend", partial(xfail, request), {"reason", "strict"}),
     ):
         for marker in request.node.iter_markers(marker_name):
-            if len(marker.args) != 1:  # pyright: ignore[reportUnknownArgumentType]
+            if len(marker.args) != 1:
                 msg = f"Expected exactly one positional argument; got {marker.args}"
                 raise TypeError(msg)
             if not isinstance(marker.args[0], Backend):
                 msg = f"Argument of {marker_name} must be a Backend enum"
                 raise TypeError(msg)
-            if invalid_kwargs := set(marker.kwargs) - allow_kwargs:  # pyright: ignore[reportUnknownArgumentType]
+            if invalid_kwargs := set(marker.kwargs) - allow_kwargs:
                 msg = f"Unexpected kwarg(s): {invalid_kwargs}"
                 raise TypeError(msg)
 
@@ -52,9 +52,9 @@ def library(request: pytest.FixtureRequest) -> Backend:  # numpydoc ignore=PR01,
             strict: bool | None = marker.kwargs.get("strict", None)
 
             if library == elem:
-                reason = f"{library}: {reason}" if reason else str(library)  # pyright: ignore[reportUnknownArgumentType]
+                reason = f"{library}: {reason}" if reason else str(library)
                 kwargs = {"strict": strict} if strict is not None else {}
-                skip_or_xfail(reason=reason, **kwargs)  # pyright: ignore[reportUnknownArgumentType]
+                skip_or_xfail(reason=reason, **kwargs)
 
     return elem
 
@@ -98,7 +98,7 @@ class NumPyReadOnly:
 
             # This works with namedtuples too
             if isinstance(o, tuple | list):
-                return type(o)(*(as_readonly(i) for i in o))  # type: ignore[arg-type,return-value] # pyright: ignore[reportArgumentType,reportUnknownArgumentType]
+                return type(o)(*(as_readonly(i) for i in o))  # type: ignore[arg-type,return-value] # pyright: ignore[reportArgumentType]
 
             return o
 
