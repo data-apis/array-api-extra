@@ -325,6 +325,9 @@ def quantile(
 
     xp = array_namespace(x, q) if xp is None else xp
 
+    if is_dask_namespace(xp):
+        return xp.quantile(x, q, axis=axis, keepdims=keepdims, method=method)
+
     try:
         import scipy  # type: ignore[import-untyped]
         from packaging import version
