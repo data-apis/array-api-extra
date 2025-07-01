@@ -37,7 +37,7 @@ def quantile(
 
     # Promote to common dtype
     x = xp.astype(x, xp.float64)
-    q_arr = xp.asarray(q_arr, xp.float64, device=_compat.device(x))
+    q_arr = xp.asarray(q_arr, dtype=xp.float64, device=_compat.device(x))
 
     dtype = x.dtype
     axis_none = axis is None
