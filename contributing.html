@@ -336,7 +336,7 @@ development of array-api-extra is made easy with
 at <a class="reference external" href="https://github.com/data-apis/array-api-extra">https://github.com/data-apis/array-api-extra</a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">array-api-extra</span></code>.</p></li>
 <li><p><a class="reference external" href="https://pixi.sh/latest/#installation">Install Pixi</a>.</p></li>
-<li><p>To enter a development environment:</p></li>
+<li><p>To enter a development environment (if you prefer this to the <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span></code> interface):</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">dev</span>
 </pre></div>
@@ -345,18 +345,6 @@ at <a class="reference external" href="https://github.com/data-apis/array-api-ex
 <li><p>To run the tests:</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="n">tests</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>To generate the coverage report:</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="n">coverage</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>To generate and display the coverage report:</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="nb">open</span><span class="o">-</span><span class="n">coverage</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -372,15 +360,21 @@ at <a class="reference external" href="https://github.com/data-apis/array-api-ex
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>To install a <a class="reference external" href="https://pre-commit.com">pre-commit</a> hook:</p></li>
+<li><p>To install pre-commit hooks:</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="n">pre</span><span class="o">-</span><span class="n">commit</span><span class="o">-</span><span class="n">install</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="n">hooks</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>To run the lint suite:</p></li>
+<li><p>To run pre-commit checks on staged files:</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span> <span class="n">lint</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="n">pre</span><span class="o">-</span><span class="n">commit</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>To run the full lint suite:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="o">--</span><span class="n">environment</span><span class="o">=</span><span class="n">lint</span> <span class="n">lint</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -390,26 +384,36 @@ at <a class="reference external" href="https://github.com/data-apis/array-api-ex
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>To run individual parts of the lint suite separately:</p></li>
+<li><p>To run individual parts of the lint suite separately (for example):</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span> <span class="n">pre</span><span class="o">-</span><span class="n">commit</span>
-<span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span> <span class="n">pylint</span>
-<span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span> <span class="n">mypy</span>
-<span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span> <span class="n">pyright</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="o">--</span><span class="n">environment</span><span class="o">=</span><span class="n">lint</span> <span class="n">pyright</span>
+<span class="n">pixi</span> <span class="n">run</span> <span class="o">--</span><span class="n">environment</span><span class="o">=</span><span class="n">lint</span> <span class="n">dprint</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>To generate the coverage report:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="n">coverage</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>To generate and display the coverage report:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="nb">open</span><span class="o">-</span><span class="n">coverage</span>
 </pre></div>
 </div>
 <p>Alternative environments are available with a subset of the dependencies and
 tasks available in the <code class="docutils literal notranslate"><span class="pre">dev</span></code> environment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">docs</span>
-<span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">tests</span>
-<span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">tests</span><span class="o">-</span><span class="n">backends</span>
-<span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">lint</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">shell</span> <span class="o">--</span><span class="n">environment</span><span class="o">=</span><span class="n">docs</span>
+<span class="n">pixi</span> <span class="n">shell</span> <span class="o">--</span><span class="n">environment</span><span class="o">=</span><span class="n">tests</span>
+<span class="n">pixi</span> <span class="n">shell</span> <span class="o">--</span><span class="n">environment</span><span class="o">=</span><span class="n">tests</span><span class="o">-</span><span class="n">backends</span>
+<span class="n">pixi</span> <span class="n">shell</span> <span class="o">--</span><span class="n">environment</span><span class="o">=</span><span class="n">lint</span>
 </pre></div>
 </div>
 <p>If you run on a host with CUDA hardware, you can enable extra tests:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">dev</span><span class="o">-</span><span class="n">cuda</span>
-<span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">tests</span><span class="o">-</span><span class="n">cuda</span>
-<span class="n">pixi</span> <span class="n">run</span> <span class="o">-</span><span class="n">e</span> <span class="n">tests</span><span class="o">-</span><span class="n">cuda</span> <span class="n">tests</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">shell</span> <span class="o">--</span><span class="n">environment</span><span class="o">=</span><span class="n">dev</span><span class="o">-</span><span class="n">cuda</span>
+<span class="n">pixi</span> <span class="n">shell</span> <span class="o">--</span><span class="n">environment</span><span class="o">=</span><span class="n">tests</span><span class="o">-</span><span class="n">cuda</span>
+<span class="n">pixi</span> <span class="n">run</span> <span class="o">--</span><span class="n">environment</span><span class="o">=</span><span class="n">tests</span><span class="o">-</span><span class="n">cuda</span> <span class="n">tests</span>
 </pre></div>
 </div>
 </section>
