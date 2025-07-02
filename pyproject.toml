@@ -94,7 +94,7 @@ numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with nump
 lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters" }
 
 [tool.pixi.feature.tests.dependencies]
-pytest = ">=8.4.0"
+pytest = ">=8.4.1"
 pytest-cov = ">=6.2.1"
 hypothesis = ">=6.131.28"
 array-api-strict = ">=2.3.1,<2.4"
@@ -122,7 +122,7 @@ sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
 dask-core = ">=2025.5.1" # No distributed, tornado, etc.
-pytest = ">=8.4.0"
+pytest = ">=8.4.1"
 typing-extensions = ">=4.14.0"
 numpy = ">=2.1.3"
 
