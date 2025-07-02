@@ -2,7 +2,7 @@
 
 from typing import Any
 
-import array_api_strict as xp
+import numpy as np
 from numpy.testing import assert_array_equal
 
 
@@ -30,24 +30,24 @@ def test_vendor_compat():
         to_device,
     )
 
-    x = xp.asarray([1, 2, 3])
-    assert array_namespace(x) is xp
+    x = np.asarray([1, 2, 3])
+    assert array_namespace(x).__name__.endswith("array_api_compat.numpy")
     to_device(x, device(x))
     assert is_array_api_obj(x)
-    assert is_array_api_strict_namespace(xp)
+    assert not is_array_api_strict_namespace(np)
     assert not is_cupy_array(x)
-    assert not is_cupy_namespace(xp)
+    assert not is_cupy_namespace(np)
     assert not is_dask_array(x)
-    assert not is_dask_namespace(xp)
+    assert not is_dask_namespace(np)
     assert not is_jax_array(x)
-    assert not is_jax_namespace(xp)
+    assert not is_jax_namespace(np)
     assert not is_lazy_array(x)
-    assert not is_numpy_array(x)
-    assert not is_numpy_namespace(xp)
+    assert is_numpy_array(x)
+    assert is_numpy_namespace(np)
     assert not is_pydata_sparse_array(x)
-    assert not is_pydata_sparse_namespace(xp)
+    assert not is_pydata_sparse_namespace(np)
     assert not is_torch_array(x)
-    assert not is_torch_namespace(xp)
+    assert not is_torch_namespace(np)
     assert is_writeable_array(x)
     assert size(x) == 3
 
@@ -55,7 +55,7 @@ def test_vendor_compat():
 def test_vendor_extra():
     from .array_api_extra import atleast_nd
 
-    x = xp.asarray(1)
+    x = np.asarray(1)
     y = atleast_nd(x, ndim=0)
     assert_array_equal(y, x)  # pyright: ignore[reportUnknownArgumentType]
 
