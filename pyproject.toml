@@ -61,7 +61,7 @@ mypy = ">=1.16.1"
 basedpyright = ">=1.29.4"
 numpydoc = ">=1.8.0,<2"
 # import dependencies for mypy:
-array-api-strict = ">=2.3.1,<2.4"
+array-api-strict = ">=2.4"
 numpy = ">=2.1.3"
 hypothesis = ">=6.131.28"
 dask-core = ">=2025.5.1" # No distributed, tornado, etc.
@@ -97,8 +97,10 @@ lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run
 pytest = ">=8.4.0"
 pytest-cov = ">=6.2.1"
 hypothesis = ">=6.131.28"
-array-api-strict = ">=2.3.1,<2.4"
 numpy = ">=1.22.0"
+
+[tool.pixi.feature.tests-py313.dependencies]
+array-api-strict = ">=2.4" # Requires python >=3.12
 
 [tool.pixi.feature.tests.tasks]
 tests = { cmd = "pytest -v", description = "Run tests" }
@@ -208,21 +210,23 @@ dask-core = ">=2025.5.1" # No distributed, tornado, etc.
 default = { features = ["py313"], solve-group = "py313" }
 lint = { features = ["py313", "lint"], solve-group = "py313" }
 docs = { features = ["py313", "docs"], solve-group = "py313" }
-tests = { features = ["py313", "tests"], solve-group = "py313" }
-tests-py313 = { features = ["py313", "tests"], solve-group = "py313" } # alias of tests
+tests = { features = ["py313", "tests", "tests-py313"], solve-group = "py313" }
+tests-py313 = { features = ["py313", "tests", "tests-py313"], solve-group = "py313" } # alias of tests
 
 # Some backends may pin numpy; use separate solve-group
-dev = { features = ["py310", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
-tests-backends = { features = ["py310", "tests", "backends"], solve-group = "backends" }
+dev = { features = ["py313", "lint", "tests", "tests-py313", "docs", "dev", "backends"], solve-group = "backends" }
+tests-backends = { features = ["py313", "tests", "tests-py313", "backends"], solve-group = "backends" }
+tests-backends-py313 = { features = ["py313", "tests", "tests-py313", "backends"], solve-group = "backends" } # alias of tests-backends
 
 # CUDA not available on free github actions and on some developers' PCs
-dev-cuda = { features = ["py310", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda = { features = ["py310", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
+dev-cuda = { features = ["py313", "lint", "tests", "tests-py313", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
+tests-cuda = { features = ["py313", "tests", "tests-py313", "backends", "cuda-backends"], solve-group = "cuda" }
 
 # Ungrouped environments
 tests-numpy1 = ["py310", "tests", "numpy1"]
 tests-py310 = ["py310", "tests"]
-tests-nogil = ["nogil", "tests"]
+tests-backends-py310 = { features = ["py310", "tests", "backends"] }
+tests-nogil = ["nogil", "tests", "tests-py313"]
 
 # pytest
 

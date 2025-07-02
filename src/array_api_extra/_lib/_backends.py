@@ -58,13 +58,6 @@ class Backend(Enum):  # numpydoc ignore=PR02
         )
 
         marks = []
-        if self.like(Backend.ARRAY_API_STRICT):
-            marks.append(
-                pytest.mark.skipif(
-                    NUMPY_VERSION < (1, 26),
-                    reason="array_api_strict is untested on NumPy <1.26",
-                )
-            )
         if self.like(Backend.DASK, Backend.JAX):
             # Monkey-patched by lazy_xp_function
             marks.append(pytest.mark.thread_unsafe)
