@@ -26,16 +26,10 @@
     "schedule": ["* * 15 * *"],
     "automerge": true
   }, {
-    "description": "Don't bump test dependencies for oldest Python compatibility.",
-    "matchManagers": ["pixi"],
-    "matchDepTypes": ["feature-tests"],
-    "matchPackageNames": ["numpy"],
-    "enabled": false
-  }, {
     "description": "Block PRs for updates blocked on dropping Python 3.10.",
     "matchManagers": ["pixi"],
     "matchUpdateTypes": ["major"],
-    "matchPackageNames": ["sphinx", "ipython", "sphinx-autodoc-typehints"],
+    "matchPackageNames": ["numpy", "sphinx", "ipython", "sphinx-autodoc-typehints"],
     "enabled": false
   }, {
     "description": "Group Dask packages.",
