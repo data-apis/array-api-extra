@@ -15,8 +15,8 @@
     "matchCurrentValue": "/^~?=/",
     "enabled": false
   }, {
-    "description": "Do not bump Python deps in the manifest or requires-python.",
-    "matchManagers": ["pixi", "pep621"],
+    "description": "Do not bump requires-python.",
+    "matchManagers": ["pep621"],
     "matchPackageNames": ["python"],
     "enabled": false
   }, {
@@ -28,17 +28,8 @@
   }, {
     "description": "Block PRs for updates blocked on dropping Python 3.10.",
     "matchManagers": ["pixi"],
+    "matchUpdateTypes": ["major"],
     "matchPackageNames": ["sphinx", "ipython", "sphinx-autodoc-typehints"],
-    "enabled": false
-  }, {
-    "description": "Waiting for Numba to support NumPy 2.2.",
-    "matchManagers": ["pixi"],
-    "matchPackageNames": ["numpy"],
-    "enabled": false
-  }, {
-    "description": "Block Python CI updates as setup-python lags behind (gh-194).",
-    "matchManagers": ["github-actions"],
-    "matchPackageNames": ["python"],
     "enabled": false
   }, {
     "description": "Group Dask packages.",
