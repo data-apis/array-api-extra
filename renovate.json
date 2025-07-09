@@ -28,7 +28,7 @@
   }, {
     "description": "Block PRs for updates blocked on dropping Python 3.10.",
     "matchManagers": ["pixi"],
-    "matchUpdateTypes": ["major"],
+    "matchUpdateTypes": ["major", "minor"],
     "matchPackageNames": ["numpy", "sphinx", "ipython", "sphinx-autodoc-typehints"],
     "enabled": false
   }, {
