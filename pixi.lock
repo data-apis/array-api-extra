@@ -4253,7 +4253,7 @@ packages:
 - pypi: ./
   name: array-api-extra
   version: 0.8.1.dev0
-  sha256: 17ea66b6b47edc3a347d92258dbd798e13ab370d01b7e1c36c5b31be1a737e05
+  sha256: 9b790b979ee30cd3120cd86d2f63915ed8b3aa4884d58f0439fcad6479e70852
   requires_dist:
   - array-api-compat>=1.12.0,<2
   requires_python: '>=3.10'
