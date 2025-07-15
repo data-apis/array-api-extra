@@ -34,7 +34,7 @@ jobs:
           cache: true
           environments: lint
 
-      - name: Lint
+      - name: Lint (if this step fails, please 'pixi run lint' locally and push the changes)
         run: pixi run -e lint lint
 
   checks:
