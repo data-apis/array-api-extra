@@ -1,15 +1,14 @@
 # array-api-extra
 
-[![Actions Status][actions-badge]][actions-link]
 [![docs - here!][docs-badge]][docs-link]
-[![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
-[![All Contributors](https://img.shields.io/github/all-contributors/data-apis/array-api-extra?color=ee8449&style=flat-square)](#contributors)
-[![Typing](https://img.shields.io/pypi/types/array-api-extra)](https://typing.python.org/)
-[![codecov](https://codecov.io/github/data-apis/array-api-extra/graph/badge.svg)](https://codecov.io/github/data-apis/array-api-extra)
-
 [![PyPI version][pypi-version]][pypi-link]
 [![Conda-Forge][conda-badge]][conda-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
+[![All Contributors](https://img.shields.io/github/all-contributors/data-apis/array-api-extra?color=ee8449&style=flat-square)](#contributors)
+
+[![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
+[![Typing](https://img.shields.io/pypi/types/array-api-extra)](https://typing.python.org/)
+[![codecov](https://codecov.io/github/data-apis/array-api-extra/graph/badge.svg)](https://codecov.io/github/data-apis/array-api-extra)
 [![EffVer Versioning](https://img.shields.io/badge/version_scheme-EffVer-0097a7)](https://jacobtomlinson.dev/effver)
 [![SPEC 8 — Securing the Release Process](https://img.shields.io/badge/SPEC-8-green?labelColor=%23004811&color=%235CA038)](https://scientific-python.org/specs/spec-0008/)
 
