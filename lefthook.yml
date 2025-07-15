@@ -1,7 +1,7 @@
-lefthook: pixi run --environment=lint lefthook
+lefthook: pixi run --no-progress --environment=lint lefthook
 
 templates:
-  run: run --environment=lint
+  run: run --quiet --no-progress --environment=lint
 
 pre-commit:
   parallel: true
