@@ -11,6 +11,8 @@ from typing import TYPE_CHECKING, ClassVar, cast
 from ._utils import _compat
 from ._utils._compat import (
     array_namespace,
+    is_array_api_obj,
+    is_array_api_strict_namespace,
     is_dask_array,
     is_jax_array,
     is_torch_array,
@@ -351,6 +353,33 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         # https://github.com/pytorch/pytorch/issues/150017
         if is_torch_array(y):
             y = xp.astype(y, x.dtype, copy=False)
+
+        # Work around lack of fancy indexing __setitem__ support in array-api-strict.
+        if (
+            is_array_api_strict_namespace(xp)
+            and is_array_api_obj(idx)
+            and xp.isdtype(idx.dtype, "integral")
+            and out_of_place_op is None  # only use for set()
+        ):
+            # Vectorize the operation using boolean indexing
+            # For non-unique indices, take the last occurrence. This requires creating
+            # masks for x and y that create matching shapes.
+            unique_indices, first_occurrence_mask = xp.unique_inverse(idx)
+            x_mask = xp.any(xp.arange(x.shape[0])[..., None] == unique_indices, axis=-1)
+            # Get last occurrence of each unique index
+            cmp = unique_indices[:, None] == unique_indices[None, :]
+            # Ignore later matches
+            lower_tri_mask = (
+                xp.arange(y.shape[0])[:, None] >= xp.arange(y.shape[0])[None, :]
+            )
+            masked_cmp = cmp & lower_tri_mask
+            # For each position i, count how many matches occurred before i
+            prior_matches = xp.sum(xp.astype(masked_cmp, xp.int32), axis=-1)
+            # Last occurrence has highest match count
+            y_mask = prior_matches == xp.max(prior_matches, axis=-1)
+            # Apply the operation only to last occurrences
+            x[x_mask] = y[y_mask]
+            return x
 
         # Backends without boolean indexing (other than JAX) crash here
         if in_place_op:  # add(), subtract(), ...

@@ -11,7 +11,11 @@ from array_api_extra import at
 from array_api_extra._lib._at import _AtOp
 from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._testing import xp_assert_equal
-from array_api_extra._lib._utils._compat import array_namespace, is_writeable_array
+from array_api_extra._lib._utils._compat import (
+    array_namespace,
+    is_jax_namespace,
+    is_writeable_array,
+)
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._typing import Array, Device, SetIndex
 from array_api_extra.testing import lazy_xp_function
@@ -270,6 +274,38 @@ def test_bool_mask_nd(xp: ModuleType):
     idx = xp.asarray([[True, False, False], [False, True, True]])
     z = at_op(x, idx, _AtOp.SET, 0)
     xp_assert_equal(z, xp.asarray([[0, 2, 3], [4, 0, 0]]))
+
+
+def test_setitem_int_array_index(xp: ModuleType):
+    # Single dimension
+    x = xp.asarray([0.0, 1.0, 2.0])
+    y = xp.asarray([3.0, 4.0])
+    idx = xp.asarray([0, 2])
+    expect = xp.asarray([3.0, 1.0, 4.0])
+    z = at_op(x, idx, _AtOp.SET, y)
+    assert isinstance(z, type(x))
+    xp_assert_equal(z, expect)
+    # Single dimension, non-unique index
+    x = xp.asarray([0.0, 1.0])
+    y = xp.asarray([2.0, 3.0])
+    idx = xp.asarray([1, 1])
+    device_str = str(get_device(x)).lower()
+    # GPU arrays generally use the first element, but JAX with float64 enabled uses the
+    # last element.
+    if ("gpu" in device_str or "cuda" in device_str) and not is_jax_namespace(xp):
+        expect = xp.asarray([0.0, 2.0])
+    else:
+        expect = xp.asarray([0.0, 3.0])  # CPU arrays use the last
+    z = at_op(x, idx, _AtOp.SET, y)
+    assert isinstance(z, type(x))
+    xp_assert_equal(z, expect)
+    # Multiple dimensions
+    x = xp.asarray([[0.0, 1.0], [2.0, 3.0]])
+    y = xp.asarray([[4.0, 5.0]])
+    idx = xp.asarray([0])
+    expect = xp.asarray([[4.0, 5.0], [2.0, 3.0]])
+    z = at_op(x, idx, _AtOp.SET, y)
+    xp_assert_equal(z, expect)
 
 
 @pytest.mark.parametrize("bool_mask", [False, True])
