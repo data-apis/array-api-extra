@@ -364,7 +364,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             # Vectorize the operation using boolean indexing
             # For non-unique indices, take the last occurrence. This requires creating
             # masks for x and y that create matching shapes.
-            unique_indices, first_occurrence_mask = xp.unique_inverse(idx)
+            unique_indices, _ = xp.unique_inverse(idx)
             x_mask = xp.any(xp.arange(x.shape[0])[..., None] == unique_indices, axis=-1)
             # Get last occurrence of each unique index
             cmp = unique_indices[:, None] == unique_indices[None, :]
