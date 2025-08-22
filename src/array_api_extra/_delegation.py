@@ -166,7 +166,7 @@ def nan_to_num(
     >>> xpx.nan_to_num(x)
     array([ 1.79769313e+308, -1.79769313e+308,  0.00000000e+000, # may vary
            -1.28000000e+002,  1.28000000e+002])
-    >>> y = xp.array([complex(xp.inf, xp.nan), xp.nan, complex(xp.nan, xp.inf)])
+    >>> y = xp.asarray([complex(xp.inf, xp.nan), xp.nan, complex(xp.nan, xp.inf)])
     array([  1.79769313e+308,  -1.79769313e+308,   0.00000000e+000, # may vary
          -1.28000000e+002,   1.28000000e+002])
     >>> xpx.nan_to_num(y)
