@@ -131,8 +131,6 @@ def nan_to_num(
     For complex dtypes, the above is applied to each of the real and
     imaginary components of `x` separately.
 
-    If `x` is not inexact, then no replacements are made.
-
     Parameters
     ----------
     x : array | float | complex
