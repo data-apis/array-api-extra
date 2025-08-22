@@ -21,6 +21,7 @@ from array_api_extra import (
     expand_dims,
     isclose,
     kron,
+    nan_to_num,
     nunique,
     one_hot,
     pad,
@@ -40,6 +41,7 @@ lazy_xp_function(cov)
 lazy_xp_function(create_diagonal)
 lazy_xp_function(expand_dims)
 lazy_xp_function(kron)
+lazy_xp_function(nan_to_num)
 lazy_xp_function(nunique)
 lazy_xp_function(one_hot)
 lazy_xp_function(pad)
