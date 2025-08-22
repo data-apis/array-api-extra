@@ -760,16 +760,16 @@ def nan_to_num(
         finfo = xp.finfo(x.dtype)
         idx_posinf = xp.isinf(x) & ~xp.signbit(x)
         idx_neginf = xp.isinf(x) & xp.signbit(x)
-        x = xp.where(idx_posinf, x, finfo.max)
-        return xp.where(idx_neginf, x, finfo.min)
+        x = xp.where(idx_posinf, finfo.max, x)
+        return xp.where(idx_neginf, finfo.min, x)
 
     if xp.isdtype(x.dtype, "complex floating"):
         return perform_replacements(
-            x,
+            xp.real(x),
             fill_value,
             xp,
         ) + 1j * perform_replacements(
-            x,
+            xp.imag(x),
             fill_value,
             xp,
         )

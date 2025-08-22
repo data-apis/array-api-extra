@@ -114,7 +114,7 @@ def isclose(
 
 
 def nan_to_num(
-    x: Array,
+    x: Array | float | complex,
     /,
     *,
     fill_value: int | float | complex = 0.0,
@@ -136,7 +136,7 @@ def nan_to_num(
 
     Parameters
     ----------
-    x : array
+    x : array, float, complex
         Input data.
     fill_value : int, float, complex, optional
         Value to be used to fill NaN values. If no value is passed
@@ -173,11 +173,10 @@ def nan_to_num(
              0.00000000e+000 +0.00000000e+000j,
              0.00000000e+000 +1.79769313e+308j])
     """
-    if x.ndim == 0:
-        msg = "x must be an array."
-        raise TypeError(msg)
-
     xp = array_namespace(x) if xp is None else xp
+
+    # for scalars we want to output an array
+    y = xp.asarray(x)
 
     if (
         is_cupy_namespace(xp)
@@ -185,9 +184,9 @@ def nan_to_num(
         or is_numpy_namespace(xp)
         or is_torch_namespace(xp)
     ):
-        return xp.nan_to_num(x, nan=fill_value)
+        return xp.nan_to_num(y, nan=fill_value)
 
-    return _funcs.nan_to_num(x, fill_value=fill_value, xp=xp)
+    return _funcs.nan_to_num(y, fill_value=fill_value, xp=xp)
 
 
 def one_hot(

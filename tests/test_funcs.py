@@ -943,6 +943,58 @@ class TestKron:
         xp_assert_equal(kron(a, b, xp=xp), k)
 
 
+class TestNumToNan:
+    def test_bool(self, xp: ModuleType) -> None:
+        a = xp.asarray([True])
+        xp_assert_equal(nan_to_num(a), a)
+
+    def test_scalar_pos_inf(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.inf
+        xp_assert_equal(nan_to_num(a, xp=xp), xp.asarray(infinity))
+
+    def test_scalar_neg_inf(self, xp: ModuleType, infinity: float) -> None:
+        a = -xp.inf
+        xp_assert_equal(nan_to_num(a, xp=xp), -xp.asarray(infinity))
+
+    def test_scalar_nan(self, xp: ModuleType) -> None:
+        a = xp.nan
+        xp_assert_equal(nan_to_num(a, xp=xp), xp.asarray(0.0))
+
+    def test_real(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.asarray([xp.inf, -xp.inf, xp.nan, -128, 128])
+        xp_assert_equal(
+            nan_to_num(a),
+            xp.asarray(
+                [
+                    infinity,
+                    -infinity,
+                    0.0,
+                    -128,
+                    128,
+                ]
+            ),
+        )
+
+    def test_complex(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.asarray(
+            [
+                complex(xp.inf, xp.nan),
+                xp.nan,
+                complex(xp.nan, xp.inf),
+            ]
+        )
+        xp_assert_equal(
+            nan_to_num(a),
+            xp.asarray(
+                [
+                    infinity + 0j,
+                    0 + 0j,
+                    0 + 1j * infinity
+                ]
+            ),
+        )
+
+
 class TestNUnique:
     def test_simple(self, xp: ModuleType):
         a = xp.asarray([[1, 1], [0, 2], [2, 2]])
