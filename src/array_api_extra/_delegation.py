@@ -124,9 +124,9 @@ def nan_to_num(
     Replace NaN with zero and infinity with large finite numbers (default behaviour).
 
     If `x` is inexact, NaN is replaced by zero or by the user defined value in
-    `nan` keyword, infinity is replaced by the largest finite floating point
-    values representable by ``x.dtype`` and -infinity is replaced by the most
-    negative finite floating point values representable by ``x.dtype``.
+    `fill_value` keyword, infinity is replaced by the largest finite floating
+    point values representable by ``x.dtype`` and -infinity is replaced by the
+    most negative finite floating point values representable by ``x.dtype``.
 
     For complex dtypes, the above is applied to each of the real and
     imaginary components of `x` separately.
@@ -135,9 +135,9 @@ def nan_to_num(
 
     Parameters
     ----------
-    x : array, float, complex
+    x : array | float | complex
         Input data.
-    fill_value : int, float, complex, optional
+    fill_value : int | float | complex, optional
         Value to be used to fill NaN values. If no value is passed
         then NaN values will be replaced with 0.0.
     xp : array_namespace, optional
