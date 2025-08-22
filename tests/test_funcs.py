@@ -985,13 +985,7 @@ class TestNumToNan:
         )
         xp_assert_equal(
             nan_to_num(a),
-            xp.asarray(
-                [
-                    infinity + 0j,
-                    0 + 0j,
-                    0 + 1j * infinity
-                ]
-            ),
+            xp.asarray([infinity + 0j, 0 + 0j, 0 + 1j * infinity]),
         )
 
 

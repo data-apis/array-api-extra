@@ -738,7 +738,7 @@ def kron(
     return xp.reshape(result, res_shape)
 
 
-def nan_to_num(
+def nan_to_num(  # numpydoc ignore=PR01,RT01
     x: Array,
     /,
     fill_value: int | float | complex = 0.0,
@@ -746,9 +746,8 @@ def nan_to_num(
     xp: ModuleType,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
-    xp = array_namespace(x) if xp is None else xp
 
-    def perform_replacements(
+    def perform_replacements(  # numpydoc ignore=PR01,RT01
         x: Array,
         fill_value: int | float | complex,
         xp: ModuleType,
