@@ -946,7 +946,7 @@ class TestKron:
 class TestNumToNan:
     def test_bool(self, xp: ModuleType) -> None:
         a = xp.asarray([True])
-        xp_assert_equal(nan_to_num(a), a)
+        xp_assert_equal(nan_to_num(a, xp=xp), a)
 
     def test_scalar_pos_inf(self, xp: ModuleType, infinity: float) -> None:
         a = xp.inf
@@ -963,7 +963,7 @@ class TestNumToNan:
     def test_real(self, xp: ModuleType, infinity: float) -> None:
         a = xp.asarray([xp.inf, -xp.inf, xp.nan, -128, 128])
         xp_assert_equal(
-            nan_to_num(a),
+            nan_to_num(a, xp=xp),
             xp.asarray(
                 [
                     infinity,

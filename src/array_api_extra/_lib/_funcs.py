@@ -741,9 +741,9 @@ def kron(
 def nan_to_num(
     x: Array,
     /,
-    *,
     fill_value: int | float | complex = 0.0,
-    xp: ModuleType | None = None,
+    *,
+    xp: ModuleType,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
     xp = array_namespace(x) if xp is None else xp
