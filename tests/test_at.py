@@ -306,6 +306,18 @@ def test_setitem_int_array_index(xp: ModuleType):
     expect = xp.asarray([[4.0, 5.0], [2.0, 3.0]])
     z = at_op(x, idx, _AtOp.SET, y)
     xp_assert_equal(z, expect)
+    # Scalar
+    x = xp.asarray([0.0, 1.0])
+    z = at_op(x, xp.asarray([1]), _AtOp.SET, 2.0)
+    xp_assert_equal(z, xp.asarray([0.0, 2.0]))
+    # 0D array
+    x = xp.asarray([0.0, 1.0])
+    z = at_op(x, xp.asarray([1]), _AtOp.SET, xp.asarray(2.0))
+    xp_assert_equal(z, xp.asarray([0.0, 2.0]))
+    # Negative indices
+    x = xp.asarray([0.0, 1.0])
+    z = at_op(x, xp.asarray([-1]), _AtOp.SET, 2.0)
+    xp_assert_equal(z, xp.asarray([0.0, 2.0]))
 
 
 @pytest.mark.parametrize("bool_mask", [False, True])
