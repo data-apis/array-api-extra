@@ -152,8 +152,8 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     For frameworks that don't support fancy indexing by default, e.g. array-api-strict,
     we implement a workaround for 1D integer indices and ``xpx.at().set``. Assignments
-    with multiple occurences of the same index always choose the last occurence. This is
-    consistent with numpy's behaviour, e.g.::
+    with multiple occurrences of the same index always choose the last occurrence. This
+    is consistent with numpy's behaviour, e.g.::
 
         >>> import numpy as np
         >>> import array_api_strict as xp

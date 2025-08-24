@@ -327,13 +327,13 @@ def test_setitem_int_array_index(xp: ModuleType):
     if is_array_api_strict_namespace(xp) or is_numpy_namespace(xp):
         # Test wrong shapes
         with pytest.raises(ValueError, match="shape"):
-            at_op(xp.asarray([0]), xp.asarray([0]), _AtOp.SET, xp.asarray([1, 2]))
+            _ = at_op(xp.asarray([0]), xp.asarray([0]), _AtOp.SET, xp.asarray([1, 2]))
         # Test positive out of bounds index
         with pytest.raises(IndexError, match="out of bounds"):
-            at_op(xp.asarray([0]), xp.asarray([1]), _AtOp.SET, xp.asarray([1]))
+            _ = at_op(xp.asarray([0]), xp.asarray([1]), _AtOp.SET, xp.asarray([1]))
         # Test negative out of bounds index
         with pytest.raises(IndexError, match="out of bounds"):
-            at_op(xp.asarray([0]), xp.asarray([-2]), _AtOp.SET, xp.asarray([1]))
+            _ = at_op(xp.asarray([0]), xp.asarray([-2]), _AtOp.SET, xp.asarray([1]))
 
 
 @pytest.mark.parametrize("bool_mask", [False, True])
