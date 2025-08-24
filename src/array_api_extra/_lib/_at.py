@@ -11,8 +11,10 @@ from typing import TYPE_CHECKING, ClassVar, cast
 from ._utils import _compat
 from ._utils._compat import (
     array_namespace,
+    is_array_api_obj,
     is_dask_array,
     is_jax_array,
+    is_lazy_array,
     is_torch_array,
     is_writeable_array,
 )
@@ -147,6 +149,19 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         array([124])
         >>> xpx.at(jnp.asarray([123]), jnp.asarray([0, 0])).add(1)
         Array([125], dtype=int32)
+
+    For frameworks that don't support fancy indexing by default, e.g. array-api-strict,
+    we implement a workaround for 1D integer indices and ``xpx.at().set``. Assignments
+    with multiple occurrences of the same index always choose the last occurrence. This
+    is consistent with numpy's behaviour, e.g.::
+
+        >>> import numpy as np
+        >>> import array_api_strict as xp
+        >>> import array_api_extra as xpx
+        >>> xpx.at(np.asarray([0]), np.asarray([0, 0])).set(np.asarray([2, 3]))
+        array([3])
+        >>> xpx.at(xp.asarray([0]), xp.asarray([0, 0])).set(xp.asarray([2, 3]))
+        Array([3], dtype=array_api_strict.int64)
 
     See Also
     --------
@@ -355,9 +370,70 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         # Backends without boolean indexing (other than JAX) crash here
         if in_place_op:  # add(), subtract(), ...
             x[idx] = in_place_op(x[idx], y)
-        else:  # set()
+            return x
+        # set()
+        try:  # We first try to use the backend's __setitem__ if available
             x[idx] = y
-        return x
+            return x
+        except IndexError as e:
+            if "Fancy indexing" not in str(e):  # Avoid masking other index errors
+                raise e
+            # Work around lack of fancy indexing __setitem__
+            if (
+                is_array_api_obj(idx)
+                and xp.isdtype(idx.dtype, "integral")
+                and idx.ndim == 1
+            ):
+                # Vectorize the operation using boolean indexing
+                # For non-unique indices, take the last occurrence. This requires
+                # masks for x and y that create matching shapes.
+                # We first create the mask for x
+                u_idx, _ = xp.unique_inverse(idx)
+                # Convert negative indices to positive, otherwise they won't get matched
+                u_idx_pos = xp.where(u_idx < 0, x.shape[0] + u_idx, u_idx)
+                # Check for out of bounds indices
+                oob_index = None
+                if is_lazy_array(u_idx_pos):
+                    pass  # Lazy arrays cannot check for out of bounds indices
+                elif xp.any(pos_oob := u_idx_pos >= x.shape[0]):
+                    first_oob_idx = xp.argmax(xp.astype(pos_oob, xp.int32))
+                    oob_index = int(u_idx[first_oob_idx])
+                elif xp.any(neg_oob := u_idx_pos < 0):
+                    first_oob_idx = xp.argmax(xp.astype(neg_oob, xp.int32))
+                    oob_index = int(u_idx[first_oob_idx])
+                if oob_index is not None:
+                    msg = (
+                        f"index {oob_index} is out of bounds for array of "
+                        f"shape {x.shape}"
+                    )
+                    raise IndexError(msg) from e
+
+                x_mask = xp.any(xp.arange(x.shape[0])[..., None] == u_idx_pos, axis=-1)
+                # If y is a scalar or 0D, we are done
+                if not is_array_api_obj(y) or y.ndim == 0:
+                    x[x_mask] = y
+                    return x
+                if y.shape[0] != idx.shape[0]:
+                    msg = (
+                        f"shape mismatch: value array of shape {y.shape} could not be "
+                        f"broadcast to indexing result of shape {idx.shape}"
+                    )
+                    raise ValueError(msg) from e
+                # If not, create a mask for y. Get last occurrence of each unique index
+                cmp = u_idx_pos[:, None] == u_idx_pos[None, :]
+                # Ignore later matches
+                lower_tri_mask = (
+                    xp.arange(y.shape[0])[:, None] >= xp.arange(y.shape[0])[None, :]
+                )
+                masked_cmp = cmp & lower_tri_mask
+                # For each position i, count how many matches occurred before i
+                prior_matches = xp.sum(xp.astype(masked_cmp, xp.int32), axis=-1)
+                # Last occurrence has highest match count
+                y_mask = prior_matches == xp.max(prior_matches, axis=-1)
+                # Apply the operation only to last occurrences
+                x[x_mask] = y[y_mask]
+                return x
+            raise e
 
     def set(
         self,
