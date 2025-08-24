@@ -21,6 +21,7 @@ from array_api_extra import (
     expand_dims,
     isclose,
     kron,
+    nan_to_num,
     nunique,
     one_hot,
     pad,
@@ -40,6 +41,7 @@ lazy_xp_function(cov)
 lazy_xp_function(create_diagonal)
 lazy_xp_function(expand_dims)
 lazy_xp_function(kron)
+lazy_xp_function(nan_to_num)
 lazy_xp_function(nunique)
 lazy_xp_function(one_hot)
 lazy_xp_function(pad)
@@ -939,6 +941,52 @@ class TestKron:
         b = xp.ones((3, 3))
         k = xp.ones((9, 9))
         xp_assert_equal(kron(a, b, xp=xp), k)
+
+
+class TestNumToNan:
+    def test_bool(self, xp: ModuleType) -> None:
+        a = xp.asarray([True])
+        xp_assert_equal(nan_to_num(a, xp=xp), a)
+
+    def test_scalar_pos_inf(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.inf
+        xp_assert_equal(nan_to_num(a, xp=xp), xp.asarray(infinity))
+
+    def test_scalar_neg_inf(self, xp: ModuleType, infinity: float) -> None:
+        a = -xp.inf
+        xp_assert_equal(nan_to_num(a, xp=xp), -xp.asarray(infinity))
+
+    def test_scalar_nan(self, xp: ModuleType) -> None:
+        a = xp.nan
+        xp_assert_equal(nan_to_num(a, xp=xp), xp.asarray(0.0))
+
+    def test_real(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.asarray([xp.inf, -xp.inf, xp.nan, -128, 128])
+        xp_assert_equal(
+            nan_to_num(a, xp=xp),
+            xp.asarray(
+                [
+                    infinity,
+                    -infinity,
+                    0.0,
+                    -128,
+                    128,
+                ]
+            ),
+        )
+
+    def test_complex(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.asarray(
+            [
+                complex(xp.inf, xp.nan),
+                xp.nan,
+                complex(xp.nan, xp.inf),
+            ]
+        )
+        xp_assert_equal(
+            nan_to_num(a),
+            xp.asarray([infinity + 0j, 0 + 0j, 0 + 1j * infinity]),
+        )
 
 
 class TestNUnique:
