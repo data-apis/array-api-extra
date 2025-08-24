@@ -13,7 +13,9 @@ from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import (
     array_namespace,
+    is_array_api_strict_namespace,
     is_jax_namespace,
+    is_numpy_namespace,
     is_writeable_array,
 )
 from array_api_extra._lib._utils._compat import device as get_device
@@ -318,6 +320,20 @@ def test_setitem_int_array_index(xp: ModuleType):
     x = xp.asarray([0.0, 1.0])
     z = at_op(x, xp.asarray([-1]), _AtOp.SET, 2.0)
     xp_assert_equal(z, xp.asarray([0.0, 2.0]))
+    # Different frameworks have all kinds of different behaviours for negative indices,
+    # out-of-bounds indices, etc. Therefore, we only test the behaviour of two
+    # frameworks: numpy because we state in the docs that it is our reference for the
+    # behaviour of other frameworks with no native support, and array-api-strict.
+    if is_array_api_strict_namespace(xp) or is_numpy_namespace(xp):
+        # Test wrong shapes
+        with pytest.raises(ValueError, match="shape"):
+            at_op(xp.asarray([0]), xp.asarray([0]), _AtOp.SET, xp.asarray([1, 2]))
+        # Test positive out of bounds index
+        with pytest.raises(IndexError, match="out of bounds"):
+            at_op(xp.asarray([0]), xp.asarray([1]), _AtOp.SET, xp.asarray([1]))
+        # Test negative out of bounds index
+        with pytest.raises(IndexError, match="out of bounds"):
+            at_op(xp.asarray([0]), xp.asarray([-2]), _AtOp.SET, xp.asarray([1]))
 
 
 @pytest.mark.parametrize("bool_mask", [False, True])
