@@ -943,7 +943,7 @@ class TestKron:
         xp_assert_equal(kron(a, b, xp=xp), k)
 
 
-class TestNumToNan:
+class TestNanToNum:
     def test_bool(self, xp: ModuleType) -> None:
         a = xp.asarray([True])
         xp_assert_equal(nan_to_num(a, xp=xp), a)
