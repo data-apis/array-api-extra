@@ -995,6 +995,11 @@ class TestNanToNum:
             xp.asarray([1.0, 2.0, 3.0, 4.0]),
         )
 
+    def test_empty_array(self, xp: ModuleType) -> None:
+        a = xp.asarray([], dtype=xp.float32)
+        xp_assert_equal(nan_to_num(a, xp=xp), a)
+        assert xp.isdtype(nan_to_num(a, xp=xp).dtype, xp.float32)
+
 
 class TestNUnique:
     def test_simple(self, xp: ModuleType):
