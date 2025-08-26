@@ -762,14 +762,14 @@ def nan_to_num(  # numpydoc ignore=PR01,RT01
         x = xp.where(idx_posinf, finfo.max, x)
         return xp.where(idx_neginf, finfo.min, x)
 
-    if xp.isdtype(x.dtype, "complex floating"):
+    if isinstance(fill_value, complex) or xp.isdtype(x.dtype, "complex floating"):
         return perform_replacements(
             xp.real(x),
-            fill_value,
+            fill_value.real,
             xp,
         ) + 1j * perform_replacements(
             xp.imag(x),
-            fill_value,
+            fill_value.imag,
             xp,
         )
 
