@@ -996,7 +996,7 @@ class TestNanToNum:
         )
 
     def test_empty_array(self, xp: ModuleType) -> None:
-        a = xp.asarray([], dtype=xp.float32)
+        a = xp.asarray([], dtype=xp.float32)  # forced dtype due to torch
         xp_assert_equal(nan_to_num(a, xp=xp), a)
         assert xp.isdtype(nan_to_num(a, xp=xp).dtype, xp.float32)
 
