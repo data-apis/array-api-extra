@@ -988,6 +988,13 @@ class TestNanToNum:
             xp.asarray([infinity + 0j, 0 + 0j, 0 + 1j * infinity]),
         )
 
+    def test_fill_value(self, xp: ModuleType) -> None:
+        a = xp.asarray([1, 2, np.nan, 4])
+        xp_assert_equal(
+            nan_to_num(a, fill_value=3, xp=xp),
+            xp.asarray([1.0, 2.0, 3.0, 4.0]),
+        )
+
 
 class TestNUnique:
     def test_simple(self, xp: ModuleType):
