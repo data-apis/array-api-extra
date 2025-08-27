@@ -16,6 +16,7 @@
     expand_dims
     isclose
     kron
+    nan_to_num
     nunique
     one_hot
     pad

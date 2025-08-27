@@ -21,6 +21,7 @@ from array_api_extra import (
     expand_dims,
     isclose,
     kron,
+    nan_to_num,
     nunique,
     one_hot,
     pad,
@@ -40,6 +41,7 @@ lazy_xp_function(cov)
 lazy_xp_function(create_diagonal)
 lazy_xp_function(expand_dims)
 lazy_xp_function(kron)
+lazy_xp_function(nan_to_num)
 lazy_xp_function(nunique)
 lazy_xp_function(one_hot)
 lazy_xp_function(pad)
@@ -939,6 +941,140 @@ class TestKron:
         b = xp.ones((3, 3))
         k = xp.ones((9, 9))
         xp_assert_equal(kron(a, b, xp=xp), k)
+
+
+class TestNanToNum:
+    def test_bool(self, xp: ModuleType) -> None:
+        a = xp.asarray([True])
+        xp_assert_equal(nan_to_num(a, xp=xp), a)
+
+    def test_scalar_pos_inf(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.inf
+        xp_assert_equal(nan_to_num(a, xp=xp), xp.asarray(infinity))
+
+    def test_scalar_neg_inf(self, xp: ModuleType, infinity: float) -> None:
+        a = -xp.inf
+        xp_assert_equal(nan_to_num(a, xp=xp), -xp.asarray(infinity))
+
+    def test_scalar_nan(self, xp: ModuleType) -> None:
+        a = xp.nan
+        xp_assert_equal(nan_to_num(a, xp=xp), xp.asarray(0.0))
+
+    def test_real(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.asarray([xp.inf, -xp.inf, xp.nan, -128, 128])
+        xp_assert_equal(
+            nan_to_num(a, xp=xp),
+            xp.asarray(
+                [
+                    infinity,
+                    -infinity,
+                    0.0,
+                    -128,
+                    128,
+                ]
+            ),
+        )
+
+    def test_complex(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.asarray(
+            [
+                complex(xp.inf, xp.nan),
+                xp.nan,
+                complex(xp.nan, xp.inf),
+            ]
+        )
+        xp_assert_equal(
+            nan_to_num(a),
+            xp.asarray([complex(infinity, 0), complex(0, 0), complex(0, infinity)]),
+        )
+
+    def test_empty_array(self, xp: ModuleType) -> None:
+        a = xp.asarray([], dtype=xp.float32)  # forced dtype due to torch
+        xp_assert_equal(nan_to_num(a, xp=xp), a)
+        assert xp.isdtype(nan_to_num(a, xp=xp).dtype, xp.float32)
+
+    @pytest.mark.parametrize(
+        ("in_vals", "fill_value", "out_vals"),
+        [
+            ([1, 2, np.nan, 4], 3, [1.0, 2.0, 3.0, 4.0]),
+            ([1, 2, np.nan, 4], 3.0, [1.0, 2.0, 3.0, 4.0]),
+            (
+                [
+                    complex(1, 1),
+                    complex(2, 2),
+                    complex(np.nan, 0),
+                    complex(4, 4),
+                ],
+                3,
+                [
+                    complex(1.0, 1.0),
+                    complex(2.0, 2.0),
+                    complex(3.0, 0.0),
+                    complex(4.0, 4.0),
+                ],
+            ),
+            (
+                [
+                    complex(1, 1),
+                    complex(2, 2),
+                    complex(0, np.nan),
+                    complex(4, 4),
+                ],
+                3.0,
+                [
+                    complex(1.0, 1.0),
+                    complex(2.0, 2.0),
+                    complex(0.0, 3.0),
+                    complex(4.0, 4.0),
+                ],
+            ),
+            (
+                [
+                    complex(1, 1),
+                    complex(2, 2),
+                    complex(np.nan, np.nan),
+                    complex(4, 4),
+                ],
+                3.0,
+                [
+                    complex(1.0, 1.0),
+                    complex(2.0, 2.0),
+                    complex(3.0, 3.0),
+                    complex(4.0, 4.0),
+                ],
+            ),
+        ],
+    )
+    def test_fill_value_success(
+        self,
+        xp: ModuleType,
+        in_vals: Array,
+        fill_value: int | float,
+        out_vals: Array,
+    ) -> None:
+        a = xp.asarray(in_vals)
+        xp_assert_equal(
+            nan_to_num(a, fill_value=fill_value, xp=xp),
+            xp.asarray(out_vals),
+        )
+
+    def test_fill_value_failure(self, xp: ModuleType) -> None:
+        a = xp.asarray(
+            [
+                complex(1, 1),
+                complex(xp.nan, xp.nan),
+                complex(3, 3),
+            ]
+        )
+        with pytest.raises(
+            TypeError,
+            match="Complex fill values are not supported",
+        ):
+            _ = nan_to_num(
+                a,
+                fill_value=complex(2, 2),  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
+                xp=xp,
+            )
 
 
 class TestNUnique:

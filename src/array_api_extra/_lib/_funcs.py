@@ -738,6 +738,47 @@ def kron(
     return xp.reshape(result, res_shape)
 
 
+def nan_to_num(  # numpydoc ignore=PR01,RT01
+    x: Array,
+    /,
+    fill_value: int | float = 0.0,
+    *,
+    xp: ModuleType,
+) -> Array:
+    """See docstring in `array_api_extra._delegation.py`."""
+
+    def perform_replacements(  # numpydoc ignore=PR01,RT01
+        x: Array,
+        fill_value: int | float,
+        xp: ModuleType,
+    ) -> Array:
+        """Internal function to perform the replacements."""
+        x = xp.where(xp.isnan(x), fill_value, x)
+
+        # convert infinities to finite values
+        finfo = xp.finfo(x.dtype)
+        idx_posinf = xp.isinf(x) & ~xp.signbit(x)
+        idx_neginf = xp.isinf(x) & xp.signbit(x)
+        x = xp.where(idx_posinf, finfo.max, x)
+        return xp.where(idx_neginf, finfo.min, x)
+
+    if xp.isdtype(x.dtype, "complex floating"):
+        return perform_replacements(
+            xp.real(x),
+            fill_value,
+            xp,
+        ) + 1j * perform_replacements(
+            xp.imag(x),
+            fill_value,
+            xp,
+        )
+
+    if xp.isdtype(x.dtype, "numeric"):
+        return perform_replacements(x, fill_value, xp)
+
+    return x
+
+
 def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
     """
     Count the number of unique elements in an array.

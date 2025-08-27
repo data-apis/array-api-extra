@@ -232,3 +232,11 @@ def device(
     if library == Backend.TORCH_GPU:
         return xp.device("cpu")
     return get_device(xp.empty(0))
+
+
+@pytest.fixture
+def infinity(library: Backend) -> float:
+    """Retrieve the positive infinity value for the given backend."""
+    if library in (Backend.TORCH, Backend.TORCH_GPU):
+        return 3.4028235e38
+    return 1.7976931348623157e308
