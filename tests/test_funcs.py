@@ -985,7 +985,7 @@ class TestNanToNum:
         )
         xp_assert_equal(
             nan_to_num(a),
-            xp.asarray([infinity + 0j, 0 + 0j, 0 + 1j * infinity]),
+            xp.asarray([complex(infinity, 0), complex(0, 0), complex(0, infinity)]),
         )
 
     @pytest.mark.parametrize(
@@ -994,23 +994,53 @@ class TestNanToNum:
             ([1, 2, np.nan, 4], 3, [1.0, 2.0, 3.0, 4.0]),
             ([1, 2, np.nan, 4], 3.0, [1.0, 2.0, 3.0, 4.0]),
             (
-                [1 + 1j, 2 + 2j, complex(np.nan, 0), 4 + 4j],
+                [
+                    complex(1, 1),
+                    complex(2, 2),
+                    complex(np.nan, 0),
+                    complex(4, 4),
+                ],
                 3,
-                [1.0 + 1.0j, 2.0 + 2.0j, 3.0 + 0.0j, 4.0 + 4.0j],
+                [
+                    complex(1.0, 1.0),
+                    complex(2.0, 2.0),
+                    complex(3.0, 0.0),
+                    complex(4.0, 4.0),
+                ],
             ),
             (
-                [1 + 1j, 2 + 2j, complex(0, np.nan), 4 + 4j],
+                [
+                    complex(1, 1),
+                    complex(2, 2),
+                    complex(0, np.nan),
+                    complex(4, 4),
+                ],
                 3.0,
-                [1.0 + 1.0j, 2.0 + 2.0j, 0.0 + 3.0j, 4.0 + 4.0j],
+                [
+                    complex(1.0, 1.0),
+                    complex(2.0, 2.0),
+                    complex(0.0, 3.0),
+                    complex(4.0, 4.0),
+                ],
             ),
             (
-                [1 + 1j, 2 + 2j, complex(np.nan, np.nan), 4 + 4j],
+                [
+                    complex(1, 1),
+                    complex(2, 2),
+                    complex(np.nan, np.nan),
+                    complex(4, 4),
+                ],
                 3.0,
-                [1.0 + 1.0j, 2.0 + 2.0j, 3.0 + 3.0j, 4.0 + 4.0j],
+                [
+                    complex(1.0, 1.0),
+                    complex(2.0, 2.0),
+                    complex(3.0, 3.0),
+                    complex(4.0, 4.0),
+                ],
             ),
         ],
     )
-    def test_fill_value(
+    def test_fill_value_success(
         self,
         xp: ModuleType,
         in_vals: Array,
