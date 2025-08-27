@@ -988,6 +988,11 @@ class TestNanToNum:
             xp.asarray([complex(infinity, 0), complex(0, 0), complex(0, infinity)]),
         )
 
+    def test_empty_array(self, xp: ModuleType) -> None:
+        a = xp.asarray([], dtype=xp.float32)  # forced dtype due to torch
+        xp_assert_equal(nan_to_num(a, xp=xp), a)
+        assert xp.isdtype(nan_to_num(a, xp=xp).dtype, xp.float32)
+
     @pytest.mark.parametrize(
         "in_vals,fill_value,out_vals",
         [
@@ -1044,8 +1049,8 @@ class TestNanToNum:
         self,
         xp: ModuleType,
         in_vals: Array,
-        fill_value: float,
-        out_vals: float,
+        fill_value: int | float,
+        out_vals: Array,
     ) -> None:
         a = xp.asarray(in_vals)
         xp_assert_equal(
@@ -1053,10 +1058,19 @@ class TestNanToNum:
             xp.asarray(out_vals),
         )
 
-    def test_empty_array(self, xp: ModuleType) -> None:
-        a = xp.asarray([], dtype=xp.float32)  # forced dtype due to torch
-        xp_assert_equal(nan_to_num(a, xp=xp), a)
-        assert xp.isdtype(nan_to_num(a, xp=xp).dtype, xp.float32)
+    def test_fill_value_failure(self, xp: ModuleType) -> None:
+        a = xp.asarray(
+            [
+                complex(1, 1),
+                complex(xp.nan, xp.nan),
+                complex(3, 3),
+            ]
+        )
+        with pytest.raises(
+            TypeError,
+            match="Complex fill values are not supported",
+        ):
+            nan_to_num(a, fill_value=complex(2, 2), xp=xp)
 
 
 class TestNUnique:

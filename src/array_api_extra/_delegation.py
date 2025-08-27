@@ -173,7 +173,7 @@ def nan_to_num(
              0.00000000e+000 +1.79769313e+308j])
     """
     if isinstance(fill_value, complex):
-        msg = "Cannot cast scalar from complex dtype to float dtype."
+        msg = "Complex fill values are not supported."
         raise TypeError(msg)
 
     xp = array_namespace(x) if xp is None else xp
