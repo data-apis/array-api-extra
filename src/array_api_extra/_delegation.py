@@ -125,7 +125,7 @@ def nan_to_num(
 
     If `x` is inexact, NaN is replaced by zero or by the user defined value in the
     `fill_value` keyword, infinity is replaced by the largest finite floating
-    point values representable by ``x.dtype`` and -infinity is replaced by the
+    point value representable by ``x.dtype``, and -infinity is replaced by the
     most negative finite floating point values representable by ``x.dtype``.
 
     For complex dtypes, the above is applied to each of the real and
