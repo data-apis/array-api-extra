@@ -123,7 +123,7 @@ def nan_to_num(
     """
     Replace NaN with zero and infinity with large finite numbers (default behaviour).
 
-    If `x` is inexact, NaN is replaced by zero or by the user defined value in
+    If `x` is inexact, NaN is replaced by zero or by the user defined value in the
     `fill_value` keyword, infinity is replaced by the largest finite floating
     point values representable by ``x.dtype`` and -infinity is replaced by the
     most negative finite floating point values representable by ``x.dtype``.
