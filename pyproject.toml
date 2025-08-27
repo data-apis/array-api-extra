@@ -56,7 +56,7 @@ array-api-extra = { path = ".", editable = true }
 
 [tool.pixi.feature.lint.dependencies]
 typing-extensions = ">=4.14.1"
-pylint = ">=3.3.7"
+pylint = ">=3.3.8"
 mypy = ">=1.17.1"
 basedpyright = ">=1.31.1"
 numpydoc = ">=1.9.0,<2"
@@ -66,9 +66,9 @@ numpy = ">=2.1.3"
 hypothesis = ">=6.136.4"
 dask-core = ">=2025.7.0" # No distributed, tornado, etc.
 dprint = ">=0.50.0,<0.51"
-lefthook = ">=1.12.2,<2"
+lefthook = ">=1.12.3,<2"
 ruff = ">=0.12.8,<0.13"
-typos = ">=1.35.1,<2"
+typos = ">=1.35.5,<2"
 actionlint = ">=1.7.7,<2"
 blacken-docs = ">=1.19.1,<2"
 pytest = ">=8.4.1,<9"
