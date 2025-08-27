@@ -988,25 +988,39 @@ class TestNanToNum:
             xp.asarray([infinity + 0j, 0 + 0j, 0 + 1j * infinity]),
         )
 
-    @pytest.mark.parametrize("fill_value", [3, 3.0, 3 + 0j])
     @pytest.mark.parametrize(
-        "output",
+        "in_vals,fill_value,out_vals",
         [
-            [1.0, 2.0, 3.0, 4.0],
-            [1.0, 2.0, 3.0, 4.0],
-            [1.0 + 0.j, 2.0 + 0.j, 3.0 + 0.j, 4.0 + 0.j]
+            ([1, 2, np.nan, 4], 3, [1.0, 2.0, 3.0, 4.0]),
+            ([1, 2, np.nan, 4], 3.0, [1.0, 2.0, 3.0, 4.0]),
+            (
+                [1 + 1j, 2 + 2j, np.nan + 0j, 4 + 4j],
+                3,
+                [1.0 + 1.0j, 2.0 + 2.0j, 3.0 + 0.0j, 4.0 + 4.0j],
+            ),
+            (
+                [1 + 1j, 2 + 2j, 0 + 1j * np.nan, 4 + 4j],
+                3.0,
+                [1.0 + 1.0j, 2.0 + 2.0j, 3.0 + 3.0j, 4.0 + 4.0j],
+            ),
+            (
+                [1 + 1j, 2 + 2j, np.nan + 1j * np.nan, 4 + 4j],
+                3.0,
+                [1.0 + 1.0j, 2.0 + 2.0j, 3.0 + 3.0j, 4.0 + 4.0j],
+            ),
         ],
     )
     def test_fill_value(
         self,
         xp: ModuleType,
+        in_vals: Array,
         fill_value: float,
-        output: float,
+        out_vals: float,
     ) -> None:
-        a = xp.asarray([1, 2, np.nan, 4])
+        a = xp.asarray(in_vals)
         xp_assert_equal(
             nan_to_num(a, fill_value=fill_value, xp=xp),
-            xp.asarray(output),
+            xp.asarray(out_vals),
         )
 
     def test_empty_array(self, xp: ModuleType) -> None:

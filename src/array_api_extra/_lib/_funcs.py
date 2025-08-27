@@ -741,7 +741,7 @@ def kron(
 def nan_to_num(  # numpydoc ignore=PR01,RT01
     x: Array,
     /,
-    fill_value: int | float | complex = 0.0,
+    fill_value: int | float = 0.0,
     *,
     xp: ModuleType,
 ) -> Array:
@@ -749,7 +749,7 @@ def nan_to_num(  # numpydoc ignore=PR01,RT01
 
     def perform_replacements(  # numpydoc ignore=PR01,RT01
         x: Array,
-        fill_value: int | float | complex,
+        fill_value: int | float,
         xp: ModuleType,
     ) -> Array:
         """Internal function to perform the replacements."""
@@ -762,14 +762,14 @@ def nan_to_num(  # numpydoc ignore=PR01,RT01
         x = xp.where(idx_posinf, finfo.max, x)
         return xp.where(idx_neginf, finfo.min, x)
 
-    if isinstance(fill_value, complex) or xp.isdtype(x.dtype, "complex floating"):
+    if xp.isdtype(x.dtype, "complex floating"):
         return perform_replacements(
             xp.real(x),
-            fill_value.real,
+            fill_value,
             xp,
         ) + 1j * perform_replacements(
             xp.imag(x),
-            fill_value.imag,
+            fill_value,
             xp,
         )
 

@@ -117,7 +117,7 @@ def nan_to_num(
     x: Array | float | complex,
     /,
     *,
-    fill_value: int | float | complex = 0.0,
+    fill_value: int | float = 0.0,
     xp: ModuleType | None = None,
 ) -> Array:
     """
@@ -135,7 +135,7 @@ def nan_to_num(
     ----------
     x : array | float | complex
         Input data.
-    fill_value : int | float | complex, optional
+    fill_value : int | float, optional
         Value to be used to fill NaN values. If no value is passed
         then NaN values will be replaced with 0.0.
     xp : array_namespace, optional
@@ -172,6 +172,10 @@ def nan_to_num(
              0.00000000e+000 +0.00000000e+000j,
              0.00000000e+000 +1.79769313e+308j])
     """
+    if isinstance(fill_value, complex):
+        msg = "Cannot cast scalar from complex dtype to float dtype."
+        raise TypeError(msg)
+
     xp = array_namespace(x) if xp is None else xp
 
     # for scalars we want to output an array
