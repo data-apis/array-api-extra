@@ -994,7 +994,7 @@ class TestNanToNum:
         assert xp.isdtype(nan_to_num(a, xp=xp).dtype, xp.float32)
 
     @pytest.mark.parametrize(
-        "in_vals,fill_value,out_vals",
+        ("in_vals", "fill_value", "out_vals"),
         [
             ([1, 2, np.nan, 4], 3, [1.0, 2.0, 3.0, 4.0]),
             ([1, 2, np.nan, 4], 3.0, [1.0, 2.0, 3.0, 4.0]),
@@ -1070,7 +1070,11 @@ class TestNanToNum:
             TypeError,
             match="Complex fill values are not supported",
         ):
-            nan_to_num(a, fill_value=complex(2, 2), xp=xp)
+            _ = nan_to_num(
+                a,
+                fill_value=complex(2, 2),  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
+                xp=xp,
+            )
 
 
 class TestNUnique:
