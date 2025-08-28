@@ -288,16 +288,16 @@ def test_setitem_int_array_index(xp: ModuleType):
     assert isinstance(z, type(x))
     xp_assert_equal(z, expect)
     # Single dimension, non-unique index
-    x = xp.asarray([0.0, 1.0])
-    y = xp.asarray([2.0, 3.0])
-    idx = xp.asarray([1, 1])
+    x = xp.asarray([0.0, 1.0, 2.0])
+    y = xp.asarray([3.0, 4.0, 5.0])
+    idx = xp.asarray([0, 1, 0])
     device_str = str(get_device(x)).lower()
     # GPU arrays generally use the first element, but JAX with float64 enabled uses the
     # last element.
     if ("gpu" in device_str or "cuda" in device_str) and not is_jax_namespace(xp):
-        expect = xp.asarray([0.0, 2.0])
+        expect = xp.asarray([3.0, 4.0, 2.0])
     else:
-        expect = xp.asarray([0.0, 3.0])  # CPU arrays use the last
+        expect = xp.asarray([5.0, 4.0, 2.0])  # CPU arrays use the last
     z = at_op(x, idx, _AtOp.SET, y)
     assert isinstance(z, type(x))
     xp_assert_equal(z, expect)
