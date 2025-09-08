@@ -155,13 +155,16 @@ dask-core = ">=2025.7.0" # No distributed, tornado, etc.
 sparse = ">=0.17.0"
 
 [tool.pixi.feature.backends.target.linux-64.dependencies]
-jax = ">=0.6.0,!=0.6.2" # 0.6.2 segfaults on Linux CUDA
+# On CPU Python 3.10, use 0.6.2
+# On CPU Python >=3.11, use >=0.7.0
+# On GPU, use 0.6.0 (0.6.2 and 0.7.0 both segfault); see jaxlib pin below.
+jax = ">=0.6.0"
 
 [tool.pixi.feature.backends.target.osx-64.dependencies]
-jax = ">=0.6.0,!=0.6.2"
+jax = ">=0.6.0"
 
 [tool.pixi.feature.backends.target.osx-arm64.dependencies]
-jax = ">=0.6.0,!=0.6.2"
+jax = ">=0.6.0"
 
 [tool.pixi.feature.backends.target.win-64.dependencies]
 # jax = "*"  # unavailable
@@ -177,7 +180,8 @@ system-requirements = { cuda = "12" }
 
 [tool.pixi.feature.cuda-backends.target.linux-64.dependencies]
 cupy = ">=13.6.0"
-jaxlib = { version = ">=0.6.0", build = "cuda12*" }
+# JAX 0.6.2 and 0.7.0 segfault on CUDA
+jaxlib = { version = ">=0.6.0,!=0.6.2,!=0.7.0", build = "cuda12*" }
 pytorch = { version = ">=2.7.1", build = "cuda12*" }
 
 [tool.pixi.feature.cuda-backends.target.osx-64.dependencies]
@@ -212,12 +216,16 @@ tests = { features = ["py313", "tests"], solve-group = "py313" }
 tests-py313 = { features = ["py313", "tests"], solve-group = "py313" } # alias of tests
 
 # Some backends may pin numpy; use separate solve-group
-dev = { features = ["py310", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
-tests-backends = { features = ["py310", "tests", "backends"], solve-group = "backends" }
+dev = { features = ["py313", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
+tests-backends = { features = ["py313", "tests", "backends"], solve-group = "backends" }
+# Note: Python 3.10 has already been dropped by some backends (like JAX),
+# so this is testing older versions.
+tests-backends-py310 = { features = ["py310", "tests", "backends"] }
 
 # CUDA not available on free github actions and on some developers' PCs
-dev-cuda = { features = ["py310", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda = { features = ["py310", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
+dev-cuda = { features = ["py313", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
+tests-cuda = { features = ["py313", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
+tests-cuda-py310 = { features = ["py310", "tests", "backends", "cuda-backends"] }
 
 # Ungrouped environments
 tests-numpy1 = ["py310", "tests", "numpy1"]

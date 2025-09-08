@@ -48,6 +48,7 @@ jobs:
           - tests-py313
           - tests-numpy1
           - tests-backends
+          - tests-backends-py310
           - tests-nogil
         runs-on: [ubuntu-latest]
 
