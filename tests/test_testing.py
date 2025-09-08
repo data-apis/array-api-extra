@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from types import ModuleType
 from typing import cast
 
@@ -468,3 +468,22 @@ def test_patch_lazy_xp_functions_deprecated_monkeypatch(
     monkeypatch.undo()
     y = non_materializable5(x)
     xp_assert_equal(y, x)
+
+
+def my_iter(x: Array) -> Iterator[Array]:
+    yield x[0, :]
+    yield x[1, :]
+
+
+lazy_xp_function(my_iter)
+
+
+def test_patch_lazy_xp_functions_iter(xp: ModuleType):
+    x = xp.asarray([[1.0, 2.0], [3.0, 4.0]])
+    it = my_iter(x)
+
+    assert isinstance(it, Iterator)
+    xp_assert_equal(next(it), x[0, :])
+    xp_assert_equal(next(it), x[1, :])
+    with pytest.raises(StopIteration):
+        _ = next(it)

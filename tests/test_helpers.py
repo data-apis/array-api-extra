@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from types import ModuleType
 from typing import TYPE_CHECKING, Generic, TypeVar, cast
 
@@ -417,3 +418,16 @@ class TestJAXAutoJIT:
         out = f([1, 2])
         assert isinstance(out, list)
         assert out == [3, 4]
+
+    def test_iterators(self, jnp: ModuleType):
+        @jax_autojit
+        def f(x: Array) -> Iterator[Array]:
+            return (x + i for i in range(2))
+
+        inp = jnp.asarray([1, 2])
+        out = f(inp)
+        assert isinstance(out, Iterator)
+        xp_assert_equal(next(out), jnp.asarray([1, 2]))
+        xp_assert_equal(next(out), jnp.asarray([2, 3]))
+        with pytest.raises(StopIteration):
+            _ = next(out)
