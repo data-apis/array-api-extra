@@ -158,13 +158,13 @@ sparse = ">=0.17.0"
 # On CPU Python 3.10, use 0.6.2
 # On CPU Python >=3.11, use >=0.7.0
 # On GPU, use 0.6.0 (0.6.2 and 0.7.0 both segfault); see jaxlib pin below.
-jax = ">=0.6.0"
+jax = ">=0.7.0"
 
 [tool.pixi.feature.backends.target.osx-64.dependencies]
-jax = ">=0.6.0"
+jax = ">=0.7.0"
 
 [tool.pixi.feature.backends.target.osx-arm64.dependencies]
-jax = ">=0.6.0"
+jax = ">=0.7.0"
 
 [tool.pixi.feature.backends.target.win-64.dependencies]
 # jax = "*"  # unavailable
