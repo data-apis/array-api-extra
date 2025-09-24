@@ -64,7 +64,7 @@ numpydoc = ">=1.9.0,<2"
 array-api-strict = ">=2.4.1,<2.5"
 numpy = ">=2.1.3"
 hypothesis = ">=6.138.3"
-dask-core = ">=2025.7.0" # No distributed, tornado, etc.
+dask-core = ">=2025.9.0" # No distributed, tornado, etc.
 dprint = ">=0.50.0,<0.51"
 lefthook = ">=1.13.1,<2"
 ruff = ">=0.12.12,<0.13"
@@ -121,7 +121,7 @@ myst-parser = ">=4.0.1"
 sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
-dask-core = ">=2025.7.0" # No distributed, tornado, etc.
+dask-core = ">=2025.9.0" # No distributed, tornado, etc.
 pytest = ">=8.4.2"
 typing-extensions = ">=4.15.0"
 numpy = ">=2.1.3"
@@ -151,7 +151,7 @@ numpy = "=1.22.0"
 # Note: JAX and PyTorch will install CPU variants.
 [tool.pixi.feature.backends.dependencies]
 pytorch = ">=2.7.1"
-dask-core = ">=2025.7.0" # No distributed, tornado, etc.
+dask-core = ">=2025.9.0" # No distributed, tornado, etc.
 sparse = ">=0.17.0"
 
 [tool.pixi.feature.backends.target.linux-64.dependencies]
@@ -204,7 +204,7 @@ python-freethreading = "~=3.13.0"
 pytest-run-parallel = ">=0.6.1"
 numpy = ">=2.3.2"
 # pytorch = "*"  # Not available on Python 3.13t yet
-dask-core = ">=2025.7.0" # No distributed, tornado, etc.
+dask-core = ">=2025.9.0" # No distributed, tornado, etc.
 # sparse = "*"  # numba not available on Python 3.13t yet
 # jax = "*"  # ml_dtypes not available on Python 3.13t yet
 
