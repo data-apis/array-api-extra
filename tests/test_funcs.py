@@ -206,7 +206,7 @@ class TestApplyWhere:
     @given(
         n_arrays=st.integers(min_value=1, max_value=3),
         rng_seed=st.integers(min_value=1000000000, max_value=9999999999),
-        dtype=st.sampled_from((np.float32, np.float64)),
+        dtype=npst.floating_dtypes(sizes=(32, 64)),
         p=st.floats(min_value=0, max_value=1),
         data=st.data(),
     )
@@ -223,7 +223,7 @@ class TestApplyWhere:
         if (
             library.like(Backend.NUMPY)
             and NUMPY_VERSION < (2, 0)
-            and dtype is np.float32
+            and dtype.type is np.float32
         ):
             pytest.xfail(reason="NumPy 1.x dtype promotion for scalars")
 
@@ -236,17 +236,17 @@ class TestApplyWhere:
         elements = {"allow_subnormal": not library.like(Backend.CUPY, Backend.JAX)}
 
         fill_value = xp.asarray(
-            data.draw(npst.arrays(dtype=dtype, shape=(), elements=elements))
+            data.draw(npst.arrays(dtype=dtype.type, shape=(), elements=elements))
         )
         float_fill_value = float(fill_value)
-        if library is Backend.CUPY and dtype is np.float32:
+        if library is Backend.CUPY and dtype.type is np.float32:
             # Avoid data-dependent dtype promotion when encountering subnormals
             # close to the max float32 value
             float_fill_value = float(np.clip(float_fill_value, -1e38, 1e38))
 
         arrays = tuple(
             xp.asarray(
-                data.draw(npst.arrays(dtype=dtype, shape=shape, elements=elements))
+                data.draw(npst.arrays(dtype=dtype.type, shape=shape, elements=elements))
             )
             for shape in shapes
         )
