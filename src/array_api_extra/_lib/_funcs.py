@@ -1029,3 +1029,23 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
         xp.asarray(xp.finfo(x.dtype).eps, dtype=x.dtype, device=_compat.device(x)),
     )
     return xp.sin(y) / y
+
+
+def partition(  # numpydoc ignore=PR01,RT01
+    x: Array,
+    kth: int,  # noqa: ARG001
+    *,
+    xp: ModuleType,
+) -> Array:
+    """See docstring in `array_api_extra._delegation.py`."""
+    return xp.sort(x, stable=False)
+
+
+def argpartition(  # numpydoc ignore=PR01,RT01
+    x: Array,
+    kth: int,  # noqa: ARG001
+    *,
+    xp: ModuleType,
+) -> Array:
+    """See docstring in `array_api_extra._delegation.py`."""
+    return xp.argsort(x, stable=False)

@@ -12,6 +12,7 @@ from hypothesis import strategies as st
 
 from array_api_extra import (
     apply_where,
+    argpartition,
     at,
     atleast_nd,
     broadcast_shapes,
@@ -25,6 +26,7 @@ from array_api_extra import (
     nunique,
     one_hot,
     pad,
+    partition,
     setdiff1d,
     sinc,
 )
@@ -1298,3 +1300,18 @@ class TestSinc:
 
     def test_xp(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0), xp=xp), xp.asarray(1.0))
+
+
+class TestPartition:
+    def test_basic(self, xp: ModuleType):
+        # Using 0-dimensional array
+        rng = np.random.default_rng(2847)
+
+        for _ in range(100):
+            n = rng.integers(1, 1000)
+            x = xp.asarray(rng.random(size=n))
+            k = int(rng.integers(1, n - 1))
+            y = partition(x, k)
+            assert xp.max(y[:k]) <= xp.min(y[k:])
+            y = x[argpartition(x, k)]
+            assert xp.max(y[:k]) <= xp.min(y[k:])

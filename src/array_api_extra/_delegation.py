@@ -326,3 +326,110 @@ def pad(
         return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)
+
+
+def partition(
+    a: Array,
+    kth: int,
+    *,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Return a partitioned copy of an array.
+
+    Parameters
+    ----------
+    a : 1-dimensional array
+        Input array.
+    kth : int
+        Element index to partition by.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    partitioned_array
+        Array of the same type and shape as a.
+    """
+    # Validate inputs.
+    if xp is None:
+        xp = array_namespace(a)
+    if a.ndim != 1:
+        msg = "only 1-dimensional arrays are currently supported"
+        raise NotImplementedError(msg)
+
+    # Delegate where possible.
+    if is_numpy_namespace(xp) or is_cupy_namespace(xp):
+        return xp.partition(a, kth)
+    if is_jax_namespace(xp):
+        from jax import numpy
+
+        return numpy.partition(a, kth)
+
+    # Use top-k when possible:
+    if is_torch_namespace(xp):
+        from torch import topk
+
+        a_left, indices_left = topk(a, kth, largest=False, sorted=False)
+        mask_right = xp.ones(a.shape, dtype=bool)
+        mask_right[indices_left] = False
+        return xp.concat((a_left, a[mask_right]))
+    # Note: dask topk/argtopk sort the return values, so it's
+    # not much more efficient than sorting everything when
+    # kth is not small compared to x.size
+
+    return _funcs.partition(a, kth, xp=xp)
+
+
+def argpartition(
+    a: Array,
+    kth: int,
+    *,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Perform an indirect partition along the given axis.
+
+    Parameters
+    ----------
+    a : 1-dimensional array
+        Input array.
+    kth : int
+        Element index to partition by.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    index_array
+        Array of indices that partition `a` along the specified axis.
+    """
+    # Validate inputs.
+    if xp is None:
+        xp = array_namespace(a)
+    if a.ndim != 1:
+        msg = "only 1-dimensional arrays are currently supported"
+        raise NotImplementedError(msg)
+
+    # Delegate where possible.
+    if is_numpy_namespace(xp) or is_cupy_namespace(xp):
+        return xp.argpartition(a, kth)
+    if is_jax_namespace(xp):
+        from jax import numpy
+
+        return numpy.argpartition(a, kth)
+
+    # Use top-k when possible:
+    if is_torch_namespace(xp):
+        from torch import topk
+
+        _, indices = topk(a, kth, largest=False, sorted=False)
+        mask = xp.ones(a.shape, dtype=bool)
+        mask[indices] = False
+        indices_above = xp.arange(a.shape[0])[mask]
+        return xp.concat((indices, indices_above))
+    # Note: dask topk/argtopk sort the return values, so it's
+    # not much more efficient than sorting everything when
+    # kth is not small compared to x.size
+
+    return _funcs.argpartition(a, kth, xp=xp)
