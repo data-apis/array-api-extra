@@ -1034,18 +1034,22 @@ def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
 def partition(  # numpydoc ignore=PR01,RT01
     x: Array,
     kth: int,  # noqa: ARG001
+    /,
+    axis: int = -1,
     *,
     xp: ModuleType,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
-    return xp.sort(x, stable=False)
+    return xp.sort(x, axis=axis, stable=False)
 
 
 def argpartition(  # numpydoc ignore=PR01,RT01
     x: Array,
     kth: int,  # noqa: ARG001
+    /,
+    axis: int = -1,
     *,
     xp: ModuleType,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
-    return xp.argsort(x, stable=False)
+    return xp.argsort(x, axis=axis, stable=False)

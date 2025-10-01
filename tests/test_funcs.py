@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
+from typing_extensions import override
 
 from array_api_extra import (
     apply_where,
@@ -32,7 +33,12 @@ from array_api_extra import (
 )
 from array_api_extra._lib._backends import NUMPY_VERSION, Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
-from array_api_extra._lib._utils._compat import device as get_device
+from array_api_extra._lib._utils._compat import (
+    device as get_device,
+)
+from array_api_extra._lib._utils._compat import (
+    is_pydata_sparse_namespace,
+)
 from array_api_extra._lib._utils._helpers import eager_shape, ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
@@ -1303,15 +1309,67 @@ class TestSinc:
 
 
 class TestPartition:
-    def test_basic(self, xp: ModuleType):
-        # Using 0-dimensional array
-        rng = np.random.default_rng(2847)
+    @classmethod
+    def _assert_valid_partition(cls, x: Array, k: int, xp: ModuleType, axis: int = -1):
+        if x.ndim != 1 and axis == 0:
+            assert isinstance(x.shape[1], int)
+            for i in range(x.shape[1]):
+                cls._assert_valid_partition(x[:, i, ...], k, xp, axis=0)
+        elif x.ndim != 1:
+            axis = axis - 1 if axis != -1 else -1
+            assert isinstance(x.shape[0], int)
+            for i in range(x.shape[0]):
+                cls._assert_valid_partition(x[i, ...], k, xp, axis=axis)
+        else:
+            if k > 0:
+                assert xp.max(x[:k]) <= x[k]
+            assert x[k] <= xp.min(x[k:])
 
-        for _ in range(100):
-            n = rng.integers(1, 1000)
-            x = xp.asarray(rng.random(size=n))
-            k = int(rng.integers(1, n - 1))
-            y = partition(x, k)
-            assert xp.max(y[:k]) <= xp.min(y[k:])
-            y = x[argpartition(x, k)]
-            assert xp.max(y[:k]) <= xp.min(y[k:])
+    @classmethod
+    def _partition(
+        cls,
+        x: Array,
+        k: int,
+        xp: ModuleType,  # noqa: ARG003
+        axis: int | None = -1,
+    ):
+        return partition(x, k, axis=axis)
+
+    def test_1d(self, xp: ModuleType):
+        rng = np.random.default_rng()
+        for n in [2, 3, 4, 5, 7, 10, 20, 50, 100, 1_000]:
+            k = int(rng.integers(n))
+            x = xp.asarray(rng.integers(n, size=n))
+            self._assert_valid_partition(self._partition(x, k, xp), k, xp)
+            x = xp.asarray(rng.random(n))
+            self._assert_valid_partition(self._partition(x, k, xp), k, xp)
+
+    @pytest.mark.parametrize("ndim", [2, 3, 4, 5])
+    def test_nd(self, xp: ModuleType, ndim: int):
+        rng = np.random.default_rng()
+
+        for n in [2, 3, 5, 10, 20, 100]:
+            base_shape = [int(v) for v in rng.integers(1, 4, size=ndim)]
+            k = int(rng.integers(n))
+
+            for i in range(ndim):
+                shape = base_shape[:]
+                shape[i] = n
+                x = xp.asarray(rng.integers(n, size=tuple(shape)))
+                y = self._partition(x, k, xp, axis=i)
+                self._assert_valid_partition(y, k, xp, axis=i)
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no argsort")
+class TestArgpartition(TestPartition):
+    @classmethod
+    @override
+    def _partition(cls, x: Array, k: int, xp: ModuleType, axis: int | None = -1):
+        if is_pydata_sparse_namespace(xp):
+            pytest.xfail(reason="Sparse backend has no argsort")
+        indices = argpartition(x, k, axis=axis)
+        if x.ndim == 1:
+            return x[indices]
+        if not hasattr(xp, "take_along_axis"):
+            pytest.skip("TODO: find an alternative to take_along_axis")
+        return xp.take_along_axis(x, indices, axis=axis)

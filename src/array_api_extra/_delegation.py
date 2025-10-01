@@ -331,6 +331,8 @@ def pad(
 def partition(
     a: Array,
     kth: int,
+    /,
+    axis: int | None = -1,
     *,
     xp: ModuleType | None = None,
 ) -> Array:
@@ -343,6 +345,9 @@ def partition(
         Input array.
     kth : int
         Element index to partition by.
+    axis : int, optional
+        Axis along which to partition. The default is -1 (the last axis).
+        If None, the flattened array is used.
     xp : array_namespace, optional
         The standard-compatible namespace for `x`. Default: infer.
 
@@ -354,36 +359,61 @@ def partition(
     # Validate inputs.
     if xp is None:
         xp = array_namespace(a)
-    if a.ndim != 1:
-        msg = "only 1-dimensional arrays are currently supported"
-        raise NotImplementedError(msg)
+    if a.ndim < 1:
+        msg = "`a` must be at least 1-dimensional"
+        raise TypeError(msg)
+    if axis is None:
+        return partition(xp.reshape(a, -1), kth, axis=0, xp=xp)
+    size = a.shape[axis]
+    if size is None:
+        msg = "Array dimensions must be known"
+        raise ValueError(msg)
+    if not (0 <= kth < size):
+        msg = f"kth(={kth}) out of bounds [0 {size})"
+        raise ValueError(msg)
 
     # Delegate where possible.
-    if is_numpy_namespace(xp) or is_cupy_namespace(xp):
-        return xp.partition(a, kth)
-    if is_jax_namespace(xp):
-        from jax import numpy
-
-        return numpy.partition(a, kth)
+    if is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp):
+        return xp.partition(a, kth, axis=axis)
 
     # Use top-k when possible:
     if is_torch_namespace(xp):
-        from torch import topk
+        if not (axis == -1 or axis == a.ndim - 1):
+            a = xp.transpose(a, axis, -1)
 
-        a_left, indices_left = topk(a, kth, largest=False, sorted=False)
+        # Get smallest `kth` elements along axis
+        kth += 1  # HACK: we use a non-specified behavior of torch.topk:
+        # in `a_left`, the element in the last position is the max
+        a_left, indices = xp.topk(a, kth, dim=-1, largest=False, sorted=False)
+
+        # Build a mask to remove the selected elements
         mask_right = xp.ones(a.shape, dtype=bool)
-        mask_right[indices_left] = False
-        return xp.concat((a_left, a[mask_right]))
+        mask_right.scatter_(dim=-1, index=indices, value=False)
+
+        # Remaining elements along axis
+        a_right = a[mask_right]  # 1-d array
+
+        # Reshape. This is valid only because we work on the last axis
+        a_right = xp.reshape(a_right, shape=(*a.shape[:-1], -1))
+
+        # Concatenate the two parts along axis
+        partitioned_array = xp.cat((a_left, a_right), dim=-1)
+        if not (axis == -1 or axis == a.ndim - 1):
+            partitioned_array = xp.transpose(partitioned_array, axis, -1)
+        return partitioned_array
+
     # Note: dask topk/argtopk sort the return values, so it's
     # not much more efficient than sorting everything when
     # kth is not small compared to x.size
 
-    return _funcs.partition(a, kth, xp=xp)
+    return _funcs.partition(a, kth, axis=axis, xp=xp)
 
 
 def argpartition(
     a: Array,
     kth: int,
+    /,
+    axis: int | None = -1,
     *,
     xp: ModuleType | None = None,
 ) -> Array:
@@ -392,10 +422,13 @@ def argpartition(
 
     Parameters
     ----------
-    a : 1-dimensional array
+    a : Array
         Input array.
     kth : int
         Element index to partition by.
+    axis : int, optional
+        Axis along which to partition. The default is -1 (the last axis).
+        If None, the flattened array is used.
     xp : array_namespace, optional
         The standard-compatible namespace for `x`. Default: infer.
 
@@ -407,29 +440,46 @@ def argpartition(
     # Validate inputs.
     if xp is None:
         xp = array_namespace(a)
-    if a.ndim != 1:
-        msg = "only 1-dimensional arrays are currently supported"
-        raise NotImplementedError(msg)
+    if a.ndim < 1:
+        msg = "`a` must be at least 1-dimensional"
+        raise TypeError(msg)
+    if axis is None:
+        return partition(xp.reshape(a, -1), kth, axis=0, xp=xp)
+    size = a.shape[axis]
+    if size is None:
+        msg = "Array dimensions must be known"
+        raise ValueError(msg)
+    if not (0 <= kth < size):
+        msg = f"kth(={kth}) out of bounds [0 {size})"
+        raise ValueError(msg)
 
     # Delegate where possible.
-    if is_numpy_namespace(xp) or is_cupy_namespace(xp):
-        return xp.argpartition(a, kth)
-    if is_jax_namespace(xp):
-        from jax import numpy
-
-        return numpy.argpartition(a, kth)
+    if is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp):
+        return xp.argpartition(a, kth, axis=axis)
 
     # Use top-k when possible:
     if is_torch_namespace(xp):
-        from torch import topk
+        # see `partition` above for commented details of those steps:
+        if not (axis == -1 or axis == a.ndim - 1):
+            a = xp.transpose(a, axis, -1)
 
-        _, indices = topk(a, kth, largest=False, sorted=False)
-        mask = xp.ones(a.shape, dtype=bool)
-        mask[indices] = False
-        indices_above = xp.arange(a.shape[0])[mask]
-        return xp.concat((indices, indices_above))
+        kth += 1  # HACK
+        _, indices_left = xp.topk(a, kth, dim=-1, largest=False, sorted=False)
+
+        mask_right = xp.ones(a.shape, dtype=bool)
+        mask_right.scatter_(dim=-1, index=indices_left, value=False)
+
+        indices_right = xp.nonzero(mask_right)[-1]
+        indices_right = xp.reshape(indices_right, shape=(*a.shape[:-1], -1))
+
+        # Concatenate the two parts along axis
+        index_array = xp.cat((indices_left, indices_right), dim=-1)
+        if not (axis == -1 or axis == a.ndim - 1):
+            index_array = xp.transpose(index_array, axis, -1)
+        return index_array
+
     # Note: dask topk/argtopk sort the return values, so it's
     # not much more efficient than sorting everything when
     # kth is not small compared to x.size
 
-    return _funcs.argpartition(a, kth, xp=xp)
+    return _funcs.argpartition(a, kth, axis=axis, xp=xp)
