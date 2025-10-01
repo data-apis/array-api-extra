@@ -1359,6 +1359,12 @@ class TestPartition:
                 y = self._partition(x, k, xp, axis=i)
                 self._assert_valid_partition(y, k, xp, axis=i)
 
+    def test_input_validation(self, xp: ModuleType):
+        with pytest.raises(TypeError):
+            _ = self._partition(xp.asarray(1), 1, xp)
+        with pytest.raises(ValueError, match="out of bounds"):
+            _ = self._partition(xp.asarray([1, 2]), 3, xp)
+
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no argsort")
 class TestArgpartition(TestPartition):
