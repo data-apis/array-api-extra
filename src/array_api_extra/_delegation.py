@@ -346,6 +346,12 @@ def partition(
     The ordering of the elements in the two partitions on the either side of
     the k-th element in the output array is undefined.
 
+    Notes:
+    If `xp` implements `partition` or an equivalent method (e.g. topk for torch),
+    complexity will likely be O(n).
+    If not, this function simply calls `xp.sort` and complexity is O(n log n).
+
+    Parameters
     ----------
     a : Array
         Input array.
@@ -361,11 +367,6 @@ def partition(
     -------
     partitioned_array
         Array of the same type and shape as `a`.
-
-    Notes:
-    If `xp` implements `partition` or an equivalent method (e.g. topk for torch),
-    complexity will likely be O(n).
-    If not, this function simply calls `xp.sort` and complexity is O(n log n).
     """
     # Validate inputs.
     if xp is None:
@@ -389,26 +390,32 @@ def partition(
         if not (axis == -1 or axis == a.ndim - 1):
             a = xp.transpose(a, axis, -1)
 
-        # Get smallest `kth` elements along axis
-        kth += 1  # HACK: we use a non-specified behavior of torch.topk:
-        # in `a_left`, the element in the last position is the max
-        a_left, indices = xp.topk(a, kth, dim=-1, largest=False, sorted=False)
+        out = xp.empty_like(a)
+        ranks = xp.arange(a.shape[-1]).expand_as(a)
 
-        # Build a mask to remove the selected elements
-        mask_right = xp.ones(a.shape, dtype=bool)
-        mask_right.scatter_(dim=-1, index=indices, value=False)
+        split_value, indices = xp.kthvalue(a, kth + 1, keepdim=True)
+        del indices
 
-        # Remaining elements along axis
-        a_right = a[mask_right]  # 1-d array
+        # fill the left-side of the partition
+        mask_src = a < split_value
+        n_left = mask_src.sum(dim=-1, keepdim=True)
+        mask_dest = ranks < n_left
+        out[mask_dest] = a[mask_src]
 
-        # Reshape. This is valid only because we work on the last axis
-        a_right = xp.reshape(a_right, shape=(*a.shape[:-1], -1))
+        # fill the middle of the partition
+        mask_src = a == split_value
+        n_left += mask_src.sum(dim=-1, keepdim=True)
+        mask_dest ^= ranks < n_left
+        out[mask_dest] = a[mask_src]
 
-        # Concatenate the two parts along axis
-        partitioned_array = xp.cat((a_left, a_right), dim=-1)
+        # fill the right-side of the partition
+        mask_src = a > split_value
+        mask_dest = ranks >= n_left
+        out[mask_dest] = a[mask_src]
+
         if not (axis == -1 or axis == a.ndim - 1):
-            partitioned_array = xp.transpose(partitioned_array, axis, -1)
-        return partitioned_array
+            out = xp.transpose(out, axis, -1)
+        return out
 
     # Note: dask topk/argtopk sort the return values, so it's
     # not much more efficient than sorting everything when
@@ -427,8 +434,14 @@ def argpartition(
 ) -> Array:
     """
     Perform an indirect partition along the given axis.
+
     It returns an array of indices of the same shape as `a` that
     index data along the given axis in partitioned order.
+
+    Notes:
+    If `xp` implements `argpartition` or an equivalent method (e.g. topk for torch),
+    complexity will likely be O(n).
+    If not, this function simply calls `xp.argsort` and complexity is O(n log n).
 
     Parameters
     ----------
@@ -446,11 +459,6 @@ def argpartition(
     -------
     index_array
         Array of indices that partition `a` along the specified axis.
-
-    Notes:
-    If `xp` implements `argpartition` or an equivalent method (e.g. topk for torch),
-    complexity will likely be O(n).
-    If not, this function simply calls `xp.argsort` and complexity is O(n log n).
     """
     # Validate inputs.
     if xp is None:
@@ -478,20 +486,29 @@ def argpartition(
         if not (axis == -1 or axis == a.ndim - 1):
             a = xp.transpose(a, axis, -1)
 
-        kth += 1  # HACK
-        _, indices_left = xp.topk(a, kth, dim=-1, largest=False, sorted=False)
+        ranks = xp.arange(a.shape[-1]).expand_as(a)
+        out = xp.empty_like(ranks)
 
-        mask_right = xp.ones(a.shape, dtype=bool)
-        mask_right.scatter_(dim=-1, index=indices_left, value=False)
+        split_value, indices = xp.kthvalue(a, kth + 1, keepdim=True)
+        del indices
 
-        indices_right = xp.nonzero(mask_right)[-1]
-        indices_right = xp.reshape(indices_right, shape=(*a.shape[:-1], -1))
+        mask_src = a < split_value
+        n_left = mask_src.sum(dim=-1, keepdim=True)
+        mask_dest = ranks < n_left
+        out[mask_dest] = ranks[mask_src]
 
-        # Concatenate the two parts along axis
-        index_array = xp.cat((indices_left, indices_right), dim=-1)
+        mask_src = a == split_value
+        n_left += mask_src.sum(dim=-1, keepdim=True)
+        mask_dest ^= ranks < n_left
+        out[mask_dest] = ranks[mask_src]
+
+        mask_src = a > split_value
+        mask_dest = ranks >= n_left
+        out[mask_dest] = ranks[mask_src]
+
         if not (axis == -1 or axis == a.ndim - 1):
-            index_array = xp.transpose(index_array, axis, -1)
-        return index_array
+            out = xp.transpose(out, axis, -1)
+        return out
 
     # Note: dask topk/argtopk sort the return values, so it's
     # not much more efficient than sorting everything when
