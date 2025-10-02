@@ -1412,15 +1412,19 @@ class TestArgpartition(TestPartition):
             assert isinstance(arr.shape[1], int)
             arrs = []
             for i in range(arr.shape[1]):
-                arrs.append(cls._take_along_axis(arr[:, i, ...], indices[:, i, ...],
-                                                 axis=0, xp=xp))
+                arrs.append(
+                    cls._take_along_axis(
+                        arr[:, i, ...], indices[:, i, ...], axis=0, xp=xp
+                    )
+                )
             return xp.stack(arrs, axis=1)
         axis = axis - 1 if axis != -1 else -1
         assert isinstance(arr.shape[0], int)
         arrs = []
         for i in range(arr.shape[0]):
-            arrs.append(cls._take_along_axis(arr[i, ...], indices[i, ...],
-                                             axis=axis, xp=xp))
+            arrs.append(
+                cls._take_along_axis(arr[i, ...], indices[i, ...], axis=axis, xp=xp)
+            )
         return xp.stack(arrs, axis=0)
 
     @override

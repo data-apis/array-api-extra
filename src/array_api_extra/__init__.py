@@ -2,11 +2,13 @@
 
 from ._delegation import (
     argpartition,
+    expand_dims,
     isclose,
     nan_to_num,
     one_hot,
     pad,
     partition,
+    sinc,
 )
 from ._lib._at import at
 from ._lib._funcs import (
@@ -16,11 +18,9 @@ from ._lib._funcs import (
     cov,
     create_diagonal,
     default_dtype,
-    expand_dims,
     kron,
     nunique,
     setdiff1d,
-    sinc,
 )
 from ._lib._lazy import lazy_apply
 
