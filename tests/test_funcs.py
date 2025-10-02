@@ -413,10 +413,12 @@ class TestCov:
         expect = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]], dtype=xp.complex128)
         xp_assert_close(actual, expect)
 
+    @pytest.mark.xfail_xp_backend(Backend.JAX, reason="jax#32296")
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="sparse#877")
     def test_empty(self, xp: ModuleType):
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
+            warnings.simplefilter("always", UserWarning)
             xp_assert_equal(cov(xp.asarray([], dtype=xp.float64)), xp.asarray(xp.nan, dtype=xp.float64))
             xp_assert_equal(
                 cov(xp.reshape(xp.asarray([], dtype=xp.float64), (0, 2))),
@@ -436,6 +438,7 @@ class TestCov:
         xp_assert_close(cov(x), xp.asarray(11.71, dtype=xp.float64))
         xp_assert_close(cov(y), xp.asarray(2.144133, dtype=xp.float64), rtol=1e-6)
 
+    @pytest.mark.xfail_xp_backend(Backend.TORCH, reason="array-api-extra#455")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(cov(x)) == device
