@@ -419,7 +419,10 @@ class TestCov:
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
             warnings.simplefilter("always", UserWarning)
-            xp_assert_equal(cov(xp.asarray([], dtype=xp.float64)), xp.asarray(xp.nan, dtype=xp.float64))
+            xp_assert_equal(
+                cov(xp.asarray([], dtype=xp.float64)),
+                xp.asarray(xp.nan, dtype=xp.float64),
+            )
             xp_assert_equal(
                 cov(xp.reshape(xp.asarray([], dtype=xp.float64), (0, 2))),
                 xp.reshape(xp.asarray([], dtype=xp.float64), (0, 0)),
@@ -446,7 +449,10 @@ class TestCov:
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
     def test_xp(self, xp: ModuleType):
         xp_assert_close(
-            cov(xp.asarray([[0.0, 2.0], [1.0, 1.0], [2.0, 0.0]], dtype=xp.float64).T, xp=xp),
+            cov(
+                xp.asarray([[0.0, 2.0], [1.0, 1.0], [2.0, 0.0]], dtype=xp.float64).T,
+                xp=xp,
+            ),
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
 
