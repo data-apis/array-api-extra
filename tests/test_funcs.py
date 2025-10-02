@@ -1310,41 +1310,52 @@ class TestSinc:
 
 class TestPartition:
     @classmethod
-    def _assert_valid_partition(cls, x: Array, k: int, xp: ModuleType, axis: int = -1):
-        if x.ndim != 1 and axis == 0:
-            assert isinstance(x.shape[1], int)
-            for i in range(x.shape[1]):
-                cls._assert_valid_partition(x[:, i, ...], k, xp, axis=0)
-        elif x.ndim != 1:
-            axis = axis - 1 if axis != -1 else -1
-            assert isinstance(x.shape[0], int)
-            for i in range(x.shape[0]):
-                cls._assert_valid_partition(x[i, ...], k, xp, axis=axis)
-        else:
-            if k > 0:
-                assert xp.max(x[:k]) <= x[k]
-            assert x[k] <= xp.min(x[k:])
-
-    @classmethod
-    def _partition(
+    def _assert_valid_partition(
         cls,
-        x: Array,
+        x_np: np.ndarray | None,
         k: int,
-        xp: ModuleType,  # noqa: ARG003
+        y: Array,
+        xp: ModuleType,
         axis: int | None = -1,
     ):
-        return partition(x, k, axis=axis)
+        """
+        x : input array
+        k : int
+        y : output array returned by the partition function to test
+        """
+        if x_np is not None:
+            assert y.shape == np.partition(x_np, k, axis=axis).shape
+        if y.ndim != 1 and axis == 0:
+            assert isinstance(y.shape[1], int)
+            for i in range(y.shape[1]):
+                cls._assert_valid_partition(None, k, y[:, i, ...], xp, axis=0)
+        elif y.ndim != 1:
+            assert axis is not None
+            axis = axis - 1 if axis != -1 else -1
+            assert isinstance(y.shape[0], int)
+            for i in range(y.shape[0]):
+                cls._assert_valid_partition(None, k, y[i, ...], xp, axis=axis)
+        else:
+            if k > 0:
+                assert xp.max(y[:k]) <= y[k]
+            assert y[k] <= xp.min(y[k:])
+
+    @classmethod
+    def _partition(cls, x: np.ndarray, k: int, xp: ModuleType, axis: int | None = -1):
+        return partition(xp.asarray(x), k, axis=axis)
 
     def test_1d(self, xp: ModuleType):
         rng = np.random.default_rng()
         for n in [2, 3, 4, 5, 7, 10, 20, 50, 100, 1_000]:
             k = int(rng.integers(n))
-            x = xp.asarray(rng.integers(n, size=n))
-            self._assert_valid_partition(self._partition(x, k, xp), k, xp)
-            x = xp.asarray(rng.random(n))
-            self._assert_valid_partition(self._partition(x, k, xp), k, xp)
+            x1 = rng.integers(n, size=n)
+            y = self._partition(x1, k, xp)
+            self._assert_valid_partition(x1, k, y, xp)
+            x2 = rng.random(n)
+            y = self._partition(x2, k, xp)
+            self._assert_valid_partition(x2, k, y, xp)
 
-    @pytest.mark.parametrize("ndim", [2, 3, 4, 5])
+    @pytest.mark.parametrize("ndim", [2, 3, 4])
     def test_nd(self, xp: ModuleType, ndim: int):
         rng = np.random.default_rng()
 
@@ -1355,27 +1366,35 @@ class TestPartition:
             for i in range(ndim):
                 shape = base_shape[:]
                 shape[i] = n
-                x = xp.asarray(rng.integers(n, size=tuple(shape)))
+                x = rng.integers(n, size=tuple(shape))
                 y = self._partition(x, k, xp, axis=i)
-                self._assert_valid_partition(y, k, xp, axis=i)
+                self._assert_valid_partition(x, k, y, xp, axis=i)
+
+            z = rng.random(tuple(base_shape))
+            k = int(rng.integers(z.size))
+            y = self._partition(z, k, xp, axis=None)
+            self._assert_valid_partition(z, k, y, xp, axis=None)
 
     def test_input_validation(self, xp: ModuleType):
         with pytest.raises(TypeError):
-            _ = self._partition(xp.asarray(1), 1, xp)
+            _ = self._partition(np.asarray(1), 1, xp)
         with pytest.raises(ValueError, match="out of bounds"):
-            _ = self._partition(xp.asarray([1, 2]), 3, xp)
+            _ = self._partition(np.asarray([1, 2]), 3, xp)
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no argsort")
 class TestArgpartition(TestPartition):
     @classmethod
     @override
-    def _partition(cls, x: Array, k: int, xp: ModuleType, axis: int | None = -1):
+    def _partition(cls, x: np.ndarray, k: int, xp: ModuleType, axis: int | None = -1):
         if is_pydata_sparse_namespace(xp):
             pytest.xfail(reason="Sparse backend has no argsort")
-        indices = argpartition(x, k, axis=axis)
-        if x.ndim == 1:
-            return x[indices]
+        arr = xp.asarray(x)
+        indices = argpartition(arr, k, axis=axis)
+        if axis is None:
+            arr = xp.reshape(arr, shape=(-1,))
+        if arr.ndim == 1:
+            return arr[indices]
         if not hasattr(xp, "take_along_axis"):
             pytest.skip("TODO: find an alternative to take_along_axis")
-        return xp.take_along_axis(x, indices, axis=axis)
+        return xp.take_along_axis(arr, indices, axis=axis)

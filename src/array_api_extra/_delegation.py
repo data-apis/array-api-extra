@@ -363,7 +363,7 @@ def partition(
         msg = "`a` must be at least 1-dimensional"
         raise TypeError(msg)
     if axis is None:
-        return partition(xp.reshape(a, -1), kth, axis=0, xp=xp)
+        return partition(xp.reshape(a, (-1,)), kth, axis=0, xp=xp)
     (size,) = eager_shape(a, axis)
     if not (0 <= kth < size):
         msg = f"kth(={kth}) out of bounds [0 {size})"
@@ -441,7 +441,7 @@ def argpartition(
         msg = "`a` must be at least 1-dimensional"
         raise TypeError(msg)
     if axis is None:
-        return partition(xp.reshape(a, -1), kth, axis=0, xp=xp)
+        return argpartition(xp.reshape(a, (-1,)), kth, axis=0, xp=xp)
     (size,) = eager_shape(a, axis)
     if not (0 <= kth < size):
         msg = f"kth(={kth}) out of bounds [0 {size})"
