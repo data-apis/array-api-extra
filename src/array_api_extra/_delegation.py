@@ -339,22 +339,33 @@ def partition(
     """
     Return a partitioned copy of an array.
 
-    Parameters
+    Creates a copy of the array and partially sorts it in such a way that the value
+    of the element in k-th position is in the position it would be in a sorted array.
+    In the output array, all elements smaller than the k-th element are located to
+    the left of this element and all equal or greater are located to its right.
+    The ordering of the elements in the two partitions on the either side of
+    the k-th element in the output array is undefined.
+
     ----------
-    a : 1-dimensional array
+    a : Array
         Input array.
     kth : int
         Element index to partition by.
     axis : int, optional
-        Axis along which to partition. The default is -1 (the last axis).
-        If None, the flattened array is used.
+        Axis along which to partition. The default is ``-1`` (the last axis).
+        If ``None``, the flattened array is used.
     xp : array_namespace, optional
         The standard-compatible namespace for `x`. Default: infer.
 
     Returns
     -------
     partitioned_array
-        Array of the same type and shape as a.
+        Array of the same type and shape as `a`.
+
+    Notes:
+    If `xp` implements `partition` or an equivalent method (e.g. topk for torch),
+    complexity will likely be O(n).
+    If not, this function simply calls `xp.sort` and complexity is O(n log n).
     """
     # Validate inputs.
     if xp is None:
@@ -416,6 +427,8 @@ def argpartition(
 ) -> Array:
     """
     Perform an indirect partition along the given axis.
+    It returns an array of indices of the same shape as `a` that
+    index data along the given axis in partitioned order.
 
     Parameters
     ----------
@@ -424,8 +437,8 @@ def argpartition(
     kth : int
         Element index to partition by.
     axis : int, optional
-        Axis along which to partition. The default is -1 (the last axis).
-        If None, the flattened array is used.
+        Axis along which to partition. The default is ``-1`` (the last axis).
+        If ``None``, the flattened array is used.
     xp : array_namespace, optional
         The standard-compatible namespace for `x`. Default: infer.
 
@@ -433,6 +446,11 @@ def argpartition(
     -------
     index_array
         Array of indices that partition `a` along the specified axis.
+
+    Notes:
+    If `xp` implements `argpartition` or an equivalent method (e.g. topk for torch),
+    complexity will likely be O(n).
+    If not, this function simply calls `xp.argsort` and complexity is O(n log n).
     """
     # Validate inputs.
     if xp is None:
