@@ -1316,7 +1316,7 @@ class TestPartition:
         axis: int | None = -1,
     ):
         """
-        x : input array
+        x_np : input array
         k : int
         y : output array returned by the partition function to test
         """
@@ -1397,11 +1397,31 @@ class TestArgpartition(TestPartition):
         indices = argpartition(arr, k, axis=axis)
         if axis is None:
             arr = xp.reshape(arr, shape=(-1,))
+            return arr[indices]
         if arr.ndim == 1:
             return arr[indices]
-        if not hasattr(xp, "take_along_axis"):
-            pytest.skip("TODO: find an alternative to take_along_axis")
-        return xp.take_along_axis(arr, indices, axis=axis)
+        return cls._take_along_axis(arr, indices, axis=axis, xp=xp)
+
+    @classmethod
+    def _take_along_axis(cls, arr: Array, indices: Array, axis: int, xp: ModuleType):
+        if hasattr(xp, "take_along_axis"):
+            return xp.take_along_axis(arr, indices, axis=axis)
+        if arr.ndim == 1:
+            return arr[indices]
+        if axis == 0:
+            assert isinstance(arr.shape[1], int)
+            arrs = []
+            for i in range(arr.shape[1]):
+                arrs.append(cls._take_along_axis(arr[:, i, ...], indices[:, i, ...],
+                                                 axis=0, xp=xp))
+            return xp.stack(arrs, axis=1)
+        axis = axis - 1 if axis != -1 else -1
+        assert isinstance(arr.shape[0], int)
+        arrs = []
+        for i in range(arr.shape[0]):
+            arrs.append(cls._take_along_axis(arr[i, ...], indices[i, ...],
+                                             axis=axis, xp=xp))
+        return xp.stack(arrs, axis=0)
 
     @override
     def test_1d(self, xp: ModuleType):
