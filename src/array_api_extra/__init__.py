@@ -1,6 +1,6 @@
 """Extra array functions built on top of the array API standard."""
 
-from ._delegation import expand_dims, isclose, nan_to_num, one_hot, pad
+from ._delegation import expand_dims, isclose, nan_to_num, one_hot, pad, sinc
 from ._lib._at import at
 from ._lib._funcs import (
     apply_where,
@@ -12,7 +12,6 @@ from ._lib._funcs import (
     kron,
     nunique,
     setdiff1d,
-    sinc,
 )
 from ._lib._lazy import lazy_apply
 
