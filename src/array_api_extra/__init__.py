@@ -1,6 +1,6 @@
 """Extra array functions built on top of the array API standard."""
 
-from ._delegation import isclose, nan_to_num, one_hot, pad
+from ._delegation import expand_dims, isclose, nan_to_num, one_hot, pad
 from ._lib._at import at
 from ._lib._funcs import (
     apply_where,
@@ -9,7 +9,6 @@ from ._lib._funcs import (
     cov,
     create_diagonal,
     default_dtype,
-    expand_dims,
     kron,
     nunique,
     setdiff1d,
