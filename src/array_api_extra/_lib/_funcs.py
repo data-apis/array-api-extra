@@ -428,87 +428,9 @@ def default_dtype(
         raise ValueError(msg) from e
 
 
-def expand_dims(
-    a: Array, /, *, axis: int | tuple[int, ...] = (0,), xp: ModuleType | None = None
-) -> Array:
-    """
-    Expand the shape of an array.
-
-    Insert (a) new axis/axes that will appear at the position(s) specified by
-    `axis` in the expanded array shape.
-
-    This is ``xp.expand_dims`` for `axis` an int *or a tuple of ints*.
-    Roughly equivalent to ``numpy.expand_dims`` for NumPy arrays.
-
-    Parameters
-    ----------
-    a : array
-        Array to have its shape expanded.
-    axis : int or tuple of ints, optional
-        Position(s) in the expanded axes where the new axis (or axes) is/are placed.
-        If multiple positions are provided, they should be unique (note that a position
-        given by a positive index could also be referred to by a negative index -
-        that will also result in an error).
-        Default: ``(0,)``.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `a`. Default: infer.
-
-    Returns
-    -------
-    array
-        `a` with an expanded shape.
-
-    Examples
-    --------
-    >>> import array_api_strict as xp
-    >>> import array_api_extra as xpx
-    >>> x = xp.asarray([1, 2])
-    >>> x.shape
-    (2,)
-
-    The following is equivalent to ``x[xp.newaxis, :]`` or ``x[xp.newaxis]``:
-
-    >>> y = xpx.expand_dims(x, axis=0, xp=xp)
-    >>> y
-    Array([[1, 2]], dtype=array_api_strict.int64)
-    >>> y.shape
-    (1, 2)
-
-    The following is equivalent to ``x[:, xp.newaxis]``:
-
-    >>> y = xpx.expand_dims(x, axis=1, xp=xp)
-    >>> y
-    Array([[1],
-           [2]], dtype=array_api_strict.int64)
-    >>> y.shape
-    (2, 1)
-
-    ``axis`` may also be a tuple:
-
-    >>> y = xpx.expand_dims(x, axis=(0, 1), xp=xp)
-    >>> y
-    Array([[[1, 2]]], dtype=array_api_strict.int64)
-
-    >>> y = xpx.expand_dims(x, axis=(2, 0), xp=xp)
-    >>> y
-    Array([[[1],
-            [2]]], dtype=array_api_strict.int64)
-    """
-    if xp is None:
-        xp = array_namespace(a)
-
-    if not isinstance(axis, tuple):
-        axis = (axis,)
-    ndim = a.ndim + len(axis)
-    if axis != () and (min(axis) < -ndim or max(axis) >= ndim):
-        err_msg = (
-            f"a provided axis position is out of bounds for array of dimension {a.ndim}"
-        )
-        raise IndexError(err_msg)
-    axis = tuple(dim % ndim for dim in axis)
-    if len(set(axis)) != len(axis):
-        err_msg = "Duplicate dimensions specified in `axis`."
-        raise ValueError(err_msg)
+def expand_dims(a: Array, /, *, axis: tuple[int, ...] = (0,), xp: ModuleType) -> Array:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in array_api_extra._delegation."""
     for i in sorted(axis):
         a = xp.expand_dims(a, axis=i)
     return a
@@ -877,86 +799,10 @@ def setdiff1d(
     return x1_[_helpers.in1d(x1_, x2_, assume_unique=True, invert=True, xp=xp)]
 
 
-def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
-    r"""
-    Return the normalized sinc function.
+def sinc(x: Array, /, *, xp: ModuleType) -> Array:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._delegation.py`."""
 
-    The sinc function is equal to :math:`\sin(\pi x)/(\pi x)` for any argument
-    :math:`x\ne 0`. ``sinc(0)`` takes the limit value 1, making ``sinc`` not
-    only everywhere continuous but also infinitely differentiable.
-
-    .. note::
-
-        Note the normalization factor of ``pi`` used in the definition.
-        This is the most commonly used definition in signal processing.
-        Use ``sinc(x / xp.pi)`` to obtain the unnormalized sinc function
-        :math:`\sin(x)/x` that is more common in mathematics.
-
-    Parameters
-    ----------
-    x : array
-        Array (possibly multi-dimensional) of values for which to calculate
-        ``sinc(x)``. Must have a real floating point dtype.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
-
-    Returns
-    -------
-    array
-        ``sinc(x)`` calculated elementwise, which has the same shape as the input.
-
-    Notes
-    -----
-    The name sinc is short for "sine cardinal" or "sinus cardinalis".
-
-    The sinc function is used in various signal processing applications,
-    including in anti-aliasing, in the construction of a Lanczos resampling
-    filter, and in interpolation.
-
-    For bandlimited interpolation of discrete-time signals, the ideal
-    interpolation kernel is proportional to the sinc function.
-
-    References
-    ----------
-    #. Weisstein, Eric W. "Sinc Function." From MathWorld--A Wolfram Web
-       Resource. https://mathworld.wolfram.com/SincFunction.html
-    #. Wikipedia, "Sinc function",
-       https://en.wikipedia.org/wiki/Sinc_function
-
-    Examples
-    --------
-    >>> import array_api_strict as xp
-    >>> import array_api_extra as xpx
-    >>> x = xp.linspace(-4, 4, 41)
-    >>> xpx.sinc(x, xp=xp)
-    Array([-3.89817183e-17, -4.92362781e-02,
-           -8.40918587e-02, -8.90384387e-02,
-           -5.84680802e-02,  3.89817183e-17,
-            6.68206631e-02,  1.16434881e-01,
-            1.26137788e-01,  8.50444803e-02,
-           -3.89817183e-17, -1.03943254e-01,
-           -1.89206682e-01, -2.16236208e-01,
-           -1.55914881e-01,  3.89817183e-17,
-            2.33872321e-01,  5.04551152e-01,
-            7.56826729e-01,  9.35489284e-01,
-            1.00000000e+00,  9.35489284e-01,
-            7.56826729e-01,  5.04551152e-01,
-            2.33872321e-01,  3.89817183e-17,
-           -1.55914881e-01, -2.16236208e-01,
-           -1.89206682e-01, -1.03943254e-01,
-           -3.89817183e-17,  8.50444803e-02,
-            1.26137788e-01,  1.16434881e-01,
-            6.68206631e-02,  3.89817183e-17,
-           -5.84680802e-02, -8.90384387e-02,
-           -8.40918587e-02, -4.92362781e-02,
-           -3.89817183e-17], dtype=array_api_strict.float64)
-    """
-    if xp is None:
-        xp = array_namespace(x)
-
-    if not xp.isdtype(x.dtype, "real floating"):
-        err_msg = "`x` must have a real floating data type."
-        raise ValueError(err_msg)
     # no scalars in `where` - array-api#807
     y = xp.pi * xp.where(
         xp.astype(x, xp.bool),
