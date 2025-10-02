@@ -437,6 +437,9 @@ def argpartition(
     # Validate inputs.
     if xp is None:
         xp = array_namespace(a)
+    if is_pydata_sparse_namespace(xp):
+        msg = "Not implemented for sparse backend"
+        raise NotImplementedError(msg)
     if a.ndim < 1:
         msg = "`a` must be at least 1-dimensional"
         raise TypeError(msg)

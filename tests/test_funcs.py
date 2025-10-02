@@ -36,9 +36,6 @@ from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import (
     device as get_device,
 )
-from array_api_extra._lib._utils._compat import (
-    is_pydata_sparse_namespace,
-)
 from array_api_extra._lib._utils._helpers import eager_shape, ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
@@ -1344,7 +1341,7 @@ class TestPartition:
     def _partition(cls, x: np.ndarray, k: int, xp: ModuleType, axis: int | None = -1):
         return partition(xp.asarray(x), k, axis=axis)
 
-    def test_1d(self, xp: ModuleType):
+    def _test_1d(self, xp: ModuleType):
         rng = np.random.default_rng()
         for n in [2, 3, 4, 5, 7, 10, 20, 50, 100, 1_000]:
             k = int(rng.integers(n))
@@ -1355,8 +1352,7 @@ class TestPartition:
             y = self._partition(x2, k, xp)
             self._assert_valid_partition(x2, k, y, xp)
 
-    @pytest.mark.parametrize("ndim", [2, 3, 4])
-    def test_nd(self, xp: ModuleType, ndim: int):
+    def _test_nd(self, xp: ModuleType, ndim: int):
         rng = np.random.default_rng()
 
         for n in [2, 3, 5, 10, 20, 100]:
@@ -1375,11 +1371,21 @@ class TestPartition:
             y = self._partition(z, k, xp, axis=None)
             self._assert_valid_partition(z, k, y, xp, axis=None)
 
-    def test_input_validation(self, xp: ModuleType):
+    def _test_input_validation(self, xp: ModuleType):
         with pytest.raises(TypeError):
             _ = self._partition(np.asarray(1), 1, xp)
         with pytest.raises(ValueError, match="out of bounds"):
             _ = self._partition(np.asarray([1, 2]), 3, xp)
+
+    def test_1d(self, xp: ModuleType):
+        self._test_1d(xp)
+
+    @pytest.mark.parametrize("ndim", [2, 3, 4])
+    def test_nd(self, xp: ModuleType, ndim: int):
+        self._test_nd(xp, ndim)
+
+    def test_input_validation(self, xp: ModuleType):
+        self._test_input_validation(xp)
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no argsort")
@@ -1387,8 +1393,6 @@ class TestArgpartition(TestPartition):
     @classmethod
     @override
     def _partition(cls, x: np.ndarray, k: int, xp: ModuleType, axis: int | None = -1):
-        if is_pydata_sparse_namespace(xp):
-            pytest.xfail(reason="Sparse backend has no argsort")
         arr = xp.asarray(x)
         indices = argpartition(arr, k, axis=axis)
         if axis is None:
@@ -1398,3 +1402,16 @@ class TestArgpartition(TestPartition):
         if not hasattr(xp, "take_along_axis"):
             pytest.skip("TODO: find an alternative to take_along_axis")
         return xp.take_along_axis(arr, indices, axis=axis)
+
+    @override
+    def test_1d(self, xp: ModuleType):
+        self._test_1d(xp)
+
+    @pytest.mark.parametrize("ndim", [2, 3, 4])
+    @override
+    def test_nd(self, xp: ModuleType, ndim: int):
+        self._test_nd(xp, ndim)
+
+    @override
+    def test_input_validation(self, xp: ModuleType):
+        self._test_input_validation(xp)
