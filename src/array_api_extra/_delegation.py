@@ -15,7 +15,7 @@ from ._lib._utils._compat import (
     is_torch_namespace,
 )
 from ._lib._utils._compat import device as get_device
-from ._lib._utils._helpers import asarrays
+from ._lib._utils._helpers import asarrays, eager_shape
 from ._lib._utils._typing import Array, DType
 
 __all__ = ["isclose", "nan_to_num", "one_hot", "pad"]
@@ -364,10 +364,7 @@ def partition(
         raise TypeError(msg)
     if axis is None:
         return partition(xp.reshape(a, -1), kth, axis=0, xp=xp)
-    size = a.shape[axis]
-    if size is None:
-        msg = "Array dimensions must be known"
-        raise ValueError(msg)
+    (size,) = eager_shape(a, axis)
     if not (0 <= kth < size):
         msg = f"kth(={kth}) out of bounds [0 {size})"
         raise ValueError(msg)
@@ -445,10 +442,7 @@ def argpartition(
         raise TypeError(msg)
     if axis is None:
         return partition(xp.reshape(a, -1), kth, axis=0, xp=xp)
-    size = a.shape[axis]
-    if size is None:
-        msg = "Array dimensions must be known"
-        raise ValueError(msg)
+    (size,) = eager_shape(a, axis)
     if not (0 <= kth < size):
         msg = f"kth(={kth}) out of bounds [0 {size})"
         raise ValueError(msg)
