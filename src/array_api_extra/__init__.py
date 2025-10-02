@@ -1,10 +1,17 @@
 """Extra array functions built on top of the array API standard."""
 
-from ._delegation import expand_dims, isclose, nan_to_num, one_hot, pad, sinc
+from ._delegation import (
+    atleast_nd,
+    expand_dims,
+    isclose,
+    nan_to_num,
+    one_hot,
+    pad,
+    sinc,
+)
 from ._lib._at import at
 from ._lib._funcs import (
     apply_where,
-    atleast_nd,
     broadcast_shapes,
     cov,
     create_diagonal,
