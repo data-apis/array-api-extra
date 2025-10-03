@@ -175,42 +175,9 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
     return at(out, cond).set(temp1)
 
 
-def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array:
-    """
-    Recursively expand the dimension of an array to at least `ndim`.
-
-    Parameters
-    ----------
-    x : array
-        Input array.
-    ndim : int
-        The minimum number of dimensions for the result.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
-
-    Returns
-    -------
-    array
-        An array with ``res.ndim`` >= `ndim`.
-        If ``x.ndim`` >= `ndim`, `x` is returned.
-        If ``x.ndim`` < `ndim`, `x` is expanded by prepending new axes
-        until ``res.ndim`` equals `ndim`.
-
-    Examples
-    --------
-    >>> import array_api_strict as xp
-    >>> import array_api_extra as xpx
-    >>> x = xp.asarray([1])
-    >>> xpx.atleast_nd(x, ndim=3, xp=xp)
-    Array([[[1]]], dtype=array_api_strict.int64)
-
-    >>> x = xp.asarray([[[1, 2],
-    ...                  [3, 4]]])
-    >>> xpx.atleast_nd(x, ndim=1, xp=xp) is x
-    True
-    """
-    if xp is None:
-        xp = array_namespace(x)
+def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in array_api_extra._delegation."""
 
     if x.ndim < ndim:
         x = xp.expand_dims(x, axis=0)
@@ -281,73 +248,8 @@ def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...
     return tuple(out)
 
 
-def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
-    """
-    Estimate a covariance matrix.
-
-    Covariance indicates the level to which two variables vary together.
-    If we examine N-dimensional samples, :math:`X = [x_1, x_2, ... x_N]^T`,
-    then the covariance matrix element :math:`C_{ij}` is the covariance of
-    :math:`x_i` and :math:`x_j`. The element :math:`C_{ii}` is the variance
-    of :math:`x_i`.
-
-    This provides a subset of the functionality of ``numpy.cov``.
-
-    Parameters
-    ----------
-    m : array
-        A 1-D or 2-D array containing multiple variables and observations.
-        Each row of `m` represents a variable, and each column a single
-        observation of all those variables.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `m`. Default: infer.
-
-    Returns
-    -------
-    array
-        The covariance matrix of the variables.
-
-    Examples
-    --------
-    >>> import array_api_strict as xp
-    >>> import array_api_extra as xpx
-
-    Consider two variables, :math:`x_0` and :math:`x_1`, which
-    correlate perfectly, but in opposite directions:
-
-    >>> x = xp.asarray([[0, 2], [1, 1], [2, 0]]).T
-    >>> x
-    Array([[0, 1, 2],
-           [2, 1, 0]], dtype=array_api_strict.int64)
-
-    Note how :math:`x_0` increases while :math:`x_1` decreases. The covariance
-    matrix shows this clearly:
-
-    >>> xpx.cov(x, xp=xp)
-    Array([[ 1., -1.],
-           [-1.,  1.]], dtype=array_api_strict.float64)
-
-    Note that element :math:`C_{0,1}`, which shows the correlation between
-    :math:`x_0` and :math:`x_1`, is negative.
-
-    Further, note how `x` and `y` are combined:
-
-    >>> x = xp.asarray([-2.1, -1,  4.3])
-    >>> y = xp.asarray([3,  1.1,  0.12])
-    >>> X = xp.stack((x, y), axis=0)
-    >>> xpx.cov(X, xp=xp)
-    Array([[11.71      , -4.286     ],
-           [-4.286     ,  2.14413333]], dtype=array_api_strict.float64)
-
-    >>> xpx.cov(x, xp=xp)
-    Array(11.71, dtype=array_api_strict.float64)
-
-    >>> xpx.cov(y, xp=xp)
-    Array(2.14413333, dtype=array_api_strict.float64)
-    """
-    if xp is None:
-        xp = array_namespace(m)
-
+def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
+    """See docstring in array_api_extra._delegation."""
     m = xp.asarray(m, copy=True)
     dtype = (
         xp.float64 if xp.isdtype(m.dtype, "integral") else xp.result_type(m, xp.float64)

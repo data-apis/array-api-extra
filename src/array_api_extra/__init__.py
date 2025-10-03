@@ -2,6 +2,8 @@
 
 from ._delegation import (
     argpartition,
+    atleast_nd,
+    cov,
     expand_dims,
     isclose,
     nan_to_num,
@@ -13,9 +15,7 @@ from ._delegation import (
 from ._lib._at import at
 from ._lib._funcs import (
     apply_where,
-    atleast_nd,
     broadcast_shapes,
-    cov,
     create_diagonal,
     default_dtype,
     kron,
