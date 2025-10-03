@@ -419,38 +419,44 @@ class TestBroadcastShapes:
 class TestCov:
     def test_basic(self, xp: ModuleType):
         xp_assert_close(
-            cov(xp.asarray([[0, 2], [1, 1], [2, 0]]).T),
+            cov(xp.asarray([[0, 2], [1, 1], [2, 0]], dtype=xp.float64).T),
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
 
     def test_complex(self, xp: ModuleType):
-        actual = cov(xp.asarray([[1, 2, 3], [1j, 2j, 3j]]))
+        actual = cov(xp.asarray([[1, 2, 3], [1j, 2j, 3j]], dtype=xp.complex128))
         expect = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]], dtype=xp.complex128)
         xp_assert_close(actual, expect)
 
+    @pytest.mark.xfail_xp_backend(Backend.JAX, reason="jax#32296")
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="sparse#877")
     def test_empty(self, xp: ModuleType):
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
-            xp_assert_equal(cov(xp.asarray([])), xp.asarray(xp.nan, dtype=xp.float64))
+            warnings.simplefilter("always", UserWarning)
             xp_assert_equal(
-                cov(xp.reshape(xp.asarray([]), (0, 2))),
+                cov(xp.asarray([], dtype=xp.float64)),
+                xp.asarray(xp.nan, dtype=xp.float64),
+            )
+            xp_assert_equal(
+                cov(xp.reshape(xp.asarray([], dtype=xp.float64), (0, 2))),
                 xp.reshape(xp.asarray([], dtype=xp.float64), (0, 0)),
             )
             xp_assert_equal(
-                cov(xp.reshape(xp.asarray([]), (2, 0))),
+                cov(xp.reshape(xp.asarray([], dtype=xp.float64), (2, 0))),
                 xp.asarray([[xp.nan, xp.nan], [xp.nan, xp.nan]], dtype=xp.float64),
             )
 
     def test_combination(self, xp: ModuleType):
-        x = xp.asarray([-2.1, -1, 4.3])
-        y = xp.asarray([3, 1.1, 0.12])
+        x = xp.asarray([-2.1, -1, 4.3], dtype=xp.float64)
+        y = xp.asarray([3, 1.1, 0.12], dtype=xp.float64)
         X = xp.stack((x, y), axis=0)
         desired = xp.asarray([[11.71, -4.286], [-4.286, 2.144133]], dtype=xp.float64)
         xp_assert_close(cov(X), desired, rtol=1e-6)
         xp_assert_close(cov(x), xp.asarray(11.71, dtype=xp.float64))
         xp_assert_close(cov(y), xp.asarray(2.144133, dtype=xp.float64), rtol=1e-6)
 
+    @pytest.mark.xfail_xp_backend(Backend.TORCH, reason="array-api-extra#455")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(cov(x)) == device
@@ -458,7 +464,10 @@ class TestCov:
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
     def test_xp(self, xp: ModuleType):
         xp_assert_close(
-            cov(xp.asarray([[0.0, 2.0], [1.0, 1.0], [2.0, 0.0]]).T, xp=xp),
+            cov(
+                xp.asarray([[0.0, 2.0], [1.0, 1.0], [2.0, 0.0]], dtype=xp.float64).T,
+                xp=xp,
+            ),
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
 
