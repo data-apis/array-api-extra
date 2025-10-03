@@ -416,6 +416,58 @@ def pad(
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)
 
 
+def setdiff1d(
+    x1: Array | complex,
+    x2: Array | complex,
+    /,
+    *,
+    assume_unique: bool = False,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Find the set difference of two arrays.
+
+    Return the unique values in `x1` that are not in `x2`.
+
+    Parameters
+    ----------
+    x1 : array | int | float | complex | bool
+        Input array.
+    x2 : array
+        Input comparison array.
+    assume_unique : bool
+        If ``True``, the input arrays are both assumed to be unique, which
+        can speed up the calculation. Default is ``False``.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x1` and `x2`. Default: infer.
+
+    Returns
+    -------
+    array
+        1D array of values in `x1` that are not in `x2`. The result
+        is sorted when `assume_unique` is ``False``, but otherwise only sorted
+        if the input is sorted.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+
+    >>> x1 = xp.asarray([1, 2, 3, 2, 4, 1])
+    >>> x2 = xp.asarray([3, 4, 5, 6])
+    >>> xpx.setdiff1d(x1, x2, xp=xp)
+    Array([1, 2], dtype=array_api_strict.int64)
+    """
+
+    if xp is None:
+        xp = array_namespace(x1, x2)
+
+    if is_numpy_namespace(xp) or is_jax_namespace(xp) or is_cupy_namespace(xp):
+        return xp.setdiff1d(x1, x2, assume_unique=assume_unique)
+
+    return _funcs.setdiff1d(x1, x2, assume_unique=assume_unique, xp=xp)
+
+
 def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
     r"""
     Return the normalized sinc function.
