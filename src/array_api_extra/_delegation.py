@@ -528,11 +528,6 @@ def partition(
     The ordering of the elements in the two partitions on the either side of
     the k-th element in the output array is undefined.
 
-    Notes:
-    If `xp` implements ``partition`` or an equivalent function (e.g. ``topk`` for torch),
-    complexity will likely be O(n).
-    If not, this function simply calls ``xp.sort`` and complexity is O(n log n).
-
     Parameters
     ----------
     a : Array
@@ -549,6 +544,12 @@ def partition(
     -------
     partitioned_array
         Array of the same type and shape as `a`.
+
+    Notes
+    -----
+    If `xp` implements ``partition`` or an equivalent function
+    (e.g. ``topk`` for torch), complexity will likely be O(n).
+    If not, this function simply calls ``xp.sort`` and complexity is O(n log n).
     """
     # Validate inputs.
     if xp is None:
@@ -620,11 +621,6 @@ def argpartition(
     It returns an array of indices of the same shape as `a` that
     index data along the given axis in partitioned order.
 
-    Notes:
-    If `xp` implements `argpartition` or an equivalent method (e.g. topk for torch),
-    complexity will likely be O(n).
-    If not, this function simply calls `xp.argsort` and complexity is O(n log n).
-
     Parameters
     ----------
     a : Array
@@ -641,6 +637,12 @@ def argpartition(
     -------
     index_array
         Array of indices that partition `a` along the specified axis.
+
+    Notes
+    -----
+    If `xp` implements ``argpartition`` or an equivalent function
+    e.g. ``topk`` for torch), complexity will likely be O(n).
+    If not, this function simply calls ``xp.argsort`` and complexity is O(n log n).
     """
     # Validate inputs.
     if xp is None:
