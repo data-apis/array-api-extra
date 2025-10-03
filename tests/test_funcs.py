@@ -316,6 +316,21 @@ class TestAtLeastND:
         y = atleast_nd(x, ndim=5)
         xp_assert_equal(y, 3 * xp.ones((1, 1, 1, 1, 1)))
 
+    def test_3D(self, xp: ModuleType):
+        x = xp.asarray([[[3.0], [2.0]]])
+
+        y = atleast_nd(x, ndim=0)
+        xp_assert_equal(y, x)
+
+        y = atleast_nd(x, ndim=2)
+        xp_assert_equal(y, x)
+
+        y = atleast_nd(x, ndim=3)
+        xp_assert_equal(y, x)
+
+        y = atleast_nd(x, ndim=5)
+        xp_assert_equal(y, xp.asarray([[[[[3.0], [2.0]]]]]))
+
     def test_5D(self, xp: ModuleType):
         x = xp.ones((1, 1, 1, 1, 1))
 

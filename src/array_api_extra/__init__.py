@@ -1,6 +1,7 @@
 """Extra array functions built on top of the array API standard."""
 
 from ._delegation import (
+    atleast_nd,
     cov,
     expand_dims,
     isclose,
@@ -12,7 +13,6 @@ from ._delegation import (
 from ._lib._at import at
 from ._lib._funcs import (
     apply_where,
-    atleast_nd,
     broadcast_shapes,
     create_diagonal,
     default_dtype,
