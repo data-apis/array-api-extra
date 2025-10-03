@@ -1,3 +1,7 @@
+# pyright: reportAttributeAccessIssue=false
+
+from typing import Any
+
 import array_api_strict as xp
 from numpy.testing import assert_array_equal
 
@@ -14,6 +18,7 @@ def test_vendor_compat():
         is_dask_namespace,
         is_jax_array,
         is_jax_namespace,
+        is_lazy_array,
         is_numpy_array,
         is_numpy_namespace,
         is_pydata_sparse_array,
@@ -22,11 +27,12 @@ def test_vendor_compat():
         is_torch_namespace,
         is_writeable_array,
         size,
+        to_device,
     )
 
     x = xp.asarray([1, 2, 3])
     assert array_namespace(x) is xp
-    device(x)
+    to_device(x, device(x))
     assert is_array_api_obj(x)
     assert is_array_api_strict_namespace(xp)
     assert not is_cupy_array(x)
@@ -35,6 +41,7 @@ def test_vendor_compat():
     assert not is_dask_namespace(xp)
     assert not is_jax_array(x)
     assert not is_jax_namespace(xp)
+    assert not is_lazy_array(x)
     assert not is_numpy_array(x)
     assert not is_numpy_namespace(xp)
     assert not is_pydata_sparse_array(x)
@@ -50,13 +57,13 @@ def test_vendor_extra():
 
     x = xp.asarray(1)
     y = atleast_nd(x, ndim=0)
-    assert_array_equal(y, x)
+    assert_array_equal(y, x)  # pyright: ignore[reportUnknownArgumentType]
 
 
 def test_vendor_extra_testing():
     from .array_api_extra.testing import lazy_xp_function
 
-    def f(x):
+    def f(x: Any) -> Any:
         return x
 
     lazy_xp_function(f)

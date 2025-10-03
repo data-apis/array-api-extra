@@ -1,5 +1,8 @@
 name: CI
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   pull_request:
@@ -17,55 +20,60 @@ env:
   FORCE_COLOR: 3
 
 jobs:
-  pre-commit-and-lint:
-    name: Format
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+
+      - uses: prefix-dev/setup-pixi@fef5c9568ca6c4ff7707bf840ab0692ba3f08293 # v0.9.0
         with:
-          python-version: "3.x"
-      - uses: pre-commit/action@v3.0.1
-        with:
-          extra_args: --hook-stage manual --all-files
-      - uses: prefix-dev/setup-pixi@v0.8.3
-        with:
-          pixi-version: v0.40.3
+          pixi-version: v0.50.2
           cache: true
           environments: lint
-      - name: Run Pylint, Mypy & Pyright
-        run: |
-          pixi run -e lint pylint
-          pixi run -e lint mypy
-          pixi run -e lint pyright
+
+      - name: Lint (if this step fails, please 'pixi run lint' locally and push the changes)
+        run: pixi run -e lint lint
 
   checks:
-    name: Check ${{ matrix.environment }}
+    name: Test ${{ matrix.environment }}
     runs-on: ${{ matrix.runs-on }}
-    needs: [pre-commit-and-lint]
     strategy:
       fail-fast: false
       matrix:
-        environment: [tests-py310, tests-py313, tests-backends]
+        environment:
+          - tests-py310
+          - tests-py313
+          - tests-numpy1
+          - tests-backends
+          - tests-backends-py310
+          - tests-nogil
         runs-on: [ubuntu-latest]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
 
-      - uses: prefix-dev/setup-pixi@v0.8.3
+      - uses: prefix-dev/setup-pixi@fef5c9568ca6c4ff7707bf840ab0692ba3f08293 # v0.9.0
         with:
-          pixi-version: v0.40.3
+          pixi-version: v0.50.2
           cache: true
           environments: ${{ matrix.environment }}
 
       - name: Test package
+        # Save some time; also at the moment of writing coverage crashes on python 3.13t
+        if: ${{ matrix.environment != 'tests-nogil' }}
         run: pixi run -e ${{ matrix.environment }} tests-ci
 
+      - name: Test free-threading
+        if: ${{ matrix.environment == 'tests-nogil' }}
+        run: pixi run -e tests-nogil tests --parallel-threads=4
+
       - name: Upload coverage report
-        uses: codecov/codecov-action@v5.3.1
+        if: ${{ matrix.environment != 'tests-nogil' }}
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

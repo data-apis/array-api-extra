@@ -1,21 +1,27 @@
 name: Docs Build
 
+permissions:
+  contents: read
+
 on: [push, pull_request]
 
 jobs:
   docs-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: prefix-dev/setup-pixi@v0.8.3
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - uses: prefix-dev/setup-pixi@fef5c9568ca6c4ff7707bf840ab0692ba3f08293 # v0.9.0
         with:
-          pixi-version: v0.40.3
+          pixi-version: v0.50.2
           cache: true
           environments: docs
+
       - name: Build Docs
         run: pixi run -e docs docs
+
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: docs-build
           path: docs/build/

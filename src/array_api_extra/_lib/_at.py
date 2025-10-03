@@ -1,21 +1,27 @@
 """Update operations for read-only arrays."""
 
-# https://github.com/scikit-learn/scikit-learn/pull/27910#issuecomment-2568023972
 from __future__ import annotations
 
 import operator
 from collections.abc import Callable
 from enum import Enum
 from types import ModuleType
-from typing import ClassVar, cast
+from typing import TYPE_CHECKING, ClassVar, cast
 
+from ._utils import _compat
 from ._utils._compat import (
     array_namespace,
     is_dask_array,
     is_jax_array,
+    is_torch_array,
     is_writeable_array,
 )
-from ._utils._typing import Array, Index
+from ._utils._helpers import meta_namespace
+from ._utils._typing import Array, SetIndex
+
+if TYPE_CHECKING:  # pragma: no cover
+    # TODO import from typing (requires Python >=3.11)
+    from typing_extensions import Self
 
 
 class _AtOp(Enum):
@@ -31,7 +37,7 @@ class _AtOp(Enum):
     MAX = "max"
 
     # @override from Python 3.12
-    def __str__(self) -> str:  # type: ignore[explicit-override]  # pyright: ignore[reportImplicitOverride]
+    def __str__(self) -> str:  # pyright: ignore[reportImplicitOverride]
         """
         Return string representation (useful for pytest logs).
 
@@ -43,7 +49,13 @@ class _AtOp(Enum):
         return self.value
 
 
-_undef = object()
+class Undef(Enum):
+    """Sentinel for undefined values."""
+
+    UNDEF = 0
+
+
+_undef = Undef.UNDEF
 
 
 class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
@@ -177,7 +189,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
       >>> x = x.at[1].add(2)
 
-    If x is a read-only numpy array, they are the same as::
+    If x is a read-only NumPy array, they are the same as::
 
       >>> x = x.copy()
       >>> x[1] += 2
@@ -188,16 +200,16 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     """
 
     _x: Array
-    _idx: Index
+    _idx: SetIndex | Undef
     __slots__: ClassVar[tuple[str, ...]] = ("_idx", "_x")
 
     def __init__(
-        self, x: Array, idx: Index = _undef, /
+        self, x: Array, idx: SetIndex | Undef = _undef, /
     ) -> None:  # numpydoc ignore=GL08
         self._x = x
         self._idx = idx
 
-    def __getitem__(self, idx: Index, /) -> at:  # numpydoc ignore=PR01,RT01
+    def __getitem__(self, idx: SetIndex, /) -> Self:  # numpydoc ignore=PR01,RT01
         """
         Allow for the alternate syntax ``at(x)[start:stop:step]``.
 
@@ -207,14 +219,14 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         if self._idx is not _undef:
             msg = "Index has already been set"
             raise ValueError(msg)
-        return at(self._x, idx)
+        return type(self)(self._x, idx)
 
     def _op(
         self,
         at_op: _AtOp,
-        in_place_op: Callable[[Array, Array | object], Array] | None,
+        in_place_op: Callable[[Array, Array | complex], Array] | None,
         out_of_place_op: Callable[[Array, Array], Array] | None,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None,
         xp: ModuleType | None,
@@ -226,7 +238,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         ----------
         at_op : _AtOp
             Method of JAX's Array.at[].
-        in_place_op : Callable[[Array, Array | object], Array] | None
+        in_place_op : Callable[[Array, Array | complex], Array] | None
             In-place operation to apply on mutable backends::
 
                 x[idx] = in_place_op(x[idx], y)
@@ -245,7 +257,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
                 x = xp.where(idx, y, x)
 
-        y : array or object
+        y : array or complex
             Right-hand side of the operation.
         copy : bool or None
             Whether to copy the input array. See the class docstring for details.
@@ -257,10 +269,12 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         Array
             Updated `x`.
         """
+        from ._funcs import apply_where  # pylint: disable=cyclic-import
+
         x, idx = self._x, self._idx
         xp = array_namespace(x, y) if xp is None else xp
 
-        if idx is _undef:
+        if isinstance(idx, Undef):
             msg = (
                 "Index has not been set.\n"
                 "Usage: either\n"
@@ -286,11 +300,13 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             and idx.dtype == xp.bool
             and idx.shape == x.shape
         ):
-            y_xp = xp.asarray(y, dtype=x.dtype)
+            y_xp = xp.asarray(y, dtype=x.dtype, device=_compat.device(x))
             if y_xp.ndim == 0:
                 if out_of_place_op:  # add(), subtract(), ...
-                    # FIXME: suppress inf warnings on dask with lazywhere
-                    out = xp.where(idx, out_of_place_op(x, y_xp), x)
+                    # suppress inf warnings on Dask
+                    out = apply_where(
+                        idx, (x, y_xp), out_of_place_op, fill_value=x, xp=xp
+                    )
                     # Undo int->float promotion on JAX after _AtOp.DIVIDE
                     out = xp.astype(out, x.dtype, copy=False)
                 else:  # set()
@@ -306,7 +322,10 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         if copy or (copy is None and not writeable):
             if is_jax_array(x):
                 # Use JAX's at[]
-                func = cast(Callable[[Array], Array], getattr(x.at[idx], at_op.value))
+                func = cast(
+                    Callable[[Array | complex], Array],
+                    getattr(x.at[idx], at_op.value),  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownArgumentType]
+                )
                 out = func(y)
                 # Undo int->float promotion on JAX after _AtOp.DIVIDE
                 return xp.astype(out, x.dtype, copy=False)
@@ -315,10 +334,10 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             # with a copy followed by an update
 
             x = xp.asarray(x, copy=True)
-            if writeable is False:
-                # A copy of a read-only numpy array is writeable
-                # Note: this assumes that a copy of a writeable array is writeable
-                writeable = None
+            # A copy of a read-only numpy array is writeable
+            # Note: this assumes that a copy of a writeable array is writeable
+            assert not writeable
+            writeable = None
 
         if writeable is None:
             writeable = is_writeable_array(x)
@@ -327,15 +346,22 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             msg = f"Can't update read-only array {x}"
             raise ValueError(msg)
 
+        # Work around bug in PyTorch where __setitem__ doesn't
+        # always support mismatched dtypes
+        # https://github.com/pytorch/pytorch/issues/150017
+        if is_torch_array(y):
+            y = xp.astype(y, x.dtype, copy=False)
+
+        # Backends without boolean indexing (other than JAX) crash here
         if in_place_op:  # add(), subtract(), ...
-            x[self._idx] = in_place_op(x[self._idx], y)
+            x[idx] = in_place_op(x[idx], y)
         else:  # set()
-            x[self._idx] = y
+            x[idx] = y
         return x
 
     def set(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -345,7 +371,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def add(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -359,7 +385,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def subtract(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -371,7 +397,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def multiply(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -383,7 +409,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def divide(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -395,7 +421,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def power(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
@@ -405,24 +431,33 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     def min(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] = minimum(x[idx], y)`` and return the updated array."""
+        # On Dask, this function runs on the chunks, so we need to determine the
+        # namespace that Dask is wrapping.
+        # Note that da.minimum _incidentally_ works on NumPy, CuPy, and sparse
+        # thanks to all these meta-namespaces implementing the __array_ufunc__
+        # interface, but there's no guarantee that it will work for other
+        # wrapped libraries in the future.
         xp = array_namespace(self._x) if xp is None else xp
+        mxp = meta_namespace(self._x, xp=xp)
         y = xp.asarray(y)
-        return self._op(_AtOp.MIN, xp.minimum, xp.minimum, y, copy=copy, xp=xp)
+        return self._op(_AtOp.MIN, mxp.minimum, mxp.minimum, y, copy=copy, xp=xp)
 
     def max(
         self,
-        y: Array | object,
+        y: Array | complex,
         /,
         copy: bool | None = None,
         xp: ModuleType | None = None,
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] = maximum(x[idx], y)`` and return the updated array."""
+        # See note on min()
         xp = array_namespace(self._x) if xp is None else xp
+        mxp = meta_namespace(self._x, xp=xp)
         y = xp.asarray(y)
-        return self._op(_AtOp.MAX, xp.maximum, xp.maximum, y, copy=copy, xp=xp)
+        return self._op(_AtOp.MAX, mxp.maximum, mxp.maximum, y, copy=copy, xp=xp)

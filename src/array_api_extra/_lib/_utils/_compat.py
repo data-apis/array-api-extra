@@ -2,6 +2,7 @@
 # Allow packages that vendor both `array-api-extra` and
 # `array-api-compat` to override the import location
 
+# pylint: disable=duplicate-code
 try:
     from ...._array_api_compat_vendor import (
         array_namespace,
@@ -14,6 +15,7 @@ try:
         is_dask_namespace,
         is_jax_array,
         is_jax_namespace,
+        is_lazy_array,
         is_numpy_array,
         is_numpy_namespace,
         is_pydata_sparse_array,
@@ -22,6 +24,7 @@ try:
         is_torch_namespace,
         is_writeable_array,
         size,
+        to_device,
     )
 except ImportError:
     from array_api_compat import (
@@ -35,6 +38,7 @@ except ImportError:
         is_dask_namespace,
         is_jax_array,
         is_jax_namespace,
+        is_lazy_array,
         is_numpy_array,
         is_numpy_namespace,
         is_pydata_sparse_array,
@@ -43,6 +47,7 @@ except ImportError:
         is_torch_namespace,
         is_writeable_array,
         size,
+        to_device,
     )
 
 __all__ = [
@@ -56,6 +61,7 @@ __all__ = [
     "is_dask_namespace",
     "is_jax_array",
     "is_jax_namespace",
+    "is_lazy_array",
     "is_numpy_array",
     "is_numpy_namespace",
     "is_pydata_sparse_array",
@@ -64,4 +70,5 @@ __all__ = [
     "is_torch_namespace",
     "is_writeable_array",
     "size",
+    "to_device",
 ]

@@ -5,117 +5,136 @@ build-backend = "hatchling.build"
 [project]
 name = "array-api-extra"
 authors = [
-    { name = "Lucas Colley", email = "lucas.colley8@gmail.com" },
-    # { name = "Open Source Contributors" },  # https://github.com/pypi/warehouse/issues/14813
+  { name = "Lucas Colley", email = "lucas.colley8@gmail.com" },
+  # { name = "Open Source Contributors" },  # https://github.com/pypi/warehouse/issues/14813
 ]
 description = "Extra array functions built on top of the array API standard."
 readme = "README.md"
 license.file = "LICENSE"
 requires-python = ">=3.10"
 classifiers = [
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Typing :: Typed",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Free Threading :: 3 - Stable",
+  "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = ["array-api-compat>=1.10.0,<2"]
+dependencies = ["array-api-compat>=1.12.0,<2"]
 
 [project.urls]
 Homepage = "https://github.com/data-apis/array-api-extra"
 "Bug Tracker" = "https://github.com/data-apis/array-api-extra/issues"
 Changelog = "https://github.com/data-apis/array-api-extra/releases"
 
-
 # Hatch
 
 [tool.hatch]
 version.path = "src/array_api_extra/__init__.py"
 
+[tool.hatch.build.targets.sdist]
+exclude = ["codecov.yml", "pixi.lock", "RELEASING.md", "renovate.json"]
 
-# Pixi
+#  Pixi
 
 [tool.pixi.project]
 channels = ["https://prefix.dev/conda-forge"]
-platforms = ["linux-64", "osx-arm64", "win-64"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [tool.pixi.dependencies]
-python = ">=3.10,<3.14"
-array-api-compat = ">=1.10.0,<2"
+array-api-compat = ">=1.12.0,<2"
 
 [tool.pixi.pypi-dependencies]
 array-api-extra = { path = ".", editable = true }
 
 [tool.pixi.feature.lint.dependencies]
-typing-extensions = "*"
-pre-commit = "*"
-pylint = "*"
-basedmypy = "*"
-basedpyright = "*"
-numpydoc = ">=1.8.0,<2"
+typing-extensions = ">=4.15.0"
+pylint = ">=3.3.8"
+mypy = ">=1.18.2"
+basedpyright = ">=1.31.4"
+numpydoc = ">=1.9.0,<2"
 # import dependencies for mypy:
-array-api-strict = "*"
-numpy = "*"
-pytest = "*"
-dask-core = "*"  # No distributed, tornado, etc.
-# NOTE: don't add jax, pytorch, sparse, cupy here
+array-api-strict = ">=2.4.1,<2.5"
+numpy = ">=2.1.3"
+hypothesis = ">=6.138.3"
+dask-core = ">=2025.9.1" # No distributed, tornado, etc.
+dprint = ">=0.50.0,<0.51"
+lefthook = ">=1.13.1,<2"
+ruff = ">=0.13.1,<0.14"
+typos = ">=1.36.3,<2"
+actionlint = ">=1.7.7,<2"
+blacken-docs = ">=1.20.0,<2"
+pytest = ">=8.4.2,<9"
+validate-pyproject = ">=0.24.1,<0.25"
+# NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
 [tool.pixi.feature.lint.tasks]
-pre-commit-install = "pre-commit install"
-pre-commit = "pre-commit run --all-files"
-mypy = "mypy"
-pylint = { cmd = "pylint array_api_extra", cwd = "src" }
-pyright = "basedpyright"
-lint = { depends-on = ["pre-commit", "pylint", "mypy", "pyright"] }
+lefthook = { cmd = "lefthook", description = "Run lefthook" }
+hooks = { cmd = "lefthook install", description = "Install pre-commit hooks" }
+pre-commit = { cmd = "lefthook run pre-commit", description = "Run pre-commit checks" }
+pylint = { cmd = "pylint array_api_extra", cwd = "src", description = "Lint with pylint" }
+mypy = { cmd = "mypy", description = "Type check with mypy" }
+pyright = { cmd = "basedpyright", description = "Type check with basedpyright" }
+ruff-check = { cmd = "ruff check --fix", description = "Lint with ruff" }
+ruff-format = { cmd = "ruff format", description = "Format with ruff" }
+dprint = { cmd = "dprint fmt", description = "Format with dprint" }
+typos = { cmd = "typos --write-changes --force-exclude", description = "Fix typos" }
+actionlint = { cmd = "actionlint", description = "Lint actions with actionlint" }
+blacken-docs = { cmd = "blacken-docs", description = "Format Python markdown blocks with Black" }
+validate-pyproject = { cmd = "validate-pyproject pyproject.toml", description = "Validate pyproject.toml" }
+numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with numpydoc" }
+lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters" }
 
 [tool.pixi.feature.tests.dependencies]
-pytest = ">=6"
-pytest-cov = ">=3"
-array-api-strict = "*"
-numpy = "*"
+pytest = ">=8.4.2"
+pytest-cov = ">=7.0.0"
+hypothesis = ">=6.138.3"
+array-api-strict = ">=2.4.1,<2.5"
+numpy = ">=1.22.0"
 
 [tool.pixi.feature.tests.tasks]
-tests = "pytest -v"
-tests-cov = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20"
+tests = { cmd = "pytest -v", description = "Run tests" }
+tests-cov = { cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20", description = "Run tests with coverage" }
 
-clean-vendor-compat = "rm -rf vendor_tests/array_api_compat"
-clean-vendor-extra = "rm -rf vendor_tests/array_api_extra"
-copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/", depends-on = ["clean-vendor-compat"] }
-copy-vendor-extra = { cmd = "cp -r src/array_api_extra vendor_tests/", depends-on = ["clean-vendor-extra"] }
-tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-compat", "copy-vendor-extra"] }
+clean-vendor-compat = { cmd = "rm -rf vendor_tests/array_api_compat", description = "Delete the existing vendored version of array-api-compat" }
+clean-vendor-extra = { cmd = "rm -rf vendor_tests/array_api_extra", description = "Delete the existing vendored version of array-api-extra" }
+copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/", depends-on = ["clean-vendor-compat"], description = "Vendor a clean copy of array-api-compat" }
+copy-vendor-extra = { cmd = "cp -r src/array_api_extra vendor_tests/", depends-on = ["clean-vendor-extra"], description = "Vendor a clean copy of array-api-extra" }
+tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-compat", "copy-vendor-extra"], description = "Check that array-api-extra and array-api-compat can be vendored together" }
 
-tests-ci = { depends-on = ["tests-cov", "tests-vendor"] }
-coverage = { cmd = "coverage html", depends-on = ["tests-cov"] }
-open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"] }
+tests-ci = { depends-on = ["tests-cov", "tests-vendor"], description = "Run tests with coverage and vendor tests" }
+coverage = { cmd = "coverage html", depends-on = ["tests-cov"], description = "Generate test coverage html report" }
+open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"], description = "Open test coverage report" }
 
 [tool.pixi.feature.docs.dependencies]
-sphinx = ">=7.0"
-furo = ">=2023.08.17"
-myst-parser = ">=0.13"
-sphinx-copybutton = "*"
-sphinx-autodoc-typehints = "*"
+sphinx = ">=7.4.7"
+furo = ">=2024.8.6"
+myst-parser = ">=4.0.1"
+sphinx-copybutton = ">=0.5.2"
+sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
-dask-core = "*"
-pytest = "*"
-typing-extensions = "*"
+dask-core = ">=2025.9.1" # No distributed, tornado, etc.
+pytest = ">=8.4.2"
+typing-extensions = ">=4.15.0"
+numpy = ">=2.1.3"
 
 [tool.pixi.feature.docs.tasks]
-docs = { cmd = "sphinx-build . build/", cwd = "docs" }
-open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"] }
+docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs", description = "Build docs" }
+open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs" }
 
 [tool.pixi.feature.dev.dependencies]
-ipython = "*"
+ipython = ">=7.33.0"
 
 [tool.pixi.feature.dev.tasks]
-ipython = { cmd = "ipython" }
+ipython = { cmd = "ipython", description = "Launch ipython" }
 
 [tool.pixi.feature.py310.dependencies]
 python = "~=3.10.0"
@@ -123,54 +142,95 @@ python = "~=3.10.0"
 [tool.pixi.feature.py313.dependencies]
 python = "~=3.13.0"
 
+[tool.pixi.feature.numpy1.dependencies]
+# Oldest NumPy version supported by scikit-learn.
+# Note that this is older than what SPEC0 recommends.
+numpy = "=1.22.0"
+
 # Backends that can run on CPU-only hosts
+# Note: JAX and PyTorch will install CPU variants.
+[tool.pixi.feature.backends.dependencies]
+pytorch = ">=2.7.1"
+dask-core = ">=2025.9.1" # No distributed, tornado, etc.
+sparse = ">=0.17.0"
+
 [tool.pixi.feature.backends.target.linux-64.dependencies]
-pytorch = "*"
-dask = "*"
-sparse = ">=0.15"
-jax = "*"
+# On CPU Python 3.10, use 0.6.2
+# On CPU Python >=3.11, use >=0.7.0
+# On GPU, use 0.6.0 (0.6.2 and 0.7.0 both segfault); see jaxlib pin below.
+jax = ">=0.6.0"
+
+[tool.pixi.feature.backends.target.osx-64.dependencies]
+jax = ">=0.6.0"
 
 [tool.pixi.feature.backends.target.osx-arm64.dependencies]
-pytorch = "*"
-dask = "*"
-sparse = ">=0.15"
-jax = "*"
+jax = ">=0.6.0"
 
 [tool.pixi.feature.backends.target.win-64.dependencies]
-pytorch = "*"
-dask = "*"
-sparse = ">=0.15"
 # jax = "*"  # unavailable
 
-# Backends that require a GPU host and a CUDA driver
+# Backends that require a GPU host and a CUDA driver.
+# Note that JAX and PyTorch automatically prefer CUDA variants
+# thanks to the `system-requirements` below, *if available*.
+# We request them explicitly below to ensure that we don't
+# quietly revert to CPU-only in the future, e.g. when CUDA 13
+# is released and CUDA 12 builds are dropped upstream.
 [tool.pixi.feature.cuda-backends]
 system-requirements = { cuda = "12" }
 
 [tool.pixi.feature.cuda-backends.target.linux-64.dependencies]
-cupy = "*"
-jaxlib = { version = "*", build = "cuda12*" }
+cupy = ">=13.6.0"
+# JAX 0.6.2 and 0.7.0 segfault on CUDA
+jaxlib = { version = ">=0.6.0,!=0.6.2,!=0.7.0", build = "cuda12*" }
+pytorch = { version = ">=2.7.1", build = "cuda12*" }
+
+[tool.pixi.feature.cuda-backends.target.osx-64.dependencies]
+# cupy = "*"  # unavailable
+# jaxlib = { version = "*", build = "cuda12*" }  # unavailable
+# pytorch = { version = "*", build = "cuda12*" }  # unavailable
 
 [tool.pixi.feature.cuda-backends.target.osx-arm64.dependencies]
 # cupy = "*"  # unavailable
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
+# pytorch = { version = "*", build = "cuda12*" }  # unavailable
 
 [tool.pixi.feature.cuda-backends.target.win-64.dependencies]
-cupy = "*"
+cupy = ">=13.6.0"
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
+pytorch = { version = ">=2.7.1", build = "cuda12*" }
+
+[tool.pixi.feature.nogil.dependencies]
+python-freethreading = "~=3.13.0"
+pytest-run-parallel = ">=0.6.1"
+numpy = ">=2.3.3"
+# pytorch = "*"  # Not available on Python 3.13t yet
+dask-core = ">=2025.9.1" # No distributed, tornado, etc.
+# sparse = "*"  # numba not available on Python 3.13t yet
+# jax = "*"  # ml_dtypes not available on Python 3.13t yet
 
 [tool.pixi.environments]
-default = { solve-group = "default" }
-lint = { features = ["lint"], solve-group = "default" }
-tests = { features = ["tests"], solve-group = "default" }
-docs = { features = ["docs"], solve-group = "default" }
-dev = { features = ["lint", "tests", "docs", "dev", "backends"], solve-group = "default" }
-dev-cuda = { features = ["lint", "tests", "docs", "dev", "backends", "cuda-backends"] }
-tests-py310 = ["py310", "tests"]
-tests-py313 = ["py313", "tests"]
-# CUDA not available on free github actions and on some developers' PCs
-tests-backends = ["py310", "tests", "backends"]
-tests-cuda = ["py310", "tests", "backends", "cuda-backends"]
+default = { features = ["py313"], solve-group = "py313" }
+lint = { features = ["py313", "lint"], solve-group = "py313" }
+docs = { features = ["py313", "docs"], solve-group = "py313" }
+tests = { features = ["py313", "tests"], solve-group = "py313" }
+tests-py313 = { features = ["py313", "tests"], solve-group = "py313" } # alias of tests
 
+# Some backends may pin numpy; use separate solve-group
+dev = { features = ["py313", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
+tests-backends = { features = ["py313", "tests", "backends"], solve-group = "backends" }
+# Note: Python 3.10 has already been dropped by some backends (like JAX),
+# so this is testing older versions.
+tests-backends-py310 = { features = ["py310", "tests", "backends"] }
+
+# CUDA not available on free github actions and on some developers' PCs
+dev-cuda = { features = ["py313", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
+tests-cuda = { features = ["py313", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
+tests-cuda-py310 = { features = ["py310", "tests", "backends", "cuda-backends"] }
+
+# Ungrouped environments
+tests-numpy1 = ["py310", "tests", "numpy1"]
+tests-py310 = ["py310", "tests"]
+tests-nogil = ["nogil", "tests"]
 
 # pytest
 
@@ -182,10 +242,9 @@ filterwarnings = ["error"]
 log_cli_level = "INFO"
 testpaths = ["tests"]
 markers = [
-    "skip_xp_backend(library, *, reason=None): Skip test for a specific backend",
-    "xfail_xp_backend(library, *, reason=None): Xfail test for a specific backend",
+  "skip_xp_backend(library, /, *, reason=None): Skip test for a specific backend",
+  "xfail_xp_backend(library, /, *, reason=None, strict=None): Xfail test for a specific backend",
 ]
-
 
 # Coverage
 
@@ -200,15 +259,16 @@ python_version = "3.10"
 warn_unused_configs = true
 strict = true
 enable_error_code = ["ignore-without-code", "truthy-bool"]
-# https://github.com/data-apis/array-api-typing
-disallow_any_expr = false
-# false positives with input validation
-disable_error_code = ["redundant-expr", "unreachable"]
+disable_error_code = ["no-any-return"]
 
 [[tool.mypy.overrides]]
-# slow/unavailable on Windows; do not add to the lint env
-module = ["dask.*", "jax.*"]
+# slow or unavailable on Windows; do not add to the lint env
+module = ["cupy.*", "jax.*", "sparse.*", "torch.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["tests/*"]
+disable_error_code = ["no-untyped-def"] # test(...) without -> None
 
 # pyright
 
@@ -232,12 +292,15 @@ reportMissingTypeStubs = false
 reportUnreachable = false
 # ruff handles this
 reportUnusedParameter = false
+# cyclic imports inside function bodies
+reportImportCycles = false
+# PyRight can't trace types in lambdas
+reportUnknownLambdaType = false
 
 executionEnvironments = [
-    { root = "tests", reportPrivateUsage = false },
-    { root = "src" },
+  { root = "tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
+  { root = "src" },
 ]
-
 
 # Ruff
 
@@ -246,43 +309,43 @@ target-version = "py310"
 
 [tool.ruff.lint]
 extend-select = [
-    "B",   # flake8-bugbear
-    "F",   # Pyflakes
-    "I",   # isort
-    "E",   # Pycodestyle
-    "W",   # Pycodestyle
-    "N",   # pep8-naming
-    "ARG", # flake8-unused-arguments
-    "C4",  # flake8-comprehensions
-    "EM",  # flake8-errmsg
-    "ICN", # flake8-import-conventions
-    "ISC", # flake8-implicit-str-concat
-    "G",   # flake8-logging-format
-    "PGH", # pygrep-hooks
-    "PIE", # flake8-pie
-    "PL",  # pylint
-    "PT",  # flake8-pytest-style
-    "PTH", # flake8-use-pathlib
-    "RET", # flake8-return
-    "RUF", # Ruff-specific
-    "SIM", # flake8-simplify
-    "T20", # flake8-print
-    "UP",  # pyupgrade
-    "YTT", # flake8-2020
-    "EXE", # flake8-executable
-    "NPY", # NumPy specific rules
-    "PD",  # pandas-vet
-    "UP",  # Pyupgrade
+  "B", # flake8-bugbear
+  "F", # Pyflakes
+  "I", # isort
+  "E", # Pycodestyle
+  "W", # Pycodestyle
+  "N", # pep8-naming
+  "ARG", # flake8-unused-arguments
+  "C4", # flake8-comprehensions
+  "EM", # flake8-errmsg
+  "ICN", # flake8-import-conventions
+  "ISC", # flake8-implicit-str-concat
+  "G", # flake8-logging-format
+  "PGH", # pygrep-hooks
+  "PIE", # flake8-pie
+  "PL", # pylint
+  "PT", # flake8-pytest-style
+  "PTH", # flake8-use-pathlib
+  "RET", # flake8-return
+  "RUF", # Ruff-specific
+  "SIM", # flake8-simplify
+  "T20", # flake8-print
+  "UP", # pyupgrade
+  "YTT", # flake8-2020
+  "EXE", # flake8-executable
+  "NPY", # NumPy specific rules
+  "PD", # pandas-vet
+  "UP", # Pyupgrade
 ]
 ignore = [
-    "PLR09",   # Too many <...>
-    "PLR2004", # Magic value used in comparison
-    "ISC001",  # Conflicts with formatter
-    "N801",    # Class name should use CapWords convention
-    "N802",    # Function name should be lowercase
-    "N806",    # Variable in function should be lowercase
+  "PLR09", # Too many <...>
+  "PLR2004", # Magic value used in comparison
+  "ISC001", # Conflicts with formatter
+  "N801", # Class name should use CapWords convention
+  "N802", # Function name should be lowercase
+  "N806", # Variable in function should be lowercase
+  "PLC0415", # `import` should be at the top-level of a file
 ]
-
 
 # Pylint
 
@@ -290,25 +353,24 @@ ignore = [
 py-version = "3.10"
 reports.output-format = "colorized"
 messages_control.disable = [
-    "design",                     # ignore heavily opinionated design checks
-    "fixme",                      # allow FIXME comments
-    "line-too-long",              # ruff handles this
-    "unused-argument",            # ruff handles this
-    "missing-function-docstring", # numpydoc handles this
-    "import-error",               # mypy handles this
-    "import-outside-toplevel",    # optional dependencies
+  "design", # ignore heavily opinionated design checks
+  "fixme", #  allow FIXME comments
+  "line-too-long", # ruff handles this
+  "unused-argument", # ruff handles this
+  "missing-function-docstring", # numpydoc handles this
+  "import-error", # mypy handles this
+  "import-outside-toplevel", # optional dependencies
 ]
-
 
 # numpydoc
 
 [tool.numpydoc_validation]
 checks = [
-    "all",  # report on all checks, except the below
-    "EX01", # most docstrings do not need an example
-    "SA01", # data-apis/array-api-extra#87
-    "ES01", # most docstrings do not need an extended summary
+  "all", # report on all checks, except the below
+  "EX01", # most docstrings do not need an example
+  "SA01", # data-apis/array-api-extra#87
+  "ES01", # most docstrings do not need an extended summary
 ]
 exclude = [ # don't report on objects that match any of these regex
-    '.*test_*',
+  '.*test_*',
 ]

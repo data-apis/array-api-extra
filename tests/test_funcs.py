@@ -1,50 +1,283 @@
-import contextlib
 import math
 import warnings
 from types import ModuleType
+from typing import Any, cast
 
+import hypothesis
+import hypothesis.extra.numpy as npst
 import numpy as np
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
+from typing_extensions import override
 
 from array_api_extra import (
+    apply_where,
+    argpartition,
     at,
     atleast_nd,
     broadcast_shapes,
     cov,
     create_diagonal,
+    default_dtype,
     expand_dims,
     isclose,
     kron,
+    nan_to_num,
     nunique,
+    one_hot,
     pad,
+    partition,
     setdiff1d,
     sinc,
 )
-from array_api_extra._lib import Backend
+from array_api_extra._lib._backends import NUMPY_VERSION, Backend
 from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
-from array_api_extra._lib._utils._compat import device as get_device
-from array_api_extra._lib._utils._helpers import ndindex
+from array_api_extra._lib._utils._compat import (
+    device as get_device,
+)
+from array_api_extra._lib._utils._helpers import eager_shape, ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
-# some xp backends are untyped
-# mypy: disable-error-code=no-untyped-def
-
-lazy_xp_function(atleast_nd, static_argnames=("ndim", "xp"))
-lazy_xp_function(cov, static_argnames="xp")
-# FIXME .device attribute https://github.com/data-apis/array-api-compat/pull/238
-lazy_xp_function(create_diagonal, jax_jit=False, static_argnames=("offset", "xp"))
-lazy_xp_function(expand_dims, static_argnames=("axis", "xp"))
-lazy_xp_function(kron, static_argnames="xp")
-lazy_xp_function(nunique, static_argnames="xp")
-lazy_xp_function(pad, static_argnames=("pad_width", "mode", "constant_values", "xp"))
+lazy_xp_function(apply_where)
+lazy_xp_function(atleast_nd)
+lazy_xp_function(cov)
+lazy_xp_function(create_diagonal)
+lazy_xp_function(expand_dims)
+lazy_xp_function(kron)
+lazy_xp_function(nan_to_num)
+lazy_xp_function(nunique)
+lazy_xp_function(one_hot)
+lazy_xp_function(pad)
 # FIXME calls in1d which calls xp.unique_values without size
-lazy_xp_function(setdiff1d, jax_jit=False, static_argnames=("assume_unique", "xp"))
-# FIXME .device attribute https://github.com/data-apis/array-api-compat/pull/238
-lazy_xp_function(sinc, jax_jit=False, static_argnames="xp")
+lazy_xp_function(setdiff1d, jax_jit=False)
+lazy_xp_function(sinc)
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
+class TestApplyWhere:
+    @staticmethod
+    def f1(x: Array, y: Array | int = 10) -> Array:
+        return x + y
+
+    @staticmethod
+    def f2(x: Array, y: Array | int = 10) -> Array:
+        return x - y
+
+    def test_f1_f2(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4])
+        cond = x % 2 == 0
+        actual = apply_where(cond, x, self.f1, self.f2)
+        expect = xp.where(cond, self.f1(x), self.f2(x))
+        xp_assert_equal(actual, expect)
+
+    def test_fill_value(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4])
+        cond = x % 2 == 0
+        actual = apply_where(x % 2 == 0, x, self.f1, fill_value=0)
+        expect = xp.where(cond, self.f1(x), xp.asarray(0))
+        xp_assert_equal(actual, expect)
+
+        actual = apply_where(x % 2 == 0, x, self.f1, fill_value=xp.asarray(0))
+        xp_assert_equal(actual, expect)
+
+    def test_args_tuple(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4])
+        y = xp.asarray([10, 20, 30, 40])
+        cond = x % 2 == 0
+        actual = apply_where(cond, (x, y), self.f1, self.f2)
+        expect = xp.where(cond, self.f1(x, y), self.f2(x, y))
+        xp_assert_equal(actual, expect)
+
+    def test_broadcast(self, xp: ModuleType):
+        x = xp.asarray([1, 2])
+        y = xp.asarray([[10], [20], [30]])
+        cond = xp.broadcast_to(xp.asarray(True), (4, 1, 1))
+
+        actual = apply_where(cond, (x, y), self.f1, self.f2)
+        expect = xp.where(cond, self.f1(x, y), self.f2(x, y))
+        xp_assert_equal(actual, expect)
+
+        actual = apply_where(
+            cond,
+            (x, y),
+            lambda x, _: x,
+            lambda _, y: y,
+        )
+        expect = xp.where(cond, x, y)
+        xp_assert_equal(actual, expect)
+
+        # Shaped fill_value
+        actual = apply_where(cond, x, self.f1, fill_value=y)
+        expect = xp.where(cond, self.f1(x), y)
+        xp_assert_equal(actual, expect)
+
+    def test_dtype_propagation(self, xp: ModuleType, library: Backend):
+        x = xp.asarray([1, 2], dtype=xp.int8)
+        y = xp.asarray([3, 4], dtype=xp.int16)
+        cond = x % 2 == 0
+
+        mxp = np if library is Backend.DASK else xp
+        actual = apply_where(
+            cond,
+            (x, y),
+            self.f1,
+            lambda x, y: mxp.astype(x - y, xp.int64),  # pyright: ignore[reportArgumentType]
+        )
+        assert actual.dtype == xp.int64
+
+        actual = apply_where(cond, y, self.f1, fill_value=5)
+        assert actual.dtype == xp.int16
+
+    @pytest.mark.parametrize("fill_value_raw", [3, [3, 4]])
+    @pytest.mark.parametrize(
+        ("fill_value_dtype", "expect_dtype"), [("int32", "int32"), ("int8", "int16")]
+    )
+    def test_dtype_propagation_fill_value(
+        self,
+        xp: ModuleType,
+        fill_value_raw: int | list[int],
+        fill_value_dtype: str,
+        expect_dtype: str,
+    ):
+        x = xp.asarray([1, 2], dtype=xp.int16)
+        cond = x % 2 == 0
+        fill_value = xp.asarray(fill_value_raw, dtype=getattr(xp, fill_value_dtype))
+
+        actual = apply_where(cond, x, self.f1, fill_value=fill_value)
+        assert actual.dtype == getattr(xp, expect_dtype)
+
+    def test_dont_overwrite_fill_value(self, xp: ModuleType):
+        x = xp.asarray([1, 2])
+        fill_value = xp.asarray([100, 200])
+        actual = apply_where(x % 2 == 0, x, self.f1, fill_value=fill_value)
+        xp_assert_equal(actual, xp.asarray([100, 12]))
+        xp_assert_equal(fill_value, xp.asarray([100, 200]))
+
+    @pytest.mark.skip_xp_backend(
+        Backend.ARRAY_API_STRICTEST,
+        reason="no boolean indexing -> run everywhere",
+    )
+    @pytest.mark.skip_xp_backend(
+        Backend.SPARSE,
+        reason="no indexing by sparse array -> run everywhere",
+    )
+    def test_dont_run_on_false(self, xp: ModuleType):
+        x = xp.asarray([1.0, 2.0, 0.0])
+        y = xp.asarray([0.0, 3.0, 4.0])
+        # On NumPy, division by zero will trigger warnings
+        actual = apply_where(
+            x == 0,
+            (x, y),
+            lambda x, y: x / y,
+            lambda x, y: y / x,
+        )
+        xp_assert_equal(actual, xp.asarray([0.0, 1.5, 0.0]))
+
+    def test_bad_args(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4])
+        cond = x % 2 == 0
+        # Neither f2 nor fill_value
+        with pytest.raises(TypeError, match="Exactly one of"):
+            apply_where(cond, x, self.f1)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue]
+        # Both f2 and fill_value
+        with pytest.raises(TypeError, match="Exactly one of"):
+            apply_where(cond, x, self.f1, self.f2, fill_value=0)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue]
+
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
+    def test_xp(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4])
+        cond = x % 2 == 0
+        actual = apply_where(cond, x, self.f1, self.f2, xp=xp)
+        expect = xp.where(cond, self.f1(x), self.f2(x))
+        xp_assert_equal(actual, expect)
+
+    def test_device(self, xp: ModuleType, device: Device):
+        x = xp.asarray([1, 2, 3, 4], device=device)
+        y = apply_where(x % 2 == 0, x, self.f1, self.f2)
+        assert get_device(y) == device
+        y = apply_where(x % 2 == 0, x, self.f1, fill_value=0)
+        assert get_device(y) == device
+        y = apply_where(x % 2 == 0, x, self.f1, fill_value=x)
+        assert get_device(y) == device
+
+    @pytest.mark.filterwarnings("ignore::RuntimeWarning")  # overflows, etc.
+    @hypothesis.settings(
+        # The xp and library fixtures are not regenerated between hypothesis iterations
+        suppress_health_check=[hypothesis.HealthCheck.function_scoped_fixture],
+        # JAX can take a long time to initialize on the first call
+        deadline=None,
+    )
+    @given(
+        n_arrays=st.integers(min_value=1, max_value=3),
+        rng_seed=st.integers(min_value=1000000000, max_value=9999999999),
+        dtype=npst.floating_dtypes(sizes=(32, 64)),
+        p=st.floats(min_value=0, max_value=1),
+        data=st.data(),
+    )
+    def test_hypothesis(
+        self,
+        n_arrays: int,
+        rng_seed: int,
+        dtype: np.dtype[Any],
+        p: float,
+        data: st.DataObject,
+        xp: ModuleType,
+        library: Backend,
+    ):
+        if (
+            library.like(Backend.NUMPY)
+            and NUMPY_VERSION < (2, 0)
+            and dtype.type is np.float32
+        ):
+            pytest.xfail(reason="NumPy 1.x dtype promotion for scalars")
+
+        mbs = npst.mutually_broadcastable_shapes(num_shapes=n_arrays + 1, min_side=0)
+        input_shapes, _ = data.draw(mbs)
+        cond_shape, *shapes = input_shapes
+
+        # cupy/cupy#8382
+        # https://github.com/jax-ml/jax/issues/26658
+        elements = {"allow_subnormal": not library.like(Backend.CUPY, Backend.JAX)}
+
+        fill_value = xp.asarray(
+            data.draw(npst.arrays(dtype=dtype.type, shape=(), elements=elements))
+        )
+        float_fill_value = float(fill_value)
+        if library is Backend.CUPY and dtype.type is np.float32:
+            # Avoid data-dependent dtype promotion when encountering subnormals
+            # close to the max float32 value
+            float_fill_value = float(np.clip(float_fill_value, -1e38, 1e38))
+
+        arrays = tuple(
+            xp.asarray(
+                data.draw(npst.arrays(dtype=dtype.type, shape=shape, elements=elements))
+            )
+            for shape in shapes
+        )
+
+        def f1(*args: Array) -> Array:
+            return cast(Array, sum(args))
+
+        def f2(*args: Array) -> Array:
+            return cast(Array, sum(args) / 2)
+
+        rng = np.random.default_rng(rng_seed)
+        cond = xp.asarray(rng.random(size=cond_shape) > p)
+
+        res1 = apply_where(cond, arrays, f1, fill_value=fill_value)
+        res2 = apply_where(cond, arrays, f1, f2)
+        res3 = apply_where(cond, arrays, f1, fill_value=float_fill_value)
+
+        ref1 = xp.where(cond, f1(*arrays), fill_value)
+        ref2 = xp.where(cond, f1(*arrays), f2(*arrays))
+        ref3 = xp.where(cond, f1(*arrays), float_fill_value)
+
+        xp_assert_close(res1, ref1, rtol=2e-16)
+        xp_assert_equal(res2, ref2)
+        xp_assert_equal(res3, ref3)
+
+
 class TestAtLeastND:
     def test_0D(self, xp: ModuleType):
         x = xp.asarray(1.0)
@@ -71,7 +304,7 @@ class TestAtLeastND:
         xp_assert_equal(y, xp.asarray([[0, 1]]))
 
         y = atleast_nd(x, ndim=5)
-        xp_assert_equal(y, xp.reshape(xp.arange(2), (1, 1, 1, 1, 2)))
+        xp_assert_equal(y, xp.asarray([[[[[0, 1]]]]]))
 
     def test_2D(self, xp: ModuleType):
         x = xp.asarray([[3.0]])
@@ -87,6 +320,21 @@ class TestAtLeastND:
 
         y = atleast_nd(x, ndim=5)
         xp_assert_equal(y, 3 * xp.ones((1, 1, 1, 1, 1)))
+
+    def test_3D(self, xp: ModuleType):
+        x = xp.asarray([[[3.0], [2.0]]])
+
+        y = atleast_nd(x, ndim=0)
+        xp_assert_equal(y, x)
+
+        y = atleast_nd(x, ndim=2)
+        xp_assert_equal(y, x)
+
+        y = atleast_nd(x, ndim=3)
+        xp_assert_equal(y, x)
+
+        y = atleast_nd(x, ndim=5)
+        xp_assert_equal(y, xp.asarray([[[[[3.0], [2.0]]]]]))
 
     def test_5D(self, xp: ModuleType):
         x = xp.ones((1, 1, 1, 1, 1))
@@ -173,41 +421,47 @@ class TestBroadcastShapes:
         assert actual == expect
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestCov:
     def test_basic(self, xp: ModuleType):
         xp_assert_close(
-            cov(xp.asarray([[0, 2], [1, 1], [2, 0]]).T),
+            cov(xp.asarray([[0, 2], [1, 1], [2, 0]], dtype=xp.float64).T),
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
 
     def test_complex(self, xp: ModuleType):
-        actual = cov(xp.asarray([[1, 2, 3], [1j, 2j, 3j]]))
+        actual = cov(xp.asarray([[1, 2, 3], [1j, 2j, 3j]], dtype=xp.complex128))
         expect = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]], dtype=xp.complex128)
         xp_assert_close(actual, expect)
 
+    @pytest.mark.xfail_xp_backend(Backend.JAX, reason="jax#32296")
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="sparse#877")
     def test_empty(self, xp: ModuleType):
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
-            xp_assert_equal(cov(xp.asarray([])), xp.asarray(xp.nan, dtype=xp.float64))
+            warnings.simplefilter("always", UserWarning)
             xp_assert_equal(
-                cov(xp.reshape(xp.asarray([]), (0, 2))),
+                cov(xp.asarray([], dtype=xp.float64)),
+                xp.asarray(xp.nan, dtype=xp.float64),
+            )
+            xp_assert_equal(
+                cov(xp.reshape(xp.asarray([], dtype=xp.float64), (0, 2))),
                 xp.reshape(xp.asarray([], dtype=xp.float64), (0, 0)),
             )
             xp_assert_equal(
-                cov(xp.reshape(xp.asarray([]), (2, 0))),
+                cov(xp.reshape(xp.asarray([], dtype=xp.float64), (2, 0))),
                 xp.asarray([[xp.nan, xp.nan], [xp.nan, xp.nan]], dtype=xp.float64),
             )
 
     def test_combination(self, xp: ModuleType):
-        x = xp.asarray([-2.1, -1, 4.3])
-        y = xp.asarray([3, 1.1, 0.12])
+        x = xp.asarray([-2.1, -1, 4.3], dtype=xp.float64)
+        y = xp.asarray([3, 1.1, 0.12], dtype=xp.float64)
         X = xp.stack((x, y), axis=0)
         desired = xp.asarray([[11.71, -4.286], [-4.286, 2.144133]], dtype=xp.float64)
         xp_assert_close(cov(X), desired, rtol=1e-6)
         xp_assert_close(cov(x), xp.asarray(11.71, dtype=xp.float64))
         xp_assert_close(cov(y), xp.asarray(2.144133, dtype=xp.float64), rtol=1e-6)
 
+    @pytest.mark.xfail_xp_backend(Backend.TORCH, reason="array-api-extra#455")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(cov(x)) == device
@@ -215,13 +469,110 @@ class TestCov:
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
     def test_xp(self, xp: ModuleType):
         xp_assert_close(
-            cov(xp.asarray([[0.0, 2.0], [1.0, 1.0], [2.0, 0.0]]).T, xp=xp),
+            cov(
+                xp.asarray([[0.0, 2.0], [1.0, 1.0], [2.0, 0.0]], dtype=xp.float64).T,
+                xp=xp,
+            ),
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
 
 
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
+class TestOneHot:
+    @pytest.mark.parametrize("n_dim", range(4))
+    @pytest.mark.parametrize("num_classes", [1, 3, 10])
+    def test_dims_and_classes(self, xp: ModuleType, n_dim: int, num_classes: int):
+        shape = tuple(range(2, 2 + n_dim))
+        rng = np.random.default_rng(2347823)
+        np_x = rng.integers(num_classes, size=shape)
+        x = xp.asarray(np_x)
+        y = one_hot(x, num_classes)
+        assert y.shape == (*x.shape, num_classes)
+        for *i_list, j in ndindex(*shape, num_classes):
+            i = tuple(i_list)
+            assert float(y[(*i, j)]) == (int(x[i]) == j)
+
+    def test_basic(self, xp: ModuleType):
+        actual = one_hot(xp.asarray([0, 1, 2]), 3)
+        expected = xp.asarray([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+        xp_assert_equal(actual, expected)
+
+        actual = one_hot(xp.asarray([1, 2, 0]), 3)
+        expected = xp.asarray([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]])
+        xp_assert_equal(actual, expected)
+
+    def test_2d(self, xp: ModuleType):
+        actual = one_hot(xp.asarray([[2, 1, 0], [1, 0, 2]]), 3, axis=1)
+        expected = xp.asarray(
+            [
+                [[0.0, 0.0, 1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
+                [[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]],
+            ]
+        )
+        xp_assert_equal(actual, expected)
+
+    @pytest.mark.skip_xp_backend(
+        Backend.ARRAY_API_STRICTEST, reason="backend doesn't support Boolean indexing"
+    )
+    def test_abstract_size(self, xp: ModuleType):
+        x = xp.arange(5)
+        x = x[x > 2]
+        actual = one_hot(x, 5)
+        expected = xp.asarray([[0.0, 0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 0.0, 1.0]])
+        xp_assert_equal(actual, expected)
+
+    @pytest.mark.skip_xp_backend(
+        Backend.TORCH_GPU, reason="Puts Pytorch into a bad state."
+    )
+    def test_out_of_bound(self, xp: ModuleType):
+        # Undefined behavior.  Either return zero, or raise.
+        try:
+            actual = one_hot(xp.asarray([-1, 3]), 3)
+        except IndexError:
+            return
+        expected = xp.asarray([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+        xp_assert_equal(actual, expected)
+
+    @pytest.mark.parametrize(
+        "int_dtype",
+        ["int8", "int16", "int32", "int64", "uint8", "uint16", "uint32", "uint64"],
+    )
+    def test_int_types(self, xp: ModuleType, int_dtype: str):
+        dtype = getattr(xp, int_dtype)
+        x = xp.asarray([0, 1, 2], dtype=dtype)
+        actual = one_hot(x, 3)
+        expected = xp.asarray([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+        xp_assert_equal(actual, expected)
+
+    def test_custom_dtype(self, xp: ModuleType):
+        actual = one_hot(xp.asarray([0, 1, 2], dtype=xp.int32), 3, dtype=xp.bool)
+        expected = xp.asarray(
+            [[True, False, False], [False, True, False], [False, False, True]]
+        )
+        xp_assert_equal(actual, expected)
+
+    def test_axis(self, xp: ModuleType):
+        expected = xp.asarray([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]).T
+        actual = one_hot(xp.asarray([1, 2, 0]), 3, axis=0)
+        xp_assert_equal(actual, expected)
+
+        actual = one_hot(xp.asarray([1, 2, 0]), 3, axis=-2)
+        xp_assert_equal(actual, expected)
+
+    def test_non_integer(self, xp: ModuleType):
+        with pytest.raises(TypeError):
+            _ = one_hot(xp.asarray([1.0]), 3)
+
+    def test_device(self, xp: ModuleType, device: Device):
+        x = xp.asarray([0, 1, 2], device=device)
+        y = one_hot(x, 3)
+        assert get_device(y) == device
+
+
+@pytest.mark.skip_xp_backend(
+    Backend.SPARSE, reason="read-only backend without .at support"
+)
 class TestCreateDiagonal:
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_1d_from_numpy(self, xp: ModuleType):
         # from np.diag tests
         vals = 100 * xp.arange(5, dtype=xp.float64)
@@ -237,7 +588,6 @@ class TestCreateDiagonal:
         xp_assert_equal(create_diagonal(vals, offset=2), b)
         xp_assert_equal(create_diagonal(vals, offset=-2), c)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     @pytest.mark.parametrize("n", range(1, 10))
     @pytest.mark.parametrize("offset", range(1, 10))
     def test_1d_from_scipy(self, xp: ModuleType, n: int, offset: int):
@@ -251,9 +601,8 @@ class TestCreateDiagonal:
 
     def test_0d_raises(self, xp: ModuleType):
         with pytest.raises(ValueError, match="1-dimensional"):
-            create_diagonal(xp.asarray(1))
+            _ = create_diagonal(xp.asarray(1))
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     @pytest.mark.parametrize(
         "shape",
         [
@@ -276,41 +625,59 @@ class TestCreateDiagonal:
         c = create_diagonal(b)
         zero = xp.zeros((), dtype=xp.uint64)
         assert c.shape == (*b.shape, b.shape[-1])
-        for i in ndindex(*c.shape):
+        for i in ndindex(*eager_shape(c)):
             xp_assert_equal(c[i], b[i[:-1]] if i[-2] == i[-1] else zero)
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(create_diagonal(x)) == device
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in zeros()")
     def test_xp(self, xp: ModuleType):
         x = xp.asarray([1, 2])
         y = create_diagonal(x, xp=xp)
         xp_assert_equal(y, xp.asarray([[1, 0], [0, 2]]))
 
 
-class TestExpandDims:
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
-    @pytest.mark.xfail_xp_backend(Backend.DASK, reason="tuple index out of range")
-    @pytest.mark.xfail_xp_backend(Backend.TORCH, reason="tuple index out of range")
-    def test_functionality(self, xp: ModuleType):
-        def _squeeze_all(b: Array) -> Array:
-            """Mimics `np.squeeze(b)`. `xpx.squeeze`?"""
-            for axis in range(b.ndim):
-                with contextlib.suppress(ValueError):
-                    b = xp.squeeze(b, axis=axis)
-            return b
+class TestDefaultDType:
+    def test_basic(self, xp: ModuleType):
+        assert default_dtype(xp) == xp.empty(0).dtype
 
-        s = (2, 3, 4, 5)
-        a = xp.empty(s)
+    def test_kind(self, xp: ModuleType):
+        assert default_dtype(xp, "real floating") == xp.empty(0).dtype
+        assert default_dtype(xp, "complex floating") == (xp.empty(0) * 1j).dtype
+        assert default_dtype(xp, "integral") == xp.int64
+        assert default_dtype(xp, "indexing") == xp.int64
+
+        with pytest.raises(ValueError, match="Unknown kind"):
+            _ = default_dtype(xp, "foo")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+
+    def test_device(self, xp: ModuleType, device: Device):
+        # Note: at the moment there are no known namespaces with
+        # device-specific default dtypes.
+        assert default_dtype(xp, device=None) == xp.empty(0).dtype
+        assert default_dtype(xp, device=device) == xp.empty(0).dtype
+
+    def test_torch(self, torch: ModuleType):
+        xp = torch
+        xp.set_default_dtype(xp.float64)
+        assert default_dtype(xp) == xp.float64
+        assert default_dtype(xp, "real floating") == xp.float64
+        assert default_dtype(xp, "complex floating") == xp.complex128
+
+        xp.set_default_dtype(xp.float32)
+        assert default_dtype(xp) == xp.float32
+        assert default_dtype(xp, "real floating") == xp.float32
+        assert default_dtype(xp, "complex floating") == xp.complex64
+
+
+class TestExpandDims:
+    def test_single_axis(self, xp: ModuleType):
+        """Trivial case where xpx.expand_dims doesn't add anything to xp.expand_dims"""
+        a = xp.asarray(np.reshape(np.arange(2 * 3 * 4 * 5), (2, 3, 4, 5)))
         for axis in range(-5, 4):
             b = expand_dims(a, axis=axis)
-            assert b.shape[axis] == 1
-            assert _squeeze_all(b).shape == s
+            xp_assert_equal(b, xp.expand_dims(a, axis=axis))
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_axis_tuple(self, xp: ModuleType):
         a = xp.empty((3, 3, 3))
         assert expand_dims(a, axis=(0, 1, 2)).shape == (1, 1, 1, 3, 3, 3)
@@ -319,46 +686,46 @@ class TestExpandDims:
         assert expand_dims(a, axis=(0, -3, -5)).shape == (1, 1, 3, 1, 3, 3)
 
     def test_axis_out_of_range(self, xp: ModuleType):
-        s = (2, 3, 4, 5)
-        a = xp.empty(s)
+        a = xp.empty((2, 3, 4, 5))
         with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=-6)
+            _ = expand_dims(a, axis=-6)
         with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=5)
+            _ = expand_dims(a, axis=5)
 
         a = xp.empty((3, 3, 3))
         with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=(0, -6))
+            _ = expand_dims(a, axis=(0, -6))
         with pytest.raises(IndexError, match="out of bounds"):
-            expand_dims(a, axis=(0, 5))
+            _ = expand_dims(a, axis=(0, 5))
 
     def test_repeated_axis(self, xp: ModuleType):
         a = xp.empty((3, 3, 3))
         with pytest.raises(ValueError, match="Duplicate dimensions"):
-            expand_dims(a, axis=(1, 1))
+            _ = expand_dims(a, axis=(1, 1))
 
     def test_positive_negative_repeated(self, xp: ModuleType):
         # https://github.com/data-apis/array-api/issues/760#issuecomment-1989449817
         a = xp.empty((2, 3, 4, 5))
         with pytest.raises(ValueError, match="Duplicate dimensions"):
-            expand_dims(a, axis=(3, -3))
+            _ = expand_dims(a, axis=(3, -3))
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(expand_dims(x, axis=0)) == device
 
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
     def test_xp(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3])
         y = expand_dims(x, axis=(0, 1, 2), xp=xp)
         assert y.shape == (1, 1, 1, 3)
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
+@pytest.mark.filterwarnings(  # array_api_strictest
+    "ignore:invalid value encountered:RuntimeWarning:array_api_strict"
+)
+@pytest.mark.filterwarnings(  # sparse
+    "ignore:invalid value encountered:RuntimeWarning:sparse"
+)
 class TestIsClose:
-    # FIXME use lazywhere to avoid warnings on inf
-    @pytest.mark.filterwarnings("ignore:invalid value encountered")
     @pytest.mark.parametrize("swap", [False, True])
     @pytest.mark.parametrize(
         ("a", "b"),
@@ -417,8 +784,6 @@ class TestIsClose:
 
         xp_assert_equal(actual, expect)
 
-    # FIXME use lazywhere to avoid warnings on inf
-    @pytest.mark.filterwarnings("ignore:invalid value encountered")
     def test_some_inf(self, xp: ModuleType):
         a = xp.asarray([0.0, 1.0, xp.inf, xp.inf, xp.inf])
         b = xp.asarray([1e-9, 1.0, xp.inf, -xp.inf, 2.0])
@@ -477,6 +842,8 @@ class TestIsClose:
             isclose(xp.asarray(True), b, atol=1), xp.asarray([True, True, True])
         )
 
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
+    @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
     def test_none_shape(self, xp: ModuleType):
         a = xp.asarray([1, 5, 0])
         b = xp.asarray([1, 4, 2])
@@ -484,6 +851,8 @@ class TestIsClose:
         a = a[a < 5]
         xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
 
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
+    @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
     def test_none_shape_bool(self, xp: ModuleType):
         a = xp.asarray([True, True, False])
         b = xp.asarray([True, False, True])
@@ -492,7 +861,6 @@ class TestIsClose:
         xp_assert_equal(isclose(a, b), xp.asarray([True, False]))
 
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
-    @pytest.mark.xfail_xp_backend(Backend.TORCH, reason="Array API 2024.12 support")
     def test_python_scalar(self, xp: ModuleType):
         a = xp.asarray([0.0, 0.1], dtype=xp.float32)
         xp_assert_equal(isclose(a, 0.0), xp.asarray([True, False]))
@@ -507,15 +875,21 @@ class TestIsClose:
 
     def test_all_python_scalars(self):
         with pytest.raises(TypeError, match="Unrecognized"):
-            isclose(0, 0)
+            _ = isclose(0, 0)
 
     def test_xp(self, xp: ModuleType):
         a = xp.asarray([0.0, 0.0])
         b = xp.asarray([1e-9, 1e-4])
         xp_assert_equal(isclose(a, b, xp=xp), xp.asarray([True, False]))
 
+    @pytest.mark.parametrize("equal_nan", [True, False])
+    def test_device(self, xp: ModuleType, device: Device, equal_nan: bool):
+        a = xp.asarray([0.0, 0.0, xp.nan], device=device)
+        b = xp.asarray([1e-9, 1e-4, xp.nan], device=device)
+        res = isclose(a, b, equal_nan=equal_nan)
+        assert get_device(res) == device
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no expand_dims")
+
 class TestKron:
     def test_basic(self, xp: ModuleType):
         # Using 0-dimensional array
@@ -584,7 +958,7 @@ class TestKron:
 
     def test_all_python_scalars(self):
         with pytest.raises(TypeError, match="Unrecognized"):
-            kron(1, 1)
+            _ = kron(1, 1)
 
     def test_device(self, xp: ModuleType, device: Device):
         x1 = xp.asarray([1, 2, 3], device=device)
@@ -598,6 +972,140 @@ class TestKron:
         xp_assert_equal(kron(a, b, xp=xp), k)
 
 
+class TestNanToNum:
+    def test_bool(self, xp: ModuleType) -> None:
+        a = xp.asarray([True])
+        xp_assert_equal(nan_to_num(a, xp=xp), a)
+
+    def test_scalar_pos_inf(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.inf
+        xp_assert_equal(nan_to_num(a, xp=xp), xp.asarray(infinity))
+
+    def test_scalar_neg_inf(self, xp: ModuleType, infinity: float) -> None:
+        a = -xp.inf
+        xp_assert_equal(nan_to_num(a, xp=xp), -xp.asarray(infinity))
+
+    def test_scalar_nan(self, xp: ModuleType) -> None:
+        a = xp.nan
+        xp_assert_equal(nan_to_num(a, xp=xp), xp.asarray(0.0))
+
+    def test_real(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.asarray([xp.inf, -xp.inf, xp.nan, -128, 128])
+        xp_assert_equal(
+            nan_to_num(a, xp=xp),
+            xp.asarray(
+                [
+                    infinity,
+                    -infinity,
+                    0.0,
+                    -128,
+                    128,
+                ]
+            ),
+        )
+
+    def test_complex(self, xp: ModuleType, infinity: float) -> None:
+        a = xp.asarray(
+            [
+                complex(xp.inf, xp.nan),
+                xp.nan,
+                complex(xp.nan, xp.inf),
+            ]
+        )
+        xp_assert_equal(
+            nan_to_num(a),
+            xp.asarray([complex(infinity, 0), complex(0, 0), complex(0, infinity)]),
+        )
+
+    def test_empty_array(self, xp: ModuleType) -> None:
+        a = xp.asarray([], dtype=xp.float32)  # forced dtype due to torch
+        xp_assert_equal(nan_to_num(a, xp=xp), a)
+        assert xp.isdtype(nan_to_num(a, xp=xp).dtype, xp.float32)
+
+    @pytest.mark.parametrize(
+        ("in_vals", "fill_value", "out_vals"),
+        [
+            ([1, 2, np.nan, 4], 3, [1.0, 2.0, 3.0, 4.0]),
+            ([1, 2, np.nan, 4], 3.0, [1.0, 2.0, 3.0, 4.0]),
+            (
+                [
+                    complex(1, 1),
+                    complex(2, 2),
+                    complex(np.nan, 0),
+                    complex(4, 4),
+                ],
+                3,
+                [
+                    complex(1.0, 1.0),
+                    complex(2.0, 2.0),
+                    complex(3.0, 0.0),
+                    complex(4.0, 4.0),
+                ],
+            ),
+            (
+                [
+                    complex(1, 1),
+                    complex(2, 2),
+                    complex(0, np.nan),
+                    complex(4, 4),
+                ],
+                3.0,
+                [
+                    complex(1.0, 1.0),
+                    complex(2.0, 2.0),
+                    complex(0.0, 3.0),
+                    complex(4.0, 4.0),
+                ],
+            ),
+            (
+                [
+                    complex(1, 1),
+                    complex(2, 2),
+                    complex(np.nan, np.nan),
+                    complex(4, 4),
+                ],
+                3.0,
+                [
+                    complex(1.0, 1.0),
+                    complex(2.0, 2.0),
+                    complex(3.0, 3.0),
+                    complex(4.0, 4.0),
+                ],
+            ),
+        ],
+    )
+    def test_fill_value_success(
+        self,
+        xp: ModuleType,
+        in_vals: Array,
+        fill_value: int | float,
+        out_vals: Array,
+    ) -> None:
+        a = xp.asarray(in_vals)
+        xp_assert_equal(
+            nan_to_num(a, fill_value=fill_value, xp=xp),
+            xp.asarray(out_vals),
+        )
+
+    def test_fill_value_failure(self, xp: ModuleType) -> None:
+        a = xp.asarray(
+            [
+                complex(1, 1),
+                complex(xp.nan, xp.nan),
+                complex(3, 3),
+            ]
+        )
+        with pytest.raises(
+            TypeError,
+            match="Complex fill values are not supported",
+        ):
+            _ = nan_to_num(
+                a,
+                fill_value=complex(2, 2),  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
+                xp=xp,
+            )
+
+
 class TestNUnique:
     def test_simple(self, xp: ModuleType):
         a = xp.asarray([[1, 1], [0, 2], [2, 2]])
@@ -607,8 +1115,27 @@ class TestNUnique:
         a = xp.asarray([])
         xp_assert_equal(nunique(a), xp.asarray(0))
 
-    def test_device(self, xp: ModuleType, device: Device):
-        a = xp.asarray(0.0, device=device)
+    def test_size1(self, xp: ModuleType):
+        a = xp.asarray([123])
+        xp_assert_equal(nunique(a), xp.asarray(1))
+
+    def test_all_equal(self, xp: ModuleType):
+        a = xp.asarray([123, 123, 123])
+        xp_assert_equal(nunique(a), xp.asarray(1))
+
+    @pytest.mark.xfail_xp_backend(Backend.DASK, reason="No equal_nan kwarg in unique")
+    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="sparse#855")
+    def test_nan(self, xp: ModuleType, library: Backend):
+        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
+            pytest.xfail("NumPy <1.24 has no equal_nan kwarg in unique")
+
+        # Each NaN is counted separately
+        a = xp.asarray([xp.nan, 123.0, xp.nan])
+        xp_assert_equal(nunique(a), xp.asarray(3))
+
+    @pytest.mark.parametrize("size", [0, 1, 2])
+    def test_device(self, xp: ModuleType, device: Device, size: int):
+        a = xp.asarray([0.0] * size, device=device)
         assert get_device(nunique(a)) == device
 
     def test_xp(self, xp: ModuleType):
@@ -616,27 +1143,29 @@ class TestNUnique:
         xp_assert_equal(nunique(a, xp=xp), xp.asarray(3))
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange, no device")
 class TestPad:
     def test_simple(self, xp: ModuleType):
-        a = xp.arange(1, 4)
+        a = xp.asarray([1, 2, 3])
         padded = pad(a, 2)
         xp_assert_equal(padded, xp.asarray([0, 0, 1, 2, 3, 0, 0]))
 
+    @pytest.mark.xfail_xp_backend(
+        Backend.SPARSE, reason="constant_values can only be equal to fill value"
+    )
     def test_fill_value(self, xp: ModuleType):
-        a = xp.arange(1, 4)
+        a = xp.asarray([1, 2, 3])
         padded = pad(a, 2, constant_values=42)
         xp_assert_equal(padded, xp.asarray([42, 42, 1, 2, 3, 42, 42]))
 
     def test_ndim(self, xp: ModuleType):
-        a = xp.reshape(xp.arange(2 * 3 * 4), (2, 3, 4))
+        a = xp.asarray(np.reshape(np.arange(2 * 3 * 4), (2, 3, 4)))
         padded = pad(a, 2)
         assert padded.shape == (6, 7, 8)
 
     def test_mode_not_implemented(self, xp: ModuleType):
-        a = xp.arange(3)
+        a = xp.asarray([1, 2, 3])
         with pytest.raises(NotImplementedError, match="Only `'constant'`"):
-            pad(a, 2, mode="edge")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+            _ = pad(a, 2, mode="edge")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     def test_device(self, xp: ModuleType, device: Device):
         a = xp.asarray(0.0, device=device)
@@ -647,7 +1176,7 @@ class TestPad:
         xp_assert_equal(padded, xp.asarray(0))
 
     def test_tuple_width(self, xp: ModuleType):
-        a = xp.reshape(xp.arange(12), (3, 4))
+        a = xp.asarray(np.reshape(np.arange(12), (3, 4)))
         padded = pad(a, (1, 0))
         assert padded.shape == (4, 5)
 
@@ -655,10 +1184,10 @@ class TestPad:
         assert padded.shape == (6, 7)
 
         with pytest.raises((ValueError, RuntimeError)):
-            pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
+            _ = pad(a, [(1, 2, 3)])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]
 
     def test_sequence_of_tuples_width(self, xp: ModuleType):
-        a = xp.reshape(xp.arange(12), (3, 4))
+        a = xp.asarray(np.reshape(np.arange(12), (3, 4)))
 
         padded = pad(a, ((1, 0), (0, 2)))
         assert padded.shape == (4, 6)
@@ -680,11 +1209,15 @@ assume_unique = pytest.mark.parametrize(
 )
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no device kwarg in asarray()")
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no argsort")
+@pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="no unique_values")
 class TestSetDiff1D:
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="NaN-shaped arrays")
     @pytest.mark.xfail_xp_backend(
         Backend.TORCH, reason="index_select not implemented for uint32"
+    )
+    @pytest.mark.xfail_xp_backend(
+        Backend.TORCH_GPU, reason="index_select not implemented for uint32"
     )
     def test_setdiff1d(self, xp: ModuleType):
         x1 = xp.asarray([6, 5, 4, 7, 1, 2, 7, 4])
@@ -747,9 +1280,12 @@ class TestSetDiff1D:
     @pytest.mark.parametrize("assume_unique", [True, False])
     def test_all_python_scalars(self, assume_unique: bool):
         with pytest.raises(TypeError, match="Unrecognized"):
-            setdiff1d(0, 0, assume_unique=assume_unique)
+            _ = setdiff1d(0, 0, assume_unique=assume_unique)
 
     @assume_unique
+    @pytest.mark.skip_xp_backend(
+        Backend.TORCH, reason="device='meta' does not support unknown shapes"
+    )
     def test_device(self, xp: ModuleType, device: Device, assume_unique: bool):
         x1 = xp.asarray([3, 8, 20], device=device)
         x2 = xp.asarray([2, 3, 4], device=device)
@@ -764,23 +1300,25 @@ class TestSetDiff1D:
         xp_assert_equal(actual, expected)
 
 
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no isdtype")
 class TestSinc:
     def test_simple(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0)), xp.asarray(1.0))
-        w = sinc(xp.linspace(-1, 1, 100))
+        x = xp.asarray(np.linspace(-1, 1, 100))
+        w = sinc(x)
         # check symmetry
         xp_assert_close(w, xp.flip(w, axis=0))
 
     @pytest.mark.parametrize("x", [0, 1 + 3j])
     def test_dtype(self, xp: ModuleType, x: int | complex):
         with pytest.raises(ValueError, match="real floating data type"):
-            sinc(xp.asarray(x))
+            _ = sinc(xp.asarray(x))
 
     def test_3d(self, xp: ModuleType):
-        x = xp.reshape(xp.arange(18, dtype=xp.float64), (3, 3, 2))
-        expected = xp.zeros((3, 3, 2), dtype=xp.float64)
-        expected = at(expected)[0, 0, 0].set(1.0)
+        x = np.arange(18, dtype=np.float64).reshape((3, 3, 2))
+        expected = np.zeros_like(x)
+        expected[0, 0, 0] = 1
+        x = xp.asarray(x)
+        expected = xp.asarray(expected)
         xp_assert_close(sinc(x), expected, atol=1e-15)
 
     def test_device(self, xp: ModuleType, device: Device):
@@ -789,3 +1327,139 @@ class TestSinc:
 
     def test_xp(self, xp: ModuleType):
         xp_assert_equal(sinc(xp.asarray(0.0), xp=xp), xp.asarray(1.0))
+
+
+class TestPartition:
+    @classmethod
+    def _assert_valid_partition(
+        cls,
+        x_np: np.ndarray | None,
+        k: int,
+        y: Array,
+        xp: ModuleType,
+        axis: int | None = -1,
+    ):
+        """
+        x_np : input array
+        k : int
+        y : output array returned by the partition function to test
+        """
+        if x_np is not None:
+            assert y.shape == np.partition(x_np, k, axis=axis).shape
+        if y.ndim != 1 and axis == 0:
+            assert isinstance(y.shape[1], int)
+            for i in range(y.shape[1]):
+                cls._assert_valid_partition(None, k, y[:, i, ...], xp, axis=0)
+        elif y.ndim != 1:
+            assert axis is not None
+            axis = axis - 1 if axis != -1 else -1
+            assert isinstance(y.shape[0], int)
+            for i in range(y.shape[0]):
+                cls._assert_valid_partition(None, k, y[i, ...], xp, axis=axis)
+        else:
+            if k > 0:
+                assert xp.max(y[:k]) <= y[k]
+            assert y[k] <= xp.min(y[k:])
+
+    @classmethod
+    def _partition(cls, x: np.ndarray, k: int, xp: ModuleType, axis: int | None = -1):
+        return partition(xp.asarray(x), k, axis=axis)
+
+    def _test_1d(self, xp: ModuleType):
+        rng = np.random.default_rng()
+        for n in [2, 3, 4, 5, 7, 10, 20, 50, 100, 1_000]:
+            k = int(rng.integers(n))
+            x1 = rng.integers(n, size=n)
+            y = self._partition(x1, k, xp)
+            self._assert_valid_partition(x1, k, y, xp)
+            x2 = rng.random(n)
+            y = self._partition(x2, k, xp)
+            self._assert_valid_partition(x2, k, y, xp)
+
+    def _test_nd(self, xp: ModuleType, ndim: int):
+        rng = np.random.default_rng()
+
+        for n in [2, 3, 5, 10, 20, 100]:
+            base_shape = [int(v) for v in rng.integers(1, 4, size=ndim)]
+            k = int(rng.integers(n))
+
+            for i in range(ndim):
+                shape = base_shape[:]
+                shape[i] = n
+                x = rng.integers(n, size=tuple(shape))
+                y = self._partition(x, k, xp, axis=i)
+                self._assert_valid_partition(x, k, y, xp, axis=i)
+
+            z = rng.random(tuple(base_shape))
+            k = int(rng.integers(z.size))
+            y = self._partition(z, k, xp, axis=None)
+            self._assert_valid_partition(z, k, y, xp, axis=None)
+
+    def _test_input_validation(self, xp: ModuleType):
+        with pytest.raises(TypeError):
+            _ = self._partition(np.asarray(1), 1, xp)
+        with pytest.raises(ValueError, match="out of bounds"):
+            _ = self._partition(np.asarray([1, 2]), 3, xp)
+
+    def test_1d(self, xp: ModuleType):
+        self._test_1d(xp)
+
+    @pytest.mark.parametrize("ndim", [2, 3, 4])
+    def test_nd(self, xp: ModuleType, ndim: int):
+        self._test_nd(xp, ndim)
+
+    def test_input_validation(self, xp: ModuleType):
+        self._test_input_validation(xp)
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no argsort")
+class TestArgpartition(TestPartition):
+    @classmethod
+    @override
+    def _partition(cls, x: np.ndarray, k: int, xp: ModuleType, axis: int | None = -1):
+        arr = xp.asarray(x)
+        indices = argpartition(arr, k, axis=axis)
+        if axis is None:
+            arr = xp.reshape(arr, shape=(-1,))
+            return arr[indices]
+        if arr.ndim == 1:
+            return arr[indices]
+        return cls._take_along_axis(arr, indices, axis=axis, xp=xp)
+
+    @classmethod
+    def _take_along_axis(cls, arr: Array, indices: Array, axis: int, xp: ModuleType):
+        if hasattr(xp, "take_along_axis"):
+            return xp.take_along_axis(arr, indices, axis=axis)
+        if arr.ndim == 1:
+            return arr[indices]
+        if axis == 0:
+            assert isinstance(arr.shape[1], int)
+            arrs = []
+            for i in range(arr.shape[1]):
+                arrs.append(
+                    cls._take_along_axis(
+                        arr[:, i, ...], indices[:, i, ...], axis=0, xp=xp
+                    )
+                )
+            return xp.stack(arrs, axis=1)
+        axis = axis - 1 if axis != -1 else -1
+        assert isinstance(arr.shape[0], int)
+        arrs = []
+        for i in range(arr.shape[0]):
+            arrs.append(
+                cls._take_along_axis(arr[i, ...], indices[i, ...], axis=axis, xp=xp)
+            )
+        return xp.stack(arrs, axis=0)
+
+    @override
+    def test_1d(self, xp: ModuleType):
+        self._test_1d(xp)
+
+    @pytest.mark.parametrize("ndim", [2, 3, 4])
+    @override
+    def test_nd(self, xp: ModuleType, ndim: int):
+        self._test_nd(xp, ndim)
+
+    @override
+    def test_input_validation(self, xp: ModuleType):
+        self._test_input_validation(xp)

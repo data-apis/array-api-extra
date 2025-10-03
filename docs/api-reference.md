@@ -6,15 +6,19 @@
     :nosignatures:
     :toctree: generated
 
+    apply_where
     at
     atleast_nd
     broadcast_shapes
     cov
     create_diagonal
+    default_dtype
     expand_dims
     isclose
     kron
+    nan_to_num
     nunique
+    one_hot
     pad
     setdiff1d
     sinc
