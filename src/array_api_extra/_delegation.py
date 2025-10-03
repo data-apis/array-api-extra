@@ -529,9 +529,9 @@ def partition(
     the k-th element in the output array is undefined.
 
     Notes:
-    If `xp` implements `partition` or an equivalent method (e.g. topk for torch),
+    If `xp` implements ``partition`` or an equivalent function (e.g. ``topk`` for torch),
     complexity will likely be O(n).
-    If not, this function simply calls `xp.sort` and complexity is O(n log n).
+    If not, this function simply calls ``xp.sort`` and complexity is O(n log n).
 
     Parameters
     ----------
