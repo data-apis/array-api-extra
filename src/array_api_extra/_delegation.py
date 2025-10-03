@@ -714,7 +714,7 @@ def partition(
         ranks = xp.arange(a.shape[-1]).expand_as(a)
 
         split_value, indices = xp.kthvalue(a, kth + 1, keepdim=True)
-        del indices
+        del indices  # indices won't be used => del ASAP to reduce peak memory usage
 
         # fill the left-side of the partition
         mask_src = a < split_value
@@ -811,7 +811,7 @@ def argpartition(
         out = xp.empty_like(ranks)
 
         split_value, indices = xp.kthvalue(a, kth + 1, keepdim=True)
-        del indices
+        del indices  # indices won't be used => del ASAP to reduce peak memory usage
 
         mask_src = a < split_value
         n_left = mask_src.sum(dim=-1, keepdim=True)
