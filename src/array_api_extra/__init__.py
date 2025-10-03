@@ -1,6 +1,7 @@
 """Extra array functions built on top of the array API standard."""
 
 from ._delegation import (
+    argpartition,
     atleast_nd,
     cov,
     expand_dims,
@@ -8,6 +9,7 @@ from ._delegation import (
     nan_to_num,
     one_hot,
     pad,
+    partition,
     sinc,
 )
 from ._lib._at import at
@@ -28,6 +30,7 @@ __version__ = "0.9.1.dev0"
 __all__ = [
     "__version__",
     "apply_where",
+    "argpartition",
     "at",
     "atleast_nd",
     "broadcast_shapes",
@@ -42,6 +45,7 @@ __all__ = [
     "nunique",
     "one_hot",
     "pad",
+    "partition",
     "setdiff1d",
     "sinc",
 ]

@@ -182,11 +182,14 @@ def test_eager_shape(xp: ModuleType, library: Backend):
     # Lazy arrays, like Dask, have an eager shape until you slice them with
     # a lazy boolean mask
     assert eager_shape(a) == a.shape == (3,)
+    assert eager_shape(a, axis=0) == a.shape == (3,)
 
     b = a[a > 2]
     if library is Backend.DASK:
         with pytest.raises(TypeError, match="Unsupported lazy shape"):
             _ = eager_shape(b)
+        with pytest.raises(TypeError, match="Unsupported lazy shape"):
+            _ = eager_shape(b, axis=0)
     # FIXME can't test use case for None in the shape until we add support for
     # other lazy backends
     else:
