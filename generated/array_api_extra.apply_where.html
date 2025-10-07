@@ -284,7 +284,7 @@ when <cite>fill_value</cite> is defined, otherwise to <code class="docutils lite
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cond</strong> (<em>array</em>) – The condition, expressed as a boolean array.</p></li>
-<li><p><strong>args</strong> (<em>Array</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em> of </em><em>Arrays</em>) – Argument(s) to <cite>f1</cite> (and <cite>f2</cite>). Must be broadcastable with <cite>cond</cite>.</p></li>
+<li><p><strong>args</strong> (<em>Array</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>Arrays</em>) – Argument(s) to <cite>f1</cite> (and <cite>f2</cite>). Must be broadcastable with <cite>cond</cite>.</p></li>
 <li><p><strong>f1</strong> (<em>callable</em>) – Elementwise function of <cite>args</cite>, returning a single array.
 Where <cite>cond</cite> is True, output will be <code class="docutils literal notranslate"><span class="pre">f1(arg0[cond],</span> <span class="pre">arg1[cond],</span> <span class="pre">...)</span></code>.</p></li>
 <li><p><strong>f2</strong> (<em>callable</em><em>, </em><em>optional</em>) – Elementwise function of <cite>args</cite>, returning a single array.

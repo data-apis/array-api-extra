@@ -292,17 +292,17 @@ It must return either a single array-like or a sequence of array-likes.</p>
 <p><cite>func</cite> must be a pure function, i.e. without side effects, as depending on the
 backend it may be executed more than once or never.</p>
 </p></li>
-<li><p><strong>*args</strong> (<em>Array</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.13)"><em>complex</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em> | </em><em>None</em>) – <p>One or more Array API compliant arrays, Python scalars, or None’s.</p>
+<li><p><strong>*args</strong> (<em>Array</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><em>complex</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><em>None</em>) – <p>One or more Array API compliant arrays, Python scalars, or None’s.</p>
 <p>If <cite>as_numpy=True</cite>, you need to be able to apply <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="(in NumPy v2.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.asarray()</span></code></a> to
 non-None args to convert them to NumPy; read notes below about specific
 backends.</p>
 </p></li>
-<li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em><em>, </em><em>...</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em><em>, </em><em>...</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – Output shape or sequence of output shapes, one for each output of <cite>func</cite>.
+<li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em><em>, </em><em>...</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em><em>, </em><em>...</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – Output shape or sequence of output shapes, one for each output of <cite>func</cite>.
 Default: assume single output and broadcast shapes of the input arrays.</p></li>
 <li><p><strong>dtype</strong> (<em>DType</em><em> | </em><em>Sequence</em><em>[</em><em>DType</em><em>]</em><em>, </em><em>optional</em>) – Output dtype or sequence of output dtypes, one for each output of <cite>func</cite>.
 dtype(s) must belong to the same array namespace as the input arrays.
 Default: infer the result type(s) from the input arrays.</p></li>
-<li><p><strong>as_numpy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – <dl class="simple">
+<li><p><strong>as_numpy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – <dl class="simple">
 <dt>If True, convert the input arrays to NumPy before passing them to <cite>func</cite>.</dt><dd><p>This is particularly useful to make NumPy-only functions, e.g. written in Cython</p>
 </dd>
 <dt>or Numba, work transparently with array API-compliant arrays.</dt><dd><p>Default: False.</p>
@@ -321,7 +321,7 @@ If shape is omitted or a single <cite>tuple[int | None, …]</cite>, return a si
 Otherwise, return a tuple of arrays.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Array | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[Array, …]</p>
+<dd class="field-odd"><p>Array | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Array, …]</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -376,10 +376,10 @@ again by Dask.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – When <code class="docutils literal notranslate"><span class="pre">xp=jax.numpy</span></code>, the output <cite>shape</cite> is unknown (it contains <code class="docutils literal notranslate"><span class="pre">None</span></code> on
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – When <code class="docutils literal notranslate"><span class="pre">xp=jax.numpy</span></code>, the output <cite>shape</cite> is unknown (it contains <code class="docutils literal notranslate"><span class="pre">None</span></code> on
     one or more axes) and this function was called inside <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.13)"><strong>RuntimeError</strong></a> – When <code class="docutils literal notranslate"><span class="pre">xp=sparse</span></code> and auto-densification is disabled.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><strong>Exception</strong></a><strong> (</strong><strong>backend-specific</strong><strong>)</strong> – When the backend disallows implicit device to host transfers and the input
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – When <code class="docutils literal notranslate"><span class="pre">xp=sparse</span></code> and auto-densification is disabled.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><strong>Exception</strong></a><strong> (</strong><strong>backend-specific</strong><strong>)</strong> – When the backend disallows implicit device to host transfers and the input
     arrays are on a non-CPU device, e.g. on GPU.</p></li>
 </ul>
 </dd>

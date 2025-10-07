@@ -282,12 +282,12 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>array</em>) – Input array.</p></li>
-<li><p><strong>pad_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a><em> of </em><em>ints</em><em> or </em><em>sequence</em><em> of </em><em>pairs</em><em> of </em><em>ints</em>) – Pad the input array with this many elements from each side.
+<li><p><strong>pad_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>ints</em><em> or </em><em>sequence</em><em> of </em><em>pairs</em><em> of </em><em>ints</em>) – Pad the input array with this many elements from each side.
 If a sequence of tuples, <code class="docutils literal notranslate"><span class="pre">[(before_0,</span> <span class="pre">after_0),</span> <span class="pre">...</span> <span class="pre">(before_N,</span> <span class="pre">after_N)]</span></code>,
 each pair applies to the corresponding axis of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
 A single tuple, <code class="docutils literal notranslate"><span class="pre">(before,</span> <span class="pre">after)</span></code>, is equivalent to a list of <code class="docutils literal notranslate"><span class="pre">x.ndim</span></code>
 copies of this tuple.</p></li>
-<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – Only “constant” mode is currently supported, which pads with
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Only “constant” mode is currently supported, which pads with
 the value passed to <cite>constant_values</cite>.</p></li>
 <li><p><strong>constant_values</strong> (<em>python scalar</em><em>, </em><em>optional</em>) – Use this value to pad the input. Default is zero.</p></li>
 <li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>x</cite>. Default: infer.</p></li>
