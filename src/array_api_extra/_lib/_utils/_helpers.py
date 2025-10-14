@@ -212,10 +212,10 @@ def asarrays(
         }
         kind = same_dtype[type(cast(complex, b))]
         if xp.isdtype(a.dtype, kind):
-            xb = xp.asarray(b, dtype=a.dtype)
+            xb = xp.asarray(b, dtype=a.dtype, device=_compat.device(a))
         else:
             # Undefined behaviour. Let the function deal with it, if it can.
-            xb = xp.asarray(b)
+            xb = xp.asarray(b, device=_compat.device(a))
 
     else:
         # Neither a nor b are Array API objects.
