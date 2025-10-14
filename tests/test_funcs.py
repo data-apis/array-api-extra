@@ -888,6 +888,19 @@ class TestIsClose:
         b = xp.asarray([1e-9, 1e-4, xp.nan], device=device)
         res = isclose(a, b, equal_nan=equal_nan)
         assert get_device(res) == device
+        
+    def test_array_on_device_with_scalar(self, xp: ModuleType, device: Device):
+        a = xp.asarray([0.01, 0.5, 0.8, 0.9, 1.00001], device=device)
+        b = 1
+        res = isclose(a, b)
+        assert get_device(res) == device
+        xp_assert_equal(res, xp.asarray([False, False, False, False, True]))
+
+        a = 0.1
+        b = xp.asarray([0.01, 0.5, 0.8, 0.9, 0.100001], device=device)
+        res = isclose(a, b)
+        assert get_device(res) == device
+        xp_assert_equal(res, xp.asarray([False, False, False, False, True]))
 
 
 class TestKron:
