@@ -22,6 +22,7 @@ from array_api_extra import (
     default_dtype,
     expand_dims,
     isclose,
+    isin,
     kron,
     nan_to_num,
     nunique,
@@ -888,7 +889,7 @@ class TestIsClose:
         b = xp.asarray([1e-9, 1e-4, xp.nan], device=device)
         res = isclose(a, b, equal_nan=equal_nan)
         assert get_device(res) == device
-        
+
     def test_array_on_device_with_scalar(self, xp: ModuleType, device: Device):
         a = xp.asarray([0.01, 0.5, 0.8, 0.9, 1.00001], device=device)
         b = 1
@@ -1476,3 +1477,13 @@ class TestArgpartition(TestPartition):
     @override
     def test_input_validation(self, xp: ModuleType):
         self._test_input_validation(xp)
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no unique_inverse")
+class TestIsIn:
+    def test_simple(self, xp: ModuleType):
+        a = xp.asarray([[0, 2], [4, 6]])
+        b = xp.asarray([1, 2, 3, 4])
+        expected = xp.asarray([[False, True], [True, False]])
+        res = isin(a, b)
+        xp_assert_equal(res, expected)
