@@ -803,19 +803,16 @@ def argpartition(  # numpydoc ignore=PR01,RT01
     return xp.argsort(x, axis=axis, stable=False)
 
 
-def isin( # numpydoc ignore=PR01,RT01
+def isin(  # numpydoc ignore=PR01,RT01
     a: Array,
     b: Array,
     /,
     *,
     assume_unique: bool = False,
     invert: bool = False,
-    xp: ModuleType | None = None,
+    xp: ModuleType,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
-    if xp is None:
-        xp = array_namespace(a, b)
-
     original_a_shape = a.shape
     a = xp.reshape(a, (-1,))
     b = xp.reshape(b, (-1,))
