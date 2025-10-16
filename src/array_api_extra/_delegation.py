@@ -856,9 +856,9 @@ def isin(
 
     Parameters
     ----------
-    a : array_like
+    a : array
         Input elements.
-    b : array_like
+    b : array
         The elements against which to test each element of `a`.
     assume_unique : bool, optional
         If True, the input arrays are both assumed to be unique which can speed
@@ -868,7 +868,7 @@ def isin(
     kind : str | None, optional
         The algorithm or method to use. This will not affect the final result,
         but will affect the speed and memory use.
-        For Numpy the options are {None, "sort", "table"}.
+        For NumPy the options are {None, "sort", "table"}.
         For Jax the mapped parameter is instead `method` and the options are
         {"compare_all", "binary_search", "sort", and "auto" (default)}
         For Cupy, Dask, Torch and the default case this parameter is not present and
