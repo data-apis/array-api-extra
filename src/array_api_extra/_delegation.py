@@ -871,7 +871,7 @@ def isin(
         For NumPy the options are {None, "sort", "table"}.
         For Jax the mapped parameter is instead `method` and the options are
         {"compare_all", "binary_search", "sort", and "auto" (default)}
-        For Cupy, Dask, Torch and the default case this parameter is not present and
+        For CuPy, Dask, Torch and the default case this parameter is not present and
         thus ignored. Default: None.
     xp : array_namespace, optional
         The standard-compatible namespace for `a` and `b`. Default: infer.
