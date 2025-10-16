@@ -1481,9 +1481,40 @@ class TestArgpartition(TestPartition):
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no unique_inverse")
 class TestIsIn:
-    def test_simple(self, xp: ModuleType):
-        a = xp.asarray([[0, 2], [4, 6]])
+    def test_simple(self, xp: ModuleType, library: Backend):
+        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
+            pytest.xfail("NumPy <1.24 has no kind kwarg in isin")
+
         b = xp.asarray([1, 2, 3, 4])
+        
+        # `a` with 1 dimension
+        a = xp.asarray([1, 3, 6, 10])
+        expected = xp.asarray([True, True, False, False])
+        res = isin(a, b)
+        xp_assert_equal(res, expected)
+
+        # `a` with 2 dimensions
+        a = xp.asarray([[0, 2], [4, 6]])
         expected = xp.asarray([[False, True], [True, False]])
         res = isin(a, b)
+        xp_assert_equal(res, expected)
+
+    def test_device(self, xp: ModuleType, device: Device):
+        a = xp.asarray([1, 3, 6], device=device)
+        b = xp.asarray([1, 2, 3], device=device)
+        assert get_device(isin(a, b)) == device
+
+    def test_assume_unique_and_invert(self, xp: ModuleType, device: Device):
+        a = xp.asarray([0, 3, 6, 10], device=device)
+        b = xp.asarray([1, 2, 3, 10], device=device)
+        expected = xp.asarray([True, False, True, False])
+        res = isin(a, b, assume_unique=True, invert=True)
+        assert get_device(res) == device
+        xp_assert_equal(res, expected)
+    
+    def test_kind(self, xp: ModuleType):
+        a = xp.asarray([0, 3, 6, 10])
+        b = xp.asarray([1, 2, 3, 10])
+        expected = xp.asarray([False, True, False, True])
+        res = isin(a, b, kind="sort")
         xp_assert_equal(res, expected)
