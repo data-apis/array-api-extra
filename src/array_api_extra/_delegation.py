@@ -910,16 +910,29 @@ def quantile(
     """
     TODO
     """
-
     methods = {"linear"}
+
     if method not in methods:
         message = f"`method` must be one of {methods}"
         raise ValueError(message)
+    if keepdims not in {True, False}:
+        message = "If specified, `keepdims` must be True or False."
+        raise ValueError(message)
     if xp is None:
         xp = array_namespace(a)
-    if a.ndim < 1:
+
+    a = xp.asarray(a)
+    if not xp.isdtype(a.dtype, ('integral', 'real floating')):
+        raise ValueError("`a` must have real dtype.")
+    if not xp.isdtype(xp.asarray(q).dtype, 'real floating'):
+        raise ValueError("`q` must have real floating dtype.")
+    ndim = a.ndim
+    if ndim < 1:
         msg = "`a` must be at least 1-dimensional"
         raise TypeError(msg)
+    if (axis >= ndim) or (axis < -ndim):
+        message = "`axis` is not compatible with the dimension of `a`."
+        raise ValueError(message)
 
     # Delegate where possible.
     if is_numpy_namespace(xp) or is_dask_namespace(xp):
