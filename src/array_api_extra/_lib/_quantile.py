@@ -1,9 +1,5 @@
 from types import ModuleType
 
-import numpy as np
-from scipy.stats._axis_nan_policy import _broadcast_arrays
-
-from ._at import at
 from ._utils._compat import device as get_device
 from ._utils._helpers import eager_shape
 from ._utils._typing import Array
