@@ -836,3 +836,40 @@ def argpartition(
     # kth is not small compared to x.size
 
     return _funcs.argpartition(a, kth, axis=axis, xp=xp)
+
+
+def quantile(
+    a: Array,
+    q: float | Array,
+    /,
+    axis: int | None = None,
+    method: str = "linear",
+    keepdims: bool = False,
+    *,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    TODO
+    """
+
+    methods = {"linear"}
+    if method not in methods:
+        message = f"`method` must be one of {methods}"
+        raise ValueError(message)
+    if xp is None:
+        xp = array_namespace(a)
+    if a.ndim < 1:
+        msg = "`a` must be at least 1-dimensional"
+        raise TypeError(msg)
+
+    # Delegate where possible.
+    if is_numpy_namespace(xp) or is_dask_namespace(xp):
+        return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims)
+    is_linear = method == "linear"
+    if is_linear and is_jax_namespace(xp) or is_cupy_namespace(xp):
+        return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims)
+    if is_linear and is_torch_namespace(xp):
+        return xp.quantile(a, q, dim=axis, interpolation=method, keepdim=keepdims)
+
+    # Otherwise call our implementation (will sort data)
+    return _funcs.quantile(a, q, axis=axis, method=method, keepdims=keepdims, xp=xp)
