@@ -600,9 +600,8 @@ def setdiff1d(
         xp = array_namespace(x1, x2)
 
     if is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp):
-        # https://github.com/microsoft/pyright/issues/10103
-        x1_, x2_ = asarrays(x1, x2, xp=xp)
-        return xp.setdiff1d(x1_, x2_, assume_unique=assume_unique)
+        x1, x2 = asarrays(x1, x2, xp=xp)
+        return xp.setdiff1d(x1, x2, assume_unique=assume_unique)
 
     return _funcs.setdiff1d(x1, x2, assume_unique=assume_unique, xp=xp)
 
