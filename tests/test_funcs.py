@@ -22,6 +22,7 @@ from array_api_extra import (
     default_dtype,
     expand_dims,
     isclose,
+    isin,
     kron,
     nan_to_num,
     nunique,
@@ -888,7 +889,7 @@ class TestIsClose:
         b = xp.asarray([1e-9, 1e-4, xp.nan], device=device)
         res = isclose(a, b, equal_nan=equal_nan)
         assert get_device(res) == device
-        
+
     def test_array_on_device_with_scalar(self, xp: ModuleType, device: Device):
         a = xp.asarray([0.01, 0.5, 0.8, 0.9, 1.00001], device=device)
         b = 1
@@ -1476,3 +1477,55 @@ class TestArgpartition(TestPartition):
     @override
     def test_input_validation(self, xp: ModuleType):
         self._test_input_validation(xp)
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no unique_inverse")
+class TestIsIn:
+    def test_simple(self, xp: ModuleType, library: Backend):
+        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
+            pytest.xfail("NumPy <1.24 has no kind kwarg in isin")
+
+        b = xp.asarray([1, 2, 3, 4])
+
+        # `a` with 1 dimension
+        a = xp.asarray([1, 3, 6, 10])
+        expected = xp.asarray([True, True, False, False])
+        res = isin(a, b)
+        xp_assert_equal(res, expected)
+
+        # `a` with 2 dimensions
+        a = xp.asarray([[0, 2], [4, 6]])
+        expected = xp.asarray([[False, True], [True, False]])
+        res = isin(a, b)
+        xp_assert_equal(res, expected)
+
+    def test_device(self, xp: ModuleType, device: Device, library: Backend):
+        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
+            pytest.xfail("NumPy <1.24 has no kind kwarg in isin")
+
+        a = xp.asarray([1, 3, 6], device=device)
+        b = xp.asarray([1, 2, 3], device=device)
+        assert get_device(isin(a, b)) == device
+
+    def test_assume_unique_and_invert(
+        self, xp: ModuleType, device: Device, library: Backend
+    ):
+        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
+            pytest.xfail("NumPy <1.24 has no kind kwarg in isin")
+
+        a = xp.asarray([0, 3, 6, 10], device=device)
+        b = xp.asarray([1, 2, 3, 10], device=device)
+        expected = xp.asarray([True, False, True, False])
+        res = isin(a, b, assume_unique=True, invert=True)
+        assert get_device(res) == device
+        xp_assert_equal(res, expected)
+
+    def test_kind(self, xp: ModuleType, library: Backend):
+        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
+            pytest.xfail("NumPy <1.24 has no kind kwarg in isin")
+
+        a = xp.asarray([0, 3, 6, 10])
+        b = xp.asarray([1, 2, 3, 10])
+        expected = xp.asarray([False, True, False, True])
+        res = isin(a, b, kind="sort")
+        xp_assert_equal(res, expected)

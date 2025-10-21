@@ -801,3 +801,22 @@ def argpartition(  # numpydoc ignore=PR01,RT01
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
     return xp.argsort(x, axis=axis, stable=False)
+
+
+def isin(  # numpydoc ignore=PR01,RT01
+    a: Array,
+    b: Array,
+    /,
+    *,
+    assume_unique: bool = False,
+    invert: bool = False,
+    xp: ModuleType,
+) -> Array:
+    """See docstring in `array_api_extra._delegation.py`."""
+    original_a_shape = a.shape
+    a = xp.reshape(a, (-1,))
+    b = xp.reshape(b, (-1,))
+    return xp.reshape(
+        _helpers.in1d(a, b, assume_unique=assume_unique, invert=invert, xp=xp),
+        original_a_shape,
+    )

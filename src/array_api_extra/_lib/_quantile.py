@@ -92,7 +92,7 @@ def _quantile_iv(
         x = xp.full(shape, xp.nan, dtype=dtype, device=device)
 
     y = xp.sort(x, axis=axis, stable=False)
-    # FIXME: I still need to look into the broacasting:
+    # FIXME: I still need to look into the broadcasting:
     y, p = _broadcast_arrays((y, p), axis=axis)
 
     p_shape = eager_shape(p)

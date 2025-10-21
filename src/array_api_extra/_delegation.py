@@ -838,6 +838,65 @@ def argpartition(
     return _funcs.argpartition(a, kth, axis=axis, xp=xp)
 
 
+def isin(
+    a: Array,
+    b: Array,
+    /,
+    *,
+    assume_unique: bool = False,
+    invert: bool = False,
+    kind: str | None = None,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Determine whether each element in `a` is present in `b`.
+
+    Return a boolean array of the same shape as `a` that is True for elements
+    that are in `b` and False otherwise.
+
+    Parameters
+    ----------
+    a : array
+        Input elements.
+    b : array
+        The elements against which to test each element of `a`.
+    assume_unique : bool, optional
+        If True, the input arrays are both assumed to be unique which can speed
+        up the calculation. Default: False.
+    invert : bool, optional
+        If True, the values in the returned array are inverted. Default: False.
+    kind : str | None, optional
+        The algorithm or method to use. This will not affect the final result,
+        but will affect the speed and memory use.
+        For NumPy the options are {None, "sort", "table"}.
+        For Jax the mapped parameter is instead `method` and the options are
+        {"compare_all", "binary_search", "sort", and "auto" (default)}
+        For CuPy, Dask, Torch and the default case this parameter is not present and
+        thus ignored. Default: None.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a` and `b`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array having the same shape as that of `a` that is True for elements
+        that are in `b` and False otherwise.
+    """
+    if xp is None:
+        xp = array_namespace(a, b)
+
+    if is_numpy_namespace(xp):
+        return xp.isin(a, b, assume_unique=assume_unique, invert=invert, kind=kind)
+    if is_jax_namespace(xp):
+        if kind is None:
+            kind = "auto"
+        return xp.isin(a, b, assume_unique=assume_unique, invert=invert, method=kind)
+    if is_cupy_namespace(xp) or is_torch_namespace(xp) or is_dask_namespace(xp):
+        return xp.isin(a, b, assume_unique=assume_unique, invert=invert)
+
+    return _funcs.isin(a, b, assume_unique=assume_unique, invert=invert, xp=xp)
+
+
 def quantile(
     a: Array,
     q: float | Array,
@@ -866,7 +925,7 @@ def quantile(
     if is_numpy_namespace(xp) or is_dask_namespace(xp):
         return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims)
     is_linear = method == "linear"
-    if is_linear and is_jax_namespace(xp) or is_cupy_namespace(xp):
+    if (is_linear and is_jax_namespace(xp)) or is_cupy_namespace(xp):
         return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims)
     if is_linear and is_torch_namespace(xp):
         return xp.quantile(a, q, dim=axis, interpolation=method, keepdim=keepdims)
