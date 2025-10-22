@@ -1,3 +1,5 @@
+"""Implementations of the quantile function."""
+
 from types import ModuleType
 
 from ._utils._compat import device as get_device
@@ -9,7 +11,7 @@ def quantile(  # numpydoc ignore=PR01,RT01
     a: Array,
     q: Array | float,
     /,
-    method: str = 'linear',  # noqa: ARG001
+    method: str = "linear",  # noqa: ARG001
     axis: int | None = None,
     keepdims: bool = False,
     *,
@@ -17,13 +19,10 @@ def quantile(  # numpydoc ignore=PR01,RT01
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
     device = get_device(a)
-    floating_dtype = xp.float64 #xp.result_type(a, xp.asarray(q))
+    floating_dtype = xp.float64  # xp.result_type(a, xp.asarray(q))
     a = xp.asarray(a, dtype=floating_dtype, device=device)
     a_shape = list(a.shape)
     p: Array = xp.asarray(q, dtype=floating_dtype, device=device)
-
-    if xp.any((p > 1) | (p < 0) | xp.isnan(p)):
-        raise ValueError("`q` values must be in the range [0, 1]")
 
     q_scalar = p.ndim == 0
     if q_scalar:
@@ -37,7 +36,7 @@ def quantile(  # numpydoc ignore=PR01,RT01
     else:
         axis = int(axis)
 
-    n, = eager_shape(a, axis)
+    (n,) = eager_shape(a, axis)
     # If data has length zero along `axis`, the result will be an array of NaNs just
     # as if the data had length 1 along axis and were filled with NaNs.
     if n == 0:
@@ -66,22 +65,23 @@ def quantile(  # numpydoc ignore=PR01,RT01
     return res[0, ...] if q_scalar else res
 
 
-def _quantile_hf(a: Array, q: Array, n: float, axis: int, xp: ModuleType) -> Array:
+def _quantile_hf(  # numpydoc ignore=GL08
+    a: Array, q: Array, n: float, axis: int, xp: ModuleType
+) -> Array:
     m = 1 - q
-    jg = q*n + m - 1
+    jg = q * n + m - 1
 
     j = jg // 1
-    j = xp.clip(j, 0., n - 1)
-    jp1 = xp.clip(j + 1, 0., n - 1)
+    j = xp.clip(j, 0.0, n - 1)
+    jp1 = xp.clip(j + 1, 0.0, n - 1)
     # `̀j` and `jp1` are 1d arrays
 
     g = jg % 1
-    g = xp.where(j < 0, 0, g)  # equiv to g[j < 0] = 0, but work with strictest
+    g = xp.where(j < 0, 0, g)  # equivalent to g[j < 0] = 0, but works with strictest
     new_g_shape = [1] * a.ndim
     new_g_shape[axis] = g.shape[0]
     g = xp.reshape(g, tuple(new_g_shape))
 
-    return (
-        (1 - g) * xp.take(a, xp.astype(j, xp.int64), axis=axis)
-        + g * xp.take(a, xp.astype(jp1, xp.int64), axis=axis)
+    return (1 - g) * xp.take(a, xp.astype(j, xp.int64), axis=axis) + g * xp.take(
+        a, xp.astype(jp1, xp.int64), axis=axis
     )

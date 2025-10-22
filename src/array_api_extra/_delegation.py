@@ -768,7 +768,7 @@ def argpartition(
         Axis along which to partition. The default is ``-1`` (the last axis).
         If ``None``, the flattened array is used.
     xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
+        The standard-compatible namespace for `a`. Default: infer.
 
     Returns
     -------
@@ -908,45 +908,179 @@ def quantile(
     xp: ModuleType | None = None,
 ) -> Array:
     """
-    TODO
+    Compute the q-th quantile of the data along the specified axis.
+
+    Parameters
+    ----------
+    a : array_like of real numbers
+        Input array or object that can be converted to an array.
+    q : array_like of float
+        Probability or sequence of probabilities of the quantiles to compute.
+        Values must be between 0 and 1 inclusive.
+    axis : {int, tuple of int, None}, optional
+        Axis or axes along which the quantiles are computed. The default is
+        to compute the quantile(s) along a flattened version of the array.
+    method : str, optional
+        This parameter specifies the method to use for estimating the
+        quantile. There are many different methods.
+        The recommended options, numbered as they appear in [1]_, are:
+
+        1. 'inverted_cdf'
+        2. 'averaged_inverted_cdf'
+        3. 'closest_observation'
+        4. 'interpolated_inverted_cdf'
+        5. 'hazen'
+        6. 'weibull'
+        7. 'linear'  (default)
+        8. 'median_unbiased'
+        9. 'normal_unbiased'
+
+        The first three methods are discontinuous.
+        Only 'linear' is implemented for now.
+
+    keepdims : bool, optional
+        If this is set to True, the axes which are reduced are left in
+        the result as dimensions with size one. With this option, the
+        result will broadcast correctly against the original array `a`.
+
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a` and `q`. Default: infer.
+
+    Returns
+    -------
+    scalar or ndarray
+        If `q` is a single probability and `axis=None`, then the result
+        is a scalar. If multiple probability levels are given, first axis
+        of the result corresponds to the quantiles. The other axes are
+        the axes that remain after the reduction of `a`. If the input
+        contains integers or floats smaller than ``float64``, the output
+        data-type is ``float64``. Otherwise, the output data-type is the
+        same as that of the input. If `out` is specified, that array is
+        returned instead.
+
+    Notes
+    -----
+    Given a sample `a` from an underlying distribution, `quantile` provides a
+    nonparametric estimate of the inverse cumulative distribution function.
+
+    By default, this is done by interpolating between adjacent elements in
+    ``y``, a sorted copy of `a`::
+
+        (1-g)*y[j] + g*y[j+1]
+
+    where the index ``j`` and coefficient ``g`` are the integral and
+    fractional components of ``q * (n-1)``, and ``n`` is the number of
+    elements in the sample.
+
+    This is a special case of Equation 1 of H&F [1]_. More generally,
+
+    - ``j = (q*n + m - 1) // 1``, and
+    - ``g = (q*n + m - 1) % 1``,
+
+    where ``m`` may be defined according to several different conventions.
+    The preferred convention may be selected using the ``method`` parameter:
+
+    =============================== =============== ===============
+    ``method``                      number in H&F   ``m``
+    =============================== =============== ===============
+    ``interpolated_inverted_cdf``   4               ``0``
+    ``hazen``                       5               ``1/2``
+    ``weibull``                     6               ``q``
+    ``linear`` (default)            7               ``1 - q``
+    ``median_unbiased``             8               ``q/3 + 1/3``
+    ``normal_unbiased``             9               ``q/4 + 3/8``
+    =============================== =============== ===============
+
+    Note that indices ``j`` and ``j + 1`` are clipped to the range ``0`` to
+    ``n - 1`` when the results of the formula would be outside the allowed
+    range of non-negative indices. The ``- 1`` in the formulas for ``j`` and
+    ``g`` accounts for Python's 0-based indexing.
+
+    The table above includes only the estimators from H&F that are continuous
+    functions of probability `q` (estimators 4-9). NumPy also provides the
+    three discontinuous estimators from H&F (estimators 1-3), where ``j`` is
+    defined as above, ``m`` is defined as follows, and ``g`` is a function
+    of the real-valued ``index = q*n + m - 1`` and ``j``.
+
+    1. ``inverted_cdf``: ``m = 0`` and ``g = int(index - j > 0)``
+    2. ``averaged_inverted_cdf``: ``m = 0`` and
+       ``g = (1 + int(index - j > 0)) / 2``
+    3. ``closest_observation``: ``m = -1/2`` and
+       ``g = 1 - int((index == j) & (j%2 == 1))``
+
+    **Weighted quantiles:**
+    More formally, the quantile at probability level :math:`q` of a cumulative
+    distribution function :math:`F(y)=P(Y \\leq y)` with probability measure
+    :math:`P` is defined as any number :math:`x` that fulfills the
+    *coverage conditions*
+
+    .. math:: P(Y < x) \\leq q \\quad\\text{and}\\quad P(Y \\leq x) \\geq q
+
+    with random variable :math:`Y\\sim P`.
+    Sample quantiles, the result of `quantile`, provide nonparametric
+    estimation of the underlying population counterparts, represented by the
+    unknown :math:`F`, given a data vector `a` of length ``n``.
+
+    Some of the estimators above arise when one considers :math:`F` as the
+    empirical distribution function of the data, i.e.
+    :math:`F(y) = \\frac{1}{n} \\sum_i 1_{a_i \\leq y}`.
+    Then, different methods correspond to different choices of :math:`x` that
+    fulfill the above coverage conditions. Methods that follow this approach
+    are ``inverted_cdf`` and ``averaged_inverted_cdf``.
+
+    For weighted quantiles, the coverage conditions still hold. The
+    empirical cumulative distribution is simply replaced by its weighted
+    version, i.e.
+    :math:`P(Y \\leq t) = \\frac{1}{\\sum_i w_i} \\sum_i w_i 1_{x_i \\leq t}`.
+    Only ``method="inverted_cdf"`` supports weights.
+
+    References
+    ----------
+    .. [1] R. J. Hyndman and Y. Fan,
+       "Sample quantiles in statistical packages,"
+       The American Statistician, 50(4), pp. 361-365, 1996
     """
     methods = {"linear"}
 
     if method not in methods:
-        message = f"`method` must be one of {methods}"
-        raise ValueError(message)
+        msg = f"`method` must be one of {methods}"
+        raise ValueError(msg)
     if keepdims not in {True, False}:
-        message = "If specified, `keepdims` must be True or False."
-        raise ValueError(message)
+        msg = "If specified, `keepdims` must be True or False."
+        raise ValueError(msg)
     if xp is None:
         xp = array_namespace(a)
 
     a = xp.asarray(a)
-    if not xp.isdtype(a.dtype, ('integral', 'real floating')):
-        raise ValueError("`a` must have real dtype.")
-    if not xp.isdtype(xp.asarray(q).dtype, 'real floating'):
-        raise ValueError("`q` must have real floating dtype.")
+    if not xp.isdtype(a.dtype, ("integral", "real floating")):
+        msg = "`a` must have real dtype."
+        raise ValueError(msg)
+    if not xp.isdtype(xp.asarray(q).dtype, "real floating"):
+        msg = "`q` must have real floating dtype."
+        raise ValueError(msg)
     ndim = a.ndim
     if ndim < 1:
         msg = "`a` must be at least 1-dimensional"
         raise TypeError(msg)
     if axis is not None and ((axis >= ndim) or (axis < -ndim)):
-        message = "`axis` is not compatible with the dimension of `a`."
-        raise ValueError(message)
+        msg = "`axis` is not compatible with the dimension of `a`."
+        raise ValueError(msg)
 
     # Array API states: Mixed integer and floating-point type promotion rules
     # are not specified because behavior varies between implementations.
-    # => We choose to do:
-    dtype = (
-        xp.float64 if xp.isdtype(a.dtype, 'integral')
-        else xp.result_type(a, xp.asarray(q)) # both a and q are floats
+    # We chose to align with numpy (see docstring):
+    dtype = xp.result_type(
+        xp.float64 if xp.isdtype(a.dtype, "integral") else a,
+        xp.asarray(q),
+        xp.float64,  # at least float64
     )
     device = get_device(a)
     a = xp.asarray(a, dtype=dtype, device=device)
     q = xp.asarray(q, dtype=dtype, device=device)
 
     if xp.any((q > 1) | (q < 0) | xp.isnan(q)):
-        raise ValueError("`q` values must be in the range [0, 1]")
+        msg = "`q` values must be in the range [0, 1]"
+        raise ValueError(msg)
 
     # Delegate where possible.
     if is_numpy_namespace(xp):

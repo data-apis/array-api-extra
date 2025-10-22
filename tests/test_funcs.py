@@ -1547,8 +1547,9 @@ class TestQuantile:
         xp_assert_close(actual, expect)
 
     def test_shape(self, xp: ModuleType):
-        a = xp.asarray(np.random.rand(3, 4, 5))
-        q = xp.asarray(np.random.rand(2))
+        rng = np.random.default_rng()
+        a = xp.asarray(rng.random((3, 4, 5)))
+        q = xp.asarray(rng.random(2))
         assert quantile(a, q, axis=0).shape == (2, 4, 5)
         assert quantile(a, q, axis=1).shape == (2, 3, 5)
         assert quantile(a, q, axis=2).shape == (2, 3, 4)
@@ -1558,8 +1559,9 @@ class TestQuantile:
         assert quantile(a, q, axis=2, keepdims=True).shape == (2, 3, 4, 1)
 
     def test_against_numpy(self, xp: ModuleType):
-        a_np = np.random.rand(3, 4, 5)
-        q_np = np.random.rand(2)
+        rng = np.random.default_rng()
+        a_np = rng.random((3, 4, 5))
+        q_np = rng.random(2)
         a = xp.asarray(a_np)
         q = xp.asarray(q_np)
         for keepdims in [False, True]:
@@ -1583,7 +1585,7 @@ class TestQuantile:
 
     def test_methods(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3, 4, 5])
-        methods = ["linear"] #"hazen", "weibull"]
+        methods = ["linear"]  # "hazen", "weibull"]
         for method in methods:
             actual = quantile(x, 0.5, method=method)
             # All methods should give reasonable results
@@ -1617,7 +1619,7 @@ class TestQuantile:
             _ = quantile(x, -0.5)
 
     def test_device(self, xp: ModuleType, device: Device):
-        if hasattr(device, 'type') and getattr(device, 'type') == "meta":
+        if hasattr(device, "type") and device.type == "meta":  # pyright: ignore[reportAttributeAccessIssue]
             pytest.xfail("No Tensor.item() on meta device")
         x = xp.asarray([1, 2, 3, 4, 5], device=device)
         actual = quantile(x, 0.5)
