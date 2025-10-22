@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from types import ModuleType
 from typing import Literal
 
-from ._lib import _funcs
+from ._lib import _funcs, _quantile
 from ._lib._utils._compat import (
     array_namespace,
     is_cupy_namespace,
@@ -930,13 +930,28 @@ def quantile(
     if ndim < 1:
         msg = "`a` must be at least 1-dimensional"
         raise TypeError(msg)
-    if (axis >= ndim) or (axis < -ndim):
+    if axis is not None and ((axis >= ndim) or (axis < -ndim)):
         message = "`axis` is not compatible with the dimension of `a`."
         raise ValueError(message)
 
+    # Array API states: Mixed integer and floating-point type promotion rules
+    # are not specified because behavior varies between implementations.
+    # => We choose to do:
+    dtype = (
+        xp.float64 if xp.isdtype(a.dtype, 'integral')
+        else xp.result_type(a, xp.asarray(q)) # both a and q are floats
+    )
+    device = get_device(a)
+    a = xp.asarray(a, dtype=dtype, device=device)
+    q = xp.asarray(q, dtype=dtype, device=device)
+
+    if xp.any((q > 1) | (q < 0) | xp.isnan(q)):
+        raise ValueError("`q` values must be in the range [0, 1]")
+
     # Delegate where possible.
-    if is_numpy_namespace(xp) or is_dask_namespace(xp):
+    if is_numpy_namespace(xp):
         return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims)
+    # No delegating for dask: I couldn't make it work
     is_linear = method == "linear"
     if (is_linear and is_jax_namespace(xp)) or is_cupy_namespace(xp):
         return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims)
@@ -944,4 +959,4 @@ def quantile(
         return xp.quantile(a, q, dim=axis, interpolation=method, keepdim=keepdims)
 
     # Otherwise call our implementation (will sort data)
-    return _funcs.quantile(a, q, axis=axis, method=method, keepdims=keepdims, xp=xp)
+    return _quantile.quantile(a, q, axis=axis, method=method, keepdims=keepdims, xp=xp)

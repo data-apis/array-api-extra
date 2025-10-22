@@ -17,7 +17,7 @@ def quantile(  # numpydoc ignore=PR01,RT01
 ):
     """See docstring in `array_api_extra._delegation.py`."""
     device = get_device(a)
-    floating_dtype = xp.result_type(a, xp.asarray(q))
+    floating_dtype = xp.float64 #xp.result_type(a, xp.asarray(q))
     a = xp.asarray(a, dtype=floating_dtype, device=device)
     q = xp.asarray(q, dtype=floating_dtype, device=device)
 
@@ -29,12 +29,13 @@ def quantile(  # numpydoc ignore=PR01,RT01
         q = xp.reshape(q, (1,))
 
     axis_none = axis is None
+    a_ndim = a.ndim
     if axis_none:
         a = xp.reshape(a, (-1,))
         axis = 0
     axis = int(axis)
 
-    n = eager_shape(a, axis)
+    n, = eager_shape(a, axis)
     # If data has length zero along `axis`, the result will be an array of NaNs just
     # as if the data had length 1 along axis and were filled with NaNs.
     if n == 0:
@@ -49,12 +50,12 @@ def quantile(  # numpydoc ignore=PR01,RT01
     # The hard part will be dealing with 0-weights and NaNs
     # But maybe a proper use of searchsorted + left/right side will work?
 
-    res = _quantile_hf(a, q, n, axis, xp)
+    res = _quantile_hf(a, q, float(n), axis, xp)
 
     # reshaping to conform to doc/other libs' behavior
     if axis_none:
         if keepdims:
-            res = xp.reshape(res, q.shape + (1,) * a.ndim)
+            res = xp.reshape(res, q.shape + (1,) * a_ndim)
     else:
         res = xp.moveaxis(res, axis, 0)
         if keepdims:
@@ -69,12 +70,17 @@ def quantile(  # numpydoc ignore=PR01,RT01
 def _quantile_hf(y: Array, p: Array, n: int, axis: int, xp: ModuleType):
     m = 1 - p
     jg = p*n + m - 1
+
     j = jg // 1
-    g = jg % 1
-    g[j < 0] = 0
     j = xp.clip(j, 0., n - 1)
     jp1 = xp.clip(j + 1, 0., n - 1)
     # `̀j` and `jp1` are 1d arrays
+
+    g = jg % 1
+    g = xp.where(j < 0, 0, g)  # equiv to g[j < 0] = 0, but work with strictest
+    new_g_shape = [1] * y.ndim
+    new_g_shape[axis] = g.shape[0]
+    g = xp.reshape(g, tuple(new_g_shape))
 
     return (
         (1 - g) * xp.take(y, xp.astype(j, xp.int64), axis=axis)

@@ -29,6 +29,7 @@ from array_api_extra import (
     one_hot,
     pad,
     partition,
+    quantile,
     setdiff1d,
     sinc,
 )
@@ -1529,3 +1530,101 @@ class TestIsIn:
         expected = xp.asarray([False, True, False, True])
         res = isin(a, b, kind="sort")
         xp_assert_equal(res, expected)
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no xp.take")
+class TestQuantile:
+    def test_basic(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        actual = quantile(x, 0.5)
+        expect = xp.asarray(3.0, dtype=xp.float64)
+        xp_assert_close(actual, expect)
+
+    def test_multiple_quantiles(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        actual = quantile(x, xp.asarray([0.25, 0.5, 0.75]))
+        expect = xp.asarray([2.0, 3.0, 4.0], dtype=xp.float64)
+        xp_assert_close(actual, expect)
+
+    def test_shape(self, xp: ModuleType):
+        a = xp.asarray(np.random.rand(3, 4, 5))
+        q = xp.asarray(np.random.rand(2))
+        assert quantile(a, q, axis=0).shape == (2, 4, 5)
+        assert quantile(a, q, axis=1).shape == (2, 3, 5)
+        assert quantile(a, q, axis=2).shape == (2, 3, 4)
+
+        assert quantile(a, q, axis=0, keepdims=True).shape == (2, 1, 4, 5)
+        assert quantile(a, q, axis=1, keepdims=True).shape == (2, 3, 1, 5)
+        assert quantile(a, q, axis=2, keepdims=True).shape == (2, 3, 4, 1)
+
+    def test_against_numpy(self, xp: ModuleType):
+        a_np = np.random.rand(3, 4, 5)
+        q_np = np.random.rand(2)
+        a = xp.asarray(a_np)
+        q = xp.asarray(q_np)
+        for keepdims in [False, True]:
+            for axis in [None, *range(a.ndim)]:
+                actual = quantile(a, q, axis=axis, keepdims=keepdims)
+                expected = np.quantile(a_np, q_np, axis=axis, keepdims=keepdims)
+                expected = xp.asarray(expected, dtype=xp.float64)
+                xp_assert_close(actual, expected, atol=1e-12)
+
+    def test_2d_axis(self, xp: ModuleType):
+        x = xp.asarray([[1, 2, 3], [4, 5, 6]])
+        actual = quantile(x, 0.5, axis=0)
+        expect = xp.asarray([2.5, 3.5, 4.5], dtype=xp.float64)
+        xp_assert_close(actual, expect)
+
+    def test_2d_axis_keepdims(self, xp: ModuleType):
+        x = xp.asarray([[1, 2, 3], [4, 5, 6]])
+        actual = quantile(x, 0.5, axis=0, keepdims=True)
+        expect = xp.asarray([[2.5, 3.5, 4.5]], dtype=xp.float64)
+        xp_assert_close(actual, expect)
+
+    def test_methods(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        methods = ["linear"] #"hazen", "weibull"]
+        for method in methods:
+            actual = quantile(x, 0.5, method=method)
+            # All methods should give reasonable results
+            assert 2.5 <= float(actual) <= 3.5
+
+    def test_edge_cases(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        # q = 0 should give minimum
+        actual = quantile(x, 0.0)
+        expect = xp.asarray(1.0, dtype=xp.float64)
+        xp_assert_close(actual, expect)
+
+        # q = 1 should give maximum
+        actual = quantile(x, 1.0)
+        expect = xp.asarray(5.0, dtype=xp.float64)
+        xp_assert_close(actual, expect)
+
+    def test_invalid_q(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        _ = quantile(x, 1.0)
+        # ^ FIXME: here just to make this test fail for sparse backend
+        # q > 1 should raise
+        with pytest.raises(
+            ValueError, match=r"`q` values must be in the range \[0, 1\]"
+        ):
+            _ = quantile(x, 1.5)
+        # q < 0 should raise
+        with pytest.raises(
+            ValueError, match=r"`q` values must be in the range \[0, 1\]"
+        ):
+            _ = quantile(x, -0.5)
+
+    def test_device(self, xp: ModuleType, device: Device):
+        if hasattr(device, 'type') and device.type == "meta":
+            pytest.xfail("No Tensor.item() on meta device")
+        x = xp.asarray([1, 2, 3, 4, 5], device=device)
+        actual = quantile(x, 0.5)
+        assert get_device(actual) == device
+
+    def test_xp(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        actual = quantile(x, 0.5, xp=xp)
+        expect = xp.asarray(3.0, dtype=xp.float64)
+        xp_assert_close(actual, expect)
