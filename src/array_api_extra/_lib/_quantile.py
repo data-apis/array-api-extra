@@ -14,11 +14,12 @@ def quantile(  # numpydoc ignore=PR01,RT01
     keepdims: bool = False,
     *,
     xp: ModuleType,
-):
+) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
     device = get_device(a)
     floating_dtype = xp.float64 #xp.result_type(a, xp.asarray(q))
     a = xp.asarray(a, dtype=floating_dtype, device=device)
+    a_shape = list(a.shape)
     p: Array = xp.asarray(q, dtype=floating_dtype, device=device)
 
     if xp.any((p > 1) | (p < 0) | xp.isnan(p)):
@@ -30,19 +31,19 @@ def quantile(  # numpydoc ignore=PR01,RT01
 
     axis_none = axis is None
     a_ndim = a.ndim
-    if axis_none:
+    if axis is None:
         a = xp.reshape(a, (-1,))
         axis = 0
-    axis = int(axis)
+    else:
+        axis = int(axis)
 
     n, = eager_shape(a, axis)
     # If data has length zero along `axis`, the result will be an array of NaNs just
     # as if the data had length 1 along axis and were filled with NaNs.
     if n == 0:
-        shape = list(eager_shape(a))
-        shape[axis] = 1
+        a_shape[axis] = 1
         n = 1
-        a = xp.full(shape, xp.nan, dtype=floating_dtype, device=device)
+        a = xp.full(tuple(a_shape), xp.nan, dtype=floating_dtype, device=device)
 
     a = xp.sort(a, axis=axis, stable=False)
     # to support weights, the main thing would be to
@@ -59,15 +60,13 @@ def quantile(  # numpydoc ignore=PR01,RT01
     else:
         res = xp.moveaxis(res, axis, 0)
         if keepdims:
-            shape = list(a.shape)
-            shape[axis] = 1
-            shape = p.shape + tuple(shape)
-            res = xp.reshape(res, shape)
+            a_shape[axis] = 1
+            res = xp.reshape(res, p.shape + tuple(a_shape))
 
     return res[0, ...] if q_scalar else res
 
 
-def _quantile_hf(a: Array, q: Array, n: float, axis: int, xp: ModuleType):
+def _quantile_hf(a: Array, q: Array, n: float, axis: int, xp: ModuleType) -> Array:
     m = 1 - q
     jg = q*n + m - 1
 
