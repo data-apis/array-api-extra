@@ -1585,7 +1585,7 @@ class TestQuantile:
 
     def test_methods(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3, 4, 5])
-        methods = ["linear"]  # "hazen", "weibull"]
+        methods = ["linear", "inverted_cdf", "averaged_inverted_cdf"]
         for method in methods:
             actual = quantile(x, 0.5, method=method)
             # All methods should give reasonable results

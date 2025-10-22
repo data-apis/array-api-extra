@@ -905,6 +905,7 @@ def quantile(
     method: str = "linear",
     keepdims: bool = False,
     *,
+    weights: Array | None = None,
     xp: ModuleType | None = None,
 ) -> Array:
     """
@@ -942,6 +943,16 @@ def quantile(
         If this is set to True, the axes which are reduced are left in
         the result as dimensions with size one. With this option, the
         result will broadcast correctly against the original array `a`.
+
+    weights : array_like, optional
+        An array of weights associated with the values in `a`. Each value in
+        `a` contributes to the quantile according to its associated weight.
+        The weights array can either be 1-D (in which case its length must be
+        the size of `a` along the given axis) or of the same shape as `a`.
+        If `weights=None`, then all data in `a` are assumed to have a
+        weight equal to one.
+        Only `method="inverted_cdf"` or `method="averaged_inverted_cdf"`
+        support weights. See the notes for more details.
 
     xp : array_namespace, optional
         The standard-compatible namespace for `a` and `q`. Default: infer.
@@ -1040,7 +1051,7 @@ def quantile(
        "Sample quantiles in statistical packages,"
        The American Statistician, 50(4), pp. 361-365, 1996
     """
-    methods = {"linear"}
+    methods = {"linear", "inverted_cdf", "averaged_inverted_cdf"}
 
     if method not in methods:
         msg = f"`method` must be one of {methods}"
@@ -1084,12 +1095,12 @@ def quantile(
 
     # Delegate where possible.
     if is_numpy_namespace(xp):
+        return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims, weights=weights)
+    # No delegation for dask: I couldn't make it work
+    basic_case = method == "linear" and weights is None
+    if (basic_case and is_jax_namespace(xp)) or is_cupy_namespace(xp):
         return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims)
-    # No delegating for dask: I couldn't make it work
-    is_linear = method == "linear"
-    if (is_linear and is_jax_namespace(xp)) or is_cupy_namespace(xp):
-        return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims)
-    if is_linear and is_torch_namespace(xp):
+    if basic_case and is_torch_namespace(xp):
         return xp.quantile(a, q, dim=axis, interpolation=method, keepdim=keepdims)
 
     # Otherwise call our implementation (will sort data)
