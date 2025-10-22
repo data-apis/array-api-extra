@@ -19,14 +19,14 @@ def quantile(  # numpydoc ignore=PR01,RT01
     device = get_device(a)
     floating_dtype = xp.float64 #xp.result_type(a, xp.asarray(q))
     a = xp.asarray(a, dtype=floating_dtype, device=device)
-    q = xp.asarray(q, dtype=floating_dtype, device=device)
+    p: Array = xp.asarray(q, dtype=floating_dtype, device=device)
 
-    if xp.any((q > 1) | (q < 0) | xp.isnan(q)):
+    if xp.any((p > 1) | (p < 0) | xp.isnan(p)):
         raise ValueError("`q` values must be in the range [0, 1]")
 
-    q_scalar = q.ndim == 0
+    q_scalar = p.ndim == 0
     if q_scalar:
-        q = xp.reshape(q, (1,))
+        p = xp.reshape(p, (1,))
 
     axis_none = axis is None
     a_ndim = a.ndim
@@ -50,26 +50,26 @@ def quantile(  # numpydoc ignore=PR01,RT01
     # The hard part will be dealing with 0-weights and NaNs
     # But maybe a proper use of searchsorted + left/right side will work?
 
-    res = _quantile_hf(a, q, float(n), axis, xp)
+    res = _quantile_hf(a, p, float(n), axis, xp)
 
     # reshaping to conform to doc/other libs' behavior
     if axis_none:
         if keepdims:
-            res = xp.reshape(res, q.shape + (1,) * a_ndim)
+            res = xp.reshape(res, p.shape + (1,) * a_ndim)
     else:
         res = xp.moveaxis(res, axis, 0)
         if keepdims:
             shape = list(a.shape)
             shape[axis] = 1
-            shape = q.shape + tuple(shape)
+            shape = p.shape + tuple(shape)
             res = xp.reshape(res, shape)
 
     return res[0, ...] if q_scalar else res
 
 
-def _quantile_hf(y: Array, p: Array, n: int, axis: int, xp: ModuleType):
-    m = 1 - p
-    jg = p*n + m - 1
+def _quantile_hf(a: Array, q: Array, n: float, axis: int, xp: ModuleType):
+    m = 1 - q
+    jg = q*n + m - 1
 
     j = jg // 1
     j = xp.clip(j, 0., n - 1)
@@ -78,11 +78,11 @@ def _quantile_hf(y: Array, p: Array, n: int, axis: int, xp: ModuleType):
 
     g = jg % 1
     g = xp.where(j < 0, 0, g)  # equiv to g[j < 0] = 0, but work with strictest
-    new_g_shape = [1] * y.ndim
+    new_g_shape = [1] * a.ndim
     new_g_shape[axis] = g.shape[0]
     g = xp.reshape(g, tuple(new_g_shape))
 
     return (
-        (1 - g) * xp.take(y, xp.astype(j, xp.int64), axis=axis)
-        + g * xp.take(y, xp.astype(jp1, xp.int64), axis=axis)
+        (1 - g) * xp.take(a, xp.astype(j, xp.int64), axis=axis)
+        + g * xp.take(a, xp.astype(jp1, xp.int64), axis=axis)
     )

@@ -1617,7 +1617,7 @@ class TestQuantile:
             _ = quantile(x, -0.5)
 
     def test_device(self, xp: ModuleType, device: Device):
-        if hasattr(device, 'type') and device.type == "meta":
+        if hasattr(device, 'type') and getattr(device, 'type') == "meta":
             pytest.xfail("No Tensor.item() on meta device")
         x = xp.asarray([1, 2, 3, 4, 5], device=device)
         actual = quantile(x, 0.5)
