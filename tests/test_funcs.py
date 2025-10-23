@@ -1577,6 +1577,8 @@ class TestQuantile:
     def test_weighted_against_numpy(
         self, xp: ModuleType, keepdims: bool, q_np: Array | float, nan_policy: str
     ):
+        if NUMPY_VERSION < (2, 0):
+            pytest.xfail(reason="NumPy 1.x does not support weights in quantile")
         rng = np.random.default_rng()
         n, d = 10, 20
         a_np = rng.random((n, d))

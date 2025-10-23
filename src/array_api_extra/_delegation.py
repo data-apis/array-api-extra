@@ -5,6 +5,7 @@ from types import ModuleType
 from typing import Literal
 
 from ._lib import _funcs, _quantile
+from ._lib._backends import NUMPY_VERSION
 from ._lib._utils._compat import (
     array_namespace,
     is_cupy_namespace,
@@ -1047,7 +1048,6 @@ def quantile(
     empirical cumulative distribution is simply replaced by its weighted
     version, i.e.
     :math:`P(Y \\leq t) = \\frac{1}{\\sum_i w_i} \\sum_i w_i 1_{x_i \\leq t}`.
-    Only ``method="inverted_cdf"`` supports weights.
 
     References
     ----------
@@ -1125,14 +1125,15 @@ def quantile(
         raise ValueError(msg)
 
     # Delegate when possible.
-    if is_numpy_namespace(xp) and nan_policy == "propagate":
+    basic_case = method == "linear" and weights is None
+    np_2 = NUMPY_VERSION >= (2, 0)
+    if is_numpy_namespace(xp) and nan_policy == "propagate" and (basic_case or np_2):
         # TODO: call nanquantile for nan_policy == "omit" once
         # https://github.com/numpy/numpy/issues/29709 is fixed
         return xp.quantile(
             a, q_arr, axis=axis, method=method, keepdims=keepdims, weights=weights
         )
     # No delegation for dask: I couldn't make it work.
-    basic_case = method == "linear" and weights is None
     jax_or_cupy = is_jax_namespace(xp) or is_cupy_namespace(xp)
     if basic_case and nan_policy == "propagate" and jax_or_cupy:
         return xp.quantile(a, q_arr, axis=axis, method=method, keepdims=keepdims)
@@ -1141,8 +1142,8 @@ def quantile(
         return quantile(a, q_arr, dim=axis, interpolation=method, keepdim=keepdims)
 
     # Otherwise call our implementation (will sort data)
-    # XXX: I'm not sure we want to support dask, it seems uterly slow...
     return _quantile.quantile(
+        # XXX: I'm not sure we want to support dask, it seems uterly slow...
         a,
         q_arr,
         axis=axis,
