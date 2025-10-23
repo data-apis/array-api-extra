@@ -1531,7 +1531,9 @@ class TestIsIn:
         res = isin(a, b, kind="sort")
         xp_assert_equal(res, expected)
 
+
 METHOD = Literal["linear", "inverted_cdf", "averaged_inverted_cdf"]
+
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no xp.take")
 class TestQuantile:
@@ -1578,8 +1580,9 @@ class TestQuantile:
     @pytest.mark.parametrize("with_nans", ["no_nans", "with_nans"])
     @pytest.mark.parametrize("method", get_args(METHOD))
     @pytest.mark.parametrize("keepdims", [True, False])
-    def test_against_numpy_nd(self, xp: ModuleType, keepdims: bool,
-                              with_nans: str, method: METHOD):
+    def test_against_numpy_nd(
+        self, xp: ModuleType, keepdims: bool, with_nans: str, method: METHOD
+    ):
         rng = np.random.default_rng()
         a_np = rng.random((3, 4, 5))
         if with_nans == "with_nans":
@@ -1598,7 +1601,10 @@ class TestQuantile:
     @pytest.mark.parametrize("nan_policy", ["no_nans", "propagate"])
     @pytest.mark.parametrize("with_weights", ["with_weights", "no_weights"])
     def test_against_median(
-        self, xp: ModuleType, nan_policy: str, with_weights: str,
+        self,
+        xp: ModuleType,
+        nan_policy: str,
+        with_weights: str,
     ):
         rng = np.random.default_rng()
         n = 40
