@@ -49,10 +49,17 @@ def quantile(  # numpydoc ignore=PR01,RT01
             res = xp.moveaxis(res, axis, 0)
     else:
         weights_arr = xp.asarray(weights, dtype=xp.float64, device=device)
-        average = method == 'averaged_inverted_cdf'
+        average = method == "averaged_inverted_cdf"
         res = _weighted_quantile(
-            a, q, weights_arr, n, axis, average,
-            nan_policy=nan_policy, xp=xp, device=device
+            a,
+            q,
+            weights_arr,
+            n,
+            axis,
+            average,
+            nan_policy=nan_policy,
+            xp=xp,
+            device=device,
         )
 
     # reshaping to conform to doc/other libs' behavior
@@ -72,15 +79,17 @@ def _quantile(  # numpydoc ignore=GL08
     a = xp.sort(a, axis=axis, stable=False)
     mask_nan = xp.any(xp.isnan(a), axis=axis, keepdims=True)
     if xp.any(mask_nan):
-        # propogate NaNs:
+        # propagate NaNs:
         mask = xp.repeat(mask_nan, n, axis=axis)
         a = xp.where(mask, xp.nan, a)
         del mask
 
-    if method == "linear":
-        m = 1 - q
-    else: # method is "inverted_cdf" or "averaged_inverted_cdf"
-        m = xp.asarray(0, dtype=q.dtype)
+    m = (
+        1 - q
+        if method == "linear"
+        # method is "inverted_cdf" or "averaged_inverted_cdf"
+        else xp.asarray(0, dtype=q.dtype)
+    )
 
     jg = q * float(n) + m - 1
 
@@ -90,9 +99,9 @@ def _quantile(  # numpydoc ignore=GL08
     # `̀j` and `jp1` are 1d arrays
 
     g = jg % 1
-    if method == 'inverted_cdf':
+    if method == "inverted_cdf":
         g = xp.astype((g > 0), jg.dtype)
-    elif method == 'averaged_inverted_cdf':
+    elif method == "averaged_inverted_cdf":
         g = (1 + xp.astype((g > 0), jg.dtype)) / 2
 
     g = xp.where(j < 0, 0, g)  # equivalent to g[j < 0] = 0, but works with readonly
@@ -106,8 +115,15 @@ def _quantile(  # numpydoc ignore=GL08
 
 
 def _weighted_quantile(
-    a: Array, q: Array, weights: Array, n: int, axis: int, average: bool, nan_policy: str,
-    xp: ModuleType, device: Device
+    a: Array,
+    q: Array,
+    weights: Array,
+    n: int,
+    axis: int,
+    average: bool,
+    nan_policy: str,
+    xp: ModuleType,
+    device: Device,
 ) -> Array:
     """
     a is expected to be 1d or 2d.
@@ -122,37 +138,45 @@ def _weighted_quantile(
         w = xp.take(weights, sorter)
         return _weighted_quantile_sorted_1d(x, q, w, n, average, nan_policy, xp, device)
 
-    d, = eager_shape(a, axis=0)
+    (d,) = eager_shape(a, axis=0)
     res = []
     for idx in range(d):
         w = weights if weights.ndim == 1 else weights[idx, ...]
         w = xp.take(w, sorter[idx, ...])
         x = xp.take(a[idx, ...], sorter[idx, ...])
-        res.append(_weighted_quantile_sorted_1d(x, q, w, n, average, nan_policy, xp, device))
-    res = xp.stack(res, axis=1)
-    return res
+        res.append(
+            _weighted_quantile_sorted_1d(x, q, w, n, average, nan_policy, xp, device)
+        )
+
+    return xp.stack(res, axis=1)
 
 
 def _weighted_quantile_sorted_1d(
-    x: Array, q: Array, w: Array, n: int, average: bool, nan_policy: str,
-    xp: ModuleType, device: Device
+    x: Array,
+    q: Array,
+    w: Array,
+    n: int,
+    average: bool,
+    nan_policy: str,
+    xp: ModuleType,
+    device: Device,
 ) -> Array:
     if nan_policy == "omit":
-        w = xp.where(xp.isnan(x), 0., w)
+        w = xp.where(xp.isnan(x), 0.0, w)
     elif xp.any(xp.isnan(x)):
         return xp.full(q.shape, xp.nan, dtype=x.dtype, device=device)
     cw = xp.cumulative_sum(w)
     t = cw[-1] * q
-    i = xp.searchsorted(cw, t, side='left')
-    j = xp.searchsorted(cw, t, side='right')
+    i = xp.searchsorted(cw, t, side="left")
+    j = xp.searchsorted(cw, t, side="right")
     i = xp.clip(i, 0, n - 1)
     j = xp.clip(j, 0, n - 1)
 
     # Ignore leading `weights=0` observations when `q=0`
     # see https://github.com/scikit-learn/scikit-learn/pull/20528
-    i = xp.where(q == 0., j, i)
+    i = xp.where(q == 0.0, j, i)
     if average:
         # Ignore trailing `weights=0` observations when `q=1`
-        j = xp.where(q == 1., i, j)
+        j = xp.where(q == 1.0, i, j)
         return (xp.take(x, i) + xp.take(x, j)) / 2
     return xp.take(x, i)

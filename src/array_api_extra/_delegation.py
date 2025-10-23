@@ -1055,7 +1055,8 @@ def quantile(
     if xp is None:
         xp = array_namespace(a)
     if is_pydata_sparse_namespace(xp):
-        raise ValueError('no supported')
+        msg = "Sparse backend not supported"
+        raise ValueError(msg)
 
     methods = {"linear", "inverted_cdf", "averaged_inverted_cdf"}
     if method not in methods:
@@ -1096,7 +1097,10 @@ def quantile(
                 msg = "Axis must be specified when shapes of `a` and ̀ weights` differ."
                 raise TypeError(msg)
             if weights.shape != eager_shape(a, axis):
-                msg = "Shape of weights must be consistent with shape of a along specified axis."
+                msg = (
+                    "Shape of weights must be consistent with shape"
+                    " of a along specified axis."
+                )
                 raise ValueError(msg)
         if axis is None and ndim == 2:
             msg = "When weights are provided, axis must be specified when `a` is 2d"
@@ -1119,7 +1123,9 @@ def quantile(
 
     # Delegate where possible.
     if is_numpy_namespace(xp) and nan_policy == "propagate":
-        return xp.quantile(a, q_arr, axis=axis, method=method, keepdims=keepdims, weights=weights)
+        return xp.quantile(
+            a, q_arr, axis=axis, method=method, keepdims=keepdims, weights=weights
+        )
     # No delegation for dask: I couldn't make it work
     basic_case = method == "linear" and weights is None and nan_policy == "propagate"
     if (basic_case and is_jax_namespace(xp)) or is_cupy_namespace(xp):
@@ -1130,6 +1136,12 @@ def quantile(
     # XXX: I'm not sure we want to support dask, it seems uterly slow...
     # Otherwise call our implementation (will sort data)
     return _quantile.quantile(
-        a, q_arr, axis=axis, method=method, keepdims=keepdims,
-        nan_policy=nan_policy, weights=weights, xp=xp
+        a,
+        q_arr,
+        axis=axis,
+        method=method,
+        keepdims=keepdims,
+        nan_policy=nan_policy,
+        weights=weights,
+        xp=xp,
     )

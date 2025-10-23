@@ -1572,9 +1572,11 @@ class TestQuantile:
             xp_assert_close(actual, expected, atol=1e-12)
 
     @pytest.mark.parametrize("keepdims", [True, False])
-    @pytest.mark.parametrize("nan_policy", ["omit", "no_nans", "propagate"])#, #["omit"])#["no_nans", "propagate"])
-    @pytest.mark.parametrize("q_np", [0.5, 0., 1., np.linspace(0, 1, num=11)])
-    def test_weighted_against_numpy(self, xp: ModuleType, keepdims: bool, q_np: Array | float, nan_policy: str):
+    @pytest.mark.parametrize("nan_policy", ["omit", "no_nans", "propagate"])
+    @pytest.mark.parametrize("q_np", [0.5, 0.0, 1.0, np.linspace(0, 1, num=11)])
+    def test_weighted_against_numpy(
+        self, xp: ModuleType, keepdims: bool, q_np: Array | float, nan_policy: str
+    ):
         rng = np.random.default_rng()
         n, d = 10, 20
         a_np = rng.random((n, d))
@@ -1590,7 +1592,7 @@ class TestQuantile:
 
         a = xp.asarray(a_np, copy=True)
         q = xp.asarray(q_np, copy=True)
-        m = 'inverted_cdf'
+        m = "inverted_cdf"
 
         np_quantile = np.quantile
         if nan_policy == "omit":
@@ -1605,22 +1607,36 @@ class TestQuantile:
             (rng.integers(0, 2, (n, d)), 1),
         ]:
             with warnings.catch_warnings(record=True) as warning:
-                warnings.filterwarnings("always", "invalid value encountered in divide", RuntimeWarning)
-                warnings.filterwarnings("ignore", "All-NaN slice encountered", RuntimeWarning)
+                divide_msg = "invalid value encountered in divide"
+                warnings.filterwarnings("always", divide_msg, RuntimeWarning)
+                nan_slice_msg = "All-NaN slice encountered"
+                warnings.filterwarnings("ignore", nan_slice_msg, RuntimeWarning)
                 try:
                     expected = np_quantile(  # type: ignore[call-overload]
-                        a_np, np.asarray(q_np),
-                        axis=axis, method=m, weights=w_np, keepdims=keepdims
+                        a_np,
+                        np.asarray(q_np),
+                        axis=axis,
+                        method=m,
+                        weights=w_np,
+                        keepdims=keepdims,
                     )
                 except IndexError:
                     continue
-                if warning:  # this means some weights sum was 0, in this case we skip calling xpx.quantile
+                if warning:
+                    # this means some weights sum was 0
+                    # in this case we skip calling xpx.quantile
                     continue
             expected = xp.asarray(expected)
 
             w = xp.asarray(w_np)
-            actual = quantile(  
-                a, q, axis=axis, method=m, weights=w, keepdims=keepdims, nan_policy=nan_policy
+            actual = quantile(
+                a,
+                q,
+                axis=axis,
+                method=m,
+                weights=w,
+                keepdims=keepdims,
+                nan_policy=nan_policy,
             )
             xp_assert_close(actual, expected, atol=1e-12)
 
