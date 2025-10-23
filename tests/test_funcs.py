@@ -1623,7 +1623,8 @@ class TestQuantile:
             a_np[rng.random(n) < rng.random(n) * 0.5] = np.nan
             if w_np is not None:
                 # ensure at least one NaN on non-null weight:
-                a_np[w_np > 0][0] = np.nan
+                nz_weights_idx, = np.where(w_np > 0)
+                a_np[nz_weights_idx[0]] = np.nan
         m = "averaged_inverted_cdf"
 
         np_median = np.nanmedian if nan_policy == "omit" else np.median
