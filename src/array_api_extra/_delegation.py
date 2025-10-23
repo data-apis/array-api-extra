@@ -904,6 +904,7 @@ def quantile(
     axis: int | None = None,
     method: str = "linear",
     keepdims: bool = False,
+    nan_policy: str = "propagate",
     *,
     weights: Array | None = None,
     xp: ModuleType | None = None,
@@ -1051,16 +1052,22 @@ def quantile(
        "Sample quantiles in statistical packages,"
        The American Statistician, 50(4), pp. 361-365, 1996
     """
-    methods = {"linear", "inverted_cdf", "averaged_inverted_cdf"}
+    if xp is None:
+        xp = array_namespace(a)
+    if is_pydata_sparse_namespace(xp):
+        raise ValueError('no supported')
 
+    methods = {"linear", "inverted_cdf", "averaged_inverted_cdf"}
     if method not in methods:
         msg = f"`method` must be one of {methods}"
+        raise ValueError(msg)
+    nan_policies = {"propagate", "omit"}
+    if nan_policy not in nan_policies:
+        msg = f"`nan_policy` must be one of {nan_policies}"
         raise ValueError(msg)
     if keepdims not in {True, False}:
         msg = "If specified, `keepdims` must be True or False."
         raise ValueError(msg)
-    if xp is None:
-        xp = array_namespace(a)
 
     a = xp.asarray(a)
     if not xp.isdtype(a.dtype, ("integral", "real floating")):
@@ -1071,15 +1078,31 @@ def quantile(
         raise ValueError(msg)
     ndim = a.ndim
     if ndim < 1:
-        msg = "`a` must be at least 1-dimensional"
+        msg = "`a` must be at least 1-dimensional."
         raise TypeError(msg)
     if axis is not None and ((axis >= ndim) or (axis < -ndim)):
         msg = "`axis` is not compatible with the dimension of `a`."
         raise ValueError(msg)
+    if weights is None:
+        if nan_policy != "propagate":
+            msg = ""
+            raise ValueError(msg)
+    else:
+        if ndim > 2:
+            msg = "When weights are provided, dimension of `a` must be 1 or 2."
+            raise ValueError(msg)
+        if a.shape != weights.shape:
+            if axis is None:
+                msg = "Axis must be specified when shapes of `a` and ̀ weights` differ."
+                raise TypeError(msg)
+            if weights.shape != eager_shape(a, axis):
+                msg = "Shape of weights must be consistent with shape of a along specified axis."
+                raise ValueError(msg)
+        if axis is None and ndim == 2:
+            msg = "When weights are provided, axis must be specified when `a` is 2d"
+            raise ValueError(msg)
 
-    # Array API states: Mixed integer and floating-point type promotion rules
-    # are not specified because behavior varies between implementations.
-    # We chose to align with numpy (see docstring):
+    # Align result dtype with what numpy does:
     dtype = xp.result_type(
         xp.float64 if xp.isdtype(a.dtype, "integral") else a,
         xp.asarray(q),
@@ -1088,20 +1111,25 @@ def quantile(
     device = get_device(a)
     a = xp.asarray(a, dtype=dtype, device=device)
     q = xp.asarray(q, dtype=dtype, device=device)
+    # TODO: cast weights here? Assert weights are on the same device as `a`?
 
     if xp.any((q > 1) | (q < 0) | xp.isnan(q)):
         msg = "`q` values must be in the range [0, 1]"
         raise ValueError(msg)
 
     # Delegate where possible.
-    if is_numpy_namespace(xp):
+    if is_numpy_namespace(xp) and nan_policy == "propagate":
         return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims, weights=weights)
     # No delegation for dask: I couldn't make it work
-    basic_case = method == "linear" and weights is None
+    basic_case = method == "linear" and weights is None and nan_policy == "propagate"
     if (basic_case and is_jax_namespace(xp)) or is_cupy_namespace(xp):
         return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims)
     if basic_case and is_torch_namespace(xp):
         return xp.quantile(a, q, dim=axis, interpolation=method, keepdim=keepdims)
 
+    # XXX: I'm not sure we want to support dask, it seems uterly slow...
     # Otherwise call our implementation (will sort data)
-    return _quantile.quantile(a, q, axis=axis, method=method, keepdims=keepdims, xp=xp)
+    return _quantile.quantile(
+        a, q, axis=axis, method=method, keepdims=keepdims,
+        nan_policy=nan_policy, weights=weights, xp=xp
+    )

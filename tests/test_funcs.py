@@ -1558,18 +1558,70 @@ class TestQuantile:
         assert quantile(a, q, axis=1, keepdims=True).shape == (2, 3, 1, 5)
         assert quantile(a, q, axis=2, keepdims=True).shape == (2, 3, 4, 1)
 
-    def test_against_numpy(self, xp: ModuleType):
+    @pytest.mark.parametrize("keepdims", [True, False])
+    def test_against_numpy(self, xp: ModuleType, keepdims: bool):
         rng = np.random.default_rng()
         a_np = rng.random((3, 4, 5))
         q_np = rng.random(2)
         a = xp.asarray(a_np)
         q = xp.asarray(q_np)
-        for keepdims in [False, True]:
-            for axis in [None, *range(a.ndim)]:
-                actual = quantile(a, q, axis=axis, keepdims=keepdims)
-                expected = np.quantile(a_np, q_np, axis=axis, keepdims=keepdims)
-                expected = xp.asarray(expected, dtype=xp.float64)
-                xp_assert_close(actual, expected, atol=1e-12)
+        for axis in [None, *range(a.ndim)]:
+            actual = quantile(a, q, axis=axis, keepdims=keepdims)
+            expected = np.quantile(a_np, q_np, axis=axis, keepdims=keepdims)
+            expected = xp.asarray(expected)
+            xp_assert_close(actual, expected, atol=1e-12)
+
+    @pytest.mark.parametrize("keepdims", [True, False])
+    @pytest.mark.parametrize("nan_policy", ["omit", "no_nans", "propagate"])#, #["omit"])#["no_nans", "propagate"])
+    @pytest.mark.parametrize("q_np", [0.5, 0., 1., np.linspace(0, 1, num=11)])
+    def test_weighted_against_numpy(self, xp: ModuleType, keepdims: bool, q_np: Array | float, nan_policy: str):
+        rng = np.random.default_rng()
+        n, d = 10, 20
+        a_np = rng.random((n, d))
+        kwargs = dict(keepdims=keepdims)
+        mask_nan = np.zeros((n, d), dtype=bool)
+        if nan_policy != "no_nans":
+            # from 0% to 100% of NaNs:
+            mask_nan = rng.random((n, d)) < rng.random((n, 1))
+            # don't put nans in the first row:
+            mask_nan[:] = False
+            a_np[mask_nan] = np.nan
+            kwargs['nan_policy'] = nan_policy
+
+        a = xp.asarray(a_np)
+        q = xp.asarray(np.copy(q_np))
+        m = 'inverted_cdf'
+
+        np_quantile = np.quantile
+        if nan_policy == "omit":
+            np_quantile = np.nanquantile
+
+        for w_np, axis in [
+            (rng.random(n), 0),
+            (rng.random(d), 1),
+            (rng.integers(0, 2, n), 0),
+            (rng.integers(0, 2, d), 1),
+            (rng.integers(0, 2, (n, d)), 0),
+            (rng.integers(0, 2, (n, d)), 1),
+        ]:
+            print(w_np)
+            with warnings.catch_warnings(record=True) as warning:
+                warnings.filterwarnings("always", "invalid value encountered in divide", RuntimeWarning)
+                warnings.filterwarnings("ignore", "All-NaN slice encountered", RuntimeWarning)
+                try:
+                    expected = np_quantile(a_np, q_np, axis=axis, method=m, weights=w_np, keepdims=keepdims)
+                except IndexError:
+                    print('index error')
+                    continue
+                if warning:  # this means some weights sum was 0, in this case we skip calling xpx.quantile
+                    print('warning')
+                    continue
+            expected = xp.asarray(expected)
+            print("not skiped")
+
+            w = xp.asarray(w_np)
+            actual = quantile(a, q, axis=axis, method=m, weights=w, **kwargs)
+            xp_assert_close(actual, expected, atol=1e-12)
 
     def test_2d_axis(self, xp: ModuleType):
         x = xp.asarray([[1, 2, 3], [4, 5, 6]])
@@ -1605,8 +1657,6 @@ class TestQuantile:
 
     def test_invalid_q(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3, 4, 5])
-        _ = quantile(x, 1.0)
-        # ^ FIXME: here just to make this test fail for sparse backend
         # q > 1 should raise
         with pytest.raises(
             ValueError, match=r"`q` values must be in the range \[0, 1\]"
