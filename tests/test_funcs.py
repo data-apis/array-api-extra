@@ -1606,7 +1606,7 @@ class TestQuantile:
 
     @pytest.mark.parametrize("nan_policy", ["no_nans", "propagate"])
     @pytest.mark.parametrize("with_weights", ["with_weights", "no_weights"])
-    def test_against_median(
+    def test_against_median_min_max(
         self,
         xp: ModuleType,
         nan_policy: str,
@@ -1625,15 +1625,27 @@ class TestQuantile:
                 # ensure at least one NaN on non-null weight:
                 (nz_weights_idx,) = np.where(w_np > 0)
                 a_np[nz_weights_idx[0]] = np.nan
-        m = "averaged_inverted_cdf"
 
-        np_median = np.nanmedian if nan_policy == "omit" else np.median
         a_np_med = a_np if w_np is None else a_np[w_np > 0]
-        expected = np_median(a_np_med)
         a = xp.asarray(a_np)
         w = xp.asarray(w_np) if w_np is not None else None
-        actual = quantile(a, 0.5, method=m, nan_policy=nan_policy, weights=w)
+
+        np_median = np.nanmedian if nan_policy == "omit" else np.median
+        expected = np_median(a_np_med)
+        method = "averaged_inverted_cdf"
+        actual = quantile(a, 0.5, method=method, nan_policy=nan_policy, weights=w)
         xp_assert_close(actual, xp.asarray(expected))
+
+        for method in ["inverted_cdf", "averaged_inverted_cdf"]:
+            np_min = np.nanmin if nan_policy == "omit" else np.min
+            expected = np_min(a_np_med)
+            actual = quantile(a, 0., method=method, nan_policy=nan_policy, weights=w)
+            xp_assert_close(actual, xp.asarray(expected))
+
+            np_max = np.nanmax if nan_policy == "omit" else np.max
+            expected = np_max(a_np_med)
+            actual = quantile(a, 1., method=method, nan_policy=nan_policy, weights=w)
+            xp_assert_close(actual, xp.asarray(expected))
 
     @pytest.mark.parametrize("keepdims", [True, False])
     @pytest.mark.parametrize("nan_policy", ["no_nans", "propagate", "omit"])
