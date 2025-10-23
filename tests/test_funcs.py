@@ -1532,11 +1532,11 @@ class TestIsIn:
         xp_assert_equal(res, expected)
 
 
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="unique_values returns arrays")
 @pytest.mark.skip_xp_backend(
     Backend.ARRAY_API_STRICTEST,
     reason="data_dependent_shapes flag for unique_values is disabled",
 )
-@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="unique_values returns arrays")
 class TestUnion1d:
     def test_simple(self, xp: ModuleType):
         a = xp.asarray([-1, 1, 0])
@@ -1559,6 +1559,7 @@ class TestUnion1d:
         res = union1d(a, b)
         xp_assert_equal(res, expected)
 
+    @pytest.mark.skip_xp_backend(Backend.TORCH, reason="materialize 'meta' device")
     def test_device(self, xp: ModuleType, device: Device):
         a = xp.asarray([-1, 1, 0], device=device)
         b = xp.asarray([2, -2, 0], device=device)
