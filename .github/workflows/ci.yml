@@ -30,7 +30,7 @@ jobs:
 
       - uses: prefix-dev/setup-pixi@194d461b21b6c5717c722ffc597fa91ed2ff29fa # v0.9.1
         with:
-          pixi-version: v0.50.2
+          pixi-version: v0.58.0
           cache: true
           environments: lint
 
@@ -59,7 +59,7 @@ jobs:
 
       - uses: prefix-dev/setup-pixi@194d461b21b6c5717c722ffc597fa91ed2ff29fa # v0.9.1
         with:
-          pixi-version: v0.50.2
+          pixi-version: v0.58.0
           cache: true
           environments: ${{ matrix.environment }}
 

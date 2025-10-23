@@ -1,8 +1,5 @@
 lefthook: pixi run --no-progress --environment=lint lefthook
 
-templates:
-  run: run --quiet --no-progress --environment=lint
-
 colors: true
 
 output:
@@ -22,7 +19,7 @@ pre-commit:
     - name: dprint
       glob: "*.{json,jsonc,md,toml,yaml,yml}"
       stage_fixed: true
-      run: pixi {run} dprint
+      run: dprint fmt
     - name: ruff
       glob: "*.{py,pyi}"
       stage_fixed: true
@@ -30,27 +27,27 @@ pre-commit:
         piped: true
         jobs:
           - name: ruff check
-            run: pixi {run} ruff-check {staged_files}
+            run: ruff check --fix {staged_files}
           - name: ruff format
-            run: pixi {run} ruff-format {staged_files}
+            run: ruff format {staged_files}
     - name: pyright
       glob: "*.{py,pyi}"
-      run: pixi {run} pyright
+      run: basedpyright
     - name: mypy
       glob: "*.{py,pyi}"
-      run: pixi {run} mypy
+      run: mypy
     - name: typos
       stage_fixed: true
-      run: pixi {run} typos
+      run: typos --write-changes --force-exclude
     - name: actionlint
-      run: pixi {run} actionlint
+      run: actionlint
     - name: blacken-docs
       glob: "*.md"
       stage_fixed: true
-      run: pixi {run} blacken-docs {staged_files}
+      run: blacken-docs {staged_files}
     - name: validate-pyproject
       glob: "pyproject.toml"
-      run: pixi {run} validate-pyproject
+      run: validate-pyproject pyproject.toml
     - name: numpydoc
       glob: "*.py"
-      run: pixi {run} numpydoc {staged_files}
+      run: numpydoc lint {staged_files}
