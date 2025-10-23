@@ -938,12 +938,15 @@ def quantile(
         9. 'normal_unbiased'
 
         The first three methods are discontinuous.
-        Only 'linear' is implemented for now.
+        Only 'linear', 'inverted_cdf' and 'averaged_inverted_cdf' are implemented.
 
     keepdims : bool, optional
         If this is set to True, the axes which are reduced are left in
         the result as dimensions with size one. With this option, the
         result will broadcast correctly against the original array `a`.
+
+    nan_policy : str, optional
+        'propagate' (default) or 'omit'.
 
     weights : array_like, optional
         An array of weights associated with the values in `a`. Each value in
@@ -1121,20 +1124,24 @@ def quantile(
         msg = "`q` values must be in the range [0, 1]"
         raise ValueError(msg)
 
-    # Delegate where possible.
+    # Delegate when possible.
     if is_numpy_namespace(xp) and nan_policy == "propagate":
+        # TODO: call nanquantile for nan_policy == "omit" once
+        # https://github.com/numpy/numpy/issues/29709 is fixed
         return xp.quantile(
             a, q_arr, axis=axis, method=method, keepdims=keepdims, weights=weights
         )
-    # No delegation for dask: I couldn't make it work
-    basic_case = method == "linear" and weights is None and nan_policy == "propagate"
-    if (basic_case and is_jax_namespace(xp)) or is_cupy_namespace(xp):
+    # No delegation for dask: I couldn't make it work.
+    basic_case = method == "linear" and weights is None
+    jax_or_cupy = is_jax_namespace(xp) or is_cupy_namespace(xp)
+    if basic_case and nan_policy == "propagate" and jax_or_cupy:
         return xp.quantile(a, q_arr, axis=axis, method=method, keepdims=keepdims)
     if basic_case and is_torch_namespace(xp):
-        return xp.quantile(a, q_arr, dim=axis, interpolation=method, keepdim=keepdims)
+        quantile = xp.quantile if nan_policy == "propagate" else xp.nanquantile
+        return quantile(a, q_arr, dim=axis, interpolation=method, keepdim=keepdims)
 
-    # XXX: I'm not sure we want to support dask, it seems uterly slow...
     # Otherwise call our implementation (will sort data)
+    # XXX: I'm not sure we want to support dask, it seems uterly slow...
     return _quantile.quantile(
         a,
         q_arr,

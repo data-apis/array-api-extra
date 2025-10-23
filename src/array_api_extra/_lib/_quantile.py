@@ -73,9 +73,10 @@ def quantile(  # numpydoc ignore=PR01,RT01
     return res[0, ...] if q_scalar else res
 
 
-def _quantile(  # numpydoc ignore=GL08
+def _quantile(  # numpydoc ignore=PR01,RT01
     a: Array, q: Array, n: int, axis: int, method: str, xp: ModuleType
 ) -> Array:
+    """Compute quantile by sorting `a`."""
     a = xp.sort(a, axis=axis, stable=False)
     mask_nan = xp.any(xp.isnan(a), axis=axis, keepdims=True)
     if xp.any(mask_nan):
@@ -114,7 +115,7 @@ def _quantile(  # numpydoc ignore=GL08
     )
 
 
-def _weighted_quantile(
+def _weighted_quantile(  # numpydoc ignore=PR01,RT01
     a: Array,
     q: Array,
     weights: Array,
@@ -126,7 +127,9 @@ def _weighted_quantile(
     device: Device,
 ) -> Array:
     """
-    a is expected to be 1d or 2d.
+    Compute weighted quantile using searchsorted on CDF.
+
+    `a` is expected to be 1d or 2d.
     """
     a = xp.moveaxis(a, axis, -1)
     if weights.ndim > 1:
@@ -151,7 +154,7 @@ def _weighted_quantile(
     return xp.stack(res, axis=1)
 
 
-def _weighted_quantile_sorted_1d(
+def _weighted_quantile_sorted_1d(  # numpydoc ignore=GL08
     x: Array,
     q: Array,
     w: Array,
@@ -165,10 +168,10 @@ def _weighted_quantile_sorted_1d(
         w = xp.where(xp.isnan(x), 0.0, w)
     elif xp.any(xp.isnan(x)):
         return xp.full(q.shape, xp.nan, dtype=x.dtype, device=device)
-    cw = xp.cumulative_sum(w)
-    t = cw[-1] * q
-    i = xp.searchsorted(cw, t, side="left")
-    j = xp.searchsorted(cw, t, side="right")
+    cdf = xp.cumulative_sum(w)
+    t = cdf[-1] * q
+    i = xp.searchsorted(cdf, t, side="left")
+    j = xp.searchsorted(cdf, t, side="right")
     i = xp.clip(i, 0, n - 1)
     j = xp.clip(j, 0, n - 1)
 
