@@ -1078,6 +1078,8 @@ def quantile(
     if not xp.isdtype(xp.asarray(q).dtype, "real floating"):
         msg = "`q` must have real floating dtype."
         raise ValueError(msg)
+    weights = None if weights is None else xp.asarray(weights)
+
     ndim = a.ndim
     if ndim < 1:
         msg = "`a` must be at least 1-dimensional."
@@ -1087,9 +1089,15 @@ def quantile(
         raise ValueError(msg)
     if weights is None:
         if nan_policy != "propagate":
-            msg = "When `weights` aren't provided, `nan_policy` must be 'propagate'"
+            msg = "When `weights` aren't provided, `nan_policy` must be 'propagate'."
             raise ValueError(msg)
     else:
+        if method not in {"inverted_cdf", "averaged_inverted_cdf"}:
+            msg = f"`method` '{method}' not supported with weights."
+            raise ValueError(msg)
+        if not xp.isdtype(weights.dtype, ("integral", "real floating")):
+            msg = "`weights` must have real dtype."
+            raise ValueError(msg)
         if ndim > 2:
             msg = "When weights are provided, dimension of `a` must be 1 or 2."
             raise ValueError(msg)

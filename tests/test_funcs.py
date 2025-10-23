@@ -1623,7 +1623,7 @@ class TestQuantile:
             a_np[rng.random(n) < rng.random(n) * 0.5] = np.nan
             if w_np is not None:
                 # ensure at least one NaN on non-null weight:
-                nz_weights_idx, = np.where(w_np > 0)
+                (nz_weights_idx,) = np.where(w_np > 0)
                 a_np[nz_weights_idx[0]] = np.nan
         m = "averaged_inverted_cdf"
 
@@ -1747,17 +1747,21 @@ class TestQuantile:
             _ = quantile(xp.asarray([3.0]), 0.5, axis=1)
         # with weights:
         method = "inverted_cdf"
+
         shape = (2, 3, 4)
         with pytest.raises(ValueError, match="dimension of `a` must be 1 or 2"):
             _ = quantile(
                 xp.ones(shape), 0.5, axis=1, weights=xp.ones(shape), method=method
             )
+
         with pytest.raises(TypeError, match="Axis must be specified"):
             _ = quantile(xp.ones((2, 3)), 0.5, weights=xp.ones(3), method=method)
+
         with pytest.raises(ValueError, match="Shape of weights must be consistent"):
             _ = quantile(
                 xp.ones((2, 3)), 0.5, axis=0, weights=xp.ones(3), method=method
             )
+
         with pytest.raises(ValueError, match="Axis must be specified"):
             _ = quantile(xp.ones((2, 3)), 0.5, weights=xp.ones((2, 3)), method=method)
 
@@ -1765,13 +1769,20 @@ class TestQuantile:
         with pytest.raises(ValueError, match="`a` must have real dtype"):
             _ = quantile(xp.ones(5, dtype=xp.bool), 0.5)
 
+        a = xp.ones(5)
         with pytest.raises(ValueError, match="`q` must have real floating dtype"):
-            _ = quantile(xp.ones(5), xp.asarray([0, 1]))
+            _ = quantile(a, xp.asarray([0, 1]))
+
+        weights = xp.ones(5, dtype=xp.bool)
+        with pytest.raises(ValueError, match="`weights` must have real dtype"):
+            _ = quantile(a, 0.5, weights=weights, method="inverted_cdf")
 
     def test_invalid_method(self, xp: ModuleType):
         with pytest.raises(ValueError, match="`method` must be one of"):
             _ = quantile(xp.ones(5), 0.5, method="invalid")
-        # TODO: with weights?
+
+        with pytest.raises(ValueError, match="not supported with weights"):
+            _ = quantile(xp.ones(5), 0.5, method="linear", weights=xp.ones(5))
 
     def test_invalid_nan_policy(self, xp: ModuleType):
         with pytest.raises(ValueError, match="`nan_policy` must be one of"):
