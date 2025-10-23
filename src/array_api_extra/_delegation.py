@@ -948,6 +948,7 @@ def quantile(
 
     nan_policy : str, optional
         'propagate' (default) or 'omit'.
+        'omit' is support only when `weights` are provided.
 
     weights : array_like, optional
         An array of weights associated with the values in `a`. Each value in
@@ -1125,19 +1126,26 @@ def quantile(
         raise ValueError(msg)
 
     # Delegate when possible.
+    # Note: No delegation for dask: I couldn't make it work.
     basic_case = method == "linear" and weights is None
+
     np_2 = NUMPY_VERSION >= (2, 0)
-    if is_numpy_namespace(xp) and nan_policy == "propagate" and (basic_case or np_2):
+    np_handles_weights = np_2 and nan_policy == "propagate" and method == "inverted_cdf"
+    if weights is None:
+        if is_numpy_namespace(xp) and (basic_case or np_2):
+            quantile = xp.quantile if nan_policy == "propagate" else xp.nanquantile
+            return quantile(a, q_arr, axis=axis, method=method, keepdims=keepdims)
+    elif is_numpy_namespace(xp) and np_handles_weights:
         # TODO: call nanquantile for nan_policy == "omit" once
         # https://github.com/numpy/numpy/issues/29709 is fixed
         return xp.quantile(
             a, q_arr, axis=axis, method=method, keepdims=keepdims, weights=weights
         )
-    # No delegation for dask: I couldn't make it work.
+
     jax_or_cupy = is_jax_namespace(xp) or is_cupy_namespace(xp)
-    if basic_case and nan_policy == "propagate" and jax_or_cupy:
+    if jax_or_cupy and basic_case and nan_policy == "propagate":
         return xp.quantile(a, q_arr, axis=axis, method=method, keepdims=keepdims)
-    if basic_case and is_torch_namespace(xp):
+    if is_torch_namespace(xp) and basic_case:
         quantile = xp.quantile if nan_policy == "propagate" else xp.nanquantile
         return quantile(a, q_arr, dim=axis, interpolation=method, keepdim=keepdims)
 

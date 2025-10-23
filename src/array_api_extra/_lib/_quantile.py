@@ -36,12 +36,6 @@ def quantile(  # numpydoc ignore=PR01,RT01
         axis = int(axis)
 
     (n,) = eager_shape(a, axis)
-    # If data has length zero along `axis`, the result will be an array of NaNs just
-    # as if the data had length 1 along axis and were filled with NaNs.
-    if n == 0:
-        a_shape[axis] = 1
-        n = 1
-        a = xp.full(tuple(a_shape), xp.nan, dtype=a.dtype, device=device)
 
     if weights is None:
         res = _quantile(a, q, n, axis, method, xp)
@@ -93,12 +87,7 @@ def _quantile(  # numpydoc ignore=PR01,RT01
     )
 
     jg = q * float(n) + m - 1
-
     j = jg // 1
-    j = xp.clip(j, 0.0, float(n - 1))
-    jp1 = xp.clip(j + 1, 0.0, float(n - 1))
-    # `̀j` and `jp1` are 1d arrays
-
     g = jg % 1
     if method == "inverted_cdf":
         g = xp.astype((g > 0), jg.dtype)
@@ -109,6 +98,10 @@ def _quantile(  # numpydoc ignore=PR01,RT01
     new_g_shape = [1] * a.ndim
     new_g_shape[axis] = g.shape[0]
     g = xp.reshape(g, tuple(new_g_shape))
+
+    j = xp.clip(j, 0.0, float(n - 1))
+    jp1 = xp.clip(j + 1, 0.0, float(n - 1))
+    # `̀j` and `jp1` are 1d arrays
 
     return (1 - g) * xp.take(a, xp.astype(j, xp.int64), axis=axis) + g * xp.take(
         a, xp.astype(jp1, xp.int64), axis=axis
