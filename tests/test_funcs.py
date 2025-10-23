@@ -1621,10 +1621,14 @@ class TestQuantile:
         else:
             # from 0% to 50% of NaNs:
             a_np[rng.random(n) < rng.random(n) * 0.5] = np.nan
+            if w_np is not None:
+                # ensure at least one NaN on non-null weight:
+                a_np[w_np > 0][0] = np.nan
         m = "averaged_inverted_cdf"
 
         np_median = np.nanmedian if nan_policy == "omit" else np.median
-        expected = np_median(a_np if w_np is None else a_np[w_np > 0])
+        a_np_med = a_np if w_np is None else a_np[w_np > 0]
+        expected = np_median(a_np_med)
         a = xp.asarray(a_np)
         w = xp.asarray(w_np) if w_np is not None else None
         actual = quantile(a, 0.5, method=m, nan_policy=nan_policy, weights=w)
