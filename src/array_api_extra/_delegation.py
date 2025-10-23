@@ -1070,9 +1070,6 @@ def quantile(
     if nan_policy not in nan_policies:
         msg = f"`nan_policy` must be one of {nan_policies}"
         raise ValueError(msg)
-    if keepdims not in {True, False}:
-        msg = "If specified, `keepdims` must be True or False."
-        raise ValueError(msg)
 
     a = xp.asarray(a)
     if not xp.isdtype(a.dtype, ("integral", "real floating")):
@@ -1090,7 +1087,7 @@ def quantile(
         raise ValueError(msg)
     if weights is None:
         if nan_policy != "propagate":
-            msg = ""
+            msg = "When `weights` aren't provided, `nan_policy` must be 'propagate'"
             raise ValueError(msg)
     else:
         if ndim > 2:
@@ -1107,7 +1104,7 @@ def quantile(
                 )
                 raise ValueError(msg)
         if axis is None and ndim == 2:
-            msg = "When weights are provided, axis must be specified when `a` is 2d"
+            msg = "Axis must be specified when `a` and ̀ weights` are 2d."
             raise ValueError(msg)
 
     # Align result dtype with what numpy does:

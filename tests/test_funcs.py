@@ -1543,6 +1543,12 @@ class TestQuantile:
         expect = xp.asarray(3.0, dtype=xp.float64)
         xp_assert_close(actual, expect)
 
+    def test_xp(self, xp: ModuleType):
+        x = xp.asarray([1, 2, 3, 4, 5])
+        actual = quantile(x, 0.5, xp=xp)
+        expect = xp.asarray(3.0, dtype=xp.float64)
+        xp_assert_close(actual, expect)
+
     def test_multiple_quantiles(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3, 4, 5])
         actual = quantile(x, xp.asarray([0.25, 0.5, 0.75]))
@@ -1729,15 +1735,49 @@ class TestQuantile:
         ):
             _ = quantile(x, -0.5)
 
+    def test_invalid_shape(self, xp: ModuleType):
+        with pytest.raises(TypeError, match="at least 1-dimensional"):
+            _ = quantile(xp.asarray(3.0), 0.5)
+        with pytest.raises(ValueError, match="not compatible with the dimension"):
+            _ = quantile(xp.asarray([3.0]), 0.5, axis=1)
+        # with weights:
+        method = "inverted_cdf"
+        shape = (2, 3, 4)
+        with pytest.raises(ValueError, match="dimension of `a` must be 1 or 2"):
+            _ = quantile(
+                xp.ones(shape), 0.5, axis=1, weights=xp.ones(shape), method=method
+            )
+        with pytest.raises(TypeError, match="Axis must be specified"):
+            _ = quantile(xp.ones((2, 3)), 0.5, weights=xp.ones(3), method=method)
+        with pytest.raises(ValueError, match="Shape of weights must be consistent"):
+            _ = quantile(
+                xp.ones((2, 3)), 0.5, axis=0, weights=xp.ones(3), method=method
+            )
+        with pytest.raises(ValueError, match="Axis must be specified"):
+            _ = quantile(xp.ones((2, 3)), 0.5, weights=xp.ones((2, 3)), method=method)
+
+    def test_invalid_dtype(self, xp: ModuleType):
+        with pytest.raises(ValueError, match="`a` must have real dtype"):
+            _ = quantile(xp.ones(5, dtype=xp.bool), 0.5)
+
+        with pytest.raises(ValueError, match="`q` must have real floating dtype"):
+            _ = quantile(xp.ones(5), xp.asarray([0, 1]))
+
+    def test_invalid_method(self, xp: ModuleType):
+        with pytest.raises(ValueError, match="`method` must be one of"):
+            _ = quantile(xp.ones(5), 0.5, method="invalid")
+        # TODO: with weights?
+
+    def test_invalid_nan_policy(self, xp: ModuleType):
+        with pytest.raises(ValueError, match="`nan_policy` must be one of"):
+            _ = quantile(xp.ones(5), 0.5, nan_policy="invalid")
+
+        with pytest.raises(ValueError, match="must be 'propagate'"):
+            _ = quantile(xp.ones(5), 0.5, nan_policy="omit")
+
     def test_device(self, xp: ModuleType, device: Device):
         if hasattr(device, "type") and device.type == "meta":  # pyright: ignore[reportAttributeAccessIssue]
             pytest.xfail("No Tensor.item() on meta device")
         x = xp.asarray([1, 2, 3, 4, 5], device=device)
         actual = quantile(x, 0.5)
         assert get_device(actual) == device
-
-    def test_xp(self, xp: ModuleType):
-        x = xp.asarray([1, 2, 3, 4, 5])
-        actual = quantile(x, 0.5, xp=xp)
-        expect = xp.asarray(3.0, dtype=xp.float64)
-        xp_assert_close(actual, expect)
