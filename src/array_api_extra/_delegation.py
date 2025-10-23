@@ -1110,26 +1110,26 @@ def quantile(
     )
     device = get_device(a)
     a = xp.asarray(a, dtype=dtype, device=device)
-    q = xp.asarray(q, dtype=dtype, device=device)
+    q_arr = xp.asarray(q, dtype=dtype, device=device)
     # TODO: cast weights here? Assert weights are on the same device as `a`?
 
-    if xp.any((q > 1) | (q < 0) | xp.isnan(q)):
+    if xp.any((q_arr > 1) | (q_arr < 0) | xp.isnan(q_arr)):
         msg = "`q` values must be in the range [0, 1]"
         raise ValueError(msg)
 
     # Delegate where possible.
     if is_numpy_namespace(xp) and nan_policy == "propagate":
-        return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims, weights=weights)
+        return xp.quantile(a, q_arr, axis=axis, method=method, keepdims=keepdims, weights=weights)
     # No delegation for dask: I couldn't make it work
     basic_case = method == "linear" and weights is None and nan_policy == "propagate"
     if (basic_case and is_jax_namespace(xp)) or is_cupy_namespace(xp):
-        return xp.quantile(a, q, axis=axis, method=method, keepdims=keepdims)
+        return xp.quantile(a, q_arr, axis=axis, method=method, keepdims=keepdims)
     if basic_case and is_torch_namespace(xp):
-        return xp.quantile(a, q, dim=axis, interpolation=method, keepdim=keepdims)
+        return xp.quantile(a, q_arr, dim=axis, interpolation=method, keepdim=keepdims)
 
     # XXX: I'm not sure we want to support dask, it seems uterly slow...
     # Otherwise call our implementation (will sort data)
     return _quantile.quantile(
-        a, q, axis=axis, method=method, keepdims=keepdims,
+        a, q_arr, axis=axis, method=method, keepdims=keepdims,
         nan_policy=nan_policy, weights=weights, xp=xp
     )

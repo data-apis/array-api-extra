@@ -48,10 +48,10 @@ def quantile(  # numpydoc ignore=PR01,RT01
         if not axis_none:
             res = xp.moveaxis(res, axis, 0)
     else:
-        weights = xp.asarray(weights, dtype=xp.float64, device=device)
+        weights_arr = xp.asarray(weights, dtype=xp.float64, device=device)
         average = method == 'averaged_inverted_cdf'
         res = _weighted_quantile(
-            a, q, weights, n, axis, average,
+            a, q, weights_arr, n, axis, average,
             nan_policy=nan_policy, xp=xp, device=device
         )
 
@@ -80,7 +80,7 @@ def _quantile(  # numpydoc ignore=GL08
     if method == "linear":
         m = 1 - q
     else: # method is "inverted_cdf" or "averaged_inverted_cdf"
-        m = 0
+        m = xp.asarray(0, dtype=q.dtype)
 
     jg = q * float(n) + m - 1
 
@@ -112,7 +112,6 @@ def _weighted_quantile(
     """
     a is expected to be 1d or 2d.
     """
-    kwargs = dict(n=n, average=average, nan_policy=nan_policy, xp=xp, device=device)
     a = xp.moveaxis(a, axis, -1)
     if weights.ndim > 1:
         weights = xp.moveaxis(weights, axis, -1)
@@ -121,7 +120,7 @@ def _weighted_quantile(
     if a.ndim == 1:
         x = xp.take(a, sorter)
         w = xp.take(weights, sorter)
-        return _weighted_quantile_sorted_1d(x, q, w, **kwargs)
+        return _weighted_quantile_sorted_1d(x, q, w, n, average, nan_policy, xp, device)
 
     d, = eager_shape(a, axis=0)
     res = []
@@ -129,7 +128,7 @@ def _weighted_quantile(
         w = weights if weights.ndim == 1 else weights[idx, ...]
         w = xp.take(w, sorter[idx, ...])
         x = xp.take(a[idx, ...], sorter[idx, ...])
-        res.append(_weighted_quantile_sorted_1d(x, q, w, **kwargs))
+        res.append(_weighted_quantile_sorted_1d(x, q, w, n, average, nan_policy, xp, device))
     res = xp.stack(res, axis=1)
     return res
 

@@ -1578,18 +1578,18 @@ class TestQuantile:
         rng = np.random.default_rng()
         n, d = 10, 20
         a_np = rng.random((n, d))
-        kwargs = dict(keepdims=keepdims)
         mask_nan = np.zeros((n, d), dtype=bool)
-        if nan_policy != "no_nans":
+        if nan_policy == "no_nans":
+            nan_policy = "propagate"
+        else:
             # from 0% to 100% of NaNs:
             mask_nan = rng.random((n, d)) < rng.random((n, 1))
             # don't put nans in the first row:
             mask_nan[:] = False
             a_np[mask_nan] = np.nan
-            kwargs['nan_policy'] = nan_policy
 
-        a = xp.asarray(a_np)
-        q = xp.asarray(np.copy(q_np))
+        a = xp.asarray(a_np, copy=True)
+        q = xp.asarray(q_np, copy=True)
         m = 'inverted_cdf'
 
         np_quantile = np.quantile
@@ -1604,23 +1604,24 @@ class TestQuantile:
             (rng.integers(0, 2, (n, d)), 0),
             (rng.integers(0, 2, (n, d)), 1),
         ]:
-            print(w_np)
             with warnings.catch_warnings(record=True) as warning:
                 warnings.filterwarnings("always", "invalid value encountered in divide", RuntimeWarning)
                 warnings.filterwarnings("ignore", "All-NaN slice encountered", RuntimeWarning)
                 try:
-                    expected = np_quantile(a_np, q_np, axis=axis, method=m, weights=w_np, keepdims=keepdims)
+                    expected = np_quantile(  # type: ignore[call-overload]
+                        a_np, np.asarray(q_np),
+                        axis=axis, method=m, weights=w_np, keepdims=keepdims
+                    )
                 except IndexError:
-                    print('index error')
                     continue
                 if warning:  # this means some weights sum was 0, in this case we skip calling xpx.quantile
-                    print('warning')
                     continue
             expected = xp.asarray(expected)
-            print("not skiped")
 
             w = xp.asarray(w_np)
-            actual = quantile(a, q, axis=axis, method=m, weights=w, **kwargs)
+            actual = quantile(  
+                a, q, axis=axis, method=m, weights=w, keepdims=keepdims, nan_policy=nan_policy
+            )
             xp_assert_close(actual, expected, atol=1e-12)
 
     def test_2d_axis(self, xp: ModuleType):
