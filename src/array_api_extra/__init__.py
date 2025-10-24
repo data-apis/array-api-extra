@@ -12,6 +12,7 @@ from ._delegation import (
     pad,
     partition,
     sinc,
+    union1d,
 )
 from ._lib._at import at
 from ._lib._funcs import (
@@ -50,4 +51,5 @@ __all__ = [
     "partition",
     "setdiff1d",
     "sinc",
+    "union1d",
 ]
