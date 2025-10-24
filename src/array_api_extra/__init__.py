@@ -11,6 +11,7 @@ from ._delegation import (
     one_hot,
     pad,
     partition,
+    setdiff1d,
     sinc,
 )
 from ._lib._at import at
@@ -21,7 +22,6 @@ from ._lib._funcs import (
     default_dtype,
     kron,
     nunique,
-    setdiff1d,
 )
 from ._lib._lazy import lazy_apply
 
