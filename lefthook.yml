@@ -1,4 +1,7 @@
-lefthook: pixi run --no-progress --environment=lint lefthook
+lefthook: pixi run --no-progress --environment=lint --frozen lefthook
+
+templates:
+  run: run --quiet --no-progress --environment=lint --frozen
 
 colors: true
 
@@ -19,7 +22,7 @@ pre-commit:
     - name: dprint
       glob: "*.{json,jsonc,md,toml,yaml,yml}"
       stage_fixed: true
-      run: dprint fmt
+      run: pixi {run} dprint
     - name: ruff
       glob: "*.{py,pyi}"
       stage_fixed: true
@@ -27,27 +30,27 @@ pre-commit:
         piped: true
         jobs:
           - name: ruff check
-            run: ruff check --fix {staged_files}
+            run: pixi {run} ruff-check {staged_files}
           - name: ruff format
-            run: ruff format {staged_files}
+            run: pixi {run} ruff-format {staged_files}
     - name: pyright
       glob: "*.{py,pyi}"
-      run: basedpyright
+      run: pixi {run} pyright
     - name: mypy
       glob: "*.{py,pyi}"
-      run: mypy
+      run: pixi {run} mypy
     - name: typos
       stage_fixed: true
-      run: typos --write-changes --force-exclude
+      run: pixi {run} typos
     - name: actionlint
-      run: actionlint
+      run: pixi {run} actionlint
     - name: blacken-docs
       glob: "*.md"
       stage_fixed: true
-      run: blacken-docs {staged_files}
+      run: pixi {run} blacken-docs {staged_files}
     - name: validate-pyproject
       glob: "pyproject.toml"
-      run: validate-pyproject pyproject.toml
+      run: pixi {run} validate-pyproject
     - name: numpydoc
       glob: "*.py"
-      run: numpydoc lint {staged_files}
+      run: pixi {run} numpydoc {staged_files}
