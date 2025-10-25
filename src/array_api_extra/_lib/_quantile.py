@@ -130,18 +130,18 @@ def _weighted_quantile(  # numpydoc ignore=PR01,RT01
     sorter = xp.argsort(a, axis=-1, stable=False)
 
     if a.ndim == 1:
-        x = xp.take(a, sorter)
-        w = xp.take(weights, sorter)
-        return _weighted_quantile_sorted_1d(x, q, w, n, average, nan_policy, xp, device)
+        return _weighted_quantile_sorted_1d(
+            a, weights, sorter, q, n, average, nan_policy, xp, device
+        )
 
     (d,) = eager_shape(a, axis=0)
     res = []
     for idx in range(d):
         w = weights if weights.ndim == 1 else weights[idx, ...]
-        w = xp.take(w, sorter[idx, ...])
-        x = xp.take(a[idx, ...], sorter[idx, ...])
         res.append(
-            _weighted_quantile_sorted_1d(x, q, w, n, average, nan_policy, xp, device)
+            _weighted_quantile_sorted_1d(
+                a[idx, ...], w, sorter[idx, ...], q, n, average, nan_policy, xp, device
+            )
         )
 
     return xp.stack(res, axis=1)
@@ -149,8 +149,9 @@ def _weighted_quantile(  # numpydoc ignore=PR01,RT01
 
 def _weighted_quantile_sorted_1d(  # numpydoc ignore=GL08
     x: Array,
-    q: Array,
     w: Array,
+    sorter: Array,
+    q: Array,
     n: int,
     average: bool,
     nan_policy: str,
@@ -161,18 +162,25 @@ def _weighted_quantile_sorted_1d(  # numpydoc ignore=GL08
         w = xp.where(xp.isnan(x), 0.0, w)
     elif xp.any(xp.isnan(x)):
         return xp.full(q.shape, xp.nan, dtype=x.dtype, device=device)
-    cdf = xp.cumulative_sum(w)
-    t = cdf[-1] * q
-    i = xp.searchsorted(cdf, t, side="left")
-    j = xp.searchsorted(cdf, t, side="right")
-    i = xp.clip(i, 0, n - 1)
-    j = xp.clip(j, 0, n - 1)
 
-    # Ignore leading `weights=0` observations when `q=0`
-    # see https://github.com/scikit-learn/scikit-learn/pull/20528
-    i = xp.where(q == 0.0, j, i)
-    if average:
-        # Ignore trailing `weights=0` observations when `q=1`
-        j = xp.where(q == 1.0, i, j)
-        return (xp.take(x, i) + xp.take(x, j)) / 2
+    cdf = xp.cumulative_sum(xp.take(w, sorter))
+    t = cdf[-1] * q
+
+    i = xp.searchsorted(cdf, t, side="left")
+    i = xp.clip(i, 0, n - 1)
+    i = xp.take(sorter, i)
+
+    q0 = q == 0.0
+    if average or xp.any(q0):
+        j = xp.searchsorted(cdf, t, side="right")
+        j = xp.clip(j, 0, n - 1)
+        j = xp.take(sorter, j)
+        # Ignore leading `weights=0` observations when `q=0`
+        i = xp.where(q0, j, i)
+
+        if average:
+            # Ignore trailing `weights=0` observations when `q=1`
+            j = xp.where(q == 1.0, i, j)
+            return (xp.take(x, i) + xp.take(x, j)) / 2
+
     return xp.take(x, i)

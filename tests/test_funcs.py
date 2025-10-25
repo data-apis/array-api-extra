@@ -1639,12 +1639,12 @@ class TestQuantile:
         for method in ["inverted_cdf", "averaged_inverted_cdf"]:
             np_min = np.nanmin if nan_policy == "omit" else np.min
             expected = np_min(a_np_med)
-            actual = quantile(a, 0., method=method, nan_policy=nan_policy, weights=w)
+            actual = quantile(a, 0.0, method=method, nan_policy=nan_policy, weights=w)
             xp_assert_close(actual, xp.asarray(expected))
 
             np_max = np.nanmax if nan_policy == "omit" else np.max
             expected = np_max(a_np_med)
-            actual = quantile(a, 1., method=method, nan_policy=nan_policy, weights=w)
+            actual = quantile(a, 1.0, method=method, nan_policy=nan_policy, weights=w)
             xp_assert_close(actual, xp.asarray(expected))
 
     @pytest.mark.parametrize("keepdims", [True, False])
