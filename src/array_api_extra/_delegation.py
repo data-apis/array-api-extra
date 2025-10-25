@@ -948,7 +948,7 @@ def quantile(
 
     nan_policy : str, optional
         'propagate' (default) or 'omit'.
-        'omit' is support only when `weights` are provided.
+        'omit' is supported only when `weights` are provided.
 
     weights : array_like, optional
         An array of weights associated with the values in `a`. Each value in
