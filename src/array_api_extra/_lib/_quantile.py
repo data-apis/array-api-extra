@@ -170,7 +170,7 @@ def _weighted_quantile_sorted_1d(  # numpydoc ignore=GL08
     i = xp.clip(i, 0, n - 1)
     i = xp.take(sorter, i)
 
-    q0 = q == 0.0
+    q0 = t == 0.0
     if average or xp.any(q0):
         j = xp.searchsorted(cdf, t, side="right")
         j = xp.clip(j, 0, n - 1)
