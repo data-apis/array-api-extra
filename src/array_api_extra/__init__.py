@@ -11,6 +11,7 @@ from ._delegation import (
     one_hot,
     pad,
     partition,
+    quantile,
     sinc,
 )
 from ._lib._at import at
@@ -48,6 +49,7 @@ __all__ = [
     "one_hot",
     "pad",
     "partition",
+    "quantile",
     "setdiff1d",
     "sinc",
 ]
