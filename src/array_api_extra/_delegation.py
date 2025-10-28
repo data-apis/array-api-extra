@@ -19,6 +19,7 @@ from ._lib._utils._helpers import asarrays, eager_shape
 from ._lib._utils._typing import Array, DType
 
 __all__ = [
+    "atleast_nd",
     "cov",
     "expand_dims",
     "isclose",
@@ -27,6 +28,55 @@ __all__ = [
     "pad",
     "sinc",
 ]
+
+
+def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array:
+    """
+    Recursively expand the dimension of an array to at least `ndim`.
+
+    Parameters
+    ----------
+    x : array
+        Input array.
+    ndim : int
+        The minimum number of dimensions for the result.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array with ``res.ndim`` >= `ndim`.
+        If ``x.ndim`` >= `ndim`, `x` is returned.
+        If ``x.ndim`` < `ndim`, `x` is expanded by prepending new axes
+        until ``res.ndim`` equals `ndim`.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> x = xp.asarray([1])
+    >>> xpx.atleast_nd(x, ndim=3, xp=xp)
+    Array([[[1]]], dtype=array_api_strict.int64)
+
+    >>> x = xp.asarray([[[1, 2],
+    ...                  [3, 4]]])
+    >>> xpx.atleast_nd(x, ndim=1, xp=xp) is x
+    True
+    """
+    if xp is None:
+        xp = array_namespace(x)
+
+    if 1 <= ndim <= 3 and (
+        is_numpy_namespace(xp)
+        or is_jax_namespace(xp)
+        or is_dask_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_torch_namespace(xp)
+    ):
+        return getattr(xp, f"atleast_{ndim}d")(x)
+
+    return _funcs.atleast_nd(x, ndim=ndim, xp=xp)
 
 
 def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
@@ -195,55 +245,6 @@ def expand_dims(
         return xp.expand_dims(a, axis=axis)
 
     return _funcs.expand_dims(a, axis=axis, xp=xp)
-
-
-def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array:
-    """
-    Recursively expand the dimension of an array to at least `ndim`.
-
-    Parameters
-    ----------
-    x : array
-        Input array.
-    ndim : int
-        The minimum number of dimensions for the result.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
-
-    Returns
-    -------
-    array
-        An array with ``res.ndim`` >= `ndim`.
-        If ``x.ndim`` >= `ndim`, `x` is returned.
-        If ``x.ndim`` < `ndim`, `x` is expanded by prepending new axes
-        until ``res.ndim`` equals `ndim`.
-
-    Examples
-    --------
-    >>> import array_api_strict as xp
-    >>> import array_api_extra as xpx
-    >>> x = xp.asarray([1])
-    >>> xpx.atleast_nd(x, ndim=3, xp=xp)
-    Array([[[1]]], dtype=array_api_strict.int64)
-
-    >>> x = xp.asarray([[[1, 2],
-    ...                  [3, 4]]])
-    >>> xpx.atleast_nd(x, ndim=1, xp=xp) is x
-    True
-    """
-    if xp is None:
-        xp = array_namespace(x)
-
-    if 1 <= ndim <= 3 and (
-        is_numpy_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_dask_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_torch_namespace(xp)
-    ):
-        return getattr(xp, f"atleast_{ndim}d")(x)
-
-    return _funcs.atleast_nd(x, ndim=ndim, xp=xp)
 
 
 def isclose(
@@ -551,6 +552,59 @@ def pad(
         return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)
+
+
+def setdiff1d(
+    x1: Array | complex,
+    x2: Array | complex,
+    /,
+    *,
+    assume_unique: bool = False,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Find the set difference of two arrays.
+
+    Return the unique values in `x1` that are not in `x2`.
+
+    Parameters
+    ----------
+    x1 : array | int | float | complex | bool
+        Input array.
+    x2 : array
+        Input comparison array.
+    assume_unique : bool
+        If ``True``, the input arrays are both assumed to be unique, which
+        can speed up the calculation. Default is ``False``.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x1` and `x2`. Default: infer.
+
+    Returns
+    -------
+    array
+        1D array of values in `x1` that are not in `x2`. The result
+        is sorted when `assume_unique` is ``False``, but otherwise only sorted
+        if the input is sorted.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+
+    >>> x1 = xp.asarray([1, 2, 3, 2, 4, 1])
+    >>> x2 = xp.asarray([3, 4, 5, 6])
+    >>> xpx.setdiff1d(x1, x2, xp=xp)
+    Array([1, 2], dtype=array_api_strict.int64)
+    """
+
+    if xp is None:
+        xp = array_namespace(x1, x2)
+
+    if is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp):
+        x1, x2 = asarrays(x1, x2, xp=xp)
+        return xp.setdiff1d(x1, x2, assume_unique=assume_unique)
+
+    return _funcs.setdiff1d(x1, x2, assume_unique=assume_unique, xp=xp)
 
 
 def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:

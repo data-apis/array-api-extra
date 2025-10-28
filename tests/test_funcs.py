@@ -33,10 +33,9 @@ from array_api_extra import (
     sinc,
 )
 from array_api_extra._lib._backends import NUMPY_VERSION, Backend
-from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
-from array_api_extra._lib._utils._compat import (
-    device as get_device,
-)
+from array_api_extra._lib._testing import xfail, xp_assert_close, xp_assert_equal
+from array_api_extra._lib._utils._compat import device as get_device
+from array_api_extra._lib._utils._compat import is_jax_namespace
 from array_api_extra._lib._utils._helpers import eager_shape, ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
@@ -1264,6 +1263,7 @@ class TestSetDiff1D:
     @pytest.mark.parametrize("shape2", [(), (1,), (1, 1)])
     def test_shapes(
         self,
+        request: pytest.FixtureRequest,
         assume_unique: bool,
         shape1: tuple[int, ...],
         shape2: tuple[int, ...],
@@ -1271,17 +1271,26 @@ class TestSetDiff1D:
     ):
         x1 = xp.zeros(shape1)
         x2 = xp.zeros(shape2)
+
+        if is_jax_namespace(xp) and assume_unique and shape1 != (1,):
+            xfail(request=request, reason="jax#32335 fixed with jax>=0.8.0")
+
         actual = setdiff1d(x1, x2, assume_unique=assume_unique)
         xp_assert_equal(actual, xp.empty((0,)))
 
     @assume_unique
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
-    def test_python_scalar(self, xp: ModuleType, assume_unique: bool):
+    def test_python_scalar(
+        self, request: pytest.FixtureRequest, xp: ModuleType, assume_unique: bool
+    ):
         # Test no dtype promotion to xp.asarray(x2); use x1.dtype
         x1 = xp.asarray([3, 1, 2], dtype=xp.int16)
         x2 = 3
         actual = setdiff1d(x1, x2, assume_unique=assume_unique)
         xp_assert_equal(actual, xp.asarray([1, 2], dtype=xp.int16))
+
+        if is_jax_namespace(xp) and assume_unique:
+            xfail(request=request, reason="jax#32335 fixed with jax>=0.8.0")
 
         actual = setdiff1d(x2, x1, assume_unique=assume_unique)
         xp_assert_equal(actual, xp.asarray([], dtype=xp.int16))
