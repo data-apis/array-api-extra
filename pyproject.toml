@@ -55,7 +55,7 @@ array-api-extra = { path = ".", editable = true }
 
 [tool.pixi.feature.lint.dependencies]
 typing-extensions = ">=4.15.0"
-pylint = ">=4.0.1"
+pylint = ">=4.0.2"
 mypy = ">=1.18.2"
 basedpyright = ">=1.31.7"
 numpydoc = ">=1.9.0,<2"
