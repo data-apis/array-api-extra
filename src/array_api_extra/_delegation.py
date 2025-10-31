@@ -81,21 +81,24 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array
 
 def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     """
-    Estimate a covariance matrix.
+    Estimate a covariance matrix (or a stack of covariance matrices).
 
     Covariance indicates the level to which two variables vary together.
-    If we examine N-dimensional samples, :math:`X = [x_1, x_2, ... x_N]^T`,
-    then the covariance matrix element :math:`C_{ij}` is the covariance of
+    If we examine *N*-dimensional samples, :math:`X = [x_1, x_2, ... x_N]^T`,
+    each with *M* observations, then element :math:`C_{ij}` of the
+    :math:`N \times N` covariance matrix is the covariance of
     :math:`x_i` and :math:`x_j`. The element :math:`C_{ii}` is the variance
     of :math:`x_i`.
 
-    This provides a subset of the functionality of ``numpy.cov``.
+    With the exception of supporting batch input, this provides a subset of
+    the functionality of ``numpy.cov``.
 
     Parameters
     ----------
     m : array
-        A 1-D or 2-D array containing multiple variables and observations.
-        Each row of `m` represents a variable, and each column a single
+        An array of shape ``(..., N, M)`` whose innermost two dimensions
+        contain *M* observations of *N* variables. That is,
+        each row of `m` represents a variable, and each column a single
         observation of all those variables.
     xp : array_namespace, optional
         The standard-compatible namespace for `m`. Default: infer.
@@ -103,7 +106,8 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     Returns
     -------
     array
-        The covariance matrix of the variables.
+        An array having shape (..., N, N) whose innermost two dimensions represent
+        the covariance matrix of the variables.
 
     Examples
     --------
@@ -142,6 +146,18 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
 
     >>> xpx.cov(y, xp=xp)
     Array(2.14413333, dtype=array_api_strict.float64)
+
+    Input with more than two dimensions is treated as a stack of
+    two-dimensional input.
+
+    >>> stack = xp.stack((X, 2*X))
+    >>> xpx.cov(stack)
+    Array([[[ 11.71      ,  -4.286     ],
+            [ -4.286     ,   2.14413333]],
+
+           [[ 46.84      , -17.144     ],
+            [-17.144     ,   8.57653333]]], dtype=array_api_strict.float64)
+
     """
 
     if xp is None:
@@ -153,7 +169,7 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
         or is_torch_namespace(xp)
         or is_dask_namespace(xp)
         or is_jax_namespace(xp)
-    ):
+    ) and m.ndim <= 2:
         return xp.cov(m)
 
     return _funcs.cov(m, xp=xp)
