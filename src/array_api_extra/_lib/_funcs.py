@@ -258,20 +258,20 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
-    avg = _helpers.mean(m, axis=1, xp=xp)
+    avg = _helpers.mean(m, axis=-1, keepdims=True, xp=xp)
 
     m_shape = eager_shape(m)
-    fact = m_shape[1] - 1
+    fact = m_shape[-1] - 1
 
     if fact <= 0:
         warnings.warn("Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2)
         fact = 0
 
-    m -= avg[:, None]
-    m_transpose = m.T
+    m -= avg
+    m_transpose = xp.matrix_transpose(m)
     if xp.isdtype(m_transpose.dtype, "complex floating"):
         m_transpose = xp.conj(m_transpose)
-    c = m @ m_transpose
+    c = xp.matmul(m, m_transpose)
     c /= fact
     axes = tuple(axis for axis, length in enumerate(c.shape) if length == 1)
     return xp.squeeze(c, axis=axes)
