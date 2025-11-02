@@ -157,7 +157,6 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
 
            [[ 46.84      , -17.144     ],
             [-17.144     ,   8.57653333]]], dtype=array_api_strict.float64)
-
     """
 
     if xp is None:
