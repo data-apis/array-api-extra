@@ -277,24 +277,28 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="array_api_extra.cov">
 <span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">cov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.cov" title="Link to this definition">¶</a></dt>
-<dd><p>Estimate a covariance matrix.</p>
+<dd><p>Estimate a covariance matrix (or a stack of covariance matrices).</p>
 <p>Covariance indicates the level to which two variables vary together.
-If we examine N-dimensional samples, <span class="math notranslate nohighlight">\(X = [x_1, x_2, ... x_N]^T\)</span>,
-then the covariance matrix element <span class="math notranslate nohighlight">\(C_{ij}\)</span> is the covariance of
+If we examine <em>N</em>-dimensional samples, <span class="math notranslate nohighlight">\(X = [x_1, x_2, ... x_N]^T\)</span>,
+each with <em>M</em> observations, then element <span class="math notranslate nohighlight">\(C_{ij}\)</span> of the
+<span class="math notranslate nohighlight">\(N    imes N\)</span> covariance matrix is the covariance of
 <span class="math notranslate nohighlight">\(x_i\)</span> and <span class="math notranslate nohighlight">\(x_j\)</span>. The element <span class="math notranslate nohighlight">\(C_{ii}\)</span> is the variance
 of <span class="math notranslate nohighlight">\(x_i\)</span>.</p>
-<p>This provides a subset of the functionality of <code class="docutils literal notranslate"><span class="pre">numpy.cov</span></code>.</p>
+<p>With the exception of supporting batch input, this provides a subset of
+the functionality of <code class="docutils literal notranslate"><span class="pre">numpy.cov</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>m</strong> (<em>array</em>) – A 1-D or 2-D array containing multiple variables and observations.
-Each row of <cite>m</cite> represents a variable, and each column a single
+<li><p><strong>m</strong> (<em>array</em>) – An array of shape <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">N,</span> <span class="pre">M)</span></code> whose innermost two dimensions
+contain <em>M</em> observations of <em>N</em> variables. That is,
+each row of <cite>m</cite> represents a variable, and each column a single
 observation of all those variables.</p></li>
 <li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>m</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The covariance matrix of the variables.</p>
+<dd class="field-even"><p>An array having shape (…, N, N) whose innermost two dimensions represent
+the covariance matrix of the variables.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
@@ -339,6 +343,20 @@ matrix shows this clearly:</p>
 <span class="go">Array(2.14413333, dtype=array_api_strict.float64)</span>
 </pre></div>
 </div>
+<p>Input with more than two dimensions is treated as a stack of
+two-dimensional input.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">stack</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">X</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+<span class="go">Array([[[ 11.71      ,  -4.286     ],</span>
+<span class="go">        [ -4.286     ,   2.14413333]],</span>
+</pre></div>
+</div>
+<blockquote>
+<div><dl class="simple">
+<dt>[[ 46.84      , -17.144     ],</dt><dd><p>[-17.144     ,   8.57653333]]], dtype=array_api_strict.float64)</p>
+</dd>
+</dl>
+</div></blockquote>
 </dd></dl>
 
 </section>
