@@ -67,7 +67,7 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array
     if xp is None:
         xp = array_namespace(x)
 
-    if 1 <= ndim <= 3 and (
+    if 1 <= ndim <= 2 and (
         is_numpy_namespace(xp)
         or is_jax_namespace(xp)
         or is_dask_namespace(xp)
