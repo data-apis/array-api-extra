@@ -4224,7 +4224,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/pygments-2.19.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-8.4.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.7.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.7.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/python-3.13.9-hdc21b3b_1_cp313t.conda
       - conda: https://prefix.dev/conda-forge/noarch/python-freethreading-3.13.9-h92d6c8b_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/python_abi-3.13-8_cp313t.conda
@@ -4281,7 +4281,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/pygments-2.19.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-8.4.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.7.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.7.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/python-3.13.9-h29649b4_1_cp313t.conda
       - conda: https://prefix.dev/conda-forge/noarch/python-freethreading-3.13.9-h92d6c8b_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/python_abi-3.13-8_cp313t.conda
@@ -4339,7 +4339,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/pygments-2.19.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-8.4.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.7.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.7.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/python-3.13.9-h6234a37_1_cp313t.conda
       - conda: https://prefix.dev/conda-forge/noarch/python-freethreading-3.13.9-h92d6c8b_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/python_abi-3.13-8_cp313t.conda
@@ -4397,7 +4397,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/pygments-2.19.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-8.4.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.7.0-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.7.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/python-3.13.9-ha261ea0_1_cp313t.conda
       - conda: https://prefix.dev/conda-forge/noarch/python-freethreading-3.13.9-h92d6c8b_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/python_abi-3.13-8_cp313t.conda
@@ -5130,7 +5130,7 @@ packages:
 - pypi: ./
   name: array-api-extra
   version: 0.9.1.dev0
-  sha256: 80c6092d1c5afc383a228cba068fc7af17f56ed40170a6d6e782484cc63934cf
+  sha256: bd07d244f0cd1c9cc490b8fcc1063d2037741fa6d113ca49772a66080f7ea94e
   requires_dist:
   - array-api-compat>=1.12.0,<2
   requires_python: '>=3.10'
@@ -11457,9 +11457,9 @@ packages:
   - pkg:pypi/pytest-cov?source=hash-mapping
   size: 29016
   timestamp: 1757612051022
-- conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.7.0-pyhd8ed1ab_0.conda
-  sha256: 1eb9e7fd3b6159c0deaea1c6081c30687a46d98dcbe2543175a1db41063e42c1
-  md5: 19a9830489bfcc659191bbfd4229641d
+- conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.7.1-pyhd8ed1ab_0.conda
+  sha256: 123e34f6c4d1df2b295b1e97fafffefc291a6d610e9fea33b6c2316d433953af
+  md5: 1277cda67d2764e7b19d6b0bed02c812
   depends:
   - pytest >=6.2.0
   - python >=3.10
@@ -11467,8 +11467,8 @@ packages:
   license_family: MIT
   purls:
   - pkg:pypi/pytest-run-parallel?source=hash-mapping
-  size: 22769
-  timestamp: 1758818845036
+  size: 22982
+  timestamp: 1761231101479
 - conda: https://prefix.dev/conda-forge/linux-64/python-3.10.19-h3c07f61_2_cpython.conda
   build_number: 2
   sha256: 6e3b6b69b3cacfc7610155d58407a003820eaacd50fbe039abff52b5e70b1e9b
