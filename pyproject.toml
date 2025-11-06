@@ -201,7 +201,7 @@ pytorch = { version = ">=2.8.0", build = "cuda12*" }
 [tool.pixi.feature.nogil.dependencies]
 python-freethreading = "~=3.13.0"
 pytest-run-parallel = ">=0.7.0"
-numpy = ">=2.3.3"
+numpy = ">=2.3.4"
 # pytorch = "*"  # Not available on Python 3.13t yet
 dask-core = ">=2025.10.0" # No distributed, tornado, etc.
 # sparse = "*"  # numba not available on Python 3.13t yet
