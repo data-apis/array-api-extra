@@ -224,9 +224,7 @@ def create_diagonal(
         raise ValueError(err_msg)
 
     if is_torch_namespace(xp):
-        return xp.diag_embed(
-            atleast_nd(x, ndim=1, xp=xp), offset=offset, dim1=-2, dim2=-1
-        )
+        return xp.diag_embed(x, offset=offset, dim1=-2, dim2=-1)
 
     if (is_dask_namespace(xp) or is_cupy_namespace(xp)) and x.ndim < 2:
         return xp.diag(x, k=offset)
