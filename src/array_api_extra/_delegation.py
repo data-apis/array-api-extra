@@ -21,6 +21,7 @@ from ._lib._utils._typing import Array, DType
 __all__ = [
     "atleast_nd",
     "cov",
+    "create_diagonal",
     "expand_dims",
     "isclose",
     "nan_to_num",
@@ -172,6 +173,67 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
         return xp.cov(m)
 
     return _funcs.cov(m, xp=xp)
+
+
+def create_diagonal(
+    x: Array, /, *, offset: int = 0, xp: ModuleType | None = None
+) -> Array:
+    """
+    Construct a diagonal array.
+
+    Parameters
+    ----------
+    x : array
+        An array having shape ``(*batch_dims, k)``.
+    offset : int, optional
+        Offset from the leading diagonal (default is ``0``).
+        Use positive ints for diagonals above the leading diagonal,
+        and negative ints for diagonals below the leading diagonal.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array having shape ``(*batch_dims, k+abs(offset), k+abs(offset))`` with `x`
+        on the diagonal (offset by `offset`).
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> x = xp.asarray([2, 4, 8])
+
+    >>> xpx.create_diagonal(x, xp=xp)
+    Array([[2, 0, 0],
+           [0, 4, 0],
+           [0, 0, 8]], dtype=array_api_strict.int64)
+
+    >>> xpx.create_diagonal(x, offset=-2, xp=xp)
+    Array([[0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0],
+           [2, 0, 0, 0, 0],
+           [0, 4, 0, 0, 0],
+           [0, 0, 8, 0, 0]], dtype=array_api_strict.int64)
+    """
+    if xp is None:
+        xp = array_namespace(x)
+
+    if x.ndim == 0:
+        err_msg = "`x` must be at least 1-dimensional."
+        raise ValueError(err_msg)
+
+    if is_torch_namespace(xp):
+        return xp.diag_embed(x, offset=offset, dim1=-2, dim2=-1)
+
+    if (is_dask_namespace(xp) or is_cupy_namespace(xp)) and x.ndim < 2:
+        return xp.diag(x, k=offset)
+
+    if (is_jax_namespace(xp) or is_numpy_namespace(xp)) and x.ndim < 3:
+        batch_dim, n = eager_shape(x)[:-1], eager_shape(x, -1)[0] + abs(offset)
+        return xp.reshape(xp.diag(x, k=offset), (*batch_dim, n, n))
+
+    return _funcs.create_diagonal(x, offset=offset, xp=xp)
 
 
 def expand_dims(
