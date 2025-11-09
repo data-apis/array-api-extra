@@ -8,6 +8,7 @@ from ._delegation import (
     expand_dims,
     isclose,
     isin,
+    kron,
     nan_to_num,
     one_hot,
     pad,
@@ -20,13 +21,11 @@ from ._lib._funcs import (
     apply_where,
     broadcast_shapes,
     default_dtype,
-    kron,
     nunique,
 )
 from ._lib._lazy import lazy_apply
 
 __version__ = "0.9.1.dev0"
-
 # pylint: disable=duplicate-code
 __all__ = [
     "__version__",
