@@ -311,7 +311,7 @@ class TestAtLeastND:
         xp: ModuleType,
     ):
         n = math.prod(input_shape)
-        x = xp.reshape(xp.arange(n), input_shape)
+        x = xp.asarray(np.arange(n).reshape(input_shape))
         y = atleast_nd(x, ndim=ndim)
 
         assert y.shape == expected_shape
@@ -350,7 +350,7 @@ class TestAtLeastND:
         xp: ModuleType,
     ):
         n = math.prod(input_shape)
-        x = xp.reshape(xp.arange(n), input_shape)
+        x = xp.asarray(np.arange(n).reshape(input_shape))
         y = atleast_nd(x, ndim=ndim)
 
         assert y.shape == expected_shape
@@ -389,7 +389,7 @@ class TestAtLeastND:
         xp: ModuleType,
     ):
         n = math.prod(input_shape)
-        x = xp.reshape(xp.arange(n), input_shape)
+        x = xp.asarray(np.arange(n).reshape(input_shape))
         y = atleast_nd(x, ndim=ndim)
 
         assert y.shape == expected_shape
@@ -428,7 +428,7 @@ class TestAtLeastND:
         xp: ModuleType,
     ):
         n = math.prod(input_shape)
-        x = xp.reshape(xp.arange(n), input_shape)
+        x = xp.asarray(np.arange(n).reshape(input_shape))
         y = atleast_nd(x, ndim=ndim)
 
         assert y.shape == expected_shape
