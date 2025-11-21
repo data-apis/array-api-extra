@@ -25,7 +25,7 @@ from ._lib._funcs import (
 )
 from ._lib._lazy import lazy_apply
 
-__version__ = "0.9.1"
+__version__ = "0.9.2.dev0"
 
 # pylint: disable=duplicate-code
 __all__ = [
