@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="array_api_extra.pad" href="array_api_extra.pad.html" /><link rel="prev" title="array_api_extra.nunique" href="array_api_extra.nunique.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="array_api_extra.kron" href="array_api_extra.kron.html" /><link rel="prev" title="array_api_extra.isclose" href="array_api_extra.isclose.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>array_api_extra.one_hot - array-api-extra 0.9.2.dev0 documentation</title>
+        <title>array_api_extra.isin - array-api-extra 0.9.2.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -212,11 +212,11 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.default_dtype.html">array_api_extra.default_dtype</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.expand_dims.html">array_api_extra.expand_dims</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.isclose.html">array_api_extra.isclose</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.isin.html">array_api_extra.isin</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.isin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.kron.html">array_api_extra.kron</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.nan_to_num.html">array_api_extra.nan_to_num</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.nunique.html">array_api_extra.nunique</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.one_hot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.one_hot.html">array_api_extra.one_hot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.pad.html">array_api_extra.pad</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.partition.html">array_api_extra.partition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.setdiff1d.html">array_api_extra.setdiff1d</a></li>
@@ -251,12 +251,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.one_hot.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.isin.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.one_hot.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.isin.rst" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -275,46 +275,40 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="array-api-extra-one-hot">
-<h1>array_api_extra.one_hot<a class="headerlink" href="#array-api-extra-one-hot" title="Link to this heading">¶</a></h1>
+          <section id="array-api-extra-isin">
+<h1>array_api_extra.isin<a class="headerlink" href="#array-api-extra-isin" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.one_hot">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">one_hot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.one_hot" title="Link to this definition">¶</a></dt>
-<dd><p>One-hot encode the given indices.</p>
-<p>Each index in the input <cite>x</cite> is encoded as a vector of zeros of length <cite>num_classes</cite>
-with the element at the given index set to one.</p>
+<dt class="sig sig-object py" id="array_api_extra.isin">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">isin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">assume_unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.isin" title="Link to this definition">¶</a></dt>
+<dd><p>Determine whether each element in <cite>a</cite> is present in <cite>b</cite>.</p>
+<p>Return a boolean array of the same shape as <cite>a</cite> that is True for elements
+that are in <cite>b</cite> and False otherwise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>array</em>) – An array with integral dtype whose values are between <cite>0</cite> and <cite>num_classes - 1</cite>.</p></li>
-<li><p><strong>num_classes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of classes in the one-hot dimension.</p></li>
-<li><p><strong>dtype</strong> (<em>DType</em><em>, </em><em>optional</em>) – The dtype of the return value.  Defaults to the default float dtype (usually
-float64).</p></li>
-<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Position in the expanded axes where the new axis is placed. Default: -1.</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>x</cite>. Default: infer.</p></li>
+<li><p><strong>a</strong> (<em>array</em>) – Input elements.</p></li>
+<li><p><strong>b</strong> (<em>array</em>) – The elements against which to test each element of <cite>a</cite>.</p></li>
+<li><p><strong>assume_unique</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the input arrays are both assumed to be unique which can speed
+up the calculation. Default: False.</p></li>
+<li><p><strong>invert</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the values in the returned array are inverted. Default: False.</p></li>
+<li><p><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em><em>, </em><em>optional</em>) – The algorithm or method to use. This will not affect the final result,
+but will affect the speed and memory use.
+For NumPy the options are {None, “sort”, “table”}.
+For Jax the mapped parameter is instead <cite>method</cite> and the options are
+{“compare_all”, “binary_search”, “sort”, and “auto” (default)}
+For CuPy, Dask, Torch and the default case this parameter is not present and
+thus ignored. Default: None.</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>a</cite> and <cite>b</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>An array having the same shape as <cite>x</cite> except for a new axis at the position
-given by <cite>axis</cite> having size <cite>num_classes</cite>.  If <cite>axis</cite> is unspecified, it
-defaults to -1, which appends a new axis.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&lt;</span> <span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&gt;=</span> <span class="pre">num_classes</span></code>, then the result is undefined, may raise
-an exception, or may even cause a bad state.  <cite>x</cite> is not checked.</p>
-</p>
+<dd class="field-even"><p>An array having the same shape as that of <cite>a</cite> that is True for elements
+that are in <cite>b</cite> and False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_strict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xp</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
-<span class="go">Array([[0., 1., 0.],</span>
-<span class="go">      [0., 0., 1.],</span>
-<span class="go">      [1., 0., 0.]], dtype=array_api_strict.float64)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 </section>
@@ -324,23 +318,23 @@ an exception, or may even cause a bad state.  <cite>x</cite> is not checked.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="array_api_extra.pad.html">
+          <a class="next-page" href="array_api_extra.kron.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">array_api_extra.pad</div>
+                <div class="title">array_api_extra.kron</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.nunique.html">
+          <a class="prev-page" href="array_api_extra.isclose.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">array_api_extra.nunique</div>
+                <div class="title">array_api_extra.isclose</div>
                 
               </div>
             </a>
@@ -381,8 +375,8 @@ an exception, or may even cause a bad state.  <cite>x</cite> is not checked.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">array_api_extra.one_hot</a><ul>
-<li><a class="reference internal" href="#array_api_extra.one_hot"><code class="docutils literal notranslate"><span class="pre">one_hot()</span></code></a></li>
+<li><a class="reference internal" href="#">array_api_extra.isin</a><ul>
+<li><a class="reference internal" href="#array_api_extra.isin"><code class="docutils literal notranslate"><span class="pre">isin()</span></code></a></li>
 </ul>
 </li>
 </ul>
