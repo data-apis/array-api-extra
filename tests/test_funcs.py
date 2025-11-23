@@ -1,7 +1,7 @@
 import math
 import warnings
 from types import ModuleType
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import hypothesis
 import hypothesis.extra.numpy as npst
@@ -1645,9 +1645,11 @@ class TestIsIn:
         xp_assert_equal(res, expected)
 
 
-def _apply_over_batch(*argdefs: tuple[str, int]):
+def _apply_over_batch(*argdefs: tuple[str, int]) -> Any:
     """
     Factory for decorator that applies a function over batched arguments.
+
+    Copied (with light simplifications) from `scipy._lib._util`.
 
     Array arguments may have any number of core dimensions (typically 0,
     1, or 2) and any broadcastable batch shapes. There may be any
@@ -1675,8 +1677,11 @@ def _apply_over_batch(*argdefs: tuple[str, int]):
     names, ndims = list(zip(*argdefs, strict=True))
     n_arrays = len(names)
 
-    def decorator(f):
-        def wrapper(*args_tuple, **kwargs):
+    def decorator(f: Any) -> Any:
+        def wrapper(
+            *args_tuple: tuple[Any] | None,
+            **kwargs: dict[str, Any] | None,
+        ) -> Any:
             args = list(args_tuple)
 
             # Ensure all arrays in `arrays`, other arguments in `other_args`/`kwargs`
@@ -1688,9 +1693,9 @@ def _apply_over_batch(*argdefs: tuple[str, int]):
                             f"{f.__name__}() got multiple values for argument `{name}`."
                         )
                         raise ValueError(message)
-                    arrays.append(kwargs.pop(name))
+                    arrays.append(kwargs.pop(name))  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
 
-            xp = array_namespace(*arrays)
+            xp = array_namespace(*arrays)  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
 
             # Determine core and batch shapes
             batch_shapes = []
@@ -1751,8 +1756,13 @@ def _apply_over_batch(*argdefs: tuple[str, int]):
     return decorator
 
 
-@_apply_over_batch(("a", 1), ("v", 1))
-def xp_searchsorted(a, v, side, xp):
+@_apply_over_batch(("a", 1), ("v", 1))  # type: ignore[misc]
+def xp_searchsorted(
+    a: Array,
+    v: Array,
+    side: Literal["left", "right"],
+    xp: ModuleType,
+) -> Array:
     return xp.searchsorted(xp.asarray(a), xp.asarray(v), side=side)
 
 
@@ -1766,13 +1776,21 @@ class TestSearchsorted:
     )
     @pytest.mark.parametrize("nans_x", [False, True])
     @pytest.mark.parametrize("infs_x", [False, True])
-    def test_nd(self, side, ties, shape, nans_x, infs_x, xp):
+    def test_nd(
+        self,
+        side: Literal["left", "right"],
+        ties: bool,
+        shape: int | tuple[int],
+        nans_x: bool,
+        infs_x: bool,
+        xp: ModuleType,
+    ):
         if nans_x and is_torch_namespace(xp):
             pytest.skip("torch sorts NaNs differently")
         rng = np.random.default_rng(945298725498274853)
         x = rng.integers(5, size=shape) if ties else rng.random(shape)
         # float32 is to accommodate JAX - nextafter with `float64` is too small?
-        x = np.asarray(x, dtype=np.float32)
+        x = np.asarray(x, dtype=np.float32)  # type:ignore[assignment]
         xr = np.nextafter(x, np.inf)
         xl = np.nextafter(x, -np.inf)
         x_ = np.asarray([-np.inf, np.inf, np.nan])
@@ -1786,7 +1804,7 @@ class TestSearchsorted:
             x[mask] = -np.inf
             mask = rng.random(shape) > 0.9
             x[mask] = np.inf
-        x = np.sort(x, stable=True, axis=-1)
+        x = np.sort(x, axis=-1)  # type:ignore[assignment]
         x, y = np.asarray(x, dtype=np.float64), np.asarray(y, dtype=np.float64)
         xp_default_int = xp.asarray(1).dtype
         if x.size == 0 and x.ndim > 0 and x.shape[-1] != 0:
