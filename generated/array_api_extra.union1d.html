@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="array_api_extra.expand_dims" href="array_api_extra.expand_dims.html" /><link rel="prev" title="array_api_extra.create_diagonal" href="array_api_extra.create_diagonal.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Tools for lazy backends" href="../api-lazy.html" /><link rel="prev" title="array_api_extra.sinc" href="array_api_extra.sinc.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>array_api_extra.default_dtype - array-api-extra 0.9.2.dev0 documentation</title>
+        <title>array_api_extra.union1d - array-api-extra 0.9.2.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -209,7 +209,7 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.broadcast_shapes.html">array_api_extra.broadcast_shapes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.cov.html">array_api_extra.cov</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.create_diagonal.html">array_api_extra.create_diagonal</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.default_dtype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.default_dtype.html">array_api_extra.default_dtype</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.expand_dims.html">array_api_extra.expand_dims</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.isclose.html">array_api_extra.isclose</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.isin.html">array_api_extra.isin</a></li>
@@ -221,7 +221,7 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.partition.html">array_api_extra.partition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.setdiff1d.html">array_api_extra.setdiff1d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.sinc.html">array_api_extra.sinc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.union1d.html">array_api_extra.union1d</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.union1d</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../api-lazy.html">Tools for lazy backends</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Tools for lazy backends</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -252,12 +252,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.default_dtype.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.union1d.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.default_dtype.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.union1d.rst" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -276,27 +276,27 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="array-api-extra-default-dtype">
-<h1>array_api_extra.default_dtype<a class="headerlink" href="#array-api-extra-default-dtype" title="Link to this heading">¶</a></h1>
+          <section id="array-api-extra-union1d">
+<h1>array_api_extra.union1d<a class="headerlink" href="#array-api-extra-union1d" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.default_dtype">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">default_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'real</span> <span class="pre">floating'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.default_dtype" title="Link to this definition">¶</a></dt>
-<dd><p>Return the default dtype for the given namespace and device.</p>
-<p>This is a convenience shorthand for
-<code class="docutils literal notranslate"><span class="pre">xp.__array_namespace_info__().default_dtypes(device=device)[kind]</span></code>.</p>
+<dt class="sig sig-object py" id="array_api_extra.union1d">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">union1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.union1d" title="Link to this definition">¶</a></dt>
+<dd><p>Find the union of two arrays.</p>
+<p>Return the unique, sorted array of values that are in either of the two
+input arrays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>xp</strong> (<em>array_namespace</em>) – The standard-compatible namespace for which to get the default dtype.</p></li>
-<li><p><strong>kind</strong> (<em>{'real floating'</em><em>, </em><em>'complex floating'</em><em>, </em><em>'integral'</em><em>, </em><em>'indexing'}</em><em>, </em><em>optional</em>) – The kind of dtype to return. Default is ‘real floating’.</p></li>
-<li><p><strong>device</strong> (<em>Device</em><em>, </em><em>optional</em>) – The device for which to get the default dtype. Default: current device.</p></li>
+<li><p><strong>a</strong> (<em>Array</em>) – Input arrays. They are flattened internally if they are not already 1D.</p></li>
+<li><p><strong>b</strong> (<em>Array</em>) – Input arrays. They are flattened internally if they are not already 1D.</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>a</cite> and <cite>b</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The default dtype for the given namespace, kind, and device.</p>
+<dd class="field-even"><p>Unique, sorted union of the input arrays.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype</p>
+<dd class="field-odd"><p>Array</p>
 </dd>
 </dl>
 </dd></dl>
@@ -308,23 +308,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="array_api_extra.expand_dims.html">
+          <a class="next-page" href="../api-lazy.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">array_api_extra.expand_dims</div>
+                <div class="title">Tools for lazy backends</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.create_diagonal.html">
+          <a class="prev-page" href="array_api_extra.sinc.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">array_api_extra.create_diagonal</div>
+                <div class="title">array_api_extra.sinc</div>
                 
               </div>
             </a>
@@ -365,8 +365,8 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">array_api_extra.default_dtype</a><ul>
-<li><a class="reference internal" href="#array_api_extra.default_dtype"><code class="docutils literal notranslate"><span class="pre">default_dtype()</span></code></a></li>
+<li><a class="reference internal" href="#">array_api_extra.union1d</a><ul>
+<li><a class="reference internal" href="#array_api_extra.union1d"><code class="docutils literal notranslate"><span class="pre">union1d()</span></code></a></li>
 </ul>
 </li>
 </ul>
