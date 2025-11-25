@@ -4,6 +4,7 @@ from ._delegation import (
     argpartition,
     atleast_nd,
     cov,
+    create_diagonal,
     expand_dims,
     isclose,
     isin,
@@ -11,6 +12,7 @@ from ._delegation import (
     one_hot,
     pad,
     partition,
+    setdiff1d,
     sinc,
     union1d,
 )
@@ -18,15 +20,13 @@ from ._lib._at import at
 from ._lib._funcs import (
     apply_where,
     broadcast_shapes,
-    create_diagonal,
     default_dtype,
     kron,
     nunique,
-    setdiff1d,
 )
 from ._lib._lazy import lazy_apply
 
-__version__ = "0.9.1.dev0"
+__version__ = "0.9.2.dev0"
 
 # pylint: disable=duplicate-code
 __all__ = [

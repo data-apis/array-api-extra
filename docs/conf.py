@@ -58,7 +58,7 @@ intersphinx_mapping = {
     "array-api": ("https://data-apis.org/array-api/draft", None),
     "dask": ("https://docs.dask.org/en/stable", None),
     "numpy": ("https://numpy.org/doc/stable", None),
-    "jax": ("https://jax.readthedocs.io/en/latest", None),
+    "jax": ("https://docs.jax.dev/en/latest", None),
 }
 
 nitpick_ignore = [

@@ -34,10 +34,9 @@ from array_api_extra import (
     union1d,
 )
 from array_api_extra._lib._backends import NUMPY_VERSION, Backend
-from array_api_extra._lib._testing import xp_assert_close, xp_assert_equal
-from array_api_extra._lib._utils._compat import (
-    device as get_device,
-)
+from array_api_extra._lib._testing import xfail, xp_assert_close, xp_assert_equal
+from array_api_extra._lib._utils._compat import device as get_device
+from array_api_extra._lib._utils._compat import is_jax_namespace
 from array_api_extra._lib._utils._helpers import eager_shape, ndindex
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
@@ -55,6 +54,8 @@ lazy_xp_function(pad)
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False)
 lazy_xp_function(sinc)
+
+NestedFloatList = list[float] | list["NestedFloatList"]
 
 
 class TestApplyWhere:
@@ -293,7 +294,31 @@ class TestAtLeastND:
         y = atleast_nd(x, ndim=5)
         xp_assert_equal(y, xp.ones((1, 1, 1, 1, 1)))
 
-    def test_1D(self, xp: ModuleType):
+    @pytest.mark.parametrize(
+        ("input_shape", "ndim", "expected_shape"),
+        [
+            ((1,), 0, (1,)),
+            ((5,), 1, (5,)),
+            ((2,), 2, (1, 2)),
+            ((3,), 3, (1, 1, 3)),
+            ((2,), 5, (1, 1, 1, 1, 2)),
+        ],
+    )
+    def test_1D_shapes(
+        self,
+        input_shape: tuple[int],
+        ndim: int,
+        expected_shape: tuple[int],
+        xp: ModuleType,
+    ):
+        n = math.prod(input_shape)
+        x = xp.asarray(np.arange(n).reshape(input_shape))
+        y = atleast_nd(x, ndim=ndim)
+
+        assert y.shape == expected_shape
+        assert xp.sum(y) == int(n * (n - 1) / 2)
+
+    def test_1D_values(self, xp: ModuleType):
         x = xp.asarray([0, 1])
 
         y = atleast_nd(x, ndim=0)
@@ -308,8 +333,32 @@ class TestAtLeastND:
         y = atleast_nd(x, ndim=5)
         xp_assert_equal(y, xp.asarray([[[[[0, 1]]]]]))
 
-    def test_2D(self, xp: ModuleType):
-        x = xp.asarray([[3.0]])
+    @pytest.mark.parametrize(
+        ("input_shape", "ndim", "expected_shape"),
+        [
+            ((2, 1), 0, (2, 1)),
+            ((5, 2), 1, (5, 2)),
+            ((2, 1), 2, (2, 1)),
+            ((3, 1), 3, (1, 3, 1)),
+            ((2, 8), 5, (1, 1, 1, 2, 8)),
+        ],
+    )
+    def test_2D_shapes(
+        self,
+        input_shape: tuple[int],
+        ndim: int,
+        expected_shape: tuple[int],
+        xp: ModuleType,
+    ):
+        n = math.prod(input_shape)
+        x = xp.asarray(np.arange(n).reshape(input_shape))
+        y = atleast_nd(x, ndim=ndim)
+
+        assert y.shape == expected_shape
+        assert xp.sum(y) == int(n * (n - 1) / 2)
+
+    def test_2D_values(self, xp: ModuleType):
+        x = xp.asarray([[3.0], [4.0]])
 
         y = atleast_nd(x, ndim=0)
         xp_assert_equal(y, x)
@@ -318,12 +367,36 @@ class TestAtLeastND:
         xp_assert_equal(y, x)
 
         y = atleast_nd(x, ndim=3)
-        xp_assert_equal(y, 3 * xp.ones((1, 1, 1)))
+        xp_assert_equal(y, xp.asarray([[[3.0], [4.0]]]))
 
         y = atleast_nd(x, ndim=5)
-        xp_assert_equal(y, 3 * xp.ones((1, 1, 1, 1, 1)))
+        xp_assert_equal(y, xp.asarray([[[[[3.0], [4.0]]]]]))
 
-    def test_3D(self, xp: ModuleType):
+    @pytest.mark.parametrize(
+        ("input_shape", "ndim", "expected_shape"),
+        [
+            ((2, 1, 1), 0, (2, 1, 1)),
+            ((1, 5, 2), 1, (1, 5, 2)),
+            ((2, 1, 1), 2, (2, 1, 1)),
+            ((1, 3, 1), 3, (1, 3, 1)),
+            ((2, 8, 1), 5, (1, 1, 2, 8, 1)),
+        ],
+    )
+    def test_3D_shapes(
+        self,
+        input_shape: tuple[int],
+        ndim: int,
+        expected_shape: tuple[int],
+        xp: ModuleType,
+    ):
+        n = math.prod(input_shape)
+        x = xp.asarray(np.arange(n).reshape(input_shape))
+        y = atleast_nd(x, ndim=ndim)
+
+        assert y.shape == expected_shape
+        assert xp.sum(y) == int(n * (n - 1) / 2)
+
+    def test_3D_values(self, xp: ModuleType):
         x = xp.asarray([[[3.0], [2.0]]])
 
         y = atleast_nd(x, ndim=0)
@@ -338,8 +411,32 @@ class TestAtLeastND:
         y = atleast_nd(x, ndim=5)
         xp_assert_equal(y, xp.asarray([[[[[3.0], [2.0]]]]]))
 
-    def test_5D(self, xp: ModuleType):
-        x = xp.ones((1, 1, 1, 1, 1))
+    @pytest.mark.parametrize(
+        ("input_shape", "ndim", "expected_shape"),
+        [
+            ((2, 1, 1, 2, 1), 0, (2, 1, 1, 2, 1)),
+            ((1, 5, 2, 3, 2), 2, (1, 5, 2, 3, 2)),
+            ((2, 1, 1, 5, 2), 5, (2, 1, 1, 5, 2)),
+            ((1, 3, 1, 2, 1), 6, (1, 1, 3, 1, 2, 1)),
+            ((2, 8, 1, 9, 8), 9, (1, 1, 1, 1, 2, 8, 1, 9, 8)),
+        ],
+    )
+    def test_5D_shapes(
+        self,
+        input_shape: tuple[int],
+        ndim: int,
+        expected_shape: tuple[int],
+        xp: ModuleType,
+    ):
+        n = math.prod(input_shape)
+        x = xp.asarray(np.arange(n).reshape(input_shape))
+        y = atleast_nd(x, ndim=ndim)
+
+        assert y.shape == expected_shape
+        assert xp.sum(y) == int(n * (n - 1) / 2)
+
+    def test_5D_values(self, xp: ModuleType):
+        x = xp.asarray([[[[[3.0]], [[2.0]]]]])
 
         y = atleast_nd(x, ndim=0)
         xp_assert_equal(y, x)
@@ -351,19 +448,10 @@ class TestAtLeastND:
         xp_assert_equal(y, x)
 
         y = atleast_nd(x, ndim=6)
-        xp_assert_equal(y, xp.ones((1, 1, 1, 1, 1, 1)))
+        xp_assert_equal(y, xp.asarray([[[[[[3.0]], [[2.0]]]]]]))
 
         y = atleast_nd(x, ndim=9)
-        xp_assert_equal(y, xp.ones((1, 1, 1, 1, 1, 1, 1, 1, 1)))
-
-    def test_device(self, xp: ModuleType, device: Device):
-        x = xp.asarray([1, 2, 3], device=device)
-        assert get_device(atleast_nd(x, ndim=2)) == device
-
-    def test_xp(self, xp: ModuleType):
-        x = xp.asarray(1.0)
-        y = atleast_nd(x, ndim=1, xp=xp)
-        xp_assert_equal(y, xp.ones((1,)))
+        xp_assert_equal(y, xp.asarray([[[[[[[[[3.0]], [[2.0]]]]]]]]]))
 
 
 class TestBroadcastShapes:
@@ -477,6 +565,16 @@ class TestCov:
             ),
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
+
+    def test_batch(self, xp: ModuleType):
+        rng = np.random.default_rng(8847643423)
+        batch_shape = (3, 4)
+        n_var, n_obs = 3, 20
+        m = rng.random((*batch_shape, n_var, n_obs))
+        res = cov(xp.asarray(m))
+        ref_list = [np.cov(m_) for m_ in np.reshape(m, (-1, n_var, n_obs))]
+        ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
+        xp_assert_close(res, xp.asarray(ref))
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
@@ -1265,6 +1363,7 @@ class TestSetDiff1D:
     @pytest.mark.parametrize("shape2", [(), (1,), (1, 1)])
     def test_shapes(
         self,
+        request: pytest.FixtureRequest,
         assume_unique: bool,
         shape1: tuple[int, ...],
         shape2: tuple[int, ...],
@@ -1272,17 +1371,26 @@ class TestSetDiff1D:
     ):
         x1 = xp.zeros(shape1)
         x2 = xp.zeros(shape2)
+
+        if is_jax_namespace(xp) and assume_unique and shape1 != (1,):
+            xfail(request=request, reason="jax#32335 fixed with jax>=0.8.0")
+
         actual = setdiff1d(x1, x2, assume_unique=assume_unique)
         xp_assert_equal(actual, xp.empty((0,)))
 
     @assume_unique
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
-    def test_python_scalar(self, xp: ModuleType, assume_unique: bool):
+    def test_python_scalar(
+        self, request: pytest.FixtureRequest, xp: ModuleType, assume_unique: bool
+    ):
         # Test no dtype promotion to xp.asarray(x2); use x1.dtype
         x1 = xp.asarray([3, 1, 2], dtype=xp.int16)
         x2 = 3
         actual = setdiff1d(x1, x2, assume_unique=assume_unique)
         xp_assert_equal(actual, xp.asarray([1, 2], dtype=xp.int16))
+
+        if is_jax_namespace(xp) and assume_unique:
+            xfail(request=request, reason="jax#32335 fixed with jax>=0.8.0")
 
         actual = setdiff1d(x2, x1, assume_unique=assume_unique)
         xp_assert_equal(actual, xp.asarray([], dtype=xp.int16))

@@ -19,7 +19,9 @@ from ._lib._utils._helpers import asarrays, eager_shape
 from ._lib._utils._typing import Array, DType
 
 __all__ = [
+    "atleast_nd",
     "cov",
+    "create_diagonal",
     "expand_dims",
     "isclose",
     "nan_to_num",
@@ -29,23 +31,75 @@ __all__ = [
 ]
 
 
+def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array:
+    """
+    Recursively expand the dimension of an array to at least `ndim`.
+
+    Parameters
+    ----------
+    x : array
+        Input array.
+    ndim : int
+        The minimum number of dimensions for the result.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array with ``res.ndim`` >= `ndim`.
+        If ``x.ndim`` >= `ndim`, `x` is returned.
+        If ``x.ndim`` < `ndim`, `x` is expanded by prepending new axes
+        until ``res.ndim`` equals `ndim`.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> x = xp.asarray([1])
+    >>> xpx.atleast_nd(x, ndim=3, xp=xp)
+    Array([[[1]]], dtype=array_api_strict.int64)
+
+    >>> x = xp.asarray([[[1, 2],
+    ...                  [3, 4]]])
+    >>> xpx.atleast_nd(x, ndim=1, xp=xp) is x
+    True
+    """
+    if xp is None:
+        xp = array_namespace(x)
+
+    if 1 <= ndim <= 2 and (
+        is_numpy_namespace(xp)
+        or is_jax_namespace(xp)
+        or is_dask_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_torch_namespace(xp)
+    ):
+        return getattr(xp, f"atleast_{ndim}d")(x)
+
+    return _funcs.atleast_nd(x, ndim=ndim, xp=xp)
+
+
 def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     """
-    Estimate a covariance matrix.
+    Estimate a covariance matrix (or a stack of covariance matrices).
 
     Covariance indicates the level to which two variables vary together.
-    If we examine N-dimensional samples, :math:`X = [x_1, x_2, ... x_N]^T`,
-    then the covariance matrix element :math:`C_{ij}` is the covariance of
+    If we examine *N*-dimensional samples, :math:`X = [x_1, x_2, ... x_N]^T`,
+    each with *M* observations, then element :math:`C_{ij}` of the
+    :math:`N \times N` covariance matrix is the covariance of
     :math:`x_i` and :math:`x_j`. The element :math:`C_{ii}` is the variance
     of :math:`x_i`.
 
-    This provides a subset of the functionality of ``numpy.cov``.
+    With the exception of supporting batch input, this provides a subset of
+    the functionality of ``numpy.cov``.
 
     Parameters
     ----------
     m : array
-        A 1-D or 2-D array containing multiple variables and observations.
-        Each row of `m` represents a variable, and each column a single
+        An array of shape ``(..., N, M)`` whose innermost two dimensions
+        contain *M* observations of *N* variables. That is,
+        each row of `m` represents a variable, and each column a single
         observation of all those variables.
     xp : array_namespace, optional
         The standard-compatible namespace for `m`. Default: infer.
@@ -53,7 +107,8 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     Returns
     -------
     array
-        The covariance matrix of the variables.
+        An array having shape (..., N, N) whose innermost two dimensions represent
+        the covariance matrix of the variables.
 
     Examples
     --------
@@ -92,6 +147,17 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
 
     >>> xpx.cov(y, xp=xp)
     Array(2.14413333, dtype=array_api_strict.float64)
+
+    Input with more than two dimensions is treated as a stack of
+    two-dimensional input.
+
+    >>> stack = xp.stack((X, 2*X))
+    >>> xpx.cov(stack)
+    Array([[[ 11.71      ,  -4.286     ],
+            [ -4.286     ,   2.14413333]],
+
+           [[ 46.84      , -17.144     ],
+            [-17.144     ,   8.57653333]]], dtype=array_api_strict.float64)
     """
 
     if xp is None:
@@ -103,10 +169,71 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
         or is_torch_namespace(xp)
         or is_dask_namespace(xp)
         or is_jax_namespace(xp)
-    ):
+    ) and m.ndim <= 2:
         return xp.cov(m)
 
     return _funcs.cov(m, xp=xp)
+
+
+def create_diagonal(
+    x: Array, /, *, offset: int = 0, xp: ModuleType | None = None
+) -> Array:
+    """
+    Construct a diagonal array.
+
+    Parameters
+    ----------
+    x : array
+        An array having shape ``(*batch_dims, k)``.
+    offset : int, optional
+        Offset from the leading diagonal (default is ``0``).
+        Use positive ints for diagonals above the leading diagonal,
+        and negative ints for diagonals below the leading diagonal.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array having shape ``(*batch_dims, k+abs(offset), k+abs(offset))`` with `x`
+        on the diagonal (offset by `offset`).
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> x = xp.asarray([2, 4, 8])
+
+    >>> xpx.create_diagonal(x, xp=xp)
+    Array([[2, 0, 0],
+           [0, 4, 0],
+           [0, 0, 8]], dtype=array_api_strict.int64)
+
+    >>> xpx.create_diagonal(x, offset=-2, xp=xp)
+    Array([[0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0],
+           [2, 0, 0, 0, 0],
+           [0, 4, 0, 0, 0],
+           [0, 0, 8, 0, 0]], dtype=array_api_strict.int64)
+    """
+    if xp is None:
+        xp = array_namespace(x)
+
+    if x.ndim == 0:
+        err_msg = "`x` must be at least 1-dimensional."
+        raise ValueError(err_msg)
+
+    if is_torch_namespace(xp):
+        return xp.diag_embed(x, offset=offset, dim1=-2, dim2=-1)
+
+    if (is_dask_namespace(xp) or is_cupy_namespace(xp)) and x.ndim < 2:
+        return xp.diag(x, k=offset)
+
+    if (is_jax_namespace(xp) or is_numpy_namespace(xp)) and x.ndim < 3:
+        batch_dim, n = eager_shape(x)[:-1], eager_shape(x, -1)[0] + abs(offset)
+        return xp.reshape(xp.diag(x, k=offset), (*batch_dim, n, n))
+
+    return _funcs.create_diagonal(x, offset=offset, xp=xp)
 
 
 def expand_dims(
@@ -195,55 +322,6 @@ def expand_dims(
         return xp.expand_dims(a, axis=axis)
 
     return _funcs.expand_dims(a, axis=axis, xp=xp)
-
-
-def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array:
-    """
-    Recursively expand the dimension of an array to at least `ndim`.
-
-    Parameters
-    ----------
-    x : array
-        Input array.
-    ndim : int
-        The minimum number of dimensions for the result.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
-
-    Returns
-    -------
-    array
-        An array with ``res.ndim`` >= `ndim`.
-        If ``x.ndim`` >= `ndim`, `x` is returned.
-        If ``x.ndim`` < `ndim`, `x` is expanded by prepending new axes
-        until ``res.ndim`` equals `ndim`.
-
-    Examples
-    --------
-    >>> import array_api_strict as xp
-    >>> import array_api_extra as xpx
-    >>> x = xp.asarray([1])
-    >>> xpx.atleast_nd(x, ndim=3, xp=xp)
-    Array([[[1]]], dtype=array_api_strict.int64)
-
-    >>> x = xp.asarray([[[1, 2],
-    ...                  [3, 4]]])
-    >>> xpx.atleast_nd(x, ndim=1, xp=xp) is x
-    True
-    """
-    if xp is None:
-        xp = array_namespace(x)
-
-    if 1 <= ndim <= 3 and (
-        is_numpy_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_dask_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_torch_namespace(xp)
-    ):
-        return getattr(xp, f"atleast_{ndim}d")(x)
-
-    return _funcs.atleast_nd(x, ndim=ndim, xp=xp)
 
 
 def isclose(
@@ -551,6 +629,59 @@ def pad(
         return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)
+
+
+def setdiff1d(
+    x1: Array | complex,
+    x2: Array | complex,
+    /,
+    *,
+    assume_unique: bool = False,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Find the set difference of two arrays.
+
+    Return the unique values in `x1` that are not in `x2`.
+
+    Parameters
+    ----------
+    x1 : array | int | float | complex | bool
+        Input array.
+    x2 : array
+        Input comparison array.
+    assume_unique : bool
+        If ``True``, the input arrays are both assumed to be unique, which
+        can speed up the calculation. Default is ``False``.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x1` and `x2`. Default: infer.
+
+    Returns
+    -------
+    array
+        1D array of values in `x1` that are not in `x2`. The result
+        is sorted when `assume_unique` is ``False``, but otherwise only sorted
+        if the input is sorted.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+
+    >>> x1 = xp.asarray([1, 2, 3, 2, 4, 1])
+    >>> x2 = xp.asarray([3, 4, 5, 6])
+    >>> xpx.setdiff1d(x1, x2, xp=xp)
+    Array([1, 2], dtype=array_api_strict.int64)
+    """
+
+    if xp is None:
+        xp = array_namespace(x1, x2)
+
+    if is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp):
+        x1, x2 = asarrays(x1, x2, xp=xp)
+        return xp.setdiff1d(x1, x2, assume_unique=assume_unique)
+
+    return _funcs.setdiff1d(x1, x2, assume_unique=assume_unique, xp=xp)
 
 
 def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
