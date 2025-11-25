@@ -1026,3 +1026,56 @@ def isin(
         return xp.isin(a, b, assume_unique=assume_unique, invert=invert)
 
     return _funcs.isin(a, b, assume_unique=assume_unique, invert=invert, xp=xp)
+
+
+def fill_diagonal(
+    a: Array,
+    val: Array | int | float,
+    *,
+    wrap: bool = False,
+    xp: ModuleType | None = None,
+) -> None | Array:
+    """
+    Fill the main diagonal of the given array `a` of any dimensionality >= 2.
+
+    For an array `a` with ``a.ndim >= 2``, the diagonal is the list of
+    values ``a[i, ..., i]`` with indices ``i`` all identical.  This function
+    modifies the input array in-place without returning a value. However
+    specifically for JAX, a copy of the array `a` with the diagonal elements
+    overwritten is returned. This is because it is not possible to modify JAX's
+    immutable arrays in-place.
+
+    Parameters
+    ----------
+    a : Array
+        Input array whose diagonal is to be filled. It should be at least 2-D.
+
+    val : Array | int | float
+        Value(s) to write on the diagonal. If `val` is a scalar, the value is
+        written along the diagonal. If `val` is an Array, the flattened `val`
+        is written along the diagonal.
+
+    wrap : bool, optional
+        Only applicable for NumPy and Cupy. For tall matrices the
+        diagonal is "wrapped" after N columns. Default: False.
+
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a` and `val`. Default: infer.
+
+    Returns
+    -------
+    Array | None
+        For JAX a copy of the original array `a` is returned. For all other
+        cases the array `a` is modified in-place so None is returned.
+    """
+    if xp is None:
+        xp = array_namespace(a, val)
+
+    if is_jax_namespace(xp):
+        return xp.fill_diagonal(a, val, inplace=False)
+
+    if is_numpy_namespace(xp) or is_cupy_namespace(xp):
+        xp.fill_diagonal(a, val, wrap=wrap)
+
+    _funcs.fill_diagonal(a, val, xp=xp)
+    return None

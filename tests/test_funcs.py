@@ -21,6 +21,7 @@ from array_api_extra import (
     create_diagonal,
     default_dtype,
     expand_dims,
+    fill_diagonal,
     isclose,
     isin,
     kron,
@@ -1637,3 +1638,57 @@ class TestIsIn:
         expected = xp.asarray([False, True, False, True])
         res = isin(a, b, kind="sort")
         xp_assert_equal(res, expected)
+
+
+@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="item assignment not supported")
+@pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="numpy read only arrays")
+class TestFillDiagonal:
+    def test_simple(self, xp: ModuleType):
+        a = xp.zeros((3, 3), dtype=xp.int64)
+        val = 5
+        expected = xp.asarray([[5, 0, 0], [0, 5, 0], [0, 0, 5]], dtype=xp.int64)
+        if is_jax_namespace(xp):
+            a = cast(Array, fill_diagonal(a, val))
+        else:
+            _ = fill_diagonal(a, val)
+        xp_assert_equal(a, expected)
+
+    def test_val_1d(self, xp: ModuleType):
+        a = xp.zeros((3, 3), dtype=xp.int64)
+        val = xp.asarray([1, 2, 3], dtype=xp.int64)
+        expected = xp.asarray([[1, 0, 0], [0, 2, 0], [0, 0, 3]], dtype=xp.int64)
+        if is_jax_namespace(xp):
+            a = cast(Array, fill_diagonal(a, val))
+        else:
+            _ = fill_diagonal(a, val)
+        xp_assert_equal(a, expected)
+
+    @pytest.mark.parametrize(
+        ("a_shape", "expected"),
+        [
+            ((4, 4), [[1, 0, 0, 0], [0, 2, 0, 0], [0, 0, 3, 0], [0, 0, 0, 4]]),
+            (
+                (5, 4),
+                [[1, 0, 0, 0], [0, 2, 0, 0], [0, 0, 3, 0], [0, 0, 0, 4], [0, 0, 0, 0]],
+            ),
+        ],
+    )
+    def test_val_2d(self, xp: ModuleType, a_shape: tuple[int, int], expected: Array):
+        a = xp.zeros(a_shape, dtype=xp.int64)
+        val = xp.asarray([[1, 2], [3, 4]], dtype=xp.int64)
+        expected = xp.asarray(expected, dtype=xp.int64)
+        if is_jax_namespace(xp):
+            a = cast(Array, fill_diagonal(a, val))
+        else:
+            _ = fill_diagonal(a, val)
+        xp_assert_equal(a, expected)
+
+    @pytest.mark.parametrize("val_scalar", [True, False])
+    def test_device(self, xp: ModuleType, device: Device, val_scalar: bool):
+        a = xp.zeros((3, 3), dtype=xp.int64, device=device)
+        val = 5 if val_scalar else xp.asarray([1, 2, 3], dtype=xp.int64, device=device)
+        if is_jax_namespace(xp):
+            a = cast(Array, fill_diagonal(a, val))
+        else:
+            _ = fill_diagonal(a, val)
+        assert get_device(a) == device

@@ -8,7 +8,12 @@ from typing import Literal, cast, overload
 
 from ._at import at
 from ._utils import _compat, _helpers
-from ._utils._compat import array_namespace, is_dask_namespace, is_jax_array
+from ._utils._compat import (
+    array_namespace,
+    is_dask_namespace,
+    is_jax_array,
+    is_torch_namespace,
+)
 from ._utils._helpers import (
     asarrays,
     capabilities,
@@ -742,3 +747,36 @@ def isin(  # numpydoc ignore=PR01,RT01
         _helpers.in1d(a, b, assume_unique=assume_unique, invert=invert, xp=xp),
         original_a_shape,
     )
+
+
+def fill_diagonal(  # numpydoc ignore=PR01,RT01
+    a: Array,
+    val: Array | int | float,
+    *,
+    xp: ModuleType,
+) -> None:
+    """See docstring in `array_api_extra._delegation.py`."""
+    if a.ndim < 2:
+        msg = f"array `a` must be at least 2-d. Got array with shape {tuple(a.shape)}"
+        raise ValueError(msg)
+
+    a, val = asarrays(a, val, xp=xp)
+    min_rows_columns = min(x or 0 for x in a.shape)
+    if is_torch_namespace(xp):
+        val_size = math.prod(x or 0 for x in val.shape)
+    else:
+        val_size = val.size or 0
+    if val.ndim > 0 and val_size != min_rows_columns:
+        msg = (
+            "`val` needs to be a scalar or an array of the same size as the "
+            f"diagonal of `a` ({min_rows_columns}). Got {val.shape[0]}"
+        )
+        raise ValueError(msg)
+
+    if val.ndim == 0:
+        for i in range(min_rows_columns):
+            a[i, i] = val
+    else:
+        val = cast(Array, xp.reshape(val, (-1,)))
+        for i in range(min_rows_columns):
+            a[i, i] = val[i]
