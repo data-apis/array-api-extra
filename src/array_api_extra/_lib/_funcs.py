@@ -749,4 +749,5 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
     a = xp.reshape(a, (-1,))
     b = xp.reshape(b, (-1,))
+    # XXX: `sparse` returns NumPy arrays from `unique_values`
     return xp.asarray(xp.unique_values(xp.concat([a, b])))
