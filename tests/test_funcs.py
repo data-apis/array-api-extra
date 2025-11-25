@@ -1640,7 +1640,6 @@ class TestIsIn:
         xp_assert_equal(res, expected)
 
 
-@pytest.mark.skip_xp_backend(Backend.SPARSE, reason="unique_values returns arrays")
 @pytest.mark.skip_xp_backend(
     Backend.ARRAY_API_STRICTEST,
     reason="data_dependent_shapes flag for unique_values is disabled",
