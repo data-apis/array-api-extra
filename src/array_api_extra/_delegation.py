@@ -226,12 +226,13 @@ def create_diagonal(
     if is_torch_namespace(xp):
         return xp.diag_embed(x, offset=offset, dim1=-2, dim2=-1)
 
-    if (is_dask_namespace(xp) or is_cupy_namespace(xp)) and x.ndim < 2:
+    if (
+        is_dask_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_numpy_namespace(xp)
+        or is_jax_namespace(xp)
+    ) and (x.ndim < 2):
         return xp.diag(x, k=offset)
-
-    if (is_jax_namespace(xp) or is_numpy_namespace(xp)) and x.ndim < 3:
-        batch_dim, n = eager_shape(x)[:-1], eager_shape(x, -1)[0] + abs(offset)
-        return xp.reshape(xp.diag(x, k=offset), (*batch_dim, n, n))
 
     return _funcs.create_diagonal(x, offset=offset, xp=xp)
 

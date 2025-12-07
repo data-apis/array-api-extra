@@ -55,8 +55,6 @@ lazy_xp_function(pad)
 lazy_xp_function(setdiff1d, jax_jit=False)
 lazy_xp_function(sinc)
 
-NestedFloatList = list[float] | list["NestedFloatList"]
-
 
 class TestApplyWhere:
     @staticmethod
@@ -711,6 +709,7 @@ class TestCreateDiagonal:
             (0, 1),
             (1, 0),
             (0, 0),
+            (2, 3),
             (4, 2, 1),
             (1, 1, 7),
             (0, 0, 1),
