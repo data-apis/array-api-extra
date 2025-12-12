@@ -23,6 +23,7 @@ from ._lib._funcs import (
     default_dtype,
     kron,
     nunique,
+    searchsorted,
 )
 from ._lib._lazy import lazy_apply
 
@@ -49,6 +50,7 @@ __all__ = [
     "one_hot",
     "pad",
     "partition",
+    "searchsorted",
     "setdiff1d",
     "sinc",
     "union1d",
