@@ -226,12 +226,13 @@ def create_diagonal(
     if is_torch_namespace(xp):
         return xp.diag_embed(x, offset=offset, dim1=-2, dim2=-1)
 
-    if (is_dask_namespace(xp) or is_cupy_namespace(xp)) and x.ndim < 2:
+    if (
+        is_dask_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_numpy_namespace(xp)
+        or is_jax_namespace(xp)
+    ) and (x.ndim < 2):
         return xp.diag(x, k=offset)
-
-    if (is_jax_namespace(xp) or is_numpy_namespace(xp)) and x.ndim < 3:
-        batch_dim, n = eager_shape(x)[:-1], eager_shape(x, -1)[0] + abs(offset)
-        return xp.reshape(xp.diag(x, k=offset), (*batch_dim, n, n))
 
     return _funcs.create_diagonal(x, offset=offset, xp=xp)
 
@@ -1026,3 +1027,37 @@ def isin(
         return xp.isin(a, b, assume_unique=assume_unique, invert=invert)
 
     return _funcs.isin(a, b, assume_unique=assume_unique, invert=invert, xp=xp)
+
+
+def union1d(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
+    """
+    Find the union of two arrays.
+
+    Return the unique, sorted array of values that are in either of the two
+    input arrays.
+
+    Parameters
+    ----------
+    a, b : Array
+        Input arrays. They are flattened internally if they are not already 1D.
+
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a` and `b`. Default: infer.
+
+    Returns
+    -------
+    Array
+        Unique, sorted union of the input arrays.
+    """
+    if xp is None:
+        xp = array_namespace(a, b)
+
+    if (
+        is_numpy_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_dask_namespace(xp)
+        or is_jax_namespace(xp)
+    ):
+        return xp.union1d(a, b)
+
+    return _funcs.union1d(a, b, xp=xp)

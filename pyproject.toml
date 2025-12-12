@@ -55,22 +55,22 @@ array-api-extra = { path = ".", editable = true }
 
 [tool.pixi.feature.lint.dependencies]
 typing-extensions = ">=4.15.0"
-pylint = ">=4.0.2"
+pylint = ">=4.0.3"
 mypy = ">=1.18.2"
-basedpyright = ">=1.33.0"
+basedpyright = ">=1.34.0"
 numpydoc = ">=1.9.0,<2"
 # import dependencies for mypy:
 array-api-strict = ">=2.4.1,<2.5"
 numpy = ">=2.1.3"
-hypothesis = ">=6.142.4"
+hypothesis = ">=6.148.2"
 dask-core = ">=2025.11.0" # No distributed, tornado, etc.
 dprint = ">=0.50.0,<0.51"
-lefthook = ">=2.0.2,<3"
-ruff = ">=0.14.4,<0.15"
-typos = ">=1.39.0,<2"
-actionlint = ">=1.7.8,<2"
+lefthook = ">=2.0.4,<3"
+ruff = ">=0.14.6,<0.15"
+typos = ">=1.40.0,<2"
+actionlint = ">=1.7.9,<2"
 blacken-docs = ">=1.20.0,<2"
-pytest = ">=8.4.2,<9"
+pytest = ">=9.0.1,<10"
 validate-pyproject = ">=0.24.1,<0.25"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
@@ -93,9 +93,9 @@ numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with nump
 lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters" }
 
 [tool.pixi.feature.tests.dependencies]
-pytest = ">=8.4.2"
+pytest = ">=9.0.1"
 pytest-cov = ">=7.0.0"
-hypothesis = ">=6.142.4"
+hypothesis = ">=6.148.2"
 array-api-strict = ">=2.4.1,<2.5"
 numpy = ">=1.22.0"
 
@@ -121,7 +121,7 @@ sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
 dask-core = ">=2025.11.0" # No distributed, tornado, etc.
-pytest = ">=8.4.2"
+pytest = ">=9.0.1"
 typing-extensions = ">=4.15.0"
 numpy = ">=2.1.3"
 
@@ -200,8 +200,8 @@ pytorch = { version = ">=2.8.0", build = "cuda12*" }
 
 [tool.pixi.feature.nogil.dependencies]
 python-freethreading = "~=3.13.0"
-pytest-run-parallel = ">=0.7.1"
-numpy = ">=2.3.4"
+pytest-run-parallel = ">=0.8.0"
+numpy = ">=2.3.5"
 # pytorch = "*"  # Not available on Python 3.13t yet
 dask-core = ">=2025.11.0" # No distributed, tornado, etc.
 # sparse = "*"  # numba not available on Python 3.13t yet

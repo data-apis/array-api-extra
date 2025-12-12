@@ -32,6 +32,7 @@ from array_api_extra import (
     searchsorted,
     setdiff1d,
     sinc,
+    union1d,
 )
 from array_api_extra._lib._backends import NUMPY_VERSION, Backend
 from array_api_extra._lib._testing import xfail, xp_assert_close, xp_assert_equal
@@ -59,8 +60,6 @@ lazy_xp_function(pad)
 lazy_xp_function(setdiff1d, jax_jit=False)
 lazy_xp_function(searchsorted)
 lazy_xp_function(sinc)
-
-NestedFloatList = list[float] | list["NestedFloatList"]
 
 
 class TestApplyWhere:
@@ -716,6 +715,7 @@ class TestCreateDiagonal:
             (0, 1),
             (1, 0),
             (0, 0),
+            (2, 3),
             (4, 2, 1),
             (1, 1, 7),
             (0, 0, 1),
@@ -1815,3 +1815,36 @@ class TestSearchsorted:
         x, y = xp.asarray(x.copy()), xp.asarray(y.copy())
         res = searchsorted(x, y, side=side, xp=xp)
         xp_assert_equal(res, ref)
+
+
+@pytest.mark.skip_xp_backend(
+    Backend.ARRAY_API_STRICTEST,
+    reason="data_dependent_shapes flag for unique_values is disabled",
+)
+class TestUnion1d:
+    def test_simple(self, xp: ModuleType):
+        a = xp.asarray([-1, 1, 0])
+        b = xp.asarray([2, -2, 0])
+        expected = xp.asarray([-2, -1, 0, 1, 2])
+        res = union1d(a, b)
+        xp_assert_equal(res, expected)
+
+    def test_2d(self, xp: ModuleType):
+        a = xp.asarray([[-1, 1, 0], [1, 2, 0]])
+        b = xp.asarray([[1, 0, 1], [-2, -1, 0]])
+        expected = xp.asarray([-2, -1, 0, 1, 2])
+        res = union1d(a, b)
+        xp_assert_equal(res, expected)
+
+    def test_3d(self, xp: ModuleType):
+        a = xp.asarray([[[-1, 0], [1, 2]], [[-1, 0], [1, 2]]])
+        b = xp.asarray([[[0, 1], [-1, 2]], [[1, -2], [0, 2]]])
+        expected = xp.asarray([-2, -1, 0, 1, 2])
+        res = union1d(a, b)
+        xp_assert_equal(res, expected)
+
+    @pytest.mark.skip_xp_backend(Backend.TORCH, reason="materialize 'meta' device")
+    def test_device(self, xp: ModuleType, device: Device):
+        a = xp.asarray([-1, 1, 0], device=device)
+        b = xp.asarray([2, -2, 0], device=device)
+        assert get_device(union1d(a, b)) == device

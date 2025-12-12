@@ -837,3 +837,12 @@ def isin(  # numpydoc ignore=PR01,RT01
         _helpers.in1d(a, b, assume_unique=assume_unique, invert=invert, xp=xp),
         original_a_shape,
     )
+
+
+def union1d(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._delegation.py`."""
+    a = xp.reshape(a, (-1,))
+    b = xp.reshape(b, (-1,))
+    # XXX: `sparse` returns NumPy arrays from `unique_values`
+    return xp.asarray(xp.unique_values(xp.concat([a, b])))
