@@ -603,7 +603,7 @@ def jax_autojit(
     """
     import jax
 
-    @jax.jit  # type: ignore[misc]  # pyright: ignore[reportUntypedFunctionDecorator]
+    @jax.jit  # type: ignore[untyped-decorator]  # pyright: ignore[reportUntypedFunctionDecorator]
     def inner(  # numpydoc ignore=GL08
         wargs: _AutoJITWrapper[Any],
     ) -> _AutoJITWrapper[T]:
