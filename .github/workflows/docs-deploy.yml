@@ -17,7 +17,7 @@ jobs:
     environment:
       name: docs-deploy
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
       - name: Download Artifact
         uses: dawidd6/action-download-artifact@ac66b43f0e6a346234dd65d4d0c8fbb31cb316e5 # v11
@@ -30,7 +30,7 @@ jobs:
       # See
       # https://github.com/JamesIves/github-pages-deploy-action/tree/dev#using-an-ssh-deploy-key-
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@6c2d9db40f9296374acc17b90404b6e8864128c8 # v4.7.3
+        uses: JamesIves/github-pages-deploy-action@4a3abc783e1a24aeb44c16e869ad83caf6b4cc23 # v4.7.4
         with:
           folder: docs/build/
           ssh-key: ${{ secrets.DEPLOY_KEY }}
