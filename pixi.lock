@@ -207,7 +207,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/nodejs-wheel-24.11.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/numba-0.62.1-py313hd8e3f9f_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/numpy-2.3.5-py313hf6604e3_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/openssl-3.6.0-h26f9b46_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/opt_einsum-3.4.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/optree-0.18.0-py313h7037e92_0.conda
@@ -380,7 +380,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/nodejs-wheel-24.11.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/numba-0.62.1-py313h360c2eb_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/numpy-2.3.5-py313ha99c057_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/onednn-3.10.1-omp_hcf60519_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/openssl-3.6.0-h230baf5_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/opt_einsum-3.4.0-pyhd8ed1ab_1.conda
@@ -550,7 +550,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/nomkl-1.0-h5ca1d4c_0.tar.bz2
       - conda: https://prefix.dev/conda-forge/osx-arm64/numba-0.62.1-py313h936dde2_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/numpy-2.3.5-py313h9771d21_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/openssl-3.6.0-h5503f6c_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/opt_einsum-3.4.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/optree-0.18.0-py313ha61f8ec_0.conda
@@ -706,7 +706,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/nodejs-wheel-24.11.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/numba-0.62.1-py313h924e429_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/numpy-2.3.5-py313hce7ae62_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/openssl-3.6.0-h725018a_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/optree-0.18.0-py313hf069bd2_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/packaging-25.0-pyh29332c3_1.conda
@@ -933,7 +933,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/nodejs-wheel-24.11.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/numba-0.62.1-py313hd8e3f9f_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/numpy-2.3.5-py313hf6604e3_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/openssl-3.6.0-h26f9b46_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/opt_einsum-3.4.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/optree-0.18.0-py313h7037e92_0.conda
@@ -1108,7 +1108,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/nodejs-wheel-24.11.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/numba-0.62.1-py313h360c2eb_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/numpy-2.3.5-py313ha99c057_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/onednn-3.10.1-omp_hcf60519_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/openssl-3.6.0-h230baf5_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/opt_einsum-3.4.0-pyhd8ed1ab_1.conda
@@ -1278,7 +1278,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/nomkl-1.0-h5ca1d4c_0.tar.bz2
       - conda: https://prefix.dev/conda-forge/osx-arm64/numba-0.62.1-py313h936dde2_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/numpy-2.3.5-py313h9771d21_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/openssl-3.6.0-h5503f6c_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/opt_einsum-3.4.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/optree-0.18.0-py313ha61f8ec_0.conda
@@ -1458,7 +1458,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/nodejs-wheel-24.11.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/numba-0.62.1-py313h924e429_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/numpy-2.3.5-py313hce7ae62_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/openssl-3.6.0-h725018a_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/optree-0.18.0-py313hf069bd2_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/packaging-25.0-pyh29332c3_1.conda
@@ -1982,7 +1982,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/nodejs-24.9.0-heeeca48_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/nodejs-wheel-24.11.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/numpy-2.3.5-py313hf6604e3_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/openssl-3.6.0-h26f9b46_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/packaging-25.0-pyh29332c3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/partd-1.4.2-pyhd8ed1ab_0.conda
@@ -2092,7 +2092,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-64/nodejs-24.9.0-h09bb5a9_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/nodejs-wheel-24.11.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/numpy-2.3.5-py313ha99c057_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/openssl-3.6.0-h230baf5_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/packaging-25.0-pyh29332c3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/partd-1.4.2-pyhd8ed1ab_0.conda
@@ -2202,7 +2202,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/nodejs-24.4.1-hab9d20b_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/nodejs-wheel-24.11.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/numpy-2.3.5-py313h9771d21_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/openssl-3.6.0-h5503f6c_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/packaging-25.0-pyh29332c3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/partd-1.4.2-pyhd8ed1ab_0.conda
@@ -2311,7 +2311,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/nodejs-24.9.0-he453025_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/nodejs-wheel-24.11.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/numpy-2.3.5-py313hce7ae62_0.conda
-      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
+      - conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/openssl-3.6.0-h725018a_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/packaging-25.0-pyh29332c3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/partd-1.4.2-pyhd8ed1ab_0.conda
@@ -5168,7 +5168,7 @@ packages:
 - pypi: ./
   name: array-api-extra
   version: 0.9.2.dev0
-  sha256: 6b30672be37638845f118349bd2e761e1485f4d21342a022e07ea8f6da795b19
+  sha256: de0730927469cac3ef75b16601f967dce18a39f25dd9d64fee10ccd7a6456f8f
   requires_dist:
   - array-api-compat>=1.12.0,<2
   requires_python: '>=3.10'
@@ -10916,11 +10916,11 @@ packages:
   - pkg:pypi/numpy?source=hash-mapping
   size: 7678552
   timestamp: 1763350908961
-- conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.9.0-pyhe01879c_1.conda
-  sha256: 9e1f3dda737ac9aeec3c245c5d856d0268c4f64a5293c094298d74bb55e2b165
-  md5: 66f9ba52d846feffa1c5d62522324b4f
+- conda: https://prefix.dev/conda-forge/noarch/numpydoc-1.10.0-pyhcf101f3_0.conda
+  sha256: 482d94fce136c4352b18c6397b9faf0a3149bfb12499ab1ffebad8db0cb6678f
+  md5: 3aa4b625f20f55cf68e92df5e5bf3c39
   depends:
-  - python >=3.9
+  - python >=3.10
   - sphinx >=6
   - tomli >=1.1.0
   - python
@@ -10928,8 +10928,8 @@ packages:
   license_family: BSD
   purls:
   - pkg:pypi/numpydoc?source=hash-mapping
-  size: 60220
-  timestamp: 1750861325361
+  size: 65801
+  timestamp: 1764715638266
 - conda: https://prefix.dev/conda-forge/osx-64/onednn-3.10.1-omp_hcf60519_0.conda
   sha256: 015ac38c56d45aa8aeb8a7b885e71c6992d5080321fd3c410b5744ce6f5c1ec5
   md5: 8c05f4f03c15d9ddf7c35e4602dfaa03
