@@ -64,7 +64,7 @@ class TestAssertEqualCloseLess:
     def test_namespace(self, xp: ModuleType, func: Callable[..., None]):
         with pytest.raises(AssertionError, match="namespaces do not match"):
             func(xp.asarray(0), np.asarray(0))
-        with pytest.raises(TypeError, match="Unrecognized array input"):
+        with pytest.raises(TypeError, match=r"array_namespace requires .* array input"):
             func(xp.asarray(0), 0)
         with pytest.raises(TypeError, match="list is not a supported array type"):
             func(xp.asarray([0]), [0])
