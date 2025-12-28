@@ -973,7 +973,7 @@ class TestIsClose:
         xp_assert_equal(isclose(0, 1, xp=xp), xp.asarray(False))
 
     def test_all_python_scalars(self):
-        with pytest.raises(TypeError, match="Unrecognized"):
+        with pytest.raises(TypeError, match=r"array_namespace requires .* array input"):
             _ = isclose(0, 0)
 
     def test_xp(self, xp: ModuleType):
@@ -1069,7 +1069,7 @@ class TestKron:
         xp_assert_equal(kron(1, 1, xp=xp), xp.asarray(1))
 
     def test_all_python_scalars(self):
-        with pytest.raises(TypeError, match="Unrecognized"):
+        with pytest.raises(TypeError, match=r"array_namespace requires .* array input"):
             _ = kron(1, 1)
 
     def test_device(self, xp: ModuleType, device: Device):
@@ -1401,7 +1401,7 @@ class TestSetDiff1D:
 
     @pytest.mark.parametrize("assume_unique", [True, False])
     def test_all_python_scalars(self, assume_unique: bool):
-        with pytest.raises(TypeError, match="Unrecognized"):
+        with pytest.raises(TypeError, match=r"array_namespace requires .* array input"):
             _ = setdiff1d(0, 0, assume_unique=assume_unique)
 
     @assume_unique
