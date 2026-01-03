@@ -44,11 +44,11 @@ jobs:
       fail-fast: false
       matrix:
         environment:
-          - tests-py310
+          - tests-py311
           - tests-py313
           - tests-numpy1
           - tests-backends
-          - tests-backends-py310
+          - tests-backends-py311
           - tests-nogil
         runs-on: [ubuntu-latest]
 
