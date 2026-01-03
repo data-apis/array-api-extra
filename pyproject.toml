@@ -155,13 +155,13 @@ sparse = ">=0.17.0"
 [tool.pixi.feature.backends.target.linux-64.dependencies]
 # On CPU use >=0.7.0
 # On GPU, use 0.6.0 (0.6.2 and 0.7.0 both segfault); see jaxlib pin below.
-jax = ">=0.6.0"
+jax = ">=0.7.2"
 
 [tool.pixi.feature.backends.target.osx-64.dependencies]
-jax = ">=0.6.0"
+jax = ">=0.7.2"
 
 [tool.pixi.feature.backends.target.osx-arm64.dependencies]
-jax = ">=0.6.0"
+jax = ">=0.7.2"
 
 [tool.pixi.feature.backends.target.win-64.dependencies]
 # jax = "*"  # unavailable
@@ -178,7 +178,7 @@ system-requirements = { cuda = "12" }
 [tool.pixi.feature.cuda-backends.target.linux-64.dependencies]
 cupy = ">=13.6.0"
 # JAX 0.6.2 and 0.7.0 segfault on CUDA
-jaxlib = { version = ">=0.6.0,!=0.6.2,!=0.7.0", build = "cuda12*" }
+jaxlib = { version = ">=0.7.2,!=0.6.2,!=0.7.0", build = "cuda12*" }
 pytorch = { version = ">=2.7.1", build = "cuda12*" }
 
 [tool.pixi.feature.cuda-backends.target.osx-64.dependencies]
