@@ -321,6 +321,37 @@ def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
         xp_assert_equal(cast(Array, erf(x)), xp.asarray([1.0, 1.0]))
 
 
+class A:
+    def __init__(self, x):
+        xp = array_namespace(x)
+        self._xp = xp
+        self.x = np.asarray(x)
+
+    def f(self, y):
+        y = np.asarray(y)
+        return self._xp.asarray(np.matmul(self.x, y))
+
+    def g(self, y, z):
+        return self.f(y) + self.f(z)
+
+
+class B(A):
+    def __init__(self, x):
+        xp = array_namespace(x)
+        self._xp = xp
+        self.x = xp.asarray(x)
+
+    def f(self, y):
+        return self._xp.matmul(self.x, y)
+
+
+lazy_xp_function((B, "g"))
+
+def test_lazy_xp_function_class_inheritance(xp: ModuleType):
+    assert hasattr(B.g, "_lazy_xp_function")
+    assert not hasattr(A.g, "_lazy_xp_function")
+
+
 def dask_raises(x: Array) -> Array:
     def _raises(x: Array) -> Array:
         # Test that map_blocks doesn't eagerly call the function;
