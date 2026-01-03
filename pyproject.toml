@@ -11,14 +11,13 @@ authors = [
 description = "Extra array functions built on top of the array API standard."
 readme = "README.md"
 license.file = "LICENSE"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -135,8 +134,8 @@ ipython = ">=7.33.0"
 [tool.pixi.feature.dev.tasks]
 ipython = { cmd = "ipython", description = "Launch ipython" }
 
-[tool.pixi.feature.py310.dependencies]
-python = "~=3.10.0"
+[tool.pixi.feature.py311.dependencies]
+python = "~=3.11.0"
 
 [tool.pixi.feature.py313.dependencies]
 python = "~=3.13.0"
@@ -144,7 +143,7 @@ python = "~=3.13.0"
 [tool.pixi.feature.numpy1.dependencies]
 # Oldest NumPy version supported by scikit-learn.
 # Note that this is older than what SPEC0 recommends.
-numpy = "=1.22.0"
+numpy = "=1.24.1"
 
 # Backends that can run on CPU-only hosts
 # Note: JAX and PyTorch will install CPU variants.
@@ -154,8 +153,7 @@ dask-core = ">=2025.12.0" # No distributed, tornado, etc.
 sparse = ">=0.17.0"
 
 [tool.pixi.feature.backends.target.linux-64.dependencies]
-# On CPU Python 3.10, use 0.6.2
-# On CPU Python >=3.11, use >=0.7.0
+# On CPU use >=0.7.0
 # On GPU, use 0.6.0 (0.6.2 and 0.7.0 both segfault); see jaxlib pin below.
 jax = ">=0.6.0"
 
@@ -217,18 +215,16 @@ tests-py313 = { features = ["py313", "tests"], solve-group = "py313" } # alias o
 # Some backends may pin numpy; use separate solve-group
 dev = { features = ["py313", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
 tests-backends = { features = ["py313", "tests", "backends"], solve-group = "backends" }
-# Note: Python 3.10 has already been dropped by some backends (like JAX),
-# so this is testing older versions.
-tests-backends-py310 = { features = ["py310", "tests", "backends"] }
+tests-backends-py311 = { features = ["py311", "tests", "backends"] }
 
 # CUDA not available on free github actions and on some developers' PCs
 dev-cuda = { features = ["py313", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
 tests-cuda = { features = ["py313", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda-py310 = { features = ["py310", "tests", "backends", "cuda-backends"] }
+tests-cuda-py311 = { features = ["py311", "tests", "backends", "cuda-backends"] }
 
 # Ungrouped environments
-tests-numpy1 = ["py310", "tests", "numpy1"]
-tests-py310 = ["py310", "tests"]
+tests-numpy1 = ["py311", "tests", "numpy1"]
+tests-py311 = ["py311", "tests"]
 tests-nogil = ["nogil", "tests"]
 
 # pytest
@@ -254,7 +250,7 @@ run.source = ["array_api_extra"]
 
 [tool.mypy]
 files = ["src", "tests"]
-python_version = "3.10"
+python_version = "3.11"
 warn_unused_configs = true
 strict = true
 enable_error_code = ["ignore-without-code", "truthy-bool"]
@@ -273,7 +269,7 @@ disable_error_code = ["no-untyped-def"] # test(...) without -> None
 
 [tool.basedpyright]
 include = ["src", "tests"]
-pythonVersion = "3.10"
+pythonVersion = "3.11"
 pythonPlatform = "All"
 typeCheckingMode = "all"
 
@@ -304,7 +300,7 @@ executionEnvironments = [
 # Ruff
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 extend-select = [
@@ -349,7 +345,7 @@ ignore = [
 # Pylint
 
 [tool.pylint]
-py-version = "3.10"
+py-version = "3.11"
 reports.output-format = "colorized"
 messages_control.disable = [
   "design", # ignore heavily opinionated design checks
