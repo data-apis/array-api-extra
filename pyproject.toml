@@ -61,7 +61,7 @@ basedpyright = ">=1.36.1"
 numpydoc = ">=1.10.0,<2"
 # import dependencies for mypy:
 array-api-strict = ">=2.4.1,<2.5"
-numpy = ">=2.1.3"
+numpy = ">=2.3.4"
 hypothesis = ">=6.148.2"
 dask-core = ">=2025.12.0" # No distributed, tornado, etc.
 dprint = ">=0.50.0,<0.51"
@@ -97,7 +97,7 @@ pytest = ">=9.0.2"
 pytest-cov = ">=7.0.0"
 hypothesis = ">=6.148.2"
 array-api-strict = ">=2.4.1,<2.5"
-numpy = ">=1.22.0"
+numpy = ">=2.3.4"
 
 [tool.pixi.feature.tests.tasks]
 tests = { cmd = "pytest -v", description = "Run tests" }
@@ -123,7 +123,7 @@ sphinx-autodoc-typehints = ">=1.25.3"
 dask-core = ">=2025.12.0" # No distributed, tornado, etc.
 pytest = ">=9.0.2"
 typing-extensions = ">=4.15.0"
-numpy = ">=2.1.3"
+numpy = ">=2.3.4"
 
 [tool.pixi.feature.docs.tasks]
 docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs", description = "Build docs" }
