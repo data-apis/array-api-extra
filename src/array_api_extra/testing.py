@@ -10,8 +10,8 @@ import contextlib
 import enum
 import warnings
 from collections.abc import Callable, Generator, Iterator, Sequence
-from functools import wraps
-from types import ModuleType
+from functools import update_wrapper, wraps
+from types import FunctionType, ModuleType
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar, cast
 
 from ._lib._utils._compat import is_dask_namespace, is_jax_namespace
@@ -48,8 +48,21 @@ class Deprecated(enum.Enum):
 DEPRECATED = Deprecated.DEPRECATED
 
 
+def _clone_function(f: Callable[..., Any]) -> Callable[..., Any]:
+    """Returns a clone of an existing function."""
+    f_new = FunctionType(
+        f.__code__,
+        f.__globals__,
+        name=f.__name__,
+        argdefs=f.__defaults__,
+        closure=f.__closure__,
+    )
+    f_new.__kwdefaults__ = f.__kwdefaults__
+    return update_wrapper(f_new, f)
+
+
 def lazy_xp_function(
-    func: Callable[..., Any],
+    func: Callable[..., Any] | tuple[type, str],
     *,
     allow_dask_compute: bool | int = False,
     jax_jit: bool = True,
@@ -69,8 +82,9 @@ def lazy_xp_function(
 
     Parameters
     ----------
-    func : callable
-        Function to be tested.
+    func : callable | tuple[type, str]
+        Function to be tested, or a tuple containing an (uninstantiated) class and a
+        method name to specify a class method to be tested.
     allow_dask_compute : bool | int, optional
         Whether `func` is allowed to internally materialize the Dask graph, or maximum
         number of times it is allowed to do so. This is typically triggered by
@@ -209,10 +223,21 @@ def lazy_xp_function(
         "jax_jit": jax_jit,
     }
 
+    if isinstance(func, tuple):
+        # Replace the method with a clone before adding tags
+        # to avoid adding unwanted tags to a parent method when
+        # the method was inherited from a parent class.
+        cls, method_name = func
+        method = getattr(cls, method_name)
+        setattr(cls, method_name, _clone_function(method))
+        f = getattr(cls, method_name)
+    else:
+        f = func
+
     try:
-        func._lazy_xp_function = tags  # type: ignore[attr-defined]  # pylint: disable=protected-access  # pyright: ignore[reportFunctionMemberAccess]
+        f._lazy_xp_function = tags  # pylint: disable=protected-access  # pyright: ignore[reportFunctionMemberAccess]
     except AttributeError:  # @cython.vectorize
-        _ufuncs_tags[func] = tags
+        _ufuncs_tags[f] = tags
 
 
 def patch_lazy_xp_functions(
