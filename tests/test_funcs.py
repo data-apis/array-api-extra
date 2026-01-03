@@ -521,6 +521,7 @@ class TestCov:
         expect = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]], dtype=xp.complex128)
         xp_assert_close(actual, expect)
 
+    @pytest.mark.xfail_xp_backend(Backend.JAX_GPU, reason="jax#32296")
     @pytest.mark.xfail_xp_backend(Backend.JAX, reason="jax#32296")
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="sparse#877")
     def test_empty(self, xp: ModuleType):
@@ -989,14 +990,14 @@ class TestIsClose:
         assert get_device(res) == device
 
     def test_array_on_device_with_scalar(self, xp: ModuleType, device: Device):
-        a = xp.asarray([0.01, 0.5, 0.8, 0.9, 1.00001], device=device)
+        a = xp.asarray([0.01, 0.5, 0.8, 0.9, 1.00001], device=device, dtype=xp.float64)
         b = 1
         res = isclose(a, b)
         assert get_device(res) == device
         xp_assert_equal(res, xp.asarray([False, False, False, False, True]))
 
         a = 0.1
-        b = xp.asarray([0.01, 0.5, 0.8, 0.9, 0.100001], device=device)
+        b = xp.asarray([0.01, 0.5, 0.8, 0.9, 0.100001], device=device, dtype=xp.float64)
         res = isclose(a, b)
         assert get_device(res) == device
         xp_assert_equal(res, xp.asarray([False, False, False, False, True]))
