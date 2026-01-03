@@ -1,9 +1,10 @@
 from collections.abc import Callable, Iterator
 from types import ModuleType
-from typing import cast
+from typing import Any, cast
 
 import numpy as np
 import pytest
+from typing_extensions import override
 
 from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._testing import (
@@ -322,32 +323,34 @@ def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
 
 
 class A:
-    def __init__(self, x):
+    def __init__(self, x: Array):
         xp = array_namespace(x)
-        self._xp = xp
-        self.x = np.asarray(x)
+        self._xp: ModuleType = xp
+        self.x: Any = np.asarray(x)
 
-    def f(self, y):
-        y = np.asarray(y)
-        return self._xp.asarray(np.matmul(self.x, y))
+    def f(self, y: Array) -> Array:
+        return self._xp.asarray(np.matmul(self.x, np.asarray(y)))
 
-    def g(self, y, z):
+    def g(self, y: Array, z: Array) -> Array:
         return self.f(y) + self.f(z)
 
 
 class B(A):
-    def __init__(self, x):
+    @override
+    def __init__(self, x: Array):  # pyright: ignore[reportMissingSuperCall]
         xp = array_namespace(x)
-        self._xp = xp
-        self.x = xp.asarray(x)
+        self._xp: ModuleType = xp
+        self.x: Any = xp.asarray(x)
 
-    def f(self, y):
+    @override
+    def f(self, y: Array) -> Array:
         return self._xp.matmul(self.x, y)
 
 
 lazy_xp_function((B, "g"))
 
-def test_lazy_xp_function_class_inheritance(xp: ModuleType):
+
+def test_lazy_xp_function_class_inheritance():
     assert hasattr(B.g, "_lazy_xp_function")
     assert not hasattr(A.g, "_lazy_xp_function")
 

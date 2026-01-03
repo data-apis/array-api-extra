@@ -48,7 +48,7 @@ class Deprecated(enum.Enum):
 DEPRECATED = Deprecated.DEPRECATED
 
 
-def _clone_function(f):
+def _clone_function(f: Callable[..., Any]) -> Callable[..., Any]:
     """Returns a clone of an existing function."""
     f_new = FunctionType(
         f.__code__,
@@ -58,12 +58,11 @@ def _clone_function(f):
         closure=f.__closure__,
     )
     f_new.__kwdefaults__ = f.__kwdefaults__
-    update_wrapper(f_new, f)
-    return f_new
+    return update_wrapper(f_new, f)
 
 
 def lazy_xp_function(
-    func: Callable[..., Any] | Tuple[type, str],
+    func: Callable[..., Any] | tuple[type, str],
     *,
     allow_dask_compute: bool | int = False,
     jax_jit: bool = True,
@@ -231,12 +230,14 @@ def lazy_xp_function(
         cls, method_name = func
         method = getattr(cls, method_name)
         setattr(cls, method_name, _clone_function(method))
-        func = getattr(cls, method_name)
+        f = getattr(cls, method_name)
+    else:
+        f = func
 
     try:
-        func._lazy_xp_function = tags  # type: ignore[attr-defined]  # pylint: disable=protected-access  # pyright: ignore[reportFunctionMemberAccess]
+        f._lazy_xp_function = tags  # pylint: disable=protected-access  # pyright: ignore[reportFunctionMemberAccess]
     except AttributeError:  # @cython.vectorize
-        _ufuncs_tags[func] = tags
+        _ufuncs_tags[f] = tags
 
 
 def patch_lazy_xp_functions(
