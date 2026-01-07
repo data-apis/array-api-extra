@@ -227,6 +227,8 @@ def lazy_xp_function(
         # Replace the method with a clone before adding tags
         # to avoid adding unwanted tags to a parent method when
         # the method was inherited from a parent class.
+        # Note: can't just accept an unbound method `cls.method_name` because in
+        # case of inheritance it would be impossible to attribute it to the child class.
         cls, method_name = func
         method = getattr(cls, method_name)
         setattr(cls, method_name, _clone_function(method))
