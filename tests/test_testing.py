@@ -350,9 +350,19 @@ class B(A):
 lazy_xp_function((B, "g"))
 
 
-def test_lazy_xp_function_class_inheritance():
-    assert hasattr(B.g, "_lazy_xp_function")
-    assert not hasattr(A.g, "_lazy_xp_function")
+class TestLazyXpFunctionClasses:
+    def test_parent_method_not_tagged(self):
+        assert hasattr(B.g, "_lazy_xp_function")
+        assert not hasattr(A.g, "_lazy_xp_function")
+
+    def test_lazy_xp_function_classes(self, xp):
+        x = xp.asarray([1.1, 2.2, 3.3])
+        y = xp.asarray([1.0, 2.0, 3.0])
+        z = xp.asarray([3.0, 4.0, 5.0])
+        foo = B(x)
+        observed = foo.g(y, z)
+        expected = xp.asarray(44.0)[()]
+        xp_assert_close(observed, expected)
 
 
 def dask_raises(x: Array) -> Array:
