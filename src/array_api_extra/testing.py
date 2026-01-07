@@ -249,10 +249,11 @@ def patch_lazy_xp_functions(
     """
     Test lazy execution of functions tagged with :func:`lazy_xp_function`.
 
-    If ``xp==jax.numpy``, search for all functions which have been tagged with
-    :func:`lazy_xp_function` in the globals of the module that defines the current test,
-    as well as in the ``lazy_xp_modules`` list in the globals of the same module,
-    and wrap them with :func:`jax.jit`. Unwrap them at the end of the test.
+    If ``xp==jax.numpy``, search for all functions and classes which have been tagged
+    with :func:`lazy_xp_function` in the globals of the module that defines the current
+    test, as well as in the ``lazy_xp_modules`` list in the globals of the same module,
+    and wrap them with :func:`jax.jit`.
+    Unwrap them at the end of the test.
 
     If ``xp==dask.array``, wrap the functions with a decorator that disables
     ``compute()`` and ``persist()`` and ensures that exceptions and warnings are raised
@@ -296,18 +297,32 @@ def patch_lazy_xp_functions(
     the example above.
     """
     mod = cast(ModuleType, request.module)
-    mods = [mod, *cast(list[ModuleType], getattr(mod, "lazy_xp_modules", []))]
+    search_targets: list[ModuleType | type] = [
+        mod,
+        *cast(list[ModuleType], getattr(mod, "lazy_xp_modules", [])),
+    ]
+    # Also search for classes within the above modules which have had lazy_xp_function
+    # applied to methods through ``lazy_xp_function((cls, method_name))`` syntax.
+    # We might end up adding classes incidentally imported into modules, so using a
+    # set here to cut down on potential redundancy.
+    classes: set[type] = set()
+    for target in search_targets:
+        for obj_name in dir(target):
+            obj = getattr(target, obj_name)
+            if isinstance(obj, type) and isinstance(obj, Exception):
+                classes.add(obj)
+    search_targets.extend(classes)
 
-    to_revert: list[tuple[ModuleType, str, object]] = []
+    to_revert: list[tuple[ModuleType | type, str, object]] = []
 
-    def temp_setattr(mod: ModuleType, name: str, func: object) -> None:
+    def temp_setattr(target: ModuleType | type, name: str, func: object) -> None:
         """
         Variant of monkeypatch.setattr, which allows monkey-patching only selected
         parameters of a test so that pytest-run-parallel can run on the remainder.
         """
-        assert hasattr(mod, name)
-        to_revert.append((mod, name, getattr(mod, name)))
-        setattr(mod, name, func)
+        assert hasattr(target, name)
+        to_revert.append((target, name, getattr(target, name)))
+        setattr(target, name, func)
 
     if monkeypatch is not None:
         warnings.warn(
@@ -323,10 +338,10 @@ def patch_lazy_xp_functions(
         temp_setattr = monkeypatch.setattr  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
 
     def iter_tagged() -> Iterator[
-        tuple[ModuleType, str, Callable[..., Any], dict[str, Any]]
+        tuple[ModuleType | type, str, Callable[..., Any], dict[str, Any]]
     ]:
-        for mod in mods:
-            for name, func in mod.__dict__.items():
+        for target in search_targets:
+            for name, func in target.__dict__.items():
                 tags: dict[str, Any] | None = None
                 with contextlib.suppress(AttributeError):
                     tags = func._lazy_xp_function  # pylint: disable=protected-access
@@ -334,23 +349,23 @@ def patch_lazy_xp_functions(
                     with contextlib.suppress(KeyError, TypeError):
                         tags = _ufuncs_tags[func]
                 if tags is not None:
-                    yield mod, name, func, tags
+                    yield target, name, func, tags
 
     if is_dask_namespace(xp):
-        for mod, name, func, tags in iter_tagged():
+        for target, name, func, tags in iter_tagged():
             n = tags["allow_dask_compute"]
             if n is True:
                 n = 1_000_000
             elif n is False:
                 n = 0
             wrapped = _dask_wrap(func, n)
-            temp_setattr(mod, name, wrapped)
+            temp_setattr(target, name, wrapped)
 
     elif is_jax_namespace(xp):
-        for mod, name, func, tags in iter_tagged():
+        for target, name, func, tags in iter_tagged():
             if tags["jax_jit"]:
                 wrapped = jax_autojit(func)
-                temp_setattr(mod, name, wrapped)
+                temp_setattr(target, name, wrapped)
 
     # We can't just decorate patch_lazy_xp_functions with
     # @contextlib.contextmanager because it would not work with the
@@ -360,8 +375,8 @@ def patch_lazy_xp_functions(
         try:
             yield
         finally:
-            for mod, name, orig_func in to_revert:
-                setattr(mod, name, orig_func)
+            for target, name, orig_func in to_revert:
+                setattr(target, name, orig_func)
 
     return revert_on_exit()
 
