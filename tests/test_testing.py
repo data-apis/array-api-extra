@@ -359,6 +359,10 @@ class TestLazyXpFunctionClasses:
         assert hasattr(B.g, "_lazy_xp_function")
         assert not hasattr(A.g, "_lazy_xp_function")
 
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="converts to NumPy")
+    @pytest.mark.skip_xp_backend(Backend.CUPY, reason="converts to NumPy")
+    @pytest.mark.skip_xp_backend(Backend.JAX_GPU, reason="converts to NumPy")
+    @pytest.mark.skip_xp_backend(Backend.TORCH_GPU, reason="converts to NumPy")
     def test_lazy_xp_function_classes(self, xp: ModuleType, library: Backend):
         x = xp.asarray([1.1, 2.2, 3.3])
         y = xp.asarray([1.0, 2.0, 3.0])
