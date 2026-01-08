@@ -251,7 +251,7 @@ def patch_lazy_xp_functions(
     """
     Test lazy execution of functions tagged with :func:`lazy_xp_function`.
 
-    If ``xp==jax.numpy``, search for all functions and classes which have been tagged
+    If ``xp==jax.numpy``, search for all functions and methods which have been tagged
     with :func:`lazy_xp_function` in the globals of the module that defines the current
     test, as well as in the ``lazy_xp_modules`` list in the globals of the same module,
     and wrap them with :func:`jax.jit`.
@@ -311,7 +311,7 @@ def patch_lazy_xp_functions(
     for target in search_targets:
         for obj_name in dir(target):
             obj = getattr(target, obj_name)
-            if isinstance(obj, type) and isinstance(obj, Exception):
+            if isinstance(obj, type):
                 classes.add(obj)
     search_targets.extend(classes)
 
