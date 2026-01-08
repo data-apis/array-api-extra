@@ -334,6 +334,9 @@ class A:
     def g(self, y: Array, z: Array) -> Array:
         return self.f(y) + self.f(z)
 
+    def w(self, y: Array) -> bool:
+        return bool(self._xp.any(y))
+
 
 class B(A):
     @override
@@ -348,6 +351,7 @@ class B(A):
 
 
 lazy_xp_function((B, "g"))
+lazy_xp_function((B, "w"))
 
 
 class TestLazyXpFunctionClasses:
@@ -355,14 +359,19 @@ class TestLazyXpFunctionClasses:
         assert hasattr(B.g, "_lazy_xp_function")
         assert not hasattr(A.g, "_lazy_xp_function")
 
-    def test_lazy_xp_function_classes(self, xp):
+    def test_lazy_xp_function_classes(self, xp: ModuleType, library: Backend):
         x = xp.asarray([1.1, 2.2, 3.3])
         y = xp.asarray([1.0, 2.0, 3.0])
-        z = xp.asarray([3.0, 4.0, 5.0])
-        foo = B(x)
-        observed = foo.g(y, z)
-        expected = xp.asarray(44.0)[()]
-        xp_assert_close(observed, expected)
+        foo = A(x)
+        bar = B(x)
+
+        if library.like(Backend.JAX):
+            with pytest.raises(
+                TypeError, match="Attempted boolean conversion of traced array"
+            ):
+                assert bar.w(y)
+
+        assert foo.w(y)
 
 
 def dask_raises(x: Array) -> Array:
