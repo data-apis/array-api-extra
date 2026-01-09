@@ -349,9 +349,14 @@ class B(A):
     def f(self, y: Array) -> Array:
         return self._xp.matmul(self.x, y)
 
+    @staticmethod
+    def k(y: Array) -> "B":
+        return B(2.0 * y)
+
 
 lazy_xp_function((B, "g"))
 lazy_xp_function((B, "w"))
+lazy_xp_function((B, "k"))
 
 
 class TestLazyXpFunctionClasses:
@@ -376,6 +381,12 @@ class TestLazyXpFunctionClasses:
                 assert bar.w(y)
 
         assert foo.w(y)
+
+    def test_static_methods(self, xp: ModuleType):
+        x = xp.asarray([1.1, 2.2, 3.3])
+        foo = B(x)
+        bar = foo.k(x)
+        xp_assert_equal(bar.x, 2.0 * foo.x)
 
 
 def dask_raises(x: Array) -> Array:
