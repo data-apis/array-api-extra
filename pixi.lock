@@ -5296,7 +5296,7 @@ packages:
 - pypi: ./
   name: array-api-extra
   version: 0.10.0.dev0
-  sha256: 064bda469f7692bc6b2a4018c596c36af55a31e54ccc726a6b0b912dda478dbd
+  sha256: dbc3abd6bb4ce3b508394e29344b9fd75c70414529dcaede915511a9cb0607c5
   requires_dist:
   - array-api-compat>=1.12.0,<2
   requires_python: '>=3.11'
