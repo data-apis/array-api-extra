@@ -334,7 +334,7 @@ class A:
     def g(self, y: Array, z: Array) -> Array:
         return self.f(y) + self.f(z)
 
-    def w(self, y: Array) -> bool:
+    def h(self, y: Array) -> bool:
         return bool(self._xp.any(y))
 
 
@@ -361,6 +361,14 @@ class B(A):
             return B(y)
         return B(y + 1.0)
 
+    @classmethod
+    def w(cls, y: Array) -> "B":
+        xp = array_namespace(y)
+        y = xp.asarray(y)
+        if bool(xp.any(y)):
+            return B(y)
+        return B(y + 1.0)
+
 
 @final
 class eager:
@@ -369,9 +377,10 @@ class eager:
 
 
 lazy_xp_function((B, "g"))
-lazy_xp_function((B, "w"))
+lazy_xp_function((B, "h"))
 lazy_xp_function((B, "k"))
 lazy_xp_function((B, "j"))
+lazy_xp_function((B, "w"))
 
 
 class TestLazyXpFunctionClasses:
@@ -393,9 +402,9 @@ class TestLazyXpFunctionClasses:
             with pytest.raises(
                 TypeError, match="Attempted boolean conversion of traced array"
             ):
-                assert bar.w(y)
+                assert bar.h(y)
 
-        assert foo.w(y)
+        assert foo.h(y)
 
     def test_static_methods_preserved(self, xp: ModuleType):
         # Tests that static methods stay static methods when
@@ -417,6 +426,17 @@ class TestLazyXpFunctionClasses:
                 assert isinstance(foo.j(x), B)
         else:
             assert isinstance(foo.j(x), B)
+
+    @pytest.mark.skip_xp_backend(Backend.DASK, reason="calls dask.compute()")
+    def test_class_methods_wrapped(self, xp: ModuleType, library: Backend):
+        x = xp.asarray([1.1, 2.2, 3.3])
+        if library.like(Backend.JAX):
+            with pytest.raises(
+                TypeError, match="Attempted boolean conversion of traced array"
+            ):
+                assert isinstance(B.w(x), B)
+        else:
+            assert isinstance(B.w(x), B)
 
     def test_circumvention(self, xp: ModuleType):
         x = xp.asarray([1.0, 2.0])
