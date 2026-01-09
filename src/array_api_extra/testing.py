@@ -237,6 +237,8 @@ def lazy_xp_function(
         # to ensure that this is preserved.
         raw_attr = getattr_static(cls, method_name)
         method = getattr(cls, method_name)
+        if isinstance(raw_attr, classmethod):
+            method = method.__func__
         cloned_method = _clone_function(method)
 
         method_to_set: Any
@@ -249,6 +251,8 @@ def lazy_xp_function(
 
         setattr(cls, method_name, method_to_set)
         f = getattr(cls, method_name)
+        if isinstance(raw_attr, classmethod):
+            f = f.__func__
         # Annotate that cls owns this method so we can check that later.
         tags["owner"] = cls
     else:
