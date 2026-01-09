@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterator
 from types import ModuleType
-from typing import Any, cast
+from typing import Any, cast, final
 
 import numpy as np
 import pytest
@@ -362,6 +362,12 @@ class B(A):
         return B(y + 1.0)
 
 
+@final
+class eager:
+    # this needs to be a staticmethod to appease the type checker
+    non_materializable5 = staticmethod(non_materializable5)
+
+
 lazy_xp_function((B, "g"))
 lazy_xp_function((B, "w"))
 lazy_xp_function((B, "k"))
@@ -411,6 +417,11 @@ class TestLazyXpFunctionClasses:
                 assert isinstance(foo.j(x), B)
         else:
             assert isinstance(foo.j(x), B)
+
+    def test_circumvention(self, xp: ModuleType):
+        x = xp.asarray([1.0, 2.0])
+        y = eager.non_materializable5(x)
+        xp_assert_equal(y, x)
 
 
 def dask_raises(x: Array) -> Array:
