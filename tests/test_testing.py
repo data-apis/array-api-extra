@@ -399,6 +399,7 @@ class TestLazyXpFunctionClasses:
         bar = foo.k(x)
         xp_assert_equal(bar.x, 2.0 * foo.x)
 
+    @pytest.mark.skip_xp_backend(Backend.DASK, reason="calls dask.compute()")
     def test_static_methods_wrapped(self, xp: ModuleType, library: Backend):
         x = xp.asarray([1.1, 2.2, 3.3])
         foo = B(x)
@@ -408,7 +409,8 @@ class TestLazyXpFunctionClasses:
                 TypeError, match="Attempted boolean conversion of traced array"
             ):
                 assert isinstance(foo.j(x), B)
-        assert isinstance(foo.j(x), B)
+        else:
+            assert isinstance(foo.j(x), B)
 
 
 def dask_raises(x: Array) -> Array:
