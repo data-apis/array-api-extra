@@ -238,6 +238,10 @@ def lazy_xp_function(
         raw_attr = getattr_static(cls, method_name)
         method = getattr(cls, method_name)
         cloned_method = _clone_function(method)
+        # Update the ``__qualname__`` because this will be used later to check
+        # whether something is a method defined in the class of interest, or just
+        # a reference to a function that's stored in a class.
+        cloned_method.__qualname__ = f"{cls.__name__}.{method_name}"
 
         method_to_set: Any
         if isinstance(raw_attr, staticmethod):
@@ -378,6 +382,19 @@ def patch_lazy_xp_functions(
                     with contextlib.suppress(KeyError, TypeError):
                         tags = _ufuncs_tags[func]
                 if tags is not None:
+                    if isinstance(target, type):
+                        # There's a common pattern to wrap functions in namespace
+                        # classes to bypass lazy_xp_function like this:
+                        #
+                        # class naked:
+                        #     myfunc = mymodule.myfunc
+                        #
+                        # To ensure this still works when checking for tags in
+                        # attributes of classes, use ``__qualname__`` to check whether
+                        # or not ``func`` was originally defined within ``target``.
+                        qn = getattr(func, "__qualname__", "")
+                        if not qn.startswith(f"{target.__name__}."):
+                            continue
                     # put attr, and func in the outputs so we can later tell
                     # if this was a staticmethod or classmethod.
                     yield target, name, attr, func, tags
