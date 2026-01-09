@@ -353,10 +353,19 @@ class B(A):
     def k(y: Array) -> "B":
         return B(2.0 * y)
 
+    @staticmethod
+    def j(y: Array) -> "B":
+        xp = array_namespace(y)
+        y = xp.asarray(y)
+        if bool(xp.any(y)):
+            return B(y)
+        return B(y + 1.0)
+
 
 lazy_xp_function((B, "g"))
 lazy_xp_function((B, "w"))
 lazy_xp_function((B, "k"))
+lazy_xp_function((B, "j"))
 
 
 class TestLazyXpFunctionClasses:
@@ -382,11 +391,24 @@ class TestLazyXpFunctionClasses:
 
         assert foo.w(y)
 
-    def test_static_methods(self, xp: ModuleType):
+    def test_static_methods_preserved(self, xp: ModuleType):
+        # Tests that static methods stay static methods when
+        # lazy_xp_function is applied.
         x = xp.asarray([1.1, 2.2, 3.3])
         foo = B(x)
         bar = foo.k(x)
         xp_assert_equal(bar.x, 2.0 * foo.x)
+
+    def test_static_methods_wrapped(self, xp: ModuleType, library: Backend):
+        x = xp.asarray([1.1, 2.2, 3.3])
+        foo = B(x)
+
+        if library.like(Backend.JAX):
+            with pytest.raises(
+                TypeError, match="Attempted boolean conversion of traced array"
+            ):
+                assert isinstance(foo.j(x), B)
+        assert isinstance(foo.j(x), B)
 
 
 def dask_raises(x: Array) -> Array:
