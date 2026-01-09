@@ -230,8 +230,21 @@ def lazy_xp_function(
         # Note: can't just accept an unbound method `cls.method_name` because in
         # case of inheritance it would be impossible to attribute it to the child class.
         cls, method_name = func
+        # The method might be a staticmethod or classmethod so we need to do a dance
+        # to ensure that this is preserved.
+        raw_attr = cls.__dict__.get(method_name)
         method = getattr(cls, method_name)
-        setattr(cls, method_name, _clone_function(method))
+        cloned_method = _clone_function(method)
+
+        method_to_set: Any
+        if isinstance(raw_attr, staticmethod):
+            method_to_set = staticmethod(cloned_method)
+        elif isinstance(raw_attr, classmethod):
+            method_to_set = classmethod(cloned_method)
+        else:
+            method_to_set = cloned_method
+
+        setattr(cls, method_name, method_to_set)
         f = getattr(cls, method_name)
     else:
         f = func
