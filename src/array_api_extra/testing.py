@@ -11,6 +11,7 @@ import enum
 import warnings
 from collections.abc import Callable, Generator, Iterator, Sequence
 from functools import update_wrapper, wraps
+from inspect import getattr_static
 from types import FunctionType, ModuleType
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar, cast
 
@@ -229,10 +230,12 @@ def lazy_xp_function(
         # the method was inherited from a parent class.
         # Note: can't just accept an unbound method `cls.method_name` because in
         # case of inheritance it would be impossible to attribute it to the child class.
+        # This also makes it so tagged methods will appear in their class's ``__dict__``
+        # and thus findable by ``iter_tagged_modules`` below.
         cls, method_name = func
         # The method might be a staticmethod or classmethod so we need to do a dance
         # to ensure that this is preserved.
-        raw_attr = cls.__dict__.get(method_name)
+        raw_attr = getattr_static(cls, method_name)
         method = getattr(cls, method_name)
         cloned_method = _clone_function(method)
 
@@ -322,8 +325,7 @@ def patch_lazy_xp_functions(
     # set here to cut down on potential redundancy.
     classes: set[type] = set()
     for target in search_targets:
-        for obj_name in dir(target):
-            obj = getattr(target, obj_name)
+        for obj in target.__dict__.values():
             if isinstance(obj, type):
                 classes.add(obj)
     search_targets.extend(classes)
@@ -336,7 +338,10 @@ def patch_lazy_xp_functions(
         parameters of a test so that pytest-run-parallel can run on the remainder.
         """
         assert hasattr(target, name)
-        to_revert.append((target, name, getattr(target, name)))
+        # Need getattr_static because the attr could be a staticmethod or other
+        # descriptor and we don't want that to be stripped away.
+        original = getattr_static(target, name)
+        to_revert.append((target, name, original))
         setattr(target, name, func)
 
     if monkeypatch is not None:
@@ -353,10 +358,19 @@ def patch_lazy_xp_functions(
         temp_setattr = monkeypatch.setattr  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
 
     def iter_tagged() -> Iterator[
-        tuple[ModuleType | type, str, Callable[..., Any], dict[str, Any]]
+        tuple[ModuleType | type, str, Any, Callable[..., Any], dict[str, Any]]
     ]:
         for target in search_targets:
-            for name, func in target.__dict__.items():
+            for name, attr in target.__dict__.items():
+                # attr might be a staticmethod or classmethod. If so we need
+                # to peel it back and wrap the underlying function and later
+                # make sure not to accidentally replace it with a regular
+                # method.
+                func: Any = (
+                    attr.__func__
+                    if isinstance(attr, (staticmethod, classmethod))
+                    else attr
+                )
                 tags: dict[str, Any] | None = None
                 with contextlib.suppress(AttributeError):
                     tags = func._lazy_xp_function  # pylint: disable=protected-access
@@ -364,22 +378,37 @@ def patch_lazy_xp_functions(
                     with contextlib.suppress(KeyError, TypeError):
                         tags = _ufuncs_tags[func]
                 if tags is not None:
-                    yield target, name, func, tags
+                    # put attr, and func in the outputs so we can later tell
+                    # if this was a staticmethod or classmethod.
+                    yield target, name, attr, func, tags
 
+    wrapped: Any
     if is_dask_namespace(xp):
-        for target, name, func, tags in iter_tagged():
+        for target, name, attr, func, tags in iter_tagged():
             n = tags["allow_dask_compute"]
             if n is True:
                 n = 1_000_000
             elif n is False:
                 n = 0
             wrapped = _dask_wrap(func, n)
+            # If we're dealing with a staticmethod or classmethod, make
+            # sure things stay that way.
+            if isinstance(attr, staticmethod):
+                wrapped = staticmethod(wrapped)
+            elif isinstance(attr, classmethod):
+                wrapped = classmethod(wrapped)
             temp_setattr(target, name, wrapped)
 
     elif is_jax_namespace(xp):
-        for target, name, func, tags in iter_tagged():
+        for target, name, attr, func, tags in iter_tagged():
             if tags["jax_jit"]:
                 wrapped = jax_autojit(func)
+                # If we're dealing with a staticmethod or classmethod, make
+                # sure things stay that way.
+                if isinstance(attr, staticmethod):
+                    wrapped = staticmethod(wrapped)
+                elif isinstance(attr, classmethod):
+                    wrapped = classmethod(wrapped)
                 temp_setattr(target, name, wrapped)
 
     # We can't just decorate patch_lazy_xp_functions with
