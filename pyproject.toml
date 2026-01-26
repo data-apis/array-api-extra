@@ -1,16 +1,18 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["meson-python"]
+build-backend = "mesonpy"
 
 [project]
 name = "array-api-extra"
+version = "0.10.0.dev0"
 authors = [
   { name = "Lucas Colley", email = "lucas.colley8@gmail.com" },
   # { name = "Open Source Contributors" },  # https://github.com/pypi/warehouse/issues/14813
 ]
 description = "Extra array functions built on top of the array API standard."
 readme = "README.md"
-license.file = "LICENSE"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 classifiers = [
   "Intended Audience :: Developers",
@@ -24,50 +26,84 @@ classifiers = [
   "Programming Language :: Python :: Free Threading :: 3 - Stable",
   "Typing :: Typed",
 ]
-dynamic = ["version"]
-dependencies = ["array-api-compat>=1.12.0,<2"]
+dependencies = ["array-api-compat>=1.13.0,<2"]
 
 [project.urls]
 Homepage = "https://github.com/data-apis/array-api-extra"
 "Bug Tracker" = "https://github.com/data-apis/array-api-extra/issues"
 Changelog = "https://github.com/data-apis/array-api-extra/releases"
 
-# Hatch
-
-[tool.hatch]
-version.path = "src/array_api_extra/__init__.py"
-
-[tool.hatch.build.targets.sdist]
-exclude = ["codecov.yml", "pixi.lock", "RELEASING.md", "renovate.json"]
-
-#  Pixi
+# Pixi
 
 [tool.pixi.workspace]
 channels = ["https://prefix.dev/conda-forge"]
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+preview = ["pixi-build"]
+
+### array-api-extra package definition ###
+
+[tool.pixi.package.build.backend]
+name = "pixi-build-python"
+version = "*"
+
+[tool.pixi.package.host-dependencies]
+meson-python = "*"
+uv = "*" # interfaces with meson-python instead of pip
+
+[tool.pixi.package.run-dependencies]
+array-api-compat = "*"
+
+### workspace environments ###
+
+[tool.pixi.environments]
+default = { features = ["py313"], solve-group = "py313" }
+lint = { features = ["py313", "lint"], solve-group = "py313" }
+docs = { features = ["py313", "docs"], solve-group = "py313" }
+tests = { features = ["py313", "tests"], solve-group = "py313" }
+tests-py313 = { features = ["py313", "tests"], solve-group = "py313" } # alias of tests
+
+# Some backends may pin numpy; use separate solve-group
+dev = { features = ["py313", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
+tests-backends = { features = ["py313", "tests", "backends"], solve-group = "backends" }
+tests-backends-py311 = { features = ["py311", "tests", "backends"] }
+
+# CUDA not available on free github actions and on some developers' PCs
+dev-cuda = { features = ["py313", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
+tests-cuda = { features = ["py313", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
+tests-cuda-py311 = { features = ["py311", "tests", "backends", "cuda-backends"] }
+
+# Ungrouped environments
+tests-numpy1 = ["py311", "tests", "numpy1"]
+tests-py311 = ["py311", "tests"]
+tests-nogil = ["nogil", "tests"]
+
+### default feature definition ###
+
+[tool.pixi.dev]
+# this pulls in array-api-extra's host and run dependencies
+array-api-extra.path = "."
 
 [tool.pixi.dependencies]
-array-api-compat = ">=1.12.0,<2"
+array-api-extra.path = "."
 
-[tool.pixi.pypi-dependencies]
-array-api-extra = { path = ".", editable = true }
+### non-default feature definitions ###
 
 [tool.pixi.feature.lint.dependencies]
 typing-extensions = ">=4.15.0"
 pylint = ">=4.0.4"
 mypy = ">=1.19.1"
-basedpyright = ">=1.36.1"
+basedpyright = ">=1.37.1"
 numpydoc = ">=1.10.0,<2"
 # import dependencies for mypy:
 array-api-strict = ">=2.4.1,<2.5"
 numpy = ">=2.1.3"
-hypothesis = ">=6.148.7"
+hypothesis = ">=6.148.8"
 dask-core = ">=2025.12.0" # No distributed, tornado, etc.
 dprint = ">=0.50.0,<0.51"
 lefthook = ">=2.0.13,<3"
-ruff = ">=0.14.10,<0.15"
-typos = ">=1.40.0,<2"
-actionlint = ">=1.7.9,<2"
+ruff = ">=0.14.11,<0.15"
+typos = ">=1.42.0,<2"
+actionlint = ">=1.7.10,<2"
 blacken-docs = ">=1.20.0,<2"
 pytest = ">=9.0.2,<10"
 validate-pyproject = ">=0.24.1,<0.25"
@@ -94,7 +130,7 @@ lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run
 [tool.pixi.feature.tests.dependencies]
 pytest = ">=9.0.2"
 pytest-cov = ">=7.0.0"
-hypothesis = ">=6.148.7"
+hypothesis = ">=6.148.8"
 array-api-strict = ">=2.4.1,<2.5"
 numpy = ">=1.22.0"
 scipy = ">=1.15.2,<2"
@@ -197,28 +233,6 @@ numpy = ">=2.3.5"
 dask-core = ">=2025.12.0" # No distributed, tornado, etc.
 # sparse = "*"  # numba not available on Python 3.13t yet
 # jax = "*"  # ml_dtypes not available on Python 3.13t yet
-
-[tool.pixi.environments]
-default = { features = ["py313"], solve-group = "py313" }
-lint = { features = ["py313", "lint"], solve-group = "py313" }
-docs = { features = ["py313", "docs"], solve-group = "py313" }
-tests = { features = ["py313", "tests"], solve-group = "py313" }
-tests-py313 = { features = ["py313", "tests"], solve-group = "py313" } # alias of tests
-
-# Some backends may pin numpy; use separate solve-group
-dev = { features = ["py313", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
-tests-backends = { features = ["py313", "tests", "backends"], solve-group = "backends" }
-tests-backends-py311 = { features = ["py311", "tests", "backends"] }
-
-# CUDA not available on free github actions and on some developers' PCs
-dev-cuda = { features = ["py313", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda = { features = ["py313", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda-py311 = { features = ["py311", "tests", "backends", "cuda-backends"] }
-
-# Ungrouped environments
-tests-numpy1 = ["py311", "tests", "numpy1"]
-tests-py311 = ["py311", "tests"]
-tests-nogil = ["nogil", "tests"]
 
 # pytest
 
