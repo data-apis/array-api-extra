@@ -180,7 +180,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/jedi-0.19.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/ld_impl_linux-64-2.45-default_hbd61a6d_105.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/lefthook-2.0.13-hfc2019e_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/lefthook-2.0.16-hfc2019e_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libabseil-20250512.1-cxx17_hba17884_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libblas-3.11.0-5_h5875eb1_mkl.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libbrotlicommon-1.2.0-hb03c661_1.conda
@@ -368,7 +368,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-64/jaxlib-0.7.2-cpu_py313h877052d_2.conda
       - conda: https://prefix.dev/conda-forge/noarch/jedi-0.19.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/osx-64/lefthook-2.0.13-hccc6df8_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-64/lefthook-2.0.16-hccc6df8_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/libabseil-20250512.1-cxx17_hfc00f1c_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/libblas-3.9.0-20_osx64_mkl.conda
       - conda: https://prefix.dev/conda-forge/osx-64/libbrotlicommon-1.2.0-h8616949_1.conda
@@ -554,7 +554,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/jaxlib-0.7.2-cpu_py313hf0aba26_2.conda
       - conda: https://prefix.dev/conda-forge/noarch/jedi-0.19.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/osx-arm64/lefthook-2.0.13-h820172f_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/lefthook-2.0.16-h820172f_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/libabseil-20250512.1-cxx17_hd41c47c_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/libblas-3.11.0-5_h51639a9_openblas.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/libbrotlicommon-1.2.0-hc919400_1.conda
@@ -728,7 +728,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/isort-7.0.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/jedi-0.19.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/win-64/lefthook-2.0.13-h11686cb_0.conda
+      - conda: https://prefix.dev/conda-forge/win-64/lefthook-2.0.16-h11686cb_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/libabseil-20250512.1-cxx17_habfad5f_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/libblas-3.11.0-5_hf2e6a31_mkl.conda
       - conda: https://prefix.dev/conda-forge/win-64/libcblas-3.11.0-5_h2a3cdd5_mkl.conda
@@ -926,7 +926,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/jedi-0.19.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/ld_impl_linux-64-2.45-default_hbd61a6d_105.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/lefthook-2.0.13-hfc2019e_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/lefthook-2.0.16-hfc2019e_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libabseil-20250512.1-cxx17_hba17884_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libblas-3.11.0-5_h5875eb1_mkl.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libbrotlicommon-1.2.0-hb03c661_1.conda
@@ -1137,7 +1137,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-64/jaxlib-0.7.2-cpu_py313h877052d_2.conda
       - conda: https://prefix.dev/conda-forge/noarch/jedi-0.19.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/osx-64/lefthook-2.0.13-hccc6df8_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-64/lefthook-2.0.16-hccc6df8_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/libabseil-20250512.1-cxx17_hfc00f1c_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/libblas-3.9.0-20_osx64_mkl.conda
       - conda: https://prefix.dev/conda-forge/osx-64/libbrotlicommon-1.2.0-h8616949_1.conda
@@ -1323,7 +1323,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/jaxlib-0.7.2-cpu_py313hf0aba26_2.conda
       - conda: https://prefix.dev/conda-forge/noarch/jedi-0.19.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/osx-arm64/lefthook-2.0.13-h820172f_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/lefthook-2.0.16-h820172f_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/libabseil-20250512.1-cxx17_hd41c47c_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/libblas-3.11.0-5_h51639a9_openblas.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/libbrotlicommon-1.2.0-hc919400_1.conda
@@ -1510,7 +1510,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/isort-7.0.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/jedi-0.19.2-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/win-64/lefthook-2.0.13-h11686cb_0.conda
+      - conda: https://prefix.dev/conda-forge/win-64/lefthook-2.0.16-h11686cb_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/libabseil-20250512.1-cxx17_habfad5f_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/libblas-3.11.0-5_hf2e6a31_mkl.conda
       - conda: https://prefix.dev/conda-forge/win-64/libcblas-3.11.0-5_h2a3cdd5_mkl.conda
@@ -2073,7 +2073,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/isort-7.0.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/ld_impl_linux-64-2.45-default_hbd61a6d_105.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/lefthook-2.0.13-hfc2019e_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/lefthook-2.0.16-hfc2019e_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libabseil-20250512.1-cxx17_hba17884_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libblas-3.11.0-5_h4a7cf45_openblas.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libbrotlicommon-1.2.0-hb03c661_1.conda
@@ -2200,7 +2200,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/iniconfig-2.3.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/isort-7.0.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/osx-64/lefthook-2.0.13-hccc6df8_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-64/lefthook-2.0.16-hccc6df8_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/libabseil-20250512.1-cxx17_hfc00f1c_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/libblas-3.11.0-5_he492b99_openblas.conda
       - conda: https://prefix.dev/conda-forge/osx-64/libbrotlicommon-1.2.0-h8616949_1.conda
@@ -2324,7 +2324,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/iniconfig-2.3.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/isort-7.0.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/osx-arm64/lefthook-2.0.13-h820172f_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/lefthook-2.0.16-h820172f_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/libabseil-20250512.1-cxx17_hd41c47c_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/libblas-3.11.0-5_h51639a9_openblas.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/libbrotlicommon-1.2.0-hc919400_1.conda
@@ -2446,7 +2446,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/iniconfig-2.3.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/isort-7.0.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/jinja2-3.1.6-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/win-64/lefthook-2.0.13-h11686cb_0.conda
+      - conda: https://prefix.dev/conda-forge/win-64/lefthook-2.0.16-h11686cb_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/libblas-3.11.0-5_hf2e6a31_mkl.conda
       - conda: https://prefix.dev/conda-forge/win-64/libcblas-3.11.0-5_h2a3cdd5_mkl.conda
       - conda: https://prefix.dev/conda-forge/win-64/libexpat-2.7.3-hac47afa_0.conda
@@ -7617,40 +7617,40 @@ packages:
   purls: []
   size: 730831
   timestamp: 1766513089214
-- conda: https://prefix.dev/conda-forge/linux-64/lefthook-2.0.13-hfc2019e_0.conda
-  sha256: bab3ee6da8a48afa3337cf90d77a3c7ea6d842d695fde4f3c4307f3312281b2a
-  md5: 48e3a538410bdfe85e406092db255a6f
+- conda: https://prefix.dev/conda-forge/linux-64/lefthook-2.0.16-hfc2019e_0.conda
+  sha256: 4596b5cb34c1a2f44e2ed80d112dd24917da4208b0505342f0f653e309f35f7f
+  md5: 1b38b355694f9253067a063684ed902a
   license: MIT
   license_family: MIT
   purls: []
-  size: 5395183
-  timestamp: 1766739438930
-- conda: https://prefix.dev/conda-forge/osx-64/lefthook-2.0.13-hccc6df8_0.conda
-  sha256: 523c5caeb2dc66570188b307002655fe48547ddf23588f7fb40d5408b6a712b2
-  md5: 8c11d4dd53c480279b70d8032fcd5119
+  size: 5337440
+  timestamp: 1769518568324
+- conda: https://prefix.dev/conda-forge/osx-64/lefthook-2.0.16-hccc6df8_0.conda
+  sha256: b5491148d9c54684a80a843042d87ccb2d80e7ab3440cee86a9b3c76c74942ba
+  md5: c5fa12094de99feaefab8715efb5ba94
   constrains:
   - __osx >=10.12
   license: MIT
   license_family: MIT
   purls: []
-  size: 5424735
-  timestamp: 1766739454079
-- conda: https://prefix.dev/conda-forge/osx-arm64/lefthook-2.0.13-h820172f_0.conda
-  sha256: 805b448231999e0593af26bee56f7c084bc2b8583b351a0b4b9b9e5c27c1ba90
-  md5: 62dab0ff0877f91336ca7c4ea4d9502d
+  size: 5364821
+  timestamp: 1769518601009
+- conda: https://prefix.dev/conda-forge/osx-arm64/lefthook-2.0.16-h820172f_0.conda
+  sha256: cd6726190242c8ef502f7dbe708a2a3d33a3ab8ad734c73aa18fe8872b4e9432
+  md5: 932cdb1fd44af12ef9770cd006fb5e83
   license: MIT
   license_family: MIT
   purls: []
-  size: 4859600
-  timestamp: 1766739461616
-- conda: https://prefix.dev/conda-forge/win-64/lefthook-2.0.13-h11686cb_0.conda
-  sha256: 7a7959a489920b57b4645304f4210a4b27c959e8baa786e8e33803cd996ef742
-  md5: 1f785302de4f72490c1df556c4bccc39
+  size: 4792997
+  timestamp: 1769518583136
+- conda: https://prefix.dev/conda-forge/win-64/lefthook-2.0.16-h11686cb_0.conda
+  sha256: 85b41b4fe4ebb2f30c62d04f7d307ca23bab1c2cb3f3b710ddf65ecf04012002
+  md5: b3df8dfd02e1966d7b5a0e850028d6ae
   license: MIT
   license_family: MIT
   purls: []
-  size: 5345052
-  timestamp: 1766739507322
+  size: 5279889
+  timestamp: 1769518616618
 - conda: https://prefix.dev/conda-forge/linux-64/libabseil-20250512.1-cxx17_hba17884_0.conda
   sha256: dcd1429a1782864c452057a6c5bc1860f2b637dc20a2b7e6eacd57395bbceff8
   md5: 83b160d4da3e1e847bf044997621ed63
