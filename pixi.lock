@@ -4544,7 +4544,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/pyproject-metadata-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-9.0.2-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.8.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.8.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/python-3.13.11-hdc21b3b_0_cp313t.conda
       - conda: https://prefix.dev/conda-forge/noarch/python-freethreading-3.13.11-h92d6c8b_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/python_abi-3.13-8_cp313t.conda
@@ -4610,7 +4610,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/pyproject-metadata-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-9.0.2-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.8.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.8.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/python-3.13.11-h29649b4_0_cp313t.conda
       - conda: https://prefix.dev/conda-forge/noarch/python-freethreading-3.13.11-h92d6c8b_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/python_abi-3.13-8_cp313t.conda
@@ -4674,7 +4674,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/pyproject-metadata-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-9.0.2-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.8.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.8.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/python-3.13.11-h6234a37_0_cp313t.conda
       - conda: https://prefix.dev/conda-forge/noarch/python-freethreading-3.13.11-h92d6c8b_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/python_abi-3.13-8_cp313t.conda
@@ -4738,7 +4738,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/pyproject-metadata-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-9.0.2-pyhcf101f3_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
-      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.8.1-pyhd8ed1ab_0.conda
+      - conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.8.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/python-3.13.11-ha261ea0_0_cp313t.conda
       - conda: https://prefix.dev/conda-forge/noarch/python-freethreading-3.13.11-h92d6c8b_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/python_abi-3.13-8_cp313t.conda
@@ -11987,9 +11987,9 @@ packages:
   - pkg:pypi/pytest-cov?source=hash-mapping
   size: 29016
   timestamp: 1757612051022
-- conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.8.1-pyhd8ed1ab_0.conda
-  sha256: 5fe680dc82c6585fa38b0385af8ca8a7c20a7e4376a0a5552f44c70e0e80453a
-  md5: 4e98ccdfa64d30826a7977c7a4fa17e8
+- conda: https://prefix.dev/conda-forge/noarch/pytest-run-parallel-0.8.2-pyhd8ed1ab_0.conda
+  sha256: dc1aae8162fe5e21dc38175fdb1627a146a73885215433e151a195333f6d8e20
+  md5: 288250b7e539cddf52f39616deae278d
   depends:
   - pytest >=6.2.0
   - python >=3.10
@@ -11997,8 +11997,8 @@ packages:
   license_family: MIT
   purls:
   - pkg:pypi/pytest-run-parallel?source=hash-mapping
-  size: 23534
-  timestamp: 1766512264581
+  size: 23601
+  timestamp: 1768437488141
 - conda: https://prefix.dev/conda-forge/linux-64/python-3.11.14-hd63d673_2_cpython.conda
   build_number: 2
   sha256: 5b872f7747891e50e990a96d2b235236a5c66cc9f8c9dcb7149aee674ea8145a
