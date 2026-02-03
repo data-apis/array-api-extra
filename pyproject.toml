@@ -23,6 +23,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Free Threading :: 3 - Stable",
   "Typing :: Typed",
 ]
@@ -56,20 +57,20 @@ array-api-compat = "*"
 ### workspace environments ###
 
 [tool.pixi.environments]
-default = { features = ["py313"], solve-group = "py313" }
-lint = { features = ["py313", "lint"], solve-group = "py313" }
-docs = { features = ["py313", "docs"], solve-group = "py313" }
-tests = { features = ["py313", "tests"], solve-group = "py313" }
-tests-py313 = { features = ["py313", "tests"], solve-group = "py313" } # alias of tests
+default = { features = ["py314"], solve-group = "py314" }
+lint = { features = ["py314", "lint"], solve-group = "py314" }
+docs = { features = ["py314", "docs"], solve-group = "py314" }
+tests = { features = ["py314", "tests"], solve-group = "py314" }
+tests-py314 = { features = ["py314", "tests"], solve-group = "py314" } # alias of tests
 
 # Some backends may pin numpy; use separate solve-group
-dev = { features = ["py313", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
-tests-backends = { features = ["py313", "tests", "backends"], solve-group = "backends" }
+dev = { features = ["py314", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
+tests-backends = { features = ["py314", "tests", "backends"], solve-group = "backends" }
 tests-backends-py311 = { features = ["py311", "tests", "backends"] }
 
 # CUDA not available on free github actions and on some developers' PCs
-dev-cuda = { features = ["py313", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda = { features = ["py313", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
+dev-cuda = { features = ["py314", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
+tests-cuda = { features = ["py314", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
 tests-cuda-py311 = { features = ["py311", "tests", "backends", "cuda-backends"] }
 
 # Ungrouped environments
@@ -173,8 +174,8 @@ ipython = { cmd = "ipython", description = "Launch ipython" }
 [tool.pixi.feature.py311.dependencies]
 python = "~=3.11.0"
 
-[tool.pixi.feature.py313.dependencies]
-python = "~=3.13.0"
+[tool.pixi.feature.py314.dependencies]
+python = "~=3.14.0"
 
 [tool.pixi.feature.numpy1.dependencies]
 # Oldest NumPy version supported by scikit-learn.
