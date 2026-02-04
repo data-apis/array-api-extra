@@ -152,7 +152,7 @@ open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"], de
 [tool.pixi.feature.docs.dependencies]
 sphinx = ">=7.4.7"
 furo = ">=2024.8.6"
-myst-parser = ">=4.0.1"
+myst-parser = ">=5.0.0"
 sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
