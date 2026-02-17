@@ -107,7 +107,7 @@ typos = ">=1.43.0,<2"
 actionlint = ">=1.7.10,<2"
 blacken-docs = ">=1.20.0,<2"
 pytest = ">=9.0.2,<10"
-validate-pyproject = ">=0.24.1,<0.25"
+validate-pyproject = ">=0.25,<0.26"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
