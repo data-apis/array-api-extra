@@ -102,7 +102,7 @@ hypothesis = ">=6.151.2"
 dask-core = ">=2026.1.2" # No distributed, tornado, etc.
 dprint = ">=0.50.0,<0.51"
 lefthook = ">=2.1.0,<3"
-ruff = ">=0.14.14,<0.15"
+ruff = ">=0.15.0,<0.16"
 typos = ">=1.43.1,<2"
 actionlint = ">=1.7.10,<2"
 blacken-docs = ">=1.20.0,<2"
