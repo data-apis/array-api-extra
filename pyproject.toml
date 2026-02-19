@@ -185,7 +185,7 @@ numpy = "=1.24.1"
 # Backends that can run on CPU-only hosts
 # Note: JAX and PyTorch will install CPU variants.
 [tool.pixi.feature.backends.dependencies]
-pytorch = ">=2.9.1"
+pytorch = ">=2.10.0"
 dask-core = ">=2026.1.2" # No distributed, tornado, etc.
 sparse = ">=0.17.0"
 
@@ -213,7 +213,7 @@ system-requirements = { cuda = "12" }
 [tool.pixi.feature.cuda-backends.target.linux.dependencies]
 cupy = ">=13.6.0"
 jaxlib = { version = ">=0.7.2", build = "cuda12*" }
-pytorch = { version = ">=2.9.1", build = "cuda12*" }
+pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
 [tool.pixi.feature.cuda-backends.target.osx.dependencies]
 # cupy = "*"  # unavailable
@@ -223,7 +223,7 @@ pytorch = { version = ">=2.9.1", build = "cuda12*" }
 [tool.pixi.feature.cuda-backends.target.win.dependencies]
 cupy = ">=13.6.0"
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
-pytorch = { version = ">=2.9.1", build = "cuda12*" }
+pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
 [tool.pixi.feature.nogil.dependencies]
 python-freethreading = "~=3.13.0"
