@@ -41,6 +41,7 @@ def apply_where(  # numpydoc ignore=GL08
     f2: Callable[..., Array],
     /,
     *,
+    kwargs: dict[str, Array] | None = None,
     xp: ModuleType | None = None,
 ) -> Array: ...
 
@@ -53,6 +54,7 @@ def apply_where(  # numpydoc ignore=GL08
     /,
     *,
     fill_value: Array | complex,
+    kwargs: dict[str, Array] | None = None,
     xp: ModuleType | None = None,
 ) -> Array: ...
 
@@ -65,6 +67,7 @@ def apply_where(  # numpydoc ignore=PR01,PR02
     /,
     *,
     fill_value: Array | complex | None = None,
+    kwargs: dict[str, Array] | None = None,
     xp: ModuleType | None = None,
 ) -> Array:
     """
@@ -91,6 +94,9 @@ def apply_where(  # numpydoc ignore=PR01,PR02
         It does not need to be scalar; it needs however to be broadcastable with
         `cond` and `args`.
         Mutually exclusive with `f2`. You must provide one or the other.
+    kwargs : dict of str : Array pairs
+        Keyword argument(s) to `f1` (and `f2`). Values must be broadcastable with
+        `cond`.
     xp : array_namespace, optional
         The standard-compatible namespace for `cond` and `args`. Default: infer.
 
@@ -129,6 +135,11 @@ def apply_where(  # numpydoc ignore=PR01,PR02
     args_ = list(args) if isinstance(args, tuple) else [args]
     del args
 
+    kwargs_ = {} if kwargs is None else kwargs
+    kwkeys = list(kwargs_.keys())
+    args_ = [*args_, *kwargs_.values()]
+    del kwargs
+
     xp = array_namespace(cond, fill_value, *args_) if xp is None else xp
 
     if isinstance(fill_value, int | float | complex | NoneType):
@@ -139,8 +150,11 @@ def apply_where(  # numpydoc ignore=PR01,PR02
     if is_dask_namespace(xp):
         meta_xp = meta_namespace(cond, fill_value, *args_, xp=xp)
         # map_blocks doesn't descend into tuples of Arrays
-        return xp.map_blocks(_apply_where, cond, f1, f2, fill_value, *args_, xp=meta_xp)
-    return _apply_where(cond, f1, f2, fill_value, *args_, xp=xp)
+        return xp.map_blocks(
+            _apply_where, cond, f1, f2, fill_value, *args_, kwkeys=kwkeys, xp=meta_xp
+        )
+
+    return _apply_where(cond, f1, f2, fill_value, *args_, kwkeys=kwkeys, xp=xp)
 
 
 def _apply_where(  # numpydoc ignore=PR01,RT01
@@ -149,15 +163,26 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
     f2: Callable[..., Array] | None,
     fill_value: Array | int | float | complex | bool | None,
     *args: Array,
+    kwkeys: list[str],
     xp: ModuleType,
 ) -> Array:
     """Helper of `apply_where`. On Dask, this runs on a single chunk."""
 
+    nargs = len(args) - len(kwkeys)
+    kwargs = dict(zip(kwkeys, args[nargs:], strict=True))
+    args = args[:nargs]
+
     if not capabilities(xp, device=_compat.device(cond))["boolean indexing"]:
         # jax.jit does not support assignment by boolean mask
-        return xp.where(cond, f1(*args), f2(*args) if f2 is not None else fill_value)
+        return xp.where(
+            cond,
+            f1(*args, **kwargs),
+            f2(*args, **kwargs) if f2 is not None else fill_value,
+        )
 
-    temp1 = f1(*(arr[cond] for arr in args))
+    temp1 = f1(
+        *(arr[cond] for arr in args), **{key: val[cond] for key, val in kwargs.items()}
+    )
 
     if f2 is None:
         dtype = xp.result_type(temp1, fill_value)
@@ -167,7 +192,10 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
             out = xp.astype(fill_value, dtype, copy=True)
     else:
         ncond = ~cond
-        temp2 = f2(*(arr[ncond] for arr in args))
+        temp2 = f2(
+            *(arr[ncond] for arr in args),
+            **{key: val[ncond] for key, val in kwargs.items()},
+        )
         dtype = xp.result_type(temp1, temp2)
         out = xp.empty_like(cond, dtype=dtype)
         out = at(out, ncond).set(temp2)
