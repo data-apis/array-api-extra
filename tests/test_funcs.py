@@ -1,5 +1,6 @@
 import math
 import warnings
+from collections.abc import Callable
 from types import ModuleType
 from typing import Any, Literal, cast
 
@@ -29,12 +30,15 @@ from array_api_extra import (
     one_hot,
     pad,
     partition,
-    searchsorted,
     setdiff1d,
     sinc,
     union1d,
 )
+from array_api_extra import (
+    searchsorted as xpx_searchsorted,
+)
 from array_api_extra._lib._backends import NUMPY_VERSION, Backend
+from array_api_extra._lib._funcs import searchsorted as _funcs_searchsorted
 from array_api_extra._lib._testing import xfail, xp_assert_close, xp_assert_equal
 from array_api_extra._lib._utils._compat import (
     array_namespace,
@@ -58,7 +62,8 @@ lazy_xp_function(one_hot)
 lazy_xp_function(pad)
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False)
-lazy_xp_function(searchsorted)
+lazy_xp_function(xpx_searchsorted)
+lazy_xp_function(_funcs_searchsorted)
 lazy_xp_function(sinc)
 
 
@@ -1772,7 +1777,7 @@ class TestSearchsorted:
     def test_input_validation(self, xp: ModuleType):
         message = "`side` must be either 'left' or 'right'."
         with pytest.raises(ValueError, match=message):
-            _ = searchsorted(xp.asarray([1, 2]), xp.asarray([1, 2]), side="center")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+            _ = xpx_searchsorted(xp.asarray([1, 2]), xp.asarray([1, 2]), side="center")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     @pytest.mark.parametrize("side", ["left", "right"])
     @pytest.mark.parametrize("ties", [False, True])
@@ -1781,6 +1786,7 @@ class TestSearchsorted:
     )
     @pytest.mark.parametrize("nans_x", [False, True])
     @pytest.mark.parametrize("infs_x", [False, True])
+    @pytest.mark.parametrize("searchsorted", [xpx_searchsorted, _funcs_searchsorted])
     def test_nd(
         self,
         side: Literal["left", "right"],
@@ -1789,9 +1795,16 @@ class TestSearchsorted:
         nans_x: bool,
         infs_x: bool,
         xp: ModuleType,
+        searchsorted: Callable[..., Array],
     ):
-        if nans_x and is_torch_namespace(xp):
+        if nans_x and is_torch_namespace(xp) and searchsorted == xpx_searchsorted:
             pytest.skip("torch sorts NaNs differently")
+        if isinstance(shape, tuple) and searchsorted == _funcs_searchsorted:
+            message = (
+                "Redundant; `xpx_searchsorted` delegates to "
+                "`_funcs_searchsorted` for multidimensional input."
+            )
+            pytest.skip(message)
         rng = np.random.default_rng(945298725498274853)
         x = rng.integers(5, size=shape) if ties else rng.random(shape)
         # float32 is to accommodate JAX - nextafter with `float64` is too small?
