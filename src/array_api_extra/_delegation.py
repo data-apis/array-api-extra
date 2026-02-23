@@ -691,6 +691,10 @@ def searchsorted(
     if xp is None:
         xp = array_namespace(x1, x2)
 
+    if side not in {"left", "right"}:
+        message = "`side` must be either 'left' or 'right'."
+        raise ValueError(message)
+
     xp_default_int = _funcs.default_dtype(xp, kind="integral")
     y_0d = xp.asarray(x2).ndim == 0
     x_1d = x1.ndim <= 1

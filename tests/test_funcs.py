@@ -1769,6 +1769,11 @@ def xp_searchsorted(
 @pytest.mark.skip_xp_backend(Backend.DASK, reason="no take_along_axis")
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no searchsorted")
 class TestSearchsorted:
+    def test_input_validation(self, xp: ModuleType):
+        message = "`side` must be either 'left' or 'right'."
+        with pytest.raises(ValueError, match=message):
+            _ = searchsorted(xp.asarray([1, 2]), xp.asarray([1, 2]), side="center")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+
     @pytest.mark.parametrize("side", ["left", "right"])
     @pytest.mark.parametrize("ties", [False, True])
     @pytest.mark.parametrize(
