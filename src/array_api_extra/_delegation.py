@@ -647,6 +647,11 @@ def searchsorted(
     Find the indices into a sorted array ``x1`` such that if the elements in ``x2``
     were inserted before the indices, the resulting array would remain sorted.
 
+    The behavior of this function is similar to that of the homonymous function in the
+    array API standard, but it relaxes the requirement that `x1` must be
+    one-dimensional. The function is vectorized, treating slices along the last axis
+    as elements and preceding axes as batch (or "loop") dimensions.
+
     Parameters
     ----------
     x1 : Array
