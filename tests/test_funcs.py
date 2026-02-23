@@ -1704,13 +1704,14 @@ def _apply_over_batch(*argdefs: tuple[str, int]) -> Any:
 
     def decorator(f: Any) -> Any:
         def wrapper(
-            *args_tuple: tuple[Any] | None,
-            **kwargs: dict[str, Any] | None,
+            *args_tuple: Any,
+            **kwargs: Any,
         ) -> Any:
             args = list(args_tuple)
 
             # Ensure all arrays in `arrays`, other arguments in `other_args`/`kwargs`
             arrays, other_args = args[:n_arrays], args[n_arrays:]
+            arrays = cast(list[Array | None], arrays)
             for i, name in enumerate(names):
                 if name in kwargs:
                     if i + 1 <= len(args):
@@ -1718,9 +1719,9 @@ def _apply_over_batch(*argdefs: tuple[str, int]) -> Any:
                             f"{f.__name__}() got multiple values for argument `{name}`."
                         )
                         raise ValueError(message)
-                    arrays.append(kwargs.pop(name))  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
+                    arrays.append(kwargs.pop(name))
 
-            xp = array_namespace(*arrays)  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
+            xp = array_namespace(*arrays)
 
             # Determine core and batch shapes
             batch_shapes = []
@@ -1781,7 +1782,7 @@ def _apply_over_batch(*argdefs: tuple[str, int]) -> Any:
     return decorator
 
 
-@_apply_over_batch(("a", 1), ("v", 1))  # type: ignore[misc]
+@_apply_over_batch(("a", 1), ("v", 1))  # type: ignore[untyped-decorator]
 def xp_searchsorted(
     a: Array,
     v: Array,
