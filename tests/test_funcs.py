@@ -210,8 +210,8 @@ class TestApplyWhere:
         deadline=None,
     )
     @given(
-        n_arrays=st.integers(min_value=1, max_value=3),
-        n_kwarrays=st.integers(min_value=1, max_value=3),
+        n_arrays=st.integers(min_value=0, max_value=3),
+        n_kwarrays=st.integers(min_value=0, max_value=3),
         rng_seed=st.integers(min_value=1000000000, max_value=9999999999),
         dtype=npst.floating_dtypes(sizes=(32, 64)),
         p=st.floats(min_value=0, max_value=1),
@@ -235,6 +235,7 @@ class TestApplyWhere:
         ):
             pytest.xfail(reason="NumPy 1.x dtype promotion for scalars")
 
+        _ = hypothesis.assume(n_arrays + n_kwarrays > 0)
         mbs = npst.mutually_broadcastable_shapes(
             num_shapes=1 + n_arrays + n_kwarrays, min_side=0
         )
@@ -264,7 +265,7 @@ class TestApplyWhere:
         )
 
         kwargs = {
-            str(n): xp.asarray(
+            f"kw{n}": xp.asarray(
                 data.draw(npst.arrays(dtype=dtype.type, shape=shape, elements=elements))
             )
             for n, shape in enumerate(kwshapes)
@@ -272,12 +273,12 @@ class TestApplyWhere:
         kwkeys = kwargs.keys()
 
         def f1(*args: Array, **kwargs: dict[str, Array]) -> Array:
-            assert set(kwargs.keys()) == set(kwkeys)
+            assert kwargs.keys() == kwkeys
             args_kwargs = cast(tuple[Array, ...], (*args, *kwargs.values()))
             return cast(Array, sum(args_kwargs))
 
         def f2(*args: Array, **kwargs: dict[str, Array]) -> Array:
-            assert set(kwargs.keys()) == set(kwkeys)
+            assert kwargs.keys() == kwkeys
             args_kwargs = cast(tuple[Array, ...], (*args, *kwargs.values()))
             return cast(Array, sum(args_kwargs) / 2)
 
