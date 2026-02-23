@@ -12,6 +12,7 @@ from ._delegation import (
     one_hot,
     pad,
     partition,
+    searchsorted,
     setdiff1d,
     sinc,
     union1d,
@@ -23,7 +24,6 @@ from ._lib._funcs import (
     default_dtype,
     kron,
     nunique,
-    searchsorted,
 )
 from ._lib._lazy import lazy_apply
 
