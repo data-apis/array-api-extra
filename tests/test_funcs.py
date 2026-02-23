@@ -221,7 +221,8 @@ class TestApplyWhere:
         deadline=None,
     )
     @given(
-        n_arrays=st.integers(min_value=1, max_value=3),
+        n_arrays=st.integers(min_value=0, max_value=3),
+        n_kwarrays=st.integers(min_value=0, max_value=3),
         rng_seed=st.integers(min_value=1000000000, max_value=9999999999),
         dtype=npst.floating_dtypes(sizes=(32, 64)),
         p=st.floats(min_value=0, max_value=1),
@@ -230,6 +231,7 @@ class TestApplyWhere:
     def test_hypothesis(
         self,
         n_arrays: int,
+        n_kwarrays: int,
         rng_seed: int,
         dtype: np.dtype[Any],
         p: float,
@@ -244,9 +246,14 @@ class TestApplyWhere:
         ):
             pytest.xfail(reason="NumPy 1.x dtype promotion for scalars")
 
-        mbs = npst.mutually_broadcastable_shapes(num_shapes=n_arrays + 1, min_side=0)
+        _ = hypothesis.assume(n_arrays + n_kwarrays > 0)
+        mbs = npst.mutually_broadcastable_shapes(
+            num_shapes=1 + n_arrays + n_kwarrays, min_side=0
+        )
         input_shapes, _ = data.draw(mbs)
-        cond_shape, *shapes = input_shapes
+        cond_shape = input_shapes[0]
+        shapes = input_shapes[1 : 1 + n_arrays]
+        kwshapes = input_shapes[1 + n_arrays :]
 
         # cupy/cupy#8382
         # https://github.com/jax-ml/jax/issues/26658
@@ -268,22 +275,34 @@ class TestApplyWhere:
             for shape in shapes
         )
 
-        def f1(*args: Array) -> Array:
-            return cast(Array, sum(args))
+        kwargs = {
+            f"kw{n}": xp.asarray(
+                data.draw(npst.arrays(dtype=dtype.type, shape=shape, elements=elements))
+            )
+            for n, shape in enumerate(kwshapes)
+        }
+        kwkeys = kwargs.keys()
 
-        def f2(*args: Array) -> Array:
-            return cast(Array, sum(args) / 2)
+        def f1(*args: Array, **kwargs: dict[str, Array]) -> Array:
+            assert kwargs.keys() == kwkeys
+            args_kwargs = cast(tuple[Array, ...], (*args, *kwargs.values()))
+            return cast(Array, sum(args_kwargs))
+
+        def f2(*args: Array, **kwargs: dict[str, Array]) -> Array:
+            assert kwargs.keys() == kwkeys
+            args_kwargs = cast(tuple[Array, ...], (*args, *kwargs.values()))
+            return cast(Array, sum(args_kwargs) / 2)
 
         rng = np.random.default_rng(rng_seed)
         cond = xp.asarray(rng.random(size=cond_shape) > p)
 
-        res1 = apply_where(cond, arrays, f1, fill_value=fill_value)
-        res2 = apply_where(cond, arrays, f1, f2)
-        res3 = apply_where(cond, arrays, f1, fill_value=float_fill_value)
+        res1 = apply_where(cond, arrays, f1, fill_value=fill_value, kwargs=kwargs)
+        res2 = apply_where(cond, arrays, f1, f2, kwargs=kwargs)
+        res3 = apply_where(cond, arrays, f1, fill_value=float_fill_value, kwargs=kwargs)
 
-        ref1 = xp.where(cond, f1(*arrays), fill_value)
-        ref2 = xp.where(cond, f1(*arrays), f2(*arrays))
-        ref3 = xp.where(cond, f1(*arrays), float_fill_value)
+        ref1 = xp.where(cond, f1(*arrays, **kwargs), fill_value)
+        ref2 = xp.where(cond, f1(*arrays, **kwargs), f2(*arrays, **kwargs))
+        ref3 = xp.where(cond, f1(*arrays, **kwargs), float_fill_value)
 
         xp_assert_close(res1, ref1, rtol=2e-16)
         xp_assert_equal(res2, ref2)
@@ -532,6 +551,7 @@ class TestCov:
         expect = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]], dtype=xp.complex128)
         xp_assert_close(actual, expect)
 
+    @pytest.mark.xfail_xp_backend(Backend.JAX_GPU, reason="jax#32296")
     @pytest.mark.xfail_xp_backend(Backend.JAX, reason="jax#32296")
     @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="sparse#877")
     def test_empty(self, xp: ModuleType):
@@ -984,7 +1004,7 @@ class TestIsClose:
         xp_assert_equal(isclose(0, 1, xp=xp), xp.asarray(False))
 
     def test_all_python_scalars(self):
-        with pytest.raises(TypeError, match="Unrecognized"):
+        with pytest.raises(TypeError, match=r"array_namespace requires .* array input"):
             _ = isclose(0, 0)
 
     def test_xp(self, xp: ModuleType):
@@ -1000,14 +1020,14 @@ class TestIsClose:
         assert get_device(res) == device
 
     def test_array_on_device_with_scalar(self, xp: ModuleType, device: Device):
-        a = xp.asarray([0.01, 0.5, 0.8, 0.9, 1.00001], device=device)
+        a = xp.asarray([0.01, 0.5, 0.8, 0.9, 1.00001], device=device, dtype=xp.float64)
         b = 1
         res = isclose(a, b)
         assert get_device(res) == device
         xp_assert_equal(res, xp.asarray([False, False, False, False, True]))
 
         a = 0.1
-        b = xp.asarray([0.01, 0.5, 0.8, 0.9, 0.100001], device=device)
+        b = xp.asarray([0.01, 0.5, 0.8, 0.9, 0.100001], device=device, dtype=xp.float64)
         res = isclose(a, b)
         assert get_device(res) == device
         xp_assert_equal(res, xp.asarray([False, False, False, False, True]))
@@ -1080,7 +1100,7 @@ class TestKron:
         xp_assert_equal(kron(1, 1, xp=xp), xp.asarray(1))
 
     def test_all_python_scalars(self):
-        with pytest.raises(TypeError, match="Unrecognized"):
+        with pytest.raises(TypeError, match=r"array_namespace requires .* array input"):
             _ = kron(1, 1)
 
     def test_device(self, xp: ModuleType, device: Device):
@@ -1412,7 +1432,7 @@ class TestSetDiff1D:
 
     @pytest.mark.parametrize("assume_unique", [True, False])
     def test_all_python_scalars(self, assume_unique: bool):
-        with pytest.raises(TypeError, match="Unrecognized"):
+        with pytest.raises(TypeError, match=r"array_namespace requires .* array input"):
             _ = setdiff1d(0, 0, assume_unique=assume_unique)
 
     @assume_unique
