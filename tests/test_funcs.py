@@ -1789,7 +1789,7 @@ def xp_searchsorted(
     side: Literal["left", "right"],
     xp: ModuleType,
 ) -> Array:
-    return xp.searchsorted(xp.asarray(a), xp.asarray(v), side=side)
+    return xp.searchsorted(a, v, side=side)
 
 
 @pytest.mark.skip_xp_backend(Backend.DASK, reason="no take_along_axis")
@@ -1845,7 +1845,7 @@ class TestSearchsorted:
             x[mask] = np.inf
         x = np.sort(x, axis=-1)  # type:ignore[assignment]
         x, y = np.asarray(x, dtype=np.float64), np.asarray(y, dtype=np.float64)
-        xp_default_int = xp.asarray(1).dtype
+        xp_default_int = default_dtype(xp, kind="integral")
         if x.size == 0 and x.ndim > 0 and x.shape[-1] != 0:
             ref = xp.empty((*x.shape[:-1], y.shape[-1]), dtype=xp_default_int)
         else:

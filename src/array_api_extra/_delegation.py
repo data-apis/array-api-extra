@@ -647,9 +647,9 @@ def searchsorted(
     Find the indices into a sorted array ``x1`` such that if the elements in ``x2``
     were inserted before the indices, the resulting array would remain sorted.
 
-    The behavior of this function is similar to that of the homonymous function in the
-    array API standard, but it relaxes the requirement that `x1` must be
-    one-dimensional. The function is vectorized, treating slices along the last axis
+    The behavior of this function is similar to that of `array_api.searchsorted`,
+    but it relaxes the requirement that `x1` must be one-dimensional.
+    This function is vectorized, treating slices along the last axis
     as elements and preceding axes as batch (or "loop") dimensions.
 
     Parameters
@@ -701,11 +701,11 @@ def searchsorted(
         raise ValueError(message)
 
     xp_default_int = _funcs.default_dtype(xp, kind="integral")
-    y_0d = xp.asarray(x2).ndim == 0
-    x_1d = x1.ndim <= 1
+    x2_0d = x2.ndim == 0
+    x1_1d = x1.ndim <= 1
 
-    if x_1d or is_torch_namespace(xp):
-        x2 = xp.reshape(x2, ()) if (y_0d and x_1d) else x2
+    if x1_1d or is_torch_namespace(xp):
+        x2 = xp.reshape(x2, ()) if (x2_0d and x1_1d) else x2
         out = xp.searchsorted(x1, x2, side=side)
         return xp.astype(out, xp_default_int, copy=False)
 
