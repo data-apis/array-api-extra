@@ -299,7 +299,12 @@ there is already an open issue for the function.</p></li>
 </li>
 <li><p>Import your function to <code class="docutils literal notranslate"><span class="pre">src/array_api_extra/__init__.py</span></code> and add it to
 <code class="docutils literal notranslate"><span class="pre">__all__</span></code> there.</p></li>
-<li><p>Add a test class for your function in <code class="docutils literal notranslate"><span class="pre">tests/test_funcs.py</span></code>.</p></li>
+<li><p>Add a test class for your function in <code class="docutils literal notranslate"><span class="pre">tests/test_funcs.py</span></code>.</p>
+<ul>
+<li><p>Ensure that <code class="docutils literal notranslate"><span class="pre">lazy_xp_function</span></code> is called on the function if lazy backends
+are supposed to be tested.</p></li>
+</ul>
+</li>
 <li><p>Add your function to <code class="docutils literal notranslate"><span class="pre">docs/api-reference.md</span></code>.</p></li>
 <li><p><a class="reference external" href="https://github.com/data-apis/array-api-extra/pulls">Make a PR!</a></p></li>
 </ul>
