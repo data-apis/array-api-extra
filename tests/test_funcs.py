@@ -51,20 +51,27 @@ from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import lazy_xp_function
 
 lazy_xp_function(apply_where)
+lazy_xp_function(argpartition)
 lazy_xp_function(atleast_nd)
+lazy_xp_function(broadcast_shapes)
 lazy_xp_function(cov)
 lazy_xp_function(create_diagonal)
+lazy_xp_function(default_dtype)
 lazy_xp_function(expand_dims)
+lazy_xp_function(isclose)
+lazy_xp_function(isin)
 lazy_xp_function(kron)
 lazy_xp_function(nan_to_num)
 lazy_xp_function(nunique)
 lazy_xp_function(one_hot)
 lazy_xp_function(pad)
+lazy_xp_function(partition)
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False)
+lazy_xp_function(sinc)
+lazy_xp_function(union1d, jax_jit=False)
 lazy_xp_function(xpx_searchsorted)
 lazy_xp_function(_funcs_searchsorted)
-lazy_xp_function(sinc)
 
 
 class TestApplyWhere:
