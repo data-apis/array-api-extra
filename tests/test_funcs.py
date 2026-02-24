@@ -560,7 +560,6 @@ class TestCov:
 
     @pytest.mark.xfail_xp_backend(Backend.JAX_GPU, reason="jax#32296")
     @pytest.mark.xfail_xp_backend(Backend.JAX, reason="jax#32296")
-    @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="sparse#877")
     def test_empty(self, xp: ModuleType):
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
