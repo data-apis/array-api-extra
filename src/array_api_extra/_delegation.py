@@ -1128,6 +1128,15 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
     -------
     Array
         Unique, sorted union of the input arrays.
+
+    See Also
+    --------
+    jax.numpy.union1d : Corresponding function in JAX.
+
+    Notes
+    -----
+    This function is not compatible with `jax.jit`.
+    See the docstring of the corresponding JAX function for more information.
     """
     if xp is None:
         xp = array_namespace(a, b)
