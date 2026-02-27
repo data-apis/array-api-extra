@@ -1,6 +1,6 @@
 project(
   'array-api-extra',
-  version: '0.10.1.dev0'
+  version: '0.10.1'
 )
 
 py = import('python').find_installation()
