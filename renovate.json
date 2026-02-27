@@ -32,6 +32,12 @@
     "matchPackageNames": ["numpy", "sphinx", "sphinx-autodoc-typehints"],
     "enabled": false
   }, {
+    "description": "Block updating SciPy (bump manually alongside sklearn)",
+    "matchManagers": ["pixi"],
+    "matchUpdateTypes": ["major", "minor"],
+    "matchPackageNames": ["scipy"],
+    "enabled": false
+  }, {
     "description": "Group Dask packages.",
     "matchPackageNames": ["dask", "dask-core"],
     "groupName": "dask"
