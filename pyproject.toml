@@ -4,7 +4,7 @@ build-backend = "mesonpy"
 
 [project]
 name = "array-api-extra"
-version = "0.10.0.dev0"
+version = "0.10.1.dev0"
 authors = [
   { name = "Lucas Colley", email = "lucas.colley8@gmail.com" },
   # { name = "Open Source Contributors" },  # https://github.com/pypi/warehouse/issues/14813
@@ -23,6 +23,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Free Threading :: 3 - Stable",
   "Typing :: Typed",
 ]
@@ -56,20 +57,20 @@ array-api-compat = "*"
 ### workspace environments ###
 
 [tool.pixi.environments]
-default = { features = ["py313"], solve-group = "py313" }
-lint = { features = ["py313", "lint"], solve-group = "py313" }
-docs = { features = ["py313", "docs"], solve-group = "py313" }
-tests = { features = ["py313", "tests"], solve-group = "py313" }
-tests-py313 = { features = ["py313", "tests"], solve-group = "py313" } # alias of tests
+default = { features = ["py314"], solve-group = "py314" }
+lint = { features = ["py314", "lint"], solve-group = "py314" }
+docs = { features = ["py314", "docs"], solve-group = "py314" }
+tests = { features = ["py314", "tests"], solve-group = "py314" }
+tests-py314 = { features = ["py314", "tests"], solve-group = "py314" } # alias of tests
 
 # Some backends may pin numpy; use separate solve-group
-dev = { features = ["py313", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
-tests-backends = { features = ["py313", "tests", "backends"], solve-group = "backends" }
+dev = { features = ["py314", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
+tests-backends = { features = ["py314", "tests", "backends"], solve-group = "backends" }
 tests-backends-py311 = { features = ["py311", "tests", "backends"] }
 
 # CUDA not available on free github actions and on some developers' PCs
-dev-cuda = { features = ["py313", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda = { features = ["py313", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
+dev-cuda = { features = ["py314", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
+tests-cuda = { features = ["py314", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
 tests-cuda-py311 = { features = ["py311", "tests", "backends", "cuda-backends"] }
 
 # Ungrouped environments
@@ -92,21 +93,21 @@ array-api-extra.path = "."
 typing-extensions = ">=4.15.0"
 pylint = ">=4.0.4"
 mypy = ">=1.19.1"
-basedpyright = ">=1.37.1"
+basedpyright = ">=1.38.0"
 numpydoc = ">=1.10.0,<2"
 # import dependencies for mypy:
 array-api-strict = ">=2.4.1,<2.5"
 numpy = ">=2.1.3"
-hypothesis = ">=6.148.8"
-dask-core = ">=2025.12.0" # No distributed, tornado, etc.
+hypothesis = ">=6.151.2"
+dask-core = ">=2026.1.2" # No distributed, tornado, etc.
 dprint = ">=0.50.0,<0.51"
-lefthook = ">=2.0.13,<3"
-ruff = ">=0.14.11,<0.15"
-typos = ">=1.42.0,<2"
+lefthook = ">=2.1.1,<3"
+ruff = ">=0.15.1,<0.16"
+typos = ">=1.43.4,<2"
 actionlint = ">=1.7.10,<2"
 blacken-docs = ">=1.20.0,<2"
 pytest = ">=9.0.2,<10"
-validate-pyproject = ">=0.24.1,<0.25"
+validate-pyproject = ">=0.25,<0.26"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
@@ -130,7 +131,7 @@ lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run
 [tool.pixi.feature.tests.dependencies]
 pytest = ">=9.0.2"
 pytest-cov = ">=7.0.0"
-hypothesis = ">=6.148.8"
+hypothesis = ">=6.151.2"
 array-api-strict = ">=2.4.1,<2.5"
 numpy = ">=1.22.0"
 scipy = ">=1.15.2,<2"
@@ -152,11 +153,11 @@ open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"], de
 [tool.pixi.feature.docs.dependencies]
 sphinx = ">=7.4.7"
 furo = ">=2024.8.6"
-myst-parser = ">=4.0.1"
+myst-parser = ">=5.0.0"
 sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
-dask-core = ">=2025.12.0" # No distributed, tornado, etc.
+dask-core = ">=2026.1.2" # No distributed, tornado, etc.
 pytest = ">=9.0.2"
 typing-extensions = ">=4.15.0"
 numpy = ">=2.1.3"
@@ -174,8 +175,8 @@ ipython = { cmd = "ipython", description = "Launch ipython" }
 [tool.pixi.feature.py311.dependencies]
 python = "~=3.11.0"
 
-[tool.pixi.feature.py313.dependencies]
-python = "~=3.13.0"
+[tool.pixi.feature.py314.dependencies]
+python = "~=3.14.0"
 
 [tool.pixi.feature.numpy1.dependencies]
 # Oldest NumPy version supported by scikit-learn.
@@ -185,8 +186,8 @@ numpy = "=1.24.1"
 # Backends that can run on CPU-only hosts
 # Note: JAX and PyTorch will install CPU variants.
 [tool.pixi.feature.backends.dependencies]
-pytorch = ">=2.9.1"
-dask-core = ">=2025.12.0" # No distributed, tornado, etc.
+pytorch = ">=2.10.0"
+dask-core = ">=2026.1.2" # No distributed, tornado, etc.
 sparse = ">=0.17.0"
 
 [tool.pixi.feature.backends.target.linux-64.dependencies]
@@ -213,7 +214,7 @@ system-requirements = { cuda = "12" }
 [tool.pixi.feature.cuda-backends.target.linux.dependencies]
 cupy = ">=13.6.0"
 jaxlib = { version = ">=0.7.2", build = "cuda12*" }
-pytorch = { version = ">=2.9.1", build = "cuda12*" }
+pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
 [tool.pixi.feature.cuda-backends.target.osx.dependencies]
 # cupy = "*"  # unavailable
@@ -223,14 +224,14 @@ pytorch = { version = ">=2.9.1", build = "cuda12*" }
 [tool.pixi.feature.cuda-backends.target.win.dependencies]
 cupy = ">=13.6.0"
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
-pytorch = { version = ">=2.9.1", build = "cuda12*" }
+pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
 [tool.pixi.feature.nogil.dependencies]
 python-freethreading = "~=3.13.0"
-pytest-run-parallel = ">=0.8.1"
+pytest-run-parallel = ">=0.8.2"
 numpy = ">=2.3.5"
 # pytorch = "*"  # Not available on Python 3.13t yet
-dask-core = ">=2025.12.0" # No distributed, tornado, etc.
+dask-core = ">=2026.1.2" # No distributed, tornado, etc.
 # sparse = "*"  # numba not available on Python 3.13t yet
 # jax = "*"  # ml_dtypes not available on Python 3.13t yet
 

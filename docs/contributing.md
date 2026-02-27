@@ -20,6 +20,8 @@ Thanks to [all contributors](contributors.md) so far!
 - Import your function to `src/array_api_extra/__init__.py` and add it to
   `__all__` there.
 - Add a test class for your function in `tests/test_funcs.py`.
+  - Ensure that `lazy_xp_function` is called on the function if lazy backends
+    are supposed to be tested.
 - Add your function to `docs/api-reference.md`.
 - [Make a PR!](https://github.com/data-apis/array-api-extra/pulls)
 

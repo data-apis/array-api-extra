@@ -12,6 +12,7 @@ from ._delegation import (
     one_hot,
     pad,
     partition,
+    searchsorted,
     setdiff1d,
     sinc,
     union1d,
@@ -26,7 +27,7 @@ from ._lib._funcs import (
 )
 from ._lib._lazy import lazy_apply
 
-__version__ = "0.10.0.dev0"
+__version__ = "0.10.1.dev0"
 
 # pylint: disable=duplicate-code
 __all__ = [
@@ -49,6 +50,7 @@ __all__ = [
     "one_hot",
     "pad",
     "partition",
+    "searchsorted",
     "setdiff1d",
     "sinc",
     "union1d",
