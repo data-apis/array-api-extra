@@ -1,9 +1,10 @@
 from collections.abc import Callable, Iterator
 from types import ModuleType
-from typing import cast
+from typing import Any, cast, final
 
 import numpy as np
 import pytest
+from typing_extensions import override
 
 from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._testing import (
@@ -319,6 +320,128 @@ def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
         # note that when sparse reduces to scalar it returns a np.generic, which
         # would make xp_assert_equal fail.
         xp_assert_equal(cast(Array, erf(x)), xp.asarray([1.0, 1.0]))
+
+
+class A:
+    def __init__(self, x: Array):
+        xp = array_namespace(x)
+        self._xp: ModuleType = xp
+        self.x: Any = np.asarray(x)
+
+    def f(self, y: Array) -> Array:
+        return self._xp.asarray(np.matmul(self.x, np.asarray(y)))
+
+    def g(self, y: Array, z: Array) -> Array:
+        return self.f(y) + self.f(z)
+
+    def h(self, y: Array) -> bool:
+        return bool(self._xp.any(y))
+
+
+class B(A):
+    @override
+    def __init__(self, x: Array):  # pyright: ignore[reportMissingSuperCall]
+        xp = array_namespace(x)
+        self._xp: ModuleType = xp
+        self.x: Any = xp.asarray(x)
+
+    @override
+    def f(self, y: Array) -> Array:
+        return self._xp.matmul(self.x, y)
+
+    @staticmethod
+    def k(y: Array) -> "B":
+        return B(2.0 * y)
+
+    @staticmethod
+    def j(y: Array) -> "B":
+        xp = array_namespace(y)
+        y = xp.asarray(y)
+        if bool(xp.any(y)):
+            return B(y)
+        return B(y + 1.0)
+
+    @classmethod
+    def w(cls, y: Array) -> "B":
+        xp = array_namespace(y)
+        y = xp.asarray(y)
+        if bool(xp.any(y)):
+            return B(y)
+        return B(y + 1.0)
+
+
+@final
+class eager:
+    # this needs to be a staticmethod to appease the type checker
+    non_materializable5 = staticmethod(non_materializable5)
+
+
+lazy_xp_function((B, "g"))
+lazy_xp_function((B, "h"))
+lazy_xp_function((B, "k"))
+lazy_xp_function((B, "j"))
+lazy_xp_function((B, "w"))
+
+
+class TestLazyXpFunctionClasses:
+    def test_parent_method_not_tagged(self):
+        assert hasattr(B.g, "_lazy_xp_function")
+        assert not hasattr(A.g, "_lazy_xp_function")
+
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="converts to NumPy")
+    @pytest.mark.skip_xp_backend(Backend.CUPY, reason="converts to NumPy")
+    @pytest.mark.skip_xp_backend(Backend.JAX_GPU, reason="converts to NumPy")
+    @pytest.mark.skip_xp_backend(Backend.TORCH_GPU, reason="converts to NumPy")
+    def test_lazy_xp_function_classes(self, xp: ModuleType, library: Backend):
+        x = xp.asarray([1.1, 2.2, 3.3])
+        y = xp.asarray([1.0, 2.0, 3.0])
+        foo = A(x)
+        bar = B(x)
+
+        if library.like(Backend.JAX):
+            with pytest.raises(
+                TypeError, match="Attempted boolean conversion of traced array"
+            ):
+                assert bar.h(y)
+
+        assert foo.h(y)
+
+    def test_static_methods_preserved(self, xp: ModuleType):
+        # Tests that static methods stay static methods when
+        # lazy_xp_function is applied.
+        x = xp.asarray([1.1, 2.2, 3.3])
+        foo = B(x)
+        bar = foo.k(x)
+        xp_assert_equal(bar.x, 2.0 * foo.x)
+
+    @pytest.mark.skip_xp_backend(Backend.DASK, reason="calls dask.compute()")
+    def test_static_methods_wrapped(self, xp: ModuleType, library: Backend):
+        x = xp.asarray([1.1, 2.2, 3.3])
+        foo = B(x)
+
+        if library.like(Backend.JAX):
+            with pytest.raises(
+                TypeError, match="Attempted boolean conversion of traced array"
+            ):
+                assert isinstance(foo.j(x), B)
+        else:
+            assert isinstance(foo.j(x), B)
+
+    @pytest.mark.skip_xp_backend(Backend.DASK, reason="calls dask.compute()")
+    def test_class_methods_wrapped(self, xp: ModuleType, library: Backend):
+        x = xp.asarray([1.1, 2.2, 3.3])
+        if library.like(Backend.JAX):
+            with pytest.raises(
+                TypeError, match="Attempted boolean conversion of traced array"
+            ):
+                assert isinstance(B.w(x), B)
+        else:
+            assert isinstance(B.w(x), B)
+
+    def test_circumvention(self, xp: ModuleType):
+        x = xp.asarray([1.0, 2.0])
+        y = eager.non_materializable5(x)
+        xp_assert_equal(y, x)
 
 
 def dask_raises(x: Array) -> Array:

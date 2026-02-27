@@ -134,6 +134,7 @@ pytest-cov = ">=7.0.0"
 hypothesis = ">=6.151.2"
 array-api-strict = ">=2.4.1,<2.5"
 numpy = ">=1.22.0"
+scipy = ">=1.15.2,<2"
 
 [tool.pixi.feature.tests.tasks]
 tests = { cmd = "pytest -v", description = "Run tests" }
