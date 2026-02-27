@@ -281,7 +281,8 @@ This will be later expanded to provide test coverage for other lazy backends.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> (<em>callable</em>) – Function to be tested.</p></li>
+<li><p><strong>func</strong> (<em>callable</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><em>type</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – Function to be tested, or a tuple containing an (uninstantiated) class and a
+method name to specify a class method to be tested.</p></li>
 <li><p><strong>allow_dask_compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Whether <cite>func</cite> is allowed to internally materialize the Dask graph, or maximum
 number of times it is allowed to do so. This is typically triggered by
 <code class="docutils literal notranslate"><span class="pre">bool()</span></code>, <code class="docutils literal notranslate"><span class="pre">float()</span></code>, or <code class="docutils literal notranslate"><span class="pre">np.asarray()</span></code>.</p>
