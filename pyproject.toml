@@ -212,7 +212,7 @@ jax = ">=0.7.2"
 system-requirements = { cuda = "12" }
 
 [tool.pixi.feature.cuda-backends.target.linux.dependencies]
-cupy = ">=13.6.0"
+cupy = ">=14.0.0"
 jaxlib = { version = ">=0.7.2", build = "cuda12*" }
 pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
@@ -222,7 +222,7 @@ pytorch = { version = ">=2.10.0", build = "cuda12*" }
 # pytorch = { version = "*", build = "cuda12*" }  # unavailable
 
 [tool.pixi.feature.cuda-backends.target.win.dependencies]
-cupy = ">=13.6.0"
+cupy = ">=14.0.0"
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
 pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
