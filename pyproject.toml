@@ -91,7 +91,7 @@ array-api-extra.path = "."
 
 [tool.pixi.feature.lint.dependencies]
 typing-extensions = ">=4.15.0"
-pylint = ">=4.0.4"
+pylint = ">=4.0.5"
 mypy = ">=1.19.1"
 basedpyright = ">=1.38.1"
 numpydoc = ">=1.10.0,<2"
