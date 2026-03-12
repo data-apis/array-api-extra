@@ -27,7 +27,7 @@ classifiers = [
   "Programming Language :: Python :: Free Threading :: 3 - Stable",
   "Typing :: Typed",
 ]
-dependencies = ["array-api-compat>=1.13.0,<2"]
+dependencies = ["array-api-compat>=1.14.0,<2"]
 
 [project.urls]
 Homepage = "https://github.com/data-apis/array-api-extra"
