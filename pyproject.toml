@@ -213,7 +213,7 @@ system-requirements = { cuda = "12" }
 
 [tool.pixi.feature.cuda-backends.target.linux.dependencies]
 cupy = ">=14.0.1"
-jaxlib = { version = ">=0.7.2", build = "cuda12*" }
+jaxlib = { version = ">=0.9.0", build = "cuda12*" }
 pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
 [tool.pixi.feature.cuda-backends.target.osx.dependencies]
