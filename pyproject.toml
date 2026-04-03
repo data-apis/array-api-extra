@@ -241,7 +241,10 @@ dask-core = ">=2026.3.0" # No distributed, tornado, etc.
 minversion = "6.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  'ignore:.*torch.jit.script_method.*',
+]
 log_cli_level = "INFO"
 testpaths = ["tests"]
 markers = [

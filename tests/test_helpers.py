@@ -1,6 +1,7 @@
-from collections.abc import Iterator
+import functools
+from collections.abc import Callable, Iterator
 from types import ModuleType
-from typing import TYPE_CHECKING, Generic, TypeVar, cast
+from typing import TYPE_CHECKING, Generic, ParamSpec, Protocol, TypeVar, cast
 
 import numpy as np
 import pytest
@@ -10,11 +11,12 @@ from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import array_namespace
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._helpers import (
+    JitLibrary,
     asarrays,
+    autojit,
     capabilities,
     eager_shape,
     in1d,
-    jax_autojit,
     meta_namespace,
     ndindex,
     pickle_flatten,
@@ -34,6 +36,7 @@ else:
         return func
 
 
+P = ParamSpec("P")
 T = TypeVar("T")
 
 # FIXME calls xp.unique_values without size
@@ -359,41 +362,48 @@ class TestPickleFlatten:
         assert obj2[1] is obj2
 
 
-class TestJAXAutoJIT:
-    def test_basic(self, jnp: ModuleType):
-        @jax_autojit
+class AutoJitFunc(Protocol):
+    def __call__(
+        self,
+        func: Callable[P, T],
+    ) -> Callable[P, T]: ...
+
+
+class CheckAutoJIT:
+    def test_basic(self, autojit_func: AutoJitFunc, xp: ModuleType):
+        @autojit_func
         def f(x: Array, k: object = False) -> Array:
             return x + 1 if k else x - 1
 
         # Basic recognition of static_argnames
-        xp_assert_equal(f(jnp.asarray([1, 2])), jnp.asarray([0, 1]))
-        xp_assert_equal(f(jnp.asarray([1, 2]), False), jnp.asarray([0, 1]))
-        xp_assert_equal(f(jnp.asarray([1, 2]), True), jnp.asarray([2, 3]))
-        xp_assert_equal(f(jnp.asarray([1, 2]), 1), jnp.asarray([2, 3]))
+        xp_assert_equal(f(xp.asarray([1, 2])), xp.asarray([0, 1]))
+        xp_assert_equal(f(xp.asarray([1, 2]), False), xp.asarray([0, 1]))
+        xp_assert_equal(f(xp.asarray([1, 2]), True), xp.asarray([2, 3]))
+        xp_assert_equal(f(xp.asarray([1, 2]), 1), xp.asarray([2, 3]))
 
         # static argument is not an ArrayLike
-        xp_assert_equal(f(jnp.asarray([1, 2]), "foo"), jnp.asarray([2, 3]))
+        xp_assert_equal(f(xp.asarray([1, 2]), "foo"), xp.asarray([2, 3]))
 
         # static argument is not hashable, but serializable
-        xp_assert_equal(f(jnp.asarray([1, 2]), ["foo"]), jnp.asarray([2, 3]))
+        xp_assert_equal(f(xp.asarray([1, 2]), ["foo"]), xp.asarray([2, 3]))
 
-    def test_wrapper(self, jnp: ModuleType):
-        @jax_autojit
+    def test_wrapper(self, autojit_func: AutoJitFunc, xp: ModuleType):
+        @autojit_func
         def f(w: Wrapper[Array]) -> Wrapper[Array]:
             return Wrapper(w.x + 1)
 
-        inp = Wrapper(jnp.asarray([1, 2]))
+        inp = Wrapper(xp.asarray([1, 2]))
         out = f(inp).x
-        xp_assert_equal(out, jnp.asarray([2, 3]))
+        xp_assert_equal(out, xp.asarray([2, 3]))
 
-    def test_static_hashable(self, jnp: ModuleType):
+    def test_static_hashable(self, autojit_func: AutoJitFunc, xp: ModuleType):
         """Static argument/return value is hashable, but not serializable"""
 
         class C:
             def __reduce__(self) -> object:  # type: ignore[override]  # pyright: ignore[reportIncompatibleMethodOverride,reportImplicitOverride]
                 raise Exception()
 
-        @jax_autojit
+        @autojit_func
         def f(x: object) -> object:
             return x
 
@@ -402,17 +412,20 @@ class TestJAXAutoJIT:
         assert out is inp
 
         # Serializable opaque input contains non-serializable object plus array
-        winp = Wrapper((C(), jnp.asarray([1, 2])))
+        winp = Wrapper((C(), xp.asarray([1, 2])))
         out = f(winp)
         assert isinstance(out, Wrapper)
         assert out.x[0] is winp.x[0]
         assert out.x[1] is not winp.x[1]
         xp_assert_equal(out.x[1], winp.x[1])
 
-    def test_arraylikes_are_static(self):
+    def test_arraylikes_are_static(
+        self,
+        autojit_func: AutoJitFunc,
+    ):
         pytest.importorskip("jax")
 
-        @jax_autojit
+        @autojit_func
         def f(x: list[int]) -> list[int]:
             assert isinstance(x, list)
             assert x == [1, 2]
@@ -422,15 +435,35 @@ class TestJAXAutoJIT:
         assert isinstance(out, list)
         assert out == [3, 4]
 
-    def test_iterators(self, jnp: ModuleType):
-        @jax_autojit
+    def test_iterators(self, autojit_func: AutoJitFunc, xp: ModuleType):
+        @autojit_func
         def f(x: Array) -> Iterator[Array]:
             return (x + i for i in range(2))
 
-        inp = jnp.asarray([1, 2])
+        inp = xp.asarray([1, 2])
         out = f(inp)
         assert isinstance(out, Iterator)
-        xp_assert_equal(next(out), jnp.asarray([1, 2]))
-        xp_assert_equal(next(out), jnp.asarray([2, 3]))
+        xp_assert_equal(next(out), xp.asarray([1, 2]))
+        xp_assert_equal(next(out), xp.asarray([2, 3]))
         with pytest.raises(StopIteration):
             _ = next(out)
+
+
+class TestJAXAutoJit(CheckAutoJIT):
+    @pytest.fixture
+    def xp(self, jnp: ModuleType) -> ModuleType:
+        return jnp
+
+    @pytest.fixture
+    def autojit_func(self) -> AutoJitFunc:
+        return functools.partial(autojit, jit_library=JitLibrary.jax)
+
+
+class TestTorchAutoJit(CheckAutoJIT):
+    @pytest.fixture
+    def xp(self, torch: ModuleType) -> ModuleType:
+        return torch
+
+    @pytest.fixture
+    def autojit_func(self) -> AutoJitFunc:
+        return functools.partial(autojit, jit_library=JitLibrary.torch)
