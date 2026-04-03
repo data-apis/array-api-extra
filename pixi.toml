@@ -228,7 +228,8 @@ scipy-doctest = ">=2.2.0,<3"
 [feature.tests.tasks]
 tests = {
   description = "Run tests",
-  cmd = "pytest -v tests/main",
+  args = [{ arg = "pytest_args", default = "tests/main" }],
+  cmd = "pytest -v {{ pytest_args }}",
   default-environment = "tests",
 }
 doctests = {
