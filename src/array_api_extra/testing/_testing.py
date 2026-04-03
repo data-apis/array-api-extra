@@ -37,17 +37,6 @@ __all__ = [
     "patch_lazy_xp_functions",
 ]
 
-
-__all__ = [
-    "assert_close",
-    "assert_close_nulp",
-    "assert_equal",
-    "assert_less",
-    "lazy_xp_function",
-    "patch_lazy_xp_functions",
-]
-
-
 P = ParamSpec("P")
 T = TypeVar("T")
 
@@ -83,6 +72,7 @@ def lazy_xp_function(
     *,
     allow_dask_compute: bool | int = False,
     jax_jit: bool = True,
+    torch_compile: bool = True,
     static_argnums: _Deprecated = DEPRECATED,
     static_argnames: _Deprecated = DEPRECATED,
 ) -> None:  # numpydoc ignore=GL07
@@ -146,6 +136,8 @@ def lazy_xp_function(
             ...     return user_consumes(z)
 
         Default: True.
+    torch_compile : bool, optional
+        TODO: proper docs.
     static_argnums : Deprecated
         Deprecated; ignored.
     static_argnames : Deprecated
@@ -238,6 +230,7 @@ def lazy_xp_function(
     tags: dict[str, bool | int | type] = {
         "allow_dask_compute": allow_dask_compute,
         "jax_jit": jax_jit,
+        "torch_compile": torch_compile,
     }
 
     if isinstance(func, tuple):
@@ -444,7 +437,19 @@ def patch_lazy_xp_functions(
     elif _compat.is_jax_namespace(xp):
         for target, name, attr, func, tags in iter_tagged():
             if tags["jax_jit"]:
-                wrapped = _helpers.jax_autojit(func)
+                wrapped = _helpers.autojit(func, _helpers.JitLibrary.jax)
+                # If we're dealing with a staticmethod or classmethod, make
+                # sure things stay that way.
+                if isinstance(attr, staticmethod):
+                    wrapped = staticmethod(wrapped)
+                elif isinstance(attr, classmethod):
+                    wrapped = classmethod(wrapped)
+                temp_setattr(target, name, wrapped)
+
+    elif _compat.is_torch_namespace(xp):
+        for target, name, attr, func, tags in iter_tagged():
+            if tags["torch_compile"]:
+                wrapped = _helpers.autojit(func, _helpers.JitLibrary.torch)
                 # If we're dealing with a staticmethod or classmethod, make
                 # sure things stay that way.
                 if isinstance(attr, staticmethod):

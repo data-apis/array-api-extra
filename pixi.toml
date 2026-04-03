@@ -224,7 +224,8 @@ scipy = ">=1.15.2"
 [feature.tests.tasks]
 tests = {
   description = "Run tests",
-  cmd = "pytest -v tests/main",
+  args = [{ arg = "pytest_args", default = "tests/main" }],
+  cmd = "pytest -v {{ pytest_args }}",
   default-environment = "tests",
 }
 tests-cov = {
