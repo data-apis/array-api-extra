@@ -244,6 +244,7 @@ xfail_strict = true
 filterwarnings = [
   "error",
   'ignore:.*torch.jit.script_method.*',
+  'ignore:.*accumulated_recompile_limit reached.*',
 ]
 log_cli_level = "INFO"
 testpaths = ["tests"]
