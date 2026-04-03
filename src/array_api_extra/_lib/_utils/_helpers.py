@@ -526,7 +526,7 @@ class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
 
     _obj: Any
     _is_iter: bool
-    _registered: ClassVar[bool] = False
+    _registered: ClassVar[set[JitLibrary]] = set()
     __slots__: tuple[str, ...] = ("_is_iter", "_obj")
 
     def __init__(self, obj: T, jit_library: JitLibrary) -> None:  # numpydoc ignore=GL08
@@ -549,24 +549,26 @@ class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
         Register upon first use instead of at import time, to avoid
         globally importing JAX.
         """
-        if not cls._registered:
-            if jit_library is JitLibrary.jax:
-                import jax
+        if jit_library in cls._registered:
+            return
 
-                jax.tree_util.register_pytree_node(
-                    cls,
-                    lambda instance: pickle_flatten(instance, jax.Array),  # pyright: ignore[reportUnknownArgumentType]
-                    lambda aux_data, children: pickle_unflatten(children, aux_data),  # pyright: ignore[reportUnknownArgumentType]
-                )
-            elif jit_library is JitLibrary.torch:
-                import torch
+        if jit_library is JitLibrary.jax:
+            import jax
 
-                torch.utils._pytree.register_pytree_node(
-                    cls,
-                    lambda instance: pickle_flatten(instance, torch.Tensor),  # pyright: ignore[reportUnknownArgumentType]
-                    pickle_unflatten,
-                )
-            cls._registered = True
+            jax.tree_util.register_pytree_node(
+                cls,
+                lambda instance: pickle_flatten(instance, jax.Array),  # pyright: ignore[reportUnknownArgumentType]
+                lambda aux_data, children: pickle_unflatten(children, aux_data),  # pyright: ignore[reportUnknownArgumentType]
+            )
+        elif jit_library is JitLibrary.torch:
+            import torch
+
+            torch.utils._pytree.register_pytree_node(
+                cls,
+                lambda instance: pickle_flatten(instance, torch.Tensor),  # pyright: ignore[reportUnknownArgumentType]
+                pickle_unflatten,
+            )
+        cls._registered.add(jit_library)
 
 
 class JitLibrary(Enum):
