@@ -40,7 +40,11 @@ Changelog = "https://github.com/data-apis/array-api-extra/releases"
 minversion = "6.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  'ignore:.*torch.jit.script_method.*',
+  'ignore:.*accumulated_recompile_limit reached.*',
+]
 log_cli_level = "INFO"
 testpaths = ["tests"]
 markers = [
