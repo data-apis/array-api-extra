@@ -279,7 +279,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/readline-8.3-h853b02a_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/ruff-0.15.5-h40fa522_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/ruff-0.15.8-h7805a7d_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/scipy-1.17.1-py314hf07bd8e_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/sleef-3.9.0-ha0421bc_0.conda
@@ -465,7 +465,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-64/readline-8.3-h68b038d_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/osx-64/ruff-0.15.5-h8ee721d_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-64/ruff-0.15.8-h16586dd_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/scipy-1.17.1-py314h5727af0_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/sleef-3.9.0-h289094c_0.conda
@@ -647,7 +647,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/readline-8.3-h46df422_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/osx-arm64/ruff-0.15.5-h279115b_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/ruff-0.15.8-hc5c3a1d_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/scipy-1.17.1-py314hfc1f868_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/sleef-3.9.0-hb028509_0.conda
@@ -805,7 +805,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/pyyaml-6.0.3-py314h2359020_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/win-64/ruff-0.15.5-h5739096_0.conda
+      - conda: https://prefix.dev/conda-forge/win-64/ruff-0.15.8-h02f8532_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/scipy-1.17.1-py314h221f224_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/sleef-3.9.0-h67fd636_0.conda
@@ -1048,7 +1048,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/readline-8.3-h853b02a_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/ruff-0.15.5-h40fa522_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/ruff-0.15.8-h7805a7d_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/scipy-1.16.3-py314hf07bd8e_2.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/sleef-3.9.0-ha0421bc_0.conda
@@ -1235,7 +1235,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-64/readline-8.3-h68b038d_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/osx-64/ruff-0.15.5-h8ee721d_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-64/ruff-0.15.8-h16586dd_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/scipy-1.17.1-py314h5727af0_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/osx-64/sleef-3.9.0-h289094c_0.conda
@@ -1417,7 +1417,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/readline-8.3-h46df422_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/osx-arm64/ruff-0.15.5-h279115b_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/ruff-0.15.8-hc5c3a1d_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/scipy-1.17.1-py314hfc1f868_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/sleef-3.9.0-hb028509_0.conda
@@ -1595,7 +1595,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/pyyaml-6.0.3-py314h2359020_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/win-64/ruff-0.15.5-h5739096_0.conda
+      - conda: https://prefix.dev/conda-forge/win-64/ruff-0.15.8-h02f8532_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/scipy-1.16.3-py314h221f224_2.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/win-64/sleef-3.9.0-h67fd636_0.conda
@@ -2135,7 +2135,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/readline-8.3-h853b02a_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/ruff-0.15.5-h40fa522_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/ruff-0.15.8-h7805a7d_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/snowballstemmer-3.0.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/sortedcontainers-2.4.0-pyhd8ed1ab_1.conda
@@ -2258,7 +2258,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-64/readline-8.3-h68b038d_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/osx-64/ruff-0.15.5-h8ee721d_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-64/ruff-0.15.8-h16586dd_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/snowballstemmer-3.0.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/sortedcontainers-2.4.0-pyhd8ed1ab_1.conda
@@ -2381,7 +2381,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/readline-8.3-h46df422_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/osx-arm64/ruff-0.15.5-h279115b_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/ruff-0.15.8-hc5c3a1d_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/snowballstemmer-3.0.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/sortedcontainers-2.4.0-pyhd8ed1ab_1.conda
@@ -2494,7 +2494,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/pyyaml-6.0.3-py314h2359020_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/requests-2.32.5-pyhcf101f3_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/roman-numerals-4.1.0-pyhd8ed1ab_0.conda
-      - conda: https://prefix.dev/conda-forge/win-64/ruff-0.15.5-h5739096_0.conda
+      - conda: https://prefix.dev/conda-forge/win-64/ruff-0.15.8-h02f8532_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/setuptools-82.0.0-pyh332efcf_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/snowballstemmer-3.0.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/sortedcontainers-2.4.0-pyhd8ed1ab_1.conda
@@ -13097,26 +13097,26 @@ packages:
   - pkg:pypi/roman-numerals?source=hash-mapping
   size: 13814
   timestamp: 1766003022813
-- conda: https://prefix.dev/conda-forge/linux-64/ruff-0.15.5-h40fa522_0.conda
+- conda: https://prefix.dev/conda-forge/linux-64/ruff-0.15.8-h7805a7d_0.conda
   noarch: python
-  sha256: da5d47b231a590257b4ee0f3459e6ec30012ae549e3c29601cd15de178dafe9c
-  md5: 2ad709f7abc95e934d96e7a20b837b6e
+  sha256: c4778a348a99b781585f8ef47f134a5ebfe205f9f403ecd601fc602efa7e54ce
+  md5: 67bed7148b00f10bd30766cb58fb8f6f
   depends:
   - python
-  - __glibc >=2.17,<3.0.a0
   - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
   constrains:
   - __glibc >=2.17
   license: MIT
   license_family: MIT
   purls:
-  - pkg:pypi/ruff?source=hash-mapping
-  size: 9273260
-  timestamp: 1772780208047
-- conda: https://prefix.dev/conda-forge/osx-64/ruff-0.15.5-h8ee721d_0.conda
+  - pkg:pypi/ruff?source=compressed-mapping
+  size: 9233459
+  timestamp: 1774602134378
+- conda: https://prefix.dev/conda-forge/osx-64/ruff-0.15.8-h16586dd_0.conda
   noarch: python
-  sha256: 4968ba59a12f211106b2b9026bb867a0e6a6abc0f6b3be67259d616e5c79357b
-  md5: 81083c6d1627d9394b6f669d2931a407
+  sha256: 461374440f51a529f7a6d98b375e7275a718c0b01eceeddd09e4686628af1694
+  md5: c2264b6843ddd72daafb99bf7f418206
   depends:
   - python
   - __osx >=11.0
@@ -13126,12 +13126,12 @@ packages:
   license_family: MIT
   purls:
   - pkg:pypi/ruff?source=hash-mapping
-  size: 9288390
-  timestamp: 1772780432283
-- conda: https://prefix.dev/conda-forge/osx-arm64/ruff-0.15.5-h279115b_0.conda
+  size: 9198854
+  timestamp: 1774602365946
+- conda: https://prefix.dev/conda-forge/osx-arm64/ruff-0.15.8-hc5c3a1d_0.conda
   noarch: python
-  sha256: 89cb3edc0239200b83cece7e27dce096facf2db0d3370dc46f047db65b1f1126
-  md5: 02f7f9ffb450e26b44120c1cc8e543a4
+  sha256: c26c0536190e0211582cfc1c35cddd231678c130ed178edc37b37fabf0a050de
+  md5: fa921b1314935be129087490fce6b8d7
   depends:
   - python
   - __osx >=11.0
@@ -13141,12 +13141,12 @@ packages:
   license_family: MIT
   purls:
   - pkg:pypi/ruff?source=hash-mapping
-  size: 8476952
-  timestamp: 1772780440888
-- conda: https://prefix.dev/conda-forge/win-64/ruff-0.15.5-h5739096_0.conda
+  size: 8389699
+  timestamp: 1774602454769
+- conda: https://prefix.dev/conda-forge/win-64/ruff-0.15.8-h02f8532_0.conda
   noarch: python
-  sha256: d0bba8615cc662c684bb79a30145b8d4940a80d6906d12ef5ed074f1f1879bc8
-  md5: 4b5fef0aa16f91d1286205ff19f2123c
+  sha256: 6b3e2568b8023cc5862b530693c7219adb924645aa14d0e81e5498cbb4498f3a
+  md5: d1d4299b79941e62f233eac40cc01945
   depends:
   - python
   - vc >=14.3,<15
@@ -13155,9 +13155,9 @@ packages:
   license: MIT
   license_family: MIT
   purls:
-  - pkg:pypi/ruff?source=hash-mapping
-  size: 9732695
-  timestamp: 1772780220897
+  - pkg:pypi/ruff?source=compressed-mapping
+  size: 9681714
+  timestamp: 1774602197472
 - conda: https://prefix.dev/conda-forge/linux-64/scipy-1.15.2-py311h8f841c2_0.conda
   sha256: 6d0902775e3ff96dd1d36ac627e03fe6c0b3d2159bb71e115dd16a1f31693b25
   md5: 5ec0a1732a05376241e1e4c6d50e0e91
