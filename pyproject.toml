@@ -130,7 +130,7 @@ lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run
 
 [tool.pixi.feature.tests.dependencies]
 pytest = ">=9.0.2"
-pytest-cov = ">=7.0.0"
+pytest-cov = ">=7.1.0"
 hypothesis = ">=6.151.9"
 array-api-strict = ">=2.5,<2.6"
 numpy = ">=1.22.0"
