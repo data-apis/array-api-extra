@@ -27,6 +27,7 @@ It is currently used by:
   scientific computing.
 - [scikit-learn](https://github.com/scikit-learn/scikit-learn) — Machine
   Learning in Python.
+- [SysIdentPy](https://github.com/wilsonrljr/sysidentpy) — System Identification Using NARMAX Models.
 - *your library? Let us know!*
 
 (installation)=
