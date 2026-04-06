@@ -291,7 +291,7 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
-    avg = _helpers.mean(m, axis=-1, keepdims=True, xp=xp)
+    avg = xp.mean(m, axis=-1, keepdims=True)
 
     m_shape = eager_shape(m)
     fact = m_shape[-1] - 1
