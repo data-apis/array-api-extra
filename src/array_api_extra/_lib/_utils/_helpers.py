@@ -28,7 +28,6 @@ from ._compat import (
     is_dask_namespace,
     is_jax_namespace,
     is_numpy_array,
-    is_pydata_sparse_namespace,
     is_torch_namespace,
 )
 from ._typing import Array, Device
@@ -53,7 +52,6 @@ __all__ = [
     "in1d",
     "is_python_scalar",
     "jax_autojit",
-    "mean",
     "meta_namespace",
     "pickle_flatten",
     "pickle_unflatten",
@@ -120,29 +118,6 @@ def in1d(
     if assume_unique:
         return ret[: x1.shape[0]]
     return xp.take(ret, rev_idx, axis=0)
-
-
-def mean(
-    x: Array,
-    /,
-    *,
-    axis: int | tuple[int, ...] | None = None,
-    keepdims: bool = False,
-    xp: ModuleType | None = None,
-) -> Array:  # numpydoc ignore=PR01,RT01
-    """
-    Complex mean, https://github.com/data-apis/array-api/issues/846.
-    """
-    if xp is None:
-        xp = array_namespace(x)
-
-    if xp.isdtype(x.dtype, "complex floating"):
-        x_real = xp.real(x)
-        x_imag = xp.imag(x)
-        mean_real = xp.mean(x_real, axis=axis, keepdims=keepdims)
-        mean_imag = xp.mean(x_imag, axis=axis, keepdims=keepdims)
-        return mean_real + (mean_imag * xp.asarray(1j))
-    return xp.mean(x, axis=axis, keepdims=keepdims)
 
 
 def is_python_scalar(x: object) -> TypeIs[complex]:  # numpydoc ignore=PR01,RT01
@@ -332,14 +307,7 @@ def capabilities(
         Capabilities of the namespace.
     """
     out = xp.__array_namespace_info__().capabilities()
-    if is_pydata_sparse_namespace(xp):
-        if out["boolean indexing"]:
-            # FIXME https://github.com/pydata/sparse/issues/876
-            # boolean indexing is supported, but not when the index is a sparse array.
-            # boolean indexing by list or numpy array is not part of the Array API.
-            out = out.copy()
-            out["boolean indexing"] = False
-    elif is_jax_namespace(xp):
+    if is_jax_namespace(xp):
         if out["boolean indexing"]:  # pragma: no cover
             # Backwards compatibility with jax <0.6.0
             # https://github.com/jax-ml/jax/issues/27418
