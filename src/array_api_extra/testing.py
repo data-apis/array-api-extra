@@ -15,8 +15,8 @@ from inspect import getattr_static
 from types import FunctionType, ModuleType
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar, cast
 
-from ._lib._utils._compat import is_dask_namespace, is_jax_namespace
-from ._lib._utils._helpers import jax_autojit, pickle_flatten, pickle_unflatten
+from ._lib._utils._compat import is_dask_namespace, is_jax_namespace, is_torch_namespace
+from ._lib._utils._helpers import JitLibrary, autojit, pickle_flatten, pickle_unflatten
 
 __all__ = ["lazy_xp_function", "patch_lazy_xp_functions"]
 
@@ -67,6 +67,7 @@ def lazy_xp_function(
     *,
     allow_dask_compute: bool | int = False,
     jax_jit: bool = True,
+    torch_compile: bool = True,
     static_argnums: Deprecated = DEPRECATED,
     static_argnames: Deprecated = DEPRECATED,
 ) -> None:  # numpydoc ignore=GL07
@@ -222,6 +223,7 @@ def lazy_xp_function(
     tags: dict[str, bool | int | type] = {
         "allow_dask_compute": allow_dask_compute,
         "jax_jit": jax_jit,
+        "torch_compile": torch_compile,
     }
 
     if isinstance(func, tuple):
@@ -419,7 +421,19 @@ def patch_lazy_xp_functions(
     elif is_jax_namespace(xp):
         for target, name, attr, func, tags in iter_tagged():
             if tags["jax_jit"]:
-                wrapped = jax_autojit(func)
+                wrapped = autojit(func, JitLibrary.jax)
+                # If we're dealing with a staticmethod or classmethod, make
+                # sure things stay that way.
+                if isinstance(attr, staticmethod):
+                    wrapped = staticmethod(wrapped)
+                elif isinstance(attr, classmethod):
+                    wrapped = classmethod(wrapped)
+                temp_setattr(target, name, wrapped)
+
+    elif is_torch_namespace(xp):
+        for target, name, attr, func, tags in iter_tagged():
+            if tags["torch_compile"]:
+                wrapped = autojit(func, JitLibrary.torch)
                 # If we're dealing with a staticmethod or classmethod, make
                 # sure things stay that way.
                 if isinstance(attr, staticmethod):

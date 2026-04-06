@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import functools
 import io
 import math
 import pickle
 import types
 from collections.abc import Callable, Generator, Iterable, Iterator
+from enum import Enum, auto
 from functools import wraps
 from types import ModuleType
 from typing import (
@@ -47,12 +49,13 @@ T = TypeVar("T")
 
 
 __all__ = [
+    "JitLibrary",
     "asarrays",
+    "autojit",
     "capabilities",
     "eager_shape",
     "in1d",
     "is_python_scalar",
-    "jax_autojit",
     "mean",
     "meta_namespace",
     "pickle_flatten",
@@ -515,7 +518,7 @@ def pickle_unflatten(instances: Iterable[object], rest: FlattenRest) -> Any:
 
 class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
     """
-    Helper of :func:`jax_autojit`.
+    Helper of :func:`autojit`.
 
     Wrap arbitrary inputs and outputs of the jitted function and
     convert them to/from PyTrees.
@@ -523,12 +526,12 @@ class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
 
     _obj: Any
     _is_iter: bool
-    _registered: ClassVar[bool] = False
+    _registered: ClassVar[set[JitLibrary]] = set()
     __slots__: tuple[str, ...] = ("_is_iter", "_obj")
 
-    def __init__(self, obj: T) -> None:  # numpydoc ignore=GL08
-        self._register()
-        if isinstance(obj, Iterator):
+    def __init__(self, obj: T, jit_library: JitLibrary) -> None:  # numpydoc ignore=GL08
+        self._register(jit_library)
+        if jit_library is JitLibrary.jax and isinstance(obj, Iterator):
             self._obj = list(obj)
             self._is_iter = True
         else:
@@ -541,12 +544,15 @@ class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
         return iter(self._obj) if self._is_iter else self._obj
 
     @classmethod
-    def _register(cls) -> None:  # numpydoc ignore=SS06
+    def _register(cls, jit_library: JitLibrary) -> None:  # numpydoc ignore=SS06,PR01
         """
         Register upon first use instead of at import time, to avoid
         globally importing JAX.
         """
-        if not cls._registered:
+        if jit_library in cls._registered:
+            return
+
+        if jit_library is JitLibrary.jax:
             import jax
 
             jax.tree_util.register_pytree_node(
@@ -554,11 +560,28 @@ class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
                 lambda instance: pickle_flatten(instance, jax.Array),  # pyright: ignore[reportUnknownArgumentType]
                 lambda aux_data, children: pickle_unflatten(children, aux_data),  # pyright: ignore[reportUnknownArgumentType]
             )
-            cls._registered = True
+        elif jit_library is JitLibrary.torch:
+            import torch
+
+            torch.utils._pytree.register_pytree_node(
+                cls,
+                lambda instance: pickle_flatten(instance, torch.Tensor),  # pyright: ignore[reportUnknownArgumentType]
+                pickle_unflatten,
+            )
+        cls._registered.add(jit_library)
 
 
-def jax_autojit(
-    func: Callable[P, T],
+class JitLibrary(Enum):
+    """
+    Enum for JIT libraries compatible with `autojit`.
+    """
+
+    jax = auto()
+    torch = auto()
+
+
+def autojit(
+    func: Callable[P, T], jit_library: JitLibrary
 ) -> Callable[P, T]:  # numpydoc ignore=PR01,RT01,SS03
     """
     Wrap `func` with ``jax.jit``, with the following differences:
@@ -601,19 +624,26 @@ def jax_autojit(
     ``j1``, but on the flip side it means that it will be re-traced for every different
     value of ``y``, which likely makes it not fit for purpose in production.
     """
-    import jax
+    if jit_library is JitLibrary.jax:
+        import jax
 
-    @jax.jit  # type: ignore[untyped-decorator]  # pyright: ignore[reportUntypedFunctionDecorator]
+        jit_decorator = jax.jit
+    elif jit_library is JitLibrary.torch:
+        import torch
+
+        jit_decorator = functools.partial(torch.compile, fullgraph=True)
+
+    @jit_decorator  # type: ignore[untyped-decorator]  # pyright: ignore[reportUntypedFunctionDecorator]
     def inner(  # numpydoc ignore=GL08
         wargs: _AutoJITWrapper[Any],
     ) -> _AutoJITWrapper[T]:
         args, kwargs = wargs.obj
         res = func(*args, **kwargs)  # pyright: ignore[reportCallIssue]
-        return _AutoJITWrapper(res)
+        return _AutoJITWrapper(res, jit_library)
 
     @wraps(func)
     def outer(*args: P.args, **kwargs: P.kwargs) -> T:  # numpydoc ignore=GL08
-        wargs = _AutoJITWrapper((args, kwargs))
+        wargs = _AutoJITWrapper((args, kwargs), jit_library)
         return inner(wargs).obj
 
     return outer

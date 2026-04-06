@@ -52,7 +52,7 @@ meson-python = "*"
 uv = "*" # interfaces with meson-python instead of pip
 
 [tool.pixi.package.run-dependencies]
-array-api-compat = "*"
+# array-api-compat = "*"
 
 ### workspace environments ###
 
@@ -86,6 +86,9 @@ array-api-extra.path = "."
 
 [tool.pixi.dependencies]
 array-api-extra.path = "."
+
+[tool.pixi.pypi-dependencies]
+array-api-compat = { git = "https://github.com/data-apis/array-api-compat", branch = "lucascolley-patch-1" }
 
 ### non-default feature definitions ###
 
@@ -241,7 +244,12 @@ dask-core = ">=2026.3.0" # No distributed, tornado, etc.
 minversion = "6.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  'ignore:.*torch.jit.script_method.*',
+  'ignore:.*recompile_limit.*',
+  'ignore:.*Dynamo.*lru_cache.*',
+]
 log_cli_level = "INFO"
 testpaths = ["tests"]
 markers = [
