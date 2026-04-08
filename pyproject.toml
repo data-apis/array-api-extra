@@ -191,13 +191,13 @@ dask-core = ">=2026.3.0" # No distributed, tornado, etc.
 sparse = ">=0.18.0"
 
 [tool.pixi.feature.backends.target.linux-64.dependencies]
-jax = ">=0.9.0"
+jax = ">=0.9.1"
 
 [tool.pixi.feature.backends.target.osx-64.dependencies]
-jax = ">=0.9.0"
+jax = ">=0.9.1"
 
 [tool.pixi.feature.backends.target.osx-arm64.dependencies]
-jax = ">=0.9.0"
+jax = ">=0.9.1"
 
 [tool.pixi.feature.backends.target.win-64.dependencies]
 # jax = "*"  # unavailable
