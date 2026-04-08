@@ -115,7 +115,7 @@ def array_namespace(*xs, **kwargs):
 See [an example of this in SciPy][scipy-vendor-example].
 ```
 
-[scipy-vendor-example]: https://github.com/scipy/scipy/blob/main/scipy/_lib/_array_api_compat_vendor.py
+[scipy-vendor-example]: https://github.com/scipy/scipy/blob/main/scipy/_external/_array_api_compat_vendor.py
 
 ## Versioning
 
