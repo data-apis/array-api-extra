@@ -281,7 +281,7 @@ def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...
     return tuple(out)
 
 
-def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
+def cov(m: Array, /, *, bias: bool = False, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     m = xp.asarray(m, copy=True)
     dtype = (
@@ -294,7 +294,7 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
     avg = xp.mean(m, axis=-1, keepdims=True)
 
     m_shape = eager_shape(m)
-    fact = m_shape[-1] - 1
+    fact = m_shape[-1] - (0 if bias else 1)
 
     if fact <= 0:
         warnings.warn("Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2)

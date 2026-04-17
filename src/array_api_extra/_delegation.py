@@ -81,7 +81,7 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array
     return _funcs.atleast_nd(x, ndim=ndim, xp=xp)
 
 
-def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
+def cov(m: Array, /, *, bias: bool = False, xp: ModuleType | None = None) -> Array:
     """
     Estimate a covariance matrix (or a stack of covariance matrices).
 
@@ -102,6 +102,9 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
         contain *M* observations of *N* variables. That is,
         each row of `m` represents a variable, and each column a single
         observation of all those variables.
+    bias : bool, optional
+        If ``False`` (default), normalize the covariance matrix by ``M - 1``
+        giving an unbiased estimate. If ``True``, normalize by ``M``.
     xp : array_namespace, optional
         The standard-compatible namespace for `m`. Default: infer.
 
@@ -164,16 +167,18 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     if xp is None:
         xp = array_namespace(m)
 
+    if is_torch_namespace(xp) and m.ndim <= 2:
+        return xp.cov(m, correction=int(not bias))
+
     if (
         is_numpy_namespace(xp)
         or is_cupy_namespace(xp)
-        or is_torch_namespace(xp)
         or is_dask_namespace(xp)
         or is_jax_namespace(xp)
     ) and m.ndim <= 2:
-        return xp.cov(m)
+        return xp.cov(m, bias=bias)
 
-    return _funcs.cov(m, xp=xp)
+    return _funcs.cov(m, bias=bias, xp=xp)
 
 
 def create_diagonal(
