@@ -281,7 +281,9 @@ def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...
     return tuple(out)
 
 
-def cov(m: Array, /, *, bias: bool = False, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
+def cov(  # numpydoc ignore=PR01,RT01
+    m: Array, /, *, bias: bool = False, xp: ModuleType
+) -> Array:
     """See docstring in array_api_extra._delegation."""
     m = xp.asarray(m, copy=True)
     dtype = (

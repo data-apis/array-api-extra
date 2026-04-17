@@ -627,9 +627,7 @@ class TestCov:
         n_var, n_obs = 3, 20
         m = rng.random((*batch_shape, n_var, n_obs))
         res = cov(xp.asarray(m), bias=bias)
-        ref_list = [
-            np.cov(m_, bias=bias) for m_ in np.reshape(m, (-1, n_var, n_obs))
-        ]
+        ref_list = [np.cov(m_, bias=bias) for m_ in np.reshape(m, (-1, n_var, n_obs))]
         ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
         xp_assert_close(res, xp.asarray(ref))
 
