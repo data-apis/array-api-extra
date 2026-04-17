@@ -281,9 +281,17 @@ def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...
     return tuple(out)
 
 
-def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
+def cov(
+    m: Array,
+    /,
+    *,
+    correction: int | float = 1,
+    frequency_weights: Array | None = None,
+    weights: Array | None = None,
+    xp: ModuleType,
+) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
-    m = xp.asarray(m, copy=True)
+    m = xp.asarray(m)
     dtype = (
         xp.float64 if xp.isdtype(m.dtype, "integral") else xp.result_type(m, xp.float64)
     )
@@ -291,21 +299,49 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
-    avg = xp.mean(m, axis=-1, keepdims=True)
+    device = _compat.device(m)
+    fw = (
+        None
+        if frequency_weights is None
+        else xp.astype(xp.asarray(frequency_weights, device=device), dtype)
+    )
+    aw = (
+        None
+        if weights is None
+        else xp.astype(xp.asarray(weights, device=device), dtype)
+    )
+    if fw is None and aw is None:
+        w = None
+    elif fw is None:
+        w = aw
+    elif aw is None:
+        w = fw
+    else:
+        w = fw * aw
 
     m_shape = eager_shape(m)
-    fact = m_shape[-1] - 1
+    if w is None:
+        avg = xp.mean(m, axis=-1, keepdims=True)
+        fact = m_shape[-1] - correction
+        if fact <= 0:
+            warnings.warn(
+                "Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2
+            )
+            fact = 0
+    else:
+        v1 = xp.sum(w, axis=-1)
+        avg = xp.sum(m * w, axis=-1, keepdims=True) / v1
+        if aw is None:
+            fact = v1 - correction
+        else:
+            fact = v1 - correction * xp.sum(w * aw, axis=-1) / v1
 
-    if fact <= 0:
-        warnings.warn("Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2)
-        fact = 0
-
-    m -= avg
-    m_transpose = xp.matrix_transpose(m)
-    if xp.isdtype(m_transpose.dtype, "complex floating"):
-        m_transpose = xp.conj(m_transpose)
-    c = xp.matmul(m, m_transpose)
-    c /= fact
+    m_c = m - avg
+    m_w = m_c if w is None else m_c * w
+    m_cT = xp.matrix_transpose(m_c)
+    if xp.isdtype(m_cT.dtype, "complex floating"):
+        m_cT = xp.conj(m_cT)
+    c = xp.matmul(m_w, m_cT) / fact
     axes = tuple(axis for axis, length in enumerate(c.shape) if length == 1)
     return xp.squeeze(c, axis=axes)
 
