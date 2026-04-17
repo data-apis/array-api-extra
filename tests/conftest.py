@@ -96,9 +96,12 @@ class NumPyReadOnly:
                 # Cannot interpret as a data type
                 return o
 
-            # This works with namedtuples too
             if isinstance(o, tuple | list):
-                return type(o)(*(as_readonly(i) for i in o))  # type: ignore[arg-type,return-value] # pyright: ignore[reportArgumentType]
+                # namedtuple wants positional args; plain tuple/list wants an iterable.
+                items = (as_readonly(i) for i in o)
+                if hasattr(o, "_fields"):
+                    return type(o)(*items)  # type: ignore[arg-type,return-value] # pyright: ignore[reportArgumentType]
+                return type(o)(items)  # type: ignore[return-value]
 
             return o
 
