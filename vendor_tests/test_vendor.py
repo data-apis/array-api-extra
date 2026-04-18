@@ -59,7 +59,8 @@ def test_vendor_extra():
     from .array_api_extra import atleast_nd
 
     x = xp.asarray(1)
-    y = atleast_nd(x, ndim=0)  # type: ignore[arg-type]
+    x = cast(Array, x)
+    y = atleast_nd(x, ndim=0)
     assert_array_equal(y, x)
 
 
