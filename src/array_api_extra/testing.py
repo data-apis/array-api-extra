@@ -259,7 +259,7 @@ def lazy_xp_function(
         f = func
 
     try:
-        f._lazy_xp_function = tags  # pylint: disable=protected-access  # pyright: ignore[reportFunctionMemberAccess]
+        f._lazy_xp_function = tags  # pylint: disable=protected-access # pyright: ignore[reportFunctionMemberAccess] # pyrefly: ignore[missing-attribute]
     except AttributeError:  # @cython.vectorize
         _ufuncs_tags[f] = tags
 
@@ -461,7 +461,7 @@ class CountingDaskScheduler(SchedulerGetCallable):
     max_count: int
     msg: str
 
-    def __init__(self, max_count: int, msg: str):  # numpydoc ignore=GL08
+    def __init__(self, max_count: int, msg: str) -> None:  # numpydoc ignore=GL08
         self.count = 0
         self.max_count = max_count
         self.msg = msg

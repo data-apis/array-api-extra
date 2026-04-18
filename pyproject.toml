@@ -108,6 +108,7 @@ actionlint = ">=1.7.12,<2"
 blacken-docs = ">=1.20.0,<2"
 pytest = ">=9.0.2,<10"
 validate-pyproject = ">=0.25,<0.26"
+pyrefly = ">=0.61.1,<0.62"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
@@ -117,6 +118,7 @@ hooks = { cmd = "lefthook install", description = "Install pre-commit hooks" }
 pre-commit = { cmd = "lefthook run pre-commit", description = "Run pre-commit checks" }
 pylint = { cmd = "pylint array_api_extra", cwd = "src", description = "Lint with pylint" }
 mypy = { cmd = "mypy", description = "Type check with mypy" }
+pyrefly = { cmd = "pyrefly check", description = "Type check with pyrefly" }
 pyright = { cmd = "basedpyright", description = "Type check with basedpyright" }
 ruff-check = { cmd = "ruff check --fix", description = "Lint with ruff" }
 ruff-format = { cmd = "ruff format", description = "Format with ruff" }
@@ -257,7 +259,7 @@ run.source = ["array_api_extra"]
 # mypy
 
 [tool.mypy]
-files = ["src", "tests"]
+files = ["src", "tests", "vendor_tests"]
 python_version = "3.11"
 warn_unused_configs = true
 strict = true
@@ -273,10 +275,46 @@ ignore_missing_imports = true
 module = ["tests/*"]
 disable_error_code = ["no-untyped-def"] # test(...) without -> None
 
+[[tool.mypy.overrides]]
+module = ["vendor_tests/*"]
+disable_error_code = ["no-untyped-def"] # test(...) without -> None
+
+[[tool.mypy.overrides]]
+module = ["vendor_tests/array_api_compat/*"]
+ignore_errors = true
+
+# pyrefly
+
+[tool.pyrefly.errors]
+# Redundant with mypy checks
+missing-import = false
+# extra checks from scipy/scipy-stubs
+implicit-abstract-class = "error"
+implicitly-defined-attribute = "error"
+missing-override-decorator = "error"
+missing-source = "ignore"
+not-required-key-access = "error"
+open-unpacking = "error"
+unannotated-attribute = "error"
+unannotated-parameter = "error"
+unannotated-return = "error"
+untyped-import = "error"
+unused-ignore = "error"
+variance-mismatch = "error"
+
+[[tool.pyrefly.sub-config]]
+matches = "tests/*.py"
+errors = { unannotated-return = false }
+
+[[tool.pyrefly.sub-config]]
+matches = "vendor_tests/*.py"
+errors = { unannotated-return = false }
+
 # pyright
 
 [tool.basedpyright]
-include = ["src", "tests"]
+include = ["src", "tests", "vendor_tests"]
+exclude = ["vendor_tests/array_api_compat"]
 pythonVersion = "3.11"
 pythonPlatform = "All"
 typeCheckingMode = "all"

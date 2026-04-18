@@ -1,13 +1,15 @@
 # pyright: reportAttributeAccessIssue=false
 
-from typing import Any
+from typing import Any, cast
 
 import array_api_strict as xp
 from numpy.testing import assert_array_equal
 
+from vendor_tests.array_api_compat.common._typing import Array
+
 
 def test_vendor_compat():
-    from ._array_api_compat_vendor import (  # type: ignore[attr-defined]
+    from ._array_api_compat_vendor import (
         array_namespace,
         device,
         is_array_api_obj,
@@ -35,6 +37,7 @@ def test_vendor_compat():
     to_device(x, device(x))
     assert is_array_api_obj(x)
     assert is_array_api_strict_namespace(xp)
+    x = cast(Array, x)
     assert not is_cupy_array(x)
     assert not is_cupy_namespace(xp)
     assert not is_dask_array(x)
@@ -56,8 +59,8 @@ def test_vendor_extra():
     from .array_api_extra import atleast_nd
 
     x = xp.asarray(1)
-    y = atleast_nd(x, ndim=0)
-    assert_array_equal(y, x)  # pyright: ignore[reportUnknownArgumentType]
+    y = atleast_nd(x, ndim=0)  # type: ignore[arg-type]
+    assert_array_equal(y, x)
 
 
 def test_vendor_extra_testing():

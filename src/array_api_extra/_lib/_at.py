@@ -37,7 +37,7 @@ class _AtOp(Enum):
     MAX = "max"
 
     # @override from Python 3.12
-    def __str__(self) -> str:  # pyright: ignore[reportImplicitOverride]
+    def __str__(self) -> str:  # pyright: ignore[reportImplicitOverride] # pyrefly: ignore[missing-override-decorator]
         """
         Return string representation (useful for pytest logs).
 
