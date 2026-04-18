@@ -5,7 +5,9 @@ from typing import Any, cast
 import array_api_strict as xp
 from numpy.testing import assert_array_equal
 
-from vendor_tests.array_api_compat.common._typing import Array
+from vendor_tests.array_api_compat.common._typing import (  # type: ignore[import-not-found]
+    Array,
+)
 
 
 def test_vendor_compat():
@@ -56,7 +58,7 @@ def test_vendor_compat():
 
 
 def test_vendor_extra():
-    from .array_api_extra import atleast_nd
+    from .array_api_extra import atleast_nd  # type: ignore[import-not-found]
 
     x = xp.asarray(1)
     x = cast(Array, x)
@@ -65,7 +67,9 @@ def test_vendor_extra():
 
 
 def test_vendor_extra_testing():
-    from .array_api_extra.testing import lazy_xp_function
+    from .array_api_extra.testing import (  # type: ignore[import-not-found]
+        lazy_xp_function,
+    )
 
     def f(x: Any) -> Any:
         return x
@@ -75,6 +79,8 @@ def test_vendor_extra_testing():
 
 def test_vendor_extra_uses_vendor_compat():
     from ._array_api_compat_vendor import array_namespace as n1
-    from .array_api_extra._lib._utils._compat import array_namespace as n2
+    from .array_api_extra._lib._utils._compat import (  # type: ignore[import-not-found]
+        array_namespace as n2,
+    )
 
     assert n1 is n2
