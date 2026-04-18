@@ -340,6 +340,7 @@ reportUnknownLambdaType = false
 
 executionEnvironments = [
   { root = "tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
+  { root = "vendor_tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
   { root = "src" },
 ]
 
