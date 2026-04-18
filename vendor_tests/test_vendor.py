@@ -9,7 +9,7 @@ from vendor_tests.array_api_compat.common._typing import Array
 
 
 def test_vendor_compat():
-    from ._array_api_compat_vendor import (
+    from ._array_api_compat_vendor import (  # type: ignore[attr-defined]
         array_namespace,
         device,
         is_array_api_obj,
