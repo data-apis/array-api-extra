@@ -109,6 +109,7 @@ blacken-docs = ">=1.20.0,<2"
 pytest = ">=9.0.2,<10"
 validate-pyproject = ">=0.25,<0.26"
 pyrefly = ">=0.61.1,<0.62"
+zizmor = ">=1.24.1,<1.25"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
@@ -125,6 +126,7 @@ ruff-format = { cmd = "ruff format", description = "Format with ruff" }
 dprint = { cmd = "dprint fmt", description = "Format with dprint" }
 typos = { cmd = "typos --write-changes --force-exclude", description = "Fix typos" }
 actionlint = { cmd = "actionlint", description = "Lint actions with actionlint" }
+zizmor = { cmd = "zizmor .github -p", description = "GHA static analysis with zizmor" }
 blacken-docs = { cmd = "blacken-docs", description = "Format Python markdown blocks with Black" }
 validate-pyproject = { cmd = "validate-pyproject pyproject.toml", description = "Validate pyproject.toml" }
 numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with numpydoc" }
