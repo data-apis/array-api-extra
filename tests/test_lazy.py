@@ -219,7 +219,10 @@ def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
     mxp = np if library is Backend.DASK else xp
     int_type = xp.asarray(0).dtype
 
-    ctx: contextlib.AbstractContextManager[object]
+    ctx: (
+        contextlib.AbstractContextManager[object]
+        | contextlib.AbstractContextManager[None]
+    )
     if library.like(Backend.JAX):
         ctx = pytest.raises(ValueError, match="Output shape must be fully known")
     elif library is Backend.ARRAY_API_STRICTEST:

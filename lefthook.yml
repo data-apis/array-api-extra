@@ -39,6 +39,9 @@ pre-commit:
     - name: mypy
       glob: "*.{py,pyi}"
       run: pixi {run} mypy
+    - name: pyrefly
+      glob: "*.{py, pyi}"
+      run: pixi {run} pyrefly
     - name: typos
       stage_fixed: true
       run: pixi {run} typos
