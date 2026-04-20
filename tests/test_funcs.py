@@ -817,11 +817,12 @@ class TestDiagIndices:
         xp_assert_equal(rows, xp.asarray(ref_rows))
         xp_assert_equal(cols, xp.asarray(ref_cols))
 
+    @pytest.mark.parametrize("n", [2, 4, 7])
     @pytest.mark.parametrize("ndim", [1, 2, 3, 4])
-    def test_ndim(self, xp: ModuleType, ndim: int):
-        idx = diag_indices(4, ndim=ndim, xp=xp)
+    def test_ndim(self, xp: ModuleType, n: int, ndim: int):
+        idx = diag_indices(n, ndim=ndim, xp=xp)
         assert len(idx) == ndim
-        ref = np.diag_indices(4, ndim=ndim)
+        ref = np.diag_indices(n, ndim=ndim)
         for got, expected in zip(idx, ref, strict=True):
             xp_assert_equal(got, xp.asarray(expected))
 
