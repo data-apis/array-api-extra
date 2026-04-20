@@ -209,7 +209,7 @@ def cov(
     """
 
     if xp is None:
-        xp = array_namespace(m)
+        xp = array_namespace(m, fweights, aweights)
 
     # Validate axis against m.ndim.
     ndim = max(m.ndim, 1)
@@ -233,9 +233,7 @@ def cov(
             msg = f"`{name}` must be 1-D, got ndim={w.ndim}"
             raise ValueError(msg)
         if w.shape[0] != n_obs:
-            msg = (
-                f"`{name}` has length {w.shape[0]} but `m` has {n_obs} observations"
-            )
+            msg = f"`{name}` has length {w.shape[0]} but `m` has {n_obs} observations"
             raise ValueError(msg)
 
     # `numpy.cov` (and cupy/dask/jax) require integer `ddof`; `torch.cov`
