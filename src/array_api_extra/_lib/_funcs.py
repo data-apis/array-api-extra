@@ -299,16 +299,15 @@ def cov(
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
-    device = _compat.device(m)
     fw = (
         None
         if frequency_weights is None
-        else xp.astype(xp.asarray(frequency_weights, device=device), dtype)
+        else xp.astype(xp.asarray(frequency_weights), dtype)
     )
     aw = (
         None
         if weights is None
-        else xp.astype(xp.asarray(weights, device=device), dtype)
+        else xp.astype(xp.asarray(weights), dtype)
     )
     if fw is None and aw is None:
         w = None
