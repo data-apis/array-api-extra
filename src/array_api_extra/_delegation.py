@@ -222,20 +222,6 @@ def cov(
     if m.ndim >= 2 and axis not in (-1, m.ndim - 1):
         m = xp.moveaxis(m, axis, -1)
 
-    # Validate weight shapes (eager metadata, lazy-safe). Value-based
-    # checks (non-negative, integer dtype) are intentionally skipped so
-    # lazy backends don't trigger compute -- same tradeoff as dask.cov.
-    n_obs = m.shape[-1]
-    for name, w in (("fweights", fweights), ("aweights", aweights)):
-        if w is None:
-            continue
-        if w.ndim != 1:
-            msg = f"`{name}` must be 1-D, got ndim={w.ndim}"
-            raise ValueError(msg)
-        if w.shape[0] != n_obs:
-            msg = f"`{name}` has length {w.shape[0]} but `m` has {n_obs} observations"
-            raise ValueError(msg)
-
     # `numpy.cov` (and cupy/dask/jax) require integer `ddof`; `torch.cov`
     # requires integer `correction`. For non-integer-valued `correction`,
     # fall through to the generic implementation.

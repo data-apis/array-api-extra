@@ -299,6 +299,23 @@ def cov(
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
+    # Validate weight shapes (eager metadata, lazy-safe). Native backends
+    # validate themselves; this covers the generic path (array-api-strict,
+    # sparse, and the dask+weights fallback where the native check is
+    # bypassed to preserve laziness).
+    n_obs = m.shape[-1]
+    for name, w_in in (("fweights", fweights), ("aweights", aweights)):
+        if w_in is None:
+            continue
+        if w_in.ndim != 1:
+            msg = f"`{name}` must be 1-D, got ndim={w_in.ndim}"
+            raise ValueError(msg)
+        if w_in.shape[0] != n_obs:
+            msg = (
+                f"`{name}` has length {w_in.shape[0]} but `m` has {n_obs} observations"
+            )
+            raise ValueError(msg)
+
     fw = None
     if fweights is not None:
         fw = xp.astype(xp.asarray(fweights), dtype)
