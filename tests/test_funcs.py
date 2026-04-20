@@ -608,6 +608,30 @@ class TestCov:
         ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
         xp_assert_close(res, xp.asarray(ref))
 
+    @pytest.mark.parametrize("bias", [True, False, 0, 1])
+    def test_bias(self, xp: ModuleType, bias: bool):
+        # `bias` maps to `correction`: bias=True -> correction=0, bias=False -> 1.
+        x = np.array([-2.1, -1, 4.3])
+        y = np.array([3, 1.1, 0.12])
+        X = np.stack((x, y), axis=0)
+        ref = np.cov(X, bias=bias)
+        xp_assert_close(
+            cov(xp.asarray(X, dtype=xp.float64), correction=0 if bias else 1),
+            xp.asarray(ref, dtype=xp.float64),
+            rtol=1e-6,
+        )
+
+    @pytest.mark.parametrize("bias", [True, False, 0, 1])
+    def test_bias_batch(self, xp: ModuleType, bias: bool):
+        rng = np.random.default_rng(8847643423)
+        batch_shape = (3, 4)
+        n_var, n_obs = 3, 20
+        m = rng.random((*batch_shape, n_var, n_obs))
+        res = cov(xp.asarray(m), correction=0 if bias else 1)
+        ref_list = [np.cov(m_, bias=bias) for m_ in np.reshape(m, (-1, n_var, n_obs))]
+        ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
+        xp_assert_close(res, xp.asarray(ref))
+
     def test_correction(self, xp: ModuleType):
         rng = np.random.default_rng(20260417)
         m = rng.random((3, 20))
