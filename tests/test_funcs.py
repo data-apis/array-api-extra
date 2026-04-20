@@ -723,6 +723,19 @@ class TestCov:
         with pytest.raises(IndexError):
             _ = cov(m, axis=5)
 
+    def test_weights_shape_validation(self, xp: ModuleType):
+        m = xp.asarray([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        # Wrong length.
+        with pytest.raises(ValueError, match="`fweights` has length"):
+            _ = cov(m, fweights=xp.asarray([1, 2]))
+        with pytest.raises(ValueError, match="`aweights` has length"):
+            _ = cov(m, aweights=xp.asarray([0.1, 0.2]))
+        # Wrong ndim.
+        with pytest.raises(ValueError, match="`fweights` must be 1-D"):
+            _ = cov(m, fweights=xp.asarray([[1, 2, 3]]))
+        with pytest.raises(ValueError, match="`aweights` must be 1-D"):
+            _ = cov(m, aweights=xp.asarray([[0.1, 0.2, 0.3]]))
+
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
 class TestOneHot:
