@@ -124,11 +124,11 @@ def cov(
         ``bias=False``). Set to ``0`` for the biased estimate (``N``
         normalization). Corresponds to ``ddof`` in ``numpy.cov`` and to
         ``correction`` in ``numpy.var``/``std`` and ``torch.cov``.
-    frequency_weights : array, optional
+    fweights : array, optional
         1-D array of integer frequency weights: the number of times each
         observation is repeated. Corresponds to ``fweights`` in
         ``numpy.cov``/``torch.cov``.
-    weights : array, optional
+    aweights : array, optional
         1-D array of observation-vector weights (analytic weights). Larger
         values mark more important observations. Corresponds to
         ``aweights`` in ``numpy.cov``/``torch.cov``.
