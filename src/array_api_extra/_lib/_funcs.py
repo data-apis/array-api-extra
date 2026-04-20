@@ -299,11 +299,9 @@ def cov(
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
-    fw = (
-        None
-        if frequency_weights is None
-        else xp.astype(xp.asarray(frequency_weights), dtype)
-    )
+    fw = None
+    if frequency_weights is not None:
+        fw = xp.astype(xp.asarray(frequency_weights), dtype)
     aw = None if weights is None else xp.astype(xp.asarray(weights), dtype)
     if fw is None and aw is None:
         w = None
