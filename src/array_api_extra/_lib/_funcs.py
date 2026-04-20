@@ -304,11 +304,7 @@ def cov(
         if frequency_weights is None
         else xp.astype(xp.asarray(frequency_weights), dtype)
     )
-    aw = (
-        None
-        if weights is None
-        else xp.astype(xp.asarray(weights), dtype)
-    )
+    aw = None if weights is None else xp.astype(xp.asarray(weights), dtype)
     if fw is None and aw is None:
         w = None
     elif fw is None:

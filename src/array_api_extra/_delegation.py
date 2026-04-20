@@ -230,9 +230,7 @@ def cov(
 
     if m.ndim <= 2 and integer_correction:
         if is_torch_namespace(xp):
-            fw = (
-                None if frequency_weights is None else xp.asarray(frequency_weights)
-            )
+            fw = None if frequency_weights is None else xp.asarray(frequency_weights)
             aw = None if weights is None else xp.asarray(weights)
             return xp.cov(m, correction=int(correction), fweights=fw, aweights=aw)
         # `dask.array.cov` forces `.compute()` whenever weights are given:
