@@ -47,6 +47,8 @@ pre-commit:
       run: pixi {run} typos
     - name: actionlint
       run: pixi {run} actionlint
+    - name: zizmor
+      run: pixi {run} zizmor
     - name: blacken-docs
       glob: "*.md"
       stage_fixed: true

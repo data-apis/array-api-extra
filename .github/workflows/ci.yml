@@ -27,6 +27,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: prefix-dev/setup-pixi@1b2de7f3351f171c8b4dfeb558c639cb58ed4ec0 # v0.9.5
         with:
@@ -52,10 +53,13 @@ jobs:
           - tests-nogil
         runs-on: [ubuntu-latest]
 
+    environment: ci-checks
+
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: prefix-dev/setup-pixi@1b2de7f3351f171c8b4dfeb558c639cb58ed4ec0 # v0.9.5
         with:
@@ -66,7 +70,9 @@ jobs:
       - name: Test package
         # Save some time; also at the moment of writing coverage crashes on python 3.13t
         if: ${{ matrix.environment != 'tests-nogil' }}
-        run: pixi run -e ${{ matrix.environment }} tests-ci
+        run: pixi run -e "${TASK_ENV}" tests-ci
+        env:
+          TASK_ENV: ${{ matrix.environment }}
 
       - name: Test free-threading
         if: ${{ matrix.environment == 'tests-nogil' }}
