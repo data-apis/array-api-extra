@@ -665,7 +665,7 @@ class TestCov:
         m = rng.random((3, 10))
         fw = np.asarray([1, 2, 1, 3, 1, 2, 1, 1, 2, 1], dtype=np.int64)
         ref = np.cov(m, fweights=fw)
-        res = cov(xp.asarray(m), frequency_weights=xp.asarray(fw))
+        res = cov(xp.asarray(m), fweights=xp.asarray(fw))
         xp_assert_close(res, xp.asarray(ref))
 
     def test_weights(self, xp: ModuleType):
@@ -673,7 +673,7 @@ class TestCov:
         m = rng.random((3, 10))
         aw = rng.random(10)
         ref = np.cov(m, aweights=aw)
-        res = cov(xp.asarray(m), weights=xp.asarray(aw))
+        res = cov(xp.asarray(m), aweights=xp.asarray(aw))
         xp_assert_close(res, xp.asarray(ref))
 
     def test_both_weights(self, xp: ModuleType):
@@ -686,8 +686,8 @@ class TestCov:
             res = cov(
                 xp.asarray(m),
                 correction=correction,
-                frequency_weights=xp.asarray(fw),
-                weights=xp.asarray(aw),
+                fweights=xp.asarray(fw),
+                aweights=xp.asarray(aw),
             )
             xp_assert_close(res, xp.asarray(ref))
 
@@ -697,7 +697,7 @@ class TestCov:
         n_var, n_obs = 3, 15
         m = rng.random((*batch_shape, n_var, n_obs))
         aw = rng.random(n_obs)
-        res = cov(xp.asarray(m), weights=xp.asarray(aw))
+        res = cov(xp.asarray(m), aweights=xp.asarray(aw))
         ref_list = [np.cov(m_, aweights=aw) for m_ in np.reshape(m, (-1, n_var, n_obs))]
         ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
         xp_assert_close(res, xp.asarray(ref))
@@ -713,8 +713,8 @@ class TestCov:
         res = cov(
             xp.asarray(m),
             axis=-2,
-            frequency_weights=xp.asarray(fw),
-            weights=xp.asarray(aw),
+            fweights=xp.asarray(fw),
+            aweights=xp.asarray(aw),
         )
         xp_assert_close(res, xp.asarray(ref))
 

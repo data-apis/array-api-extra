@@ -286,8 +286,8 @@ def cov(
     /,
     *,
     correction: int | float = 1,
-    frequency_weights: Array | None = None,
-    weights: Array | None = None,
+    fweights: Array | None = None,
+    aweights: Array | None = None,
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
@@ -300,9 +300,11 @@ def cov(
     m = xp.astype(m, dtype)
 
     fw = None
-    if frequency_weights is not None:
-        fw = xp.astype(xp.asarray(frequency_weights), dtype)
-    aw = None if weights is None else xp.astype(xp.asarray(weights), dtype)
+    if fweights is not None:
+        fw = xp.astype(xp.asarray(fweights), dtype)
+    aw = None
+    if aweights is not None:
+        aw = xp.astype(xp.asarray(aweights), dtype)
     if fw is None and aw is None:
         w = None
     elif fw is None:

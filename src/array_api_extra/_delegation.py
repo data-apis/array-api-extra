@@ -87,8 +87,8 @@ def cov(
     *,
     axis: int = -1,
     correction: int | float = 1,
-    frequency_weights: Array | None = None,
-    weights: Array | None = None,
+    fweights: Array | None = None,
+    aweights: Array | None = None,
     xp: ModuleType | None = None,
 ) -> Array:
     """
@@ -126,12 +126,12 @@ def cov(
         ``correction`` in ``numpy.var``/``std`` and ``torch.cov``.
     fweights : array, optional
         1-D array of integer frequency weights: the number of times each
-        observation is repeated. Corresponds to ``fweights`` in
+        observation is repeated. Same as ``fweights`` in
         ``numpy.cov``/``torch.cov``.
     aweights : array, optional
         1-D array of observation-vector weights (analytic weights). Larger
-        values mark more important observations. Corresponds to
-        ``aweights`` in ``numpy.cov``/``torch.cov``.
+        values mark more important observations. Same as ``aweights`` in
+        ``numpy.cov``/``torch.cov``.
     xp : array_namespace, optional
         The standard-compatible namespace for `m`. Default: infer.
 
@@ -149,8 +149,8 @@ def cov(
         numpy.cov(m, rowvar=False)          -> cov(m, axis=-2)
         numpy.cov(m, bias=True)             -> cov(m, correction=0)
         numpy.cov(m, ddof=k)                -> cov(m, correction=k)
-        numpy.cov(m, fweights=f)            -> cov(m, frequency_weights=f)
-        numpy.cov(m, aweights=a)            -> cov(m, weights=a)
+        numpy.cov(m, fweights=f)            -> cov(m, fweights=f)
+        numpy.cov(m, aweights=a)            -> cov(m, aweights=a)
 
     Unlike ``numpy.cov``, a ``RuntimeWarning`` for non-positive effective
     degrees of freedom is only emitted on the unweighted path. The
@@ -226,12 +226,12 @@ def cov(
     # requires integer `correction`. For non-integer-valued `correction`,
     # fall through to the generic implementation.
     integer_correction = isinstance(correction, int) or correction.is_integer()
-    has_weights = frequency_weights is not None or weights is not None
+    has_weights = fweights is not None or aweights is not None
 
     if m.ndim <= 2 and integer_correction:
         if is_torch_namespace(xp):
-            fw = None if frequency_weights is None else xp.asarray(frequency_weights)
-            aw = None if weights is None else xp.asarray(weights)
+            fw = None if fweights is None else xp.asarray(fweights)
+            aw = None if aweights is None else xp.asarray(aweights)
             return xp.cov(m, correction=int(correction), fweights=fw, aweights=aw)
         # `dask.array.cov` forces `.compute()` whenever weights are given:
         # its internal `if fact <= 0` check on a lazy 0-D scalar triggers
@@ -246,15 +246,15 @@ def cov(
             return xp.cov(
                 m,
                 ddof=int(correction),
-                fweights=frequency_weights,
-                aweights=weights,
+                fweights=fweights,
+                aweights=aweights,
             )
 
     return _funcs.cov(
         m,
         correction=correction,
-        frequency_weights=frequency_weights,
-        weights=weights,
+        fweights=fweights,
+        aweights=aweights,
         xp=xp,
     )
 
