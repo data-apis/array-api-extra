@@ -353,7 +353,7 @@ def cov(
     m_cT = xp.matrix_transpose(m_c)
     if xp.isdtype(m_cT.dtype, "complex floating"):
         m_cT = xp.conj(m_cT)
-    c = (m_w @ m_cT) / fact
+    c = m_w @ m_cT / fact
     axes = tuple(axis for axis, length in enumerate(c.shape) if length == 1)
     return xp.squeeze(c, axis=axes)
 
