@@ -106,7 +106,7 @@ ruff = ">=0.15.9,<0.16"
 typos = ">=1.44.0,<2"
 actionlint = ">=1.7.12,<2"
 blacken-docs = ">=1.20.0,<2"
-pytest = ">=9.0.2,<10"
+pytest = ">=9.0.3,<10"
 validate-pyproject = ">=0.25,<0.26"
 pyrefly = ">=0.61.1,<0.62"
 zizmor = ">=1.24.1,<1.25"
@@ -133,7 +133,7 @@ numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with nump
 lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters" }
 
 [tool.pixi.feature.tests.dependencies]
-pytest = ">=9.0.2"
+pytest = ">=9.0.3"
 pytest-cov = ">=7.1.0"
 hypothesis = ">=6.151.9"
 array-api-strict = ">=2.5,<2.6"
@@ -162,7 +162,7 @@ sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
 dask-core = ">=2026.3.0" # No distributed, tornado, etc.
-pytest = ">=9.0.2"
+pytest = ">=9.0.3"
 typing-extensions = ">=4.15.0"
 numpy = ">=2.1.3"
 
