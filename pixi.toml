@@ -76,23 +76,23 @@ zizmor = ">=1.24.1,<1.25"
 # as they slow down mypy and are not portable across target OSs
 
 [feature.lint.tasks]
-lefthook = { cmd = "lefthook", description = "Run lefthook" }
-hooks = { cmd = "lefthook install", description = "Install pre-commit hooks" }
-pre-commit = { cmd = "lefthook run pre-commit", description = "Run pre-commit checks" }
-pylint = { cmd = "pylint array_api_extra", cwd = "src", description = "Lint with pylint" }
-mypy = { cmd = "mypy", description = "Type check with mypy" }
-pyrefly = { cmd = "pyrefly check", description = "Type check with pyrefly" }
-pyright = { cmd = "basedpyright", description = "Type check with basedpyright" }
-ruff-check = { cmd = "ruff check --fix", description = "Lint with ruff" }
-ruff-format = { cmd = "ruff format", description = "Format with ruff" }
-dprint = { cmd = "dprint fmt", description = "Format with dprint" }
-typos = { cmd = "typos --write-changes --force-exclude", description = "Fix typos" }
-actionlint = { cmd = "actionlint", description = "Lint actions with actionlint" }
-zizmor = { cmd = "zizmor .github -p", description = "GHA static analysis with zizmor" }
-blacken-docs = { cmd = "blacken-docs", description = "Format Python markdown blocks with Black" }
-validate-pyproject = { cmd = "validate-pyproject pyproject.toml", description = "Validate pyproject.toml" }
-numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with numpydoc" }
-lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters" }
+lefthook = { cmd = "lefthook", description = "Run lefthook", default-environment = "lint" }
+hooks = { cmd = "lefthook install", description = "Install pre-commit hooks", default-environment = "lint" }
+pre-commit = { cmd = "lefthook run pre-commit", description = "Run pre-commit checks", default-environment = "lint" }
+pylint = { cmd = "pylint array_api_extra", cwd = "src", description = "Lint with pylint", default-environment = "lint" }
+mypy = { cmd = "mypy", description = "Type check with mypy", default-environment = "lint" }
+pyrefly = { cmd = "pyrefly check", description = "Type check with pyrefly", default-environment = "lint" }
+pyright = { cmd = "basedpyright", description = "Type check with basedpyright", default-environment = "lint" }
+ruff-check = { cmd = "ruff check --fix", description = "Lint with ruff", default-environment = "lint" }
+ruff-format = { cmd = "ruff format", description = "Format with ruff", default-environment = "lint" }
+dprint = { cmd = "dprint fmt", description = "Format with dprint", default-environment = "lint" }
+typos = { cmd = "typos --write-changes --force-exclude", description = "Fix typos", default-environment = "lint" }
+actionlint = { cmd = "actionlint", description = "Lint actions with actionlint", default-environment = "lint" }
+zizmor = { cmd = "zizmor .github -p", description = "GHA static analysis with zizmor", default-environment = "lint" }
+blacken-docs = { cmd = "blacken-docs", description = "Format Python markdown blocks with Black", default-environment = "lint" }
+validate-pyproject = { cmd = "validate-pyproject pyproject.toml", description = "Validate pyproject.toml", default-environment = "lint" }
+numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with numpydoc", default-environment = "lint" }
+lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters", default-environment = "lint" }
 
 [feature.tests.dependencies]
 pytest = ">=9.0.3"
@@ -103,18 +103,18 @@ numpy = ">=1.22.0"
 scipy = ">=1.15.2,<2"
 
 [feature.tests.tasks]
-tests = { cmd = "pytest -v", description = "Run tests" }
-tests-cov = { cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20", description = "Run tests with coverage" }
+tests = { cmd = "pytest -v", description = "Run tests", default-environment = "tests" }
+tests-cov = { cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20", description = "Run tests with coverage", default-environment = "tests" }
 
-clean-vendor-compat = { cmd = "rm -rf vendor_tests/array_api_compat", description = "Delete the existing vendored version of array-api-compat" }
-clean-vendor-extra = { cmd = "rm -rf vendor_tests/array_api_extra", description = "Delete the existing vendored version of array-api-extra" }
-copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/", depends-on = ["clean-vendor-compat"], description = "Vendor a clean copy of array-api-compat" }
-copy-vendor-extra = { cmd = "cp -r src/array_api_extra vendor_tests/", depends-on = ["clean-vendor-extra"], description = "Vendor a clean copy of array-api-extra" }
-tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-compat", "copy-vendor-extra"], description = "Check that array-api-extra and array-api-compat can be vendored together" }
+clean-vendor-compat = { cmd = "rm -rf vendor_tests/array_api_compat", description = "Delete the existing vendored version of array-api-compat", default-environment = "tests" }
+clean-vendor-extra = { cmd = "rm -rf vendor_tests/array_api_extra", description = "Delete the existing vendored version of array-api-extra", default-environment = "tests" }
+copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/", depends-on = ["clean-vendor-compat"], description = "Vendor a clean copy of array-api-compat", default-environment = "tests" }
+copy-vendor-extra = { cmd = "cp -r src/array_api_extra vendor_tests/", depends-on = ["clean-vendor-extra"], description = "Vendor a clean copy of array-api-extra", default-environment = "tests" }
+tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-compat", "copy-vendor-extra"], description = "Check that array-api-extra and array-api-compat can be vendored together", default-environment = "tests" }
 
 tests-ci = { depends-on = ["tests-cov", "tests-vendor"], description = "Run tests with coverage and vendor tests" }
-coverage = { cmd = "coverage html", depends-on = ["tests-cov"], description = "Generate test coverage html report" }
-open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"], description = "Open test coverage report" }
+coverage = { cmd = "coverage html", depends-on = ["tests-cov"], description = "Generate test coverage html report", default-environment = "tests" }
+open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"], description = "Open test coverage report", default-environment = "tests" }
 
 [feature.docs.dependencies]
 sphinx = ">=7.4.7"
@@ -129,14 +129,14 @@ typing-extensions = ">=4.15.0"
 numpy = ">=2.1.3"
 
 [feature.docs.tasks]
-docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs", description = "Build docs" }
-open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs" }
+docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs", description = "Build docs", default-environment = "docs" }
+open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs", default-environment = "docs" }
 
 [feature.dev.dependencies]
 ipython = ">=7.33.0"
 
 [feature.dev.tasks]
-ipython = { cmd = "ipython", description = "Launch ipython" }
+ipython = { cmd = "ipython", description = "Launch ipython", default-environment = "dev" }
 
 [feature.py311.dependencies]
 python = "~=3.11.0"
