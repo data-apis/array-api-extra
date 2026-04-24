@@ -837,6 +837,15 @@ class TestDiagIndices:
         with pytest.raises(ValueError, match="`ndim` must be >= 1"):
             _ = diag_indices(3, ndim=0, xp=xp)
 
+    def test_device(self, xp: ModuleType, device: Device):
+        default_device = get_device(xp.empty(0))
+        rows, cols = diag_indices(3, device=None, xp=xp)
+        assert get_device(rows) == default_device
+        assert get_device(cols) == default_device
+        rows, cols = diag_indices(3, device=device, xp=xp)
+        assert get_device(rows) == device
+        assert get_device(cols) == device
+
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange/nonzero", strict=False)
 @pytest.mark.xfail_xp_backend(
@@ -910,6 +919,21 @@ class TestTriIndices:
             _ = xpx_fn(-1, xp=xp)
         with pytest.raises(ValueError, match="`m` must be non-negative"):
             _ = xpx_fn(3, m=-1, xp=xp)
+
+    def test_device(
+        self,
+        xp: ModuleType,
+        device: Device,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],  # noqa: ARG002  # pytest param
+    ):
+        default_device = get_device(xp.empty(0))
+        rows, cols = xpx_fn(4, device=None, xp=xp)
+        assert get_device(rows) == default_device
+        assert get_device(cols) == default_device
+        rows, cols = xpx_fn(4, device=device, xp=xp)
+        assert get_device(rows) == device
+        assert get_device(cols) == device
 
 
 class TestExpandDims:

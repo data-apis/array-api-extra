@@ -350,20 +350,26 @@ def create_diagonal(
 
 
 def diag_indices(
-    n: int, /, *, ndim: int = 2, xp: ModuleType
+    n: int, /, *, ndim: int = 2, device: Device | None = None, xp: ModuleType
 ) -> tuple[Array, ...]:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
-    idx = xp.arange(n)
+    idx = xp.arange(n, device=device)
     return (idx,) * ndim
 
 
 def _tri_indices(
-    n: int, *, offset: int, m: int | None, upper: bool, xp: ModuleType
+    n: int,
+    *,
+    offset: int,
+    m: int | None,
+    upper: bool,
+    device: Device | None,
+    xp: ModuleType,
 ) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
     """Shared implementation for `tril_indices` and `triu_indices`."""
     cols = n if m is None else m
-    rows = xp.arange(n)[:, None]
-    cols_a = xp.arange(cols)[None, :]
+    rows = xp.arange(n, device=device)[:, None]
+    cols_a = xp.arange(cols, device=device)[None, :]
     delta = cols_a - rows
     mask = delta >= offset if upper else delta <= offset
     r, c = xp.nonzero(mask)
@@ -371,17 +377,29 @@ def _tri_indices(
 
 
 def tril_indices(
-    n: int, /, *, offset: int = 0, m: int | None = None, xp: ModuleType
+    n: int,
+    /,
+    *,
+    offset: int = 0,
+    m: int | None = None,
+    device: Device | None = None,
+    xp: ModuleType,
 ) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
-    return _tri_indices(n, offset=offset, m=m, upper=False, xp=xp)
+    return _tri_indices(n, offset=offset, m=m, upper=False, device=device, xp=xp)
 
 
 def triu_indices(
-    n: int, /, *, offset: int = 0, m: int | None = None, xp: ModuleType
+    n: int,
+    /,
+    *,
+    offset: int = 0,
+    m: int | None = None,
+    device: Device | None = None,
+    xp: ModuleType,
 ) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
-    return _tri_indices(n, offset=offset, m=m, upper=True, xp=xp)
+    return _tri_indices(n, offset=offset, m=m, upper=True, device=device, xp=xp)
 
 
 def default_dtype(

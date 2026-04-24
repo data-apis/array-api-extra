@@ -16,7 +16,7 @@ from ._lib._utils._compat import (
 )
 from ._lib._utils._compat import device as get_device
 from ._lib._utils._helpers import asarrays, eager_shape
-from ._lib._utils._typing import Array, DType
+from ._lib._utils._typing import Array, Device, DType
 
 __all__ = [
     "atleast_nd",
@@ -241,7 +241,9 @@ def create_diagonal(
     return _funcs.create_diagonal(x, offset=offset, xp=xp)
 
 
-def diag_indices(n: int, /, *, ndim: int = 2, xp: ModuleType) -> tuple[Array, ...]:
+def diag_indices(
+    n: int, /, *, ndim: int = 2, device: Device | None = None, xp: ModuleType
+) -> tuple[Array, ...]:
     """
     Return the indices to access the main diagonal of an array.
 
@@ -254,6 +256,8 @@ def diag_indices(n: int, /, *, ndim: int = 2, xp: ModuleType) -> tuple[Array, ..
         that the returned indices index into.
     ndim : int, optional
         The number of dimensions. Default: ``2``.
+    device : Device, optional
+        The device on which to place the returned arrays. Default: current device.
     xp : array_namespace
         The standard-compatible namespace to create the indices in.
 
@@ -279,9 +283,11 @@ def diag_indices(n: int, /, *, ndim: int = 2, xp: ModuleType) -> tuple[Array, ..
     if ndim < 1:
         msg = f"`ndim` must be >= 1, got {ndim}"
         raise ValueError(msg)
-    if is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp):
+    if device is None and (
+        is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp)
+    ):
         return xp.diag_indices(n, ndim=ndim)
-    return _funcs.diag_indices(n, ndim=ndim, xp=xp)
+    return _funcs.diag_indices(n, ndim=ndim, device=device, xp=xp)
 
 
 def expand_dims(
@@ -1199,7 +1205,13 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
 
 
 def tril_indices(
-    n: int, /, *, offset: int = 0, m: int | None = None, xp: ModuleType
+    n: int,
+    /,
+    *,
+    offset: int = 0,
+    m: int | None = None,
+    device: Device | None = None,
+    xp: ModuleType,
 ) -> tuple[Array, Array]:
     """
     Return the indices of the lower triangle of an ``(n, m)`` array.
@@ -1216,6 +1228,8 @@ def tril_indices(
         to ``k`` in ``numpy.tril_indices``.
     m : int, optional
         The column dimension. If ``None`` (default), assumed equal to `n`.
+    device : Device, optional
+        The device on which to place the returned arrays. Default: current device.
     xp : array_namespace
         The standard-compatible namespace to create the indices in.
 
@@ -1224,6 +1238,11 @@ def tril_indices(
     tuple of array
         Row and column indices ``(rows, cols)`` of the lower triangle of
         the ``(n, m)`` matrix, shifted by `offset`.
+
+    Notes
+    -----
+    The generic fallback uses ``xp.nonzero``, so namespaces without
+    ``nonzero`` are not supported on that path.
 
     Examples
     --------
@@ -1241,7 +1260,7 @@ def tril_indices(
     if m is not None and m < 0:
         msg = f"`m` must be non-negative, got {m}"
         raise ValueError(msg)
-    if (
+    if device is None and (
         is_numpy_namespace(xp)
         or is_cupy_namespace(xp)
         or is_jax_namespace(xp)
@@ -1252,13 +1271,19 @@ def tril_indices(
         # `torch.tril_indices` returns a 2xN tensor, not a tuple, and
         # takes (row, col) rather than (n, *, m=None).
         cols = n if m is None else m
-        idx = xp.tril_indices(n, cols, offset=offset)
+        idx = xp.tril_indices(n, cols, offset=offset, device=device)
         return (idx[0], idx[1])
-    return _funcs.tril_indices(n, offset=offset, m=m, xp=xp)
+    return _funcs.tril_indices(n, offset=offset, m=m, device=device, xp=xp)
 
 
 def triu_indices(
-    n: int, /, *, offset: int = 0, m: int | None = None, xp: ModuleType
+    n: int,
+    /,
+    *,
+    offset: int = 0,
+    m: int | None = None,
+    device: Device | None = None,
+    xp: ModuleType,
 ) -> tuple[Array, Array]:
     """
     Return the indices of the upper triangle of an ``(n, m)`` array.
@@ -1275,6 +1300,8 @@ def triu_indices(
         to ``k`` in ``numpy.triu_indices``.
     m : int, optional
         The column dimension. If ``None`` (default), assumed equal to `n`.
+    device : Device, optional
+        The device on which to place the returned arrays. Default: current device.
     xp : array_namespace
         The standard-compatible namespace to create the indices in.
 
@@ -1283,6 +1310,11 @@ def triu_indices(
     tuple of array
         Row and column indices ``(rows, cols)`` of the upper triangle of
         the ``(n, m)`` matrix, shifted by `offset`.
+
+    Notes
+    -----
+    The generic fallback uses ``xp.nonzero``, so namespaces without
+    ``nonzero`` are not supported on that path.
 
     Examples
     --------
@@ -1300,7 +1332,7 @@ def triu_indices(
     if m is not None and m < 0:
         msg = f"`m` must be non-negative, got {m}"
         raise ValueError(msg)
-    if (
+    if device is None and (
         is_numpy_namespace(xp)
         or is_cupy_namespace(xp)
         or is_jax_namespace(xp)
@@ -1309,6 +1341,6 @@ def triu_indices(
         return xp.triu_indices(n, k=offset, m=m)
     if is_torch_namespace(xp):
         cols = n if m is None else m
-        idx = xp.triu_indices(n, cols, offset=offset)
+        idx = xp.triu_indices(n, cols, offset=offset, device=device)
         return (idx[0], idx[1])
-    return _funcs.triu_indices(n, offset=offset, m=m, xp=xp)
+    return _funcs.triu_indices(n, offset=offset, m=m, device=device, xp=xp)
