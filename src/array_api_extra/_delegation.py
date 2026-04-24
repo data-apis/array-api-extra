@@ -124,6 +124,13 @@ def cov(
         ``bias=False``). Set to ``0`` for the biased estimate (``N``
         normalization). Corresponds to ``ddof`` in ``numpy.cov`` and to
         ``correction`` in ``numpy.var``/``std`` and ``torch.cov``.
+        Non-integer values are allowed for advanced use cases: the
+        unbiased correction for weighted observations depends on the
+        sum and dispersion of the weights and is generally not an
+        integer, and autocorrelated data may also require a fractional
+        correction. Non-integer ``correction`` routes through the
+        generic implementation because ``numpy.cov``'s ``ddof`` and
+        ``torch.cov``'s ``correction`` both require integers.
     fweights : array, optional
         1-D array of integer frequency weights: the number of times each
         observation is repeated. Same as ``fweights`` in
