@@ -723,6 +723,23 @@ class TestCov:
         with pytest.raises(IndexError):
             _ = cov(m, axis=5)
 
+    def test_weights_wrong_ndim(self, xp: ModuleType):
+        m = xp.asarray([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        w2d = xp.asarray([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0]])
+        # Non-integer correction forces the generic path where the
+        # validation lives; native backends raise for the same reason.
+        with pytest.raises((ValueError, TypeError)):
+            _ = cov(m, correction=0.5, fweights=w2d)
+        with pytest.raises((ValueError, TypeError)):
+            _ = cov(m, correction=0.5, aweights=w2d)
+
+    def test_weights_wrong_length(self, xp: ModuleType):
+        m = xp.asarray([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        w_bad = xp.asarray([1.0, 1.0])  # expected length 3
+        with pytest.raises((ValueError, RuntimeError)):
+            _ = cov(m, correction=0.5, fweights=w_bad)
+        with pytest.raises((ValueError, RuntimeError)):
+            _ = cov(m, correction=0.5, aweights=w_bad)
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
