@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 from types import ModuleType
-from typing import Literal
+from typing import Literal, cast
 
 from ._lib import _funcs
 from ._lib._utils._compat import (
@@ -20,6 +20,7 @@ from ._lib._utils._typing import Array, DType
 
 __all__ = [
     "atleast_nd",
+    "broadcast_shapes",
     "cov",
     "create_diagonal",
     "expand_dims",
@@ -79,6 +80,67 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array
         return getattr(xp, f"atleast_{ndim}d")(x)
 
     return _funcs.atleast_nd(x, ndim=ndim, xp=xp)
+
+
+def broadcast_shapes(
+    *shapes: tuple[float | None, ...], xp: ModuleType | None = None
+) -> tuple[int | None, ...]:
+    """
+    Compute the shape of the broadcasted arrays.
+
+    Duplicates :func:`numpy.broadcast_shapes`, with additional support for
+    None and NaN sizes.
+
+    This is equivalent to ``xp.broadcast_arrays(arr1, arr2, ...)[0].shape``
+    without needing to worry about the backend potentially deep copying
+    the arrays.
+
+    Parameters
+    ----------
+    *shapes : tuple[int | None, ...]
+        Shapes of the arrays to broadcast.
+    xp : array_namespace, optional
+        The standard-compatible namespace to use for native delegation.
+        Default: use the array-agnostic implementation.
+
+    Returns
+    -------
+    tuple[int | None, ...]
+        The shape of the broadcasted arrays.
+
+    See Also
+    --------
+    numpy.broadcast_shapes : Equivalent NumPy function.
+    array_api.broadcast_arrays : Function to broadcast actual arrays.
+
+    Notes
+    -----
+    This function accepts the Array API's ``None`` for unknown sizes,
+    as well as Dask's non-standard ``math.nan``.
+    Regardless of input, the output always contains ``None`` for unknown sizes.
+
+    Examples
+    --------
+    >>> import array_api_extra as xpx
+    >>> xpx.broadcast_shapes((2, 3), (2, 1))
+    (2, 3)
+    >>> xpx.broadcast_shapes((4, 2, 3), (2, 1), (1, 3))
+    (4, 2, 3)
+    """
+    if (
+        xp is not None
+        and all(isinstance(size, int) for shape in shapes for size in shape)
+        and (
+            is_numpy_namespace(xp)
+            or is_cupy_namespace(xp)
+            or is_jax_namespace(xp)
+            or is_torch_namespace(xp)
+        )
+    ):
+        int_shapes = cast(tuple[tuple[int, ...], ...], shapes)
+        return cast(tuple[int | None, ...], xp.broadcast_shapes(*int_shapes))
+
+    return _funcs.broadcast_shapes(*shapes)
 
 
 def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:

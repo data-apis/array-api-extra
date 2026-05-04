@@ -220,46 +220,10 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
 
 # `float` in signature to accept `math.nan` for Dask.
 # `int`s are still accepted as `float` is a superclass of `int` in typing
-def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...]:
-    """
-    Compute the shape of the broadcasted arrays.
-
-    Duplicates :func:`numpy.broadcast_shapes`, with additional support for
-    None and NaN sizes.
-
-    This is equivalent to ``xp.broadcast_arrays(arr1, arr2, ...)[0].shape``
-    without needing to worry about the backend potentially deep copying
-    the arrays.
-
-    Parameters
-    ----------
-    *shapes : tuple[int | None, ...]
-        Shapes of the arrays to broadcast.
-
-    Returns
-    -------
-    tuple[int | None, ...]
-        The shape of the broadcasted arrays.
-
-    See Also
-    --------
-    numpy.broadcast_shapes : Equivalent NumPy function.
-    array_api.broadcast_arrays : Function to broadcast actual arrays.
-
-    Notes
-    -----
-    This function accepts the Array API's ``None`` for unknown sizes,
-    as well as Dask's non-standard ``math.nan``.
-    Regardless of input, the output always contains ``None`` for unknown sizes.
-
-    Examples
-    --------
-    >>> import array_api_extra as xpx
-    >>> xpx.broadcast_shapes((2, 3), (2, 1))
-    (2, 3)
-    >>> xpx.broadcast_shapes((4, 2, 3), (2, 1), (1, 3))
-    (4, 2, 3)
-    """
+def broadcast_shapes(  # numpydoc ignore=PR01,RT01
+    *shapes: tuple[float | None, ...],
+) -> tuple[int | None, ...]:
+    """See docstring in array_api_extra._delegation."""
     if not shapes:
         return ()  # Match NumPy output
 

@@ -489,6 +489,41 @@ class TestAtLeastND:
 
 
 class TestBroadcastShapes:
+    def test_delegates_known_integer_shapes(self, monkeypatch: pytest.MonkeyPatch):
+        calls = []
+
+        def mock_broadcast_shapes(*shapes: tuple[int, ...]) -> tuple[int, ...]:
+            calls.append(shapes)
+            return (99,)
+
+        monkeypatch.setattr(np, "broadcast_shapes", mock_broadcast_shapes)
+
+        assert broadcast_shapes((2,), (1,), xp=np) == (99,)
+        assert calls == [((2,), (1,))]
+
+    def test_fallback_for_unknown_sizes(self, monkeypatch: pytest.MonkeyPatch):
+        def mock_broadcast_shapes(*_shapes: tuple[int, ...]) -> tuple[int, ...]:
+            msg = "Native delegation should not handle unknown sizes"
+            raise AssertionError(msg)
+
+        monkeypatch.setattr(np, "broadcast_shapes", mock_broadcast_shapes)
+
+        assert broadcast_shapes((None,), (1,), xp=np) == (None,)
+        assert broadcast_shapes((math.nan,), (1,), xp=np) == (None,)
+
+    def test_fallback_without_xp(self, monkeypatch: pytest.MonkeyPatch):
+        def mock_broadcast_shapes(*_shapes: tuple[int, ...]) -> tuple[int, ...]:
+            msg = "Native delegation should not be used without xp"
+            raise AssertionError(msg)
+
+        monkeypatch.setattr(np, "broadcast_shapes", mock_broadcast_shapes)
+
+        assert broadcast_shapes((2,), (1,)) == (2,)
+
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
+    def test_xp(self, xp: ModuleType):
+        assert broadcast_shapes((2, 3), (2, 1), xp=xp) == (2, 3)
+
     @pytest.mark.parametrize(
         "args",
         [
