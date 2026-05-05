@@ -812,7 +812,7 @@ class TestDefaultDType:
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
 class TestDiagIndices:
     def test_basic(self, xp: ModuleType):
-        rows, cols = diag_indices(5, xp=xp)
+        rows, cols = diag_indices(5)
         ref_rows, ref_cols = np.diag_indices(5)
         xp_assert_equal(rows, xp.asarray(ref_rows))
         xp_assert_equal(cols, xp.asarray(ref_cols))
@@ -865,7 +865,7 @@ class TestTriIndices:
         xpx_fn: Callable[..., tuple[Array, Array]],
         np_fn: Callable[..., tuple[Array, Array]],
     ):
-        rows, cols = xpx_fn(4, xp=xp)
+        rows, cols = xpx_fn(4)
         ref_rows, ref_cols = np_fn(4)
         xp_assert_equal(rows, xp.asarray(ref_rows))
         xp_assert_equal(cols, xp.asarray(ref_cols))

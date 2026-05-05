@@ -264,7 +264,7 @@ def diag_indices(
     Returns
     -------
     tuple of array
-        ``ndim`` 1-D integer arrays of length ``n`` that together index
+        1-D integer arrays of length ``n`` that together index
         the main diagonal of an array of shape ``(n,) * ndim``.
 
     Examples
