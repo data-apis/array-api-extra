@@ -55,7 +55,7 @@ array-api-extra.path = "."
 [feature.lint.dependencies]
 typing-extensions = ">=4.15.0"
 pylint = ">=4.0.5"
-mypy = ">=1.20.1"
+mypy = ">=1.20.2"
 basedpyright = ">=1.39.3"
 numpydoc = ">=1.10.0,<2"
 # import dependencies for mypy:
