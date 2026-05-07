@@ -818,3 +818,36 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     b = xp.reshape(b, (-1,))
     # XXX: `sparse` returns NumPy arrays from `unique_values`
     return xp.asarray(xp.unique_values(xp.concat([a, b])))
+
+
+def angle(z: Array, deg: bool = False, /, *, xp: ModuleType | None = None) -> Array:
+    """
+    Return the angle of the complex argument.
+
+    Parameters
+    ----------
+    z : Array
+        Input array.
+    deg : bool, optional
+        Return angle in degrees if True, radians if False (default).
+    xp : array_namespace, optional
+        The standard-compatible namespace for `z`. Default: infer.
+
+    Returns
+    -------
+    angle : ndarray or scalar
+        The counterclockwise angle from the positive real axis on the complex
+        plane in the range ``(-pi, pi]``, with dtype as float64.
+    """
+    if xp is None:
+        xp = array_namespace(z)
+    if xp.isdtype(z.dtype, "complex floating"):
+        zimage = xp.imag(z)
+        zreal = xp.real(z)
+    else:
+        zimage = xp.zeros_like(z, dtype=xp.float64)
+        zreal = xp.astype(z, xp.float64)
+    a = xp.atan2(zimage, zreal)
+    if deg:
+        a = a * 180 / xp.pi
+    return a

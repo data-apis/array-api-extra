@@ -33,6 +33,7 @@ from array_api_extra import (
     setdiff1d,
     sinc,
     union1d,
+    angle,
 )
 from array_api_extra import (
     searchsorted as xpx_searchsorted,
@@ -1881,3 +1882,27 @@ class TestUnion1d:
         a = xp.asarray([-1, 1, 0], device=device)
         b = xp.asarray([2, -2, 0], device=device)
         assert get_device(union1d(a, b)) == device
+
+class TestAngle:
+    def test_simple(self, xp: ModuleType):
+        a = xp.asarray([1, 0])
+        expected = xp.asarray([0., 0.])
+        res = angle(a)
+        xp_assert_equal(res, expected)
+
+    def test_complex(self, xp: ModuleType):
+        a = xp.asarray([1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j])
+        expected = xp.asarray([np.pi / 4, -np.pi / 4, 3 * np.pi / 4, -3 * np.pi / 4])
+        res = angle(a)
+        xp_assert_equal(res, expected)
+
+    def test_2d(self, xp: ModuleType):
+        a = xp.asarray([[1 + 1j, 1 - 1j], [-1 + 1j, -1 - 1j]])
+        expected = xp.asarray([[np.pi / 4, -np.pi / 4], [3 * np.pi / 4, -3 * np.pi / 4]])
+        res = angle(a)
+        xp_assert_equal(res, expected)
+
+    @pytest.mark.skip_xp_backend(Backend.TORCH, reason="materialize 'meta' device")
+    def test_device(self, xp: ModuleType, device: Device):
+        a = xp.asarray([1 + 1j], device=device)
+        assert get_device(angle(a)) == device

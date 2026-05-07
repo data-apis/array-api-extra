@@ -24,6 +24,7 @@ from ._lib._funcs import (
     default_dtype,
     kron,
     nunique,
+    angle,
 )
 from ._lib._lazy import lazy_apply
 
@@ -54,4 +55,5 @@ __all__ = [
     "setdiff1d",
     "sinc",
     "union1d",
+    "angle",
 ]
