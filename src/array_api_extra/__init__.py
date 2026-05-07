@@ -19,12 +19,12 @@ from ._delegation import (
 )
 from ._lib._at import at
 from ._lib._funcs import (
+    angle,
     apply_where,
     broadcast_shapes,
     default_dtype,
     kron,
     nunique,
-    angle,
 )
 from ._lib._lazy import lazy_apply
 
@@ -33,6 +33,7 @@ __version__ = "0.10.2.dev0"
 # pylint: disable=duplicate-code
 __all__ = [
     "__version__",
+    "angle",
     "apply_where",
     "argpartition",
     "at",
@@ -55,5 +56,4 @@ __all__ = [
     "setdiff1d",
     "sinc",
     "union1d",
-    "angle",
 ]

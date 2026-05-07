@@ -835,7 +835,7 @@ def angle(z: Array, deg: bool = False, /, *, xp: ModuleType | None = None) -> Ar
 
     Returns
     -------
-    angle : ndarray or scalar
+    ndarray or scalar
         The counterclockwise angle from the positive real axis on the complex
         plane in the range ``(-pi, pi]``, with dtype as float64.
     """

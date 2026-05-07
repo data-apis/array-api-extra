@@ -13,6 +13,7 @@ from hypothesis import strategies as st
 from typing_extensions import override
 
 from array_api_extra import (
+    angle,
     apply_where,
     argpartition,
     at,
@@ -33,7 +34,6 @@ from array_api_extra import (
     setdiff1d,
     sinc,
     union1d,
-    angle,
 )
 from array_api_extra import (
     searchsorted as xpx_searchsorted,
@@ -1883,10 +1883,11 @@ class TestUnion1d:
         b = xp.asarray([2, -2, 0], device=device)
         assert get_device(union1d(a, b)) == device
 
+
 class TestAngle:
     def test_simple(self, xp: ModuleType):
         a = xp.asarray([1, 0])
-        expected = xp.asarray([0., 0.])
+        expected = xp.asarray([0.0, 0.0], dtype=xp.float64)
         res = angle(a)
         xp_assert_equal(res, expected)
 
@@ -1898,7 +1899,9 @@ class TestAngle:
 
     def test_2d(self, xp: ModuleType):
         a = xp.asarray([[1 + 1j, 1 - 1j], [-1 + 1j, -1 - 1j]])
-        expected = xp.asarray([[np.pi / 4, -np.pi / 4], [3 * np.pi / 4, -3 * np.pi / 4]])
+        expected = xp.asarray(
+            [[np.pi / 4, -np.pi / 4], [3 * np.pi / 4, -3 * np.pi / 4]]
+        )
         res = angle(a)
         xp_assert_equal(res, expected)
 
