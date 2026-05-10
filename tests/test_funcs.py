@@ -608,6 +608,139 @@ class TestCov:
         ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
         xp_assert_close(res, xp.asarray(ref))
 
+    @pytest.mark.parametrize("bias", [True, False, 0, 1])
+    def test_bias(self, xp: ModuleType, bias: bool):
+        # `bias` maps to `correction`: bias=True -> correction=0, bias=False -> 1.
+        x = np.array([-2.1, -1, 4.3])
+        y = np.array([3, 1.1, 0.12])
+        X = np.stack((x, y), axis=0)
+        ref = np.cov(X, bias=bias)
+        xp_assert_close(
+            cov(xp.asarray(X, dtype=xp.float64), correction=0 if bias else 1),
+            xp.asarray(ref, dtype=xp.float64),
+            rtol=1e-6,
+        )
+
+    @pytest.mark.parametrize("bias", [True, False, 0, 1])
+    def test_bias_batch(self, xp: ModuleType, bias: bool):
+        rng = np.random.default_rng(8847643423)
+        batch_shape = (3, 4)
+        n_var, n_obs = 3, 20
+        m = rng.random((*batch_shape, n_var, n_obs))
+        res = cov(xp.asarray(m), correction=0 if bias else 1)
+        ref_list = [np.cov(m_, bias=bias) for m_ in np.reshape(m, (-1, n_var, n_obs))]
+        ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
+        xp_assert_close(res, xp.asarray(ref))
+
+    def test_correction(self, xp: ModuleType):
+        rng = np.random.default_rng(20260417)
+        m = rng.random((3, 20))
+        for correction in (0, 1, 2):
+            ref = np.cov(m, ddof=correction)
+            res = cov(xp.asarray(m), correction=correction)
+            xp_assert_close(res, xp.asarray(ref))
+
+    def test_correction_float(self, xp: ModuleType):
+        # Float correction: reference computed by hand (numpy.cov rejects
+        # non-integer ddof; our generic path supports it).
+        rng = np.random.default_rng(20260417)
+        m = rng.random((3, 20))
+        n = m.shape[-1]
+        centered = m - m.mean(axis=-1, keepdims=True)
+        ref = centered @ centered.T / (n - 1.5)
+        res = cov(xp.asarray(m), correction=1.5)
+        xp_assert_close(res, xp.asarray(ref))
+
+    def test_axis(self, xp: ModuleType):
+        rng = np.random.default_rng(20260417)
+        m = rng.random((20, 3))  # observations on axis 0
+        ref = np.cov(m, rowvar=False)
+        res = cov(xp.asarray(m), axis=0)
+        xp_assert_close(res, xp.asarray(ref))
+        res_neg = cov(xp.asarray(m), axis=-2)
+        xp_assert_close(res_neg, xp.asarray(ref))
+
+    def test_frequency_weights(self, xp: ModuleType):
+        rng = np.random.default_rng(20260417)
+        m = rng.random((3, 10))
+        fw = np.asarray([1, 2, 1, 3, 1, 2, 1, 1, 2, 1], dtype=np.int64)
+        ref = np.cov(m, fweights=fw)
+        res = cov(xp.asarray(m), fweights=xp.asarray(fw))
+        xp_assert_close(res, xp.asarray(ref))
+
+    def test_weights(self, xp: ModuleType):
+        rng = np.random.default_rng(20260417)
+        m = rng.random((3, 10))
+        aw = rng.random(10)
+        ref = np.cov(m, aweights=aw)
+        res = cov(xp.asarray(m), aweights=xp.asarray(aw))
+        xp_assert_close(res, xp.asarray(ref))
+
+    def test_both_weights(self, xp: ModuleType):
+        rng = np.random.default_rng(20260417)
+        m = rng.random((3, 10))
+        fw = np.asarray([1, 2, 1, 3, 1, 2, 1, 1, 2, 1], dtype=np.int64)
+        aw = rng.random(10)
+        for correction in (0, 1, 2):
+            ref = np.cov(m, ddof=correction, fweights=fw, aweights=aw)
+            res = cov(
+                xp.asarray(m),
+                correction=correction,
+                fweights=xp.asarray(fw),
+                aweights=xp.asarray(aw),
+            )
+            xp_assert_close(res, xp.asarray(ref))
+
+    def test_batch_with_weights(self, xp: ModuleType):
+        rng = np.random.default_rng(20260417)
+        batch_shape = (2, 3)
+        n_var, n_obs = 3, 15
+        m = rng.random((*batch_shape, n_var, n_obs))
+        aw = rng.random(n_obs)
+        res = cov(xp.asarray(m), aweights=xp.asarray(aw))
+        ref_list = [np.cov(m_, aweights=aw) for m_ in np.reshape(m, (-1, n_var, n_obs))]
+        ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
+        xp_assert_close(res, xp.asarray(ref))
+
+    def test_axis_with_weights(self, xp: ModuleType):
+        # axis=-2 (observations on first of 2D) combined with weights:
+        # verifies that moveaxis and weight alignment cooperate.
+        rng = np.random.default_rng(20260417)
+        m = rng.random((15, 3))  # observations on axis 0
+        aw = rng.random(15)
+        fw = np.asarray([1, 2, 1, 3, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1], dtype=np.int64)
+        ref = np.cov(m, rowvar=False, fweights=fw, aweights=aw)
+        res = cov(
+            xp.asarray(m),
+            axis=-2,
+            fweights=xp.asarray(fw),
+            aweights=xp.asarray(aw),
+        )
+        xp_assert_close(res, xp.asarray(ref))
+
+    def test_axis_out_of_bounds(self, xp: ModuleType):
+        m = xp.asarray([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        with pytest.raises(IndexError):
+            _ = cov(m, axis=5)
+
+    def test_weights_wrong_ndim(self, xp: ModuleType):
+        m = xp.asarray([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        w2d = xp.asarray([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0]])
+        # Non-integer correction forces the generic path where the
+        # validation lives; native backends raise for the same reason.
+        with pytest.raises((ValueError, TypeError)):
+            _ = cov(m, correction=0.5, fweights=w2d)
+        with pytest.raises((ValueError, TypeError)):
+            _ = cov(m, correction=0.5, aweights=w2d)
+
+    def test_weights_wrong_length(self, xp: ModuleType):
+        m = xp.asarray([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        w_bad = xp.asarray([1.0, 1.0])  # expected length 3
+        with pytest.raises((ValueError, RuntimeError)):
+            _ = cov(m, correction=0.5, fweights=w_bad)
+        with pytest.raises((ValueError, RuntimeError)):
+            _ = cov(m, correction=0.5, aweights=w_bad)
+
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
 class TestOneHot:

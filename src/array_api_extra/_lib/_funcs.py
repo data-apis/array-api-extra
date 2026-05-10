@@ -281,9 +281,17 @@ def broadcast_shapes(*shapes: tuple[float | None, ...]) -> tuple[int | None, ...
     return tuple(out)
 
 
-def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
+def cov(
+    m: Array,
+    /,
+    *,
+    correction: int | float = 1,
+    fweights: Array | None = None,
+    aweights: Array | None = None,
+    xp: ModuleType,
+) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
-    m = xp.asarray(m, copy=True)
+    m = xp.asarray(m)
     dtype = (
         xp.float64 if xp.isdtype(m.dtype, "integral") else xp.result_type(m, xp.float64)
     )
@@ -291,21 +299,61 @@ def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
     m = atleast_nd(m, ndim=2, xp=xp)
     m = xp.astype(m, dtype)
 
-    avg = xp.mean(m, axis=-1, keepdims=True)
+    # Validate weight shapes (eager metadata, lazy-safe). Native backends
+    # validate themselves; this covers the generic path (array-api-strict,
+    # sparse, and the dask+weights fallback where the native check is
+    # bypassed to preserve laziness).
+    n_obs = m.shape[-1]
+    for name, w_in in (("fweights", fweights), ("aweights", aweights)):
+        if w_in is None:
+            continue
+        if w_in.ndim != 1:
+            msg = f"`{name}` must be 1-D, got ndim={w_in.ndim}"
+            raise ValueError(msg)
+        if w_in.shape[0] != n_obs:
+            msg = (
+                f"`{name}` has length {w_in.shape[0]} but `m` has {n_obs} observations"
+            )
+            raise ValueError(msg)
+
+    fw = None
+    if fweights is not None:
+        fw = xp.astype(xp.asarray(fweights), dtype)
+    aw = None
+    if aweights is not None:
+        aw = xp.astype(xp.asarray(aweights), dtype)
+    if fw is None and aw is None:
+        w = None
+    elif fw is None:
+        w = aw
+    elif aw is None:
+        w = fw
+    else:
+        w = fw * aw
 
     m_shape = eager_shape(m)
-    fact = m_shape[-1] - 1
+    if w is None:
+        avg = xp.mean(m, axis=-1, keepdims=True)
+        fact = m_shape[-1] - correction
+        if fact <= 0:
+            warnings.warn(
+                "Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2
+            )
+            fact = 0
+    else:
+        v1 = xp.sum(w, axis=-1)
+        avg = xp.sum(m * w, axis=-1, keepdims=True) / v1
+        if aw is None:
+            fact = v1 - correction
+        else:
+            fact = v1 - correction * xp.sum(w * aw, axis=-1) / v1
 
-    if fact <= 0:
-        warnings.warn("Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2)
-        fact = 0
-
-    m -= avg
-    m_transpose = xp.matrix_transpose(m)
-    if xp.isdtype(m_transpose.dtype, "complex floating"):
-        m_transpose = xp.conj(m_transpose)
-    c = xp.matmul(m, m_transpose)
-    c /= fact
+    m_c = m - avg
+    m_w = m_c if w is None else m_c * w
+    m_cT = xp.matrix_transpose(m_c)
+    if xp.isdtype(m_cT.dtype, "complex floating"):
+        m_cT = xp.conj(m_cT)
+    c = m_w @ m_cT / fact
     axes = tuple(axis for axis, length in enumerate(c.shape) if length == 1)
     return xp.squeeze(c, axis=axes)
 
