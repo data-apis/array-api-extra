@@ -219,7 +219,14 @@ def xp_assert_less(
     xp_assert_close : Similar function for inexact equality checks.
     numpy.testing.assert_array_equal : Similar function for NumPy arrays.
     """
-    xp = _check_ns_shape_dtype(x, y, check_namespace, check_dtype, check_shape, check_scalar)
+    xp = _check_ns_shape_dtype(
+        x,
+        y,
+        check_namespace,
+        check_dtype,
+        check_shape,
+        check_scalar,
+    )
     if not _is_materializable(x):
         return
     x_np = as_numpy_array(x, xp=xp)
