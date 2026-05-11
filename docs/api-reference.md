@@ -26,4 +26,5 @@
     setdiff1d
     sinc
     union1d
+    angle
 ```

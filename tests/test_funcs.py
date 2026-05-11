@@ -1918,23 +1918,28 @@ class TestAngle:
             ],
             dtype=xp.float64,
         )
-        xp_assert_close(angle(x), expected, rtol=0, atol=1e-11)
-        xp_assert_close(angle(x, deg=True), expected * 180 / xp.pi, rtol=0, atol=1e-11)
+        xp_assert_close(angle(x, xp=xp), expected, rtol=0, atol=1e-11)
+        xp_assert_close(
+            angle(x, deg=True, xp=xp),
+            expected * 180 / xp.pi,
+            rtol=0,
+            atol=1e-11,
+)
 
     def test_real(self, xp: ModuleType):
         x = xp.asarray([0.0, -0.0, 1.0, -1.0])
         expected = xp.asarray([0.0, xp.pi, 0.0, xp.pi], dtype=x.dtype)
-        xp_assert_close(angle(x), expected)
+        xp_assert_close(angle(x, xp=xp), expected)
 
     def test_complex(self, xp: ModuleType):
         a = xp.asarray([1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j])
         expected = xp.asarray([xp.pi / 4, -xp.pi / 4, 3 * xp.pi / 4, -3 * xp.pi / 4])
-        res = angle(a)
+        res = angle(a, xp=xp)
         xp_assert_equal(res, expected)
 
     def test_integral(self, xp: ModuleType):
         x = xp.asarray([0, -1, 1], dtype=xp.int32)
-        actual = angle(x)
+        actual = angle(x, xp=xp)
         expected = xp.asarray(
             [0.0, xp.pi, 0.0], dtype=default_dtype(xp, device=get_device(x))
         )
@@ -1945,7 +1950,7 @@ class TestAngle:
         expected = xp.asarray(
             [[xp.pi / 4, -xp.pi / 4], [3 * xp.pi / 4, -3 * xp.pi / 4]]
         )
-        res = angle(a)
+        res = angle(a, xp=xp)
         xp_assert_equal(res, expected)
 
     @pytest.mark.skip_xp_backend(Backend.TORCH, reason="materialize 'meta' device")

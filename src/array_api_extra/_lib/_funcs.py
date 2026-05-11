@@ -838,7 +838,7 @@ def angle(z: Array, /, *, deg: bool = False, xp: ModuleType | None = None) -> Ar
     -------
     array
         The counterclockwise angle from the positive real axis on the complex
-        plane in the range ``(-pi, pi]``, with dtype as float64.
+        plane in the range ``(-pi, pi]``.
 
     Examples
     --------
