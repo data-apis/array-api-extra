@@ -6,6 +6,7 @@
     :nosignatures:
     :toctree: generated
 
+    angle
     apply_where
     argpartition
     at

@@ -19,6 +19,7 @@ from ._lib._utils._helpers import asarrays, eager_shape
 from ._lib._utils._typing import Array, DType
 
 __all__ = [
+    "angle",
     "atleast_nd",
     "cov",
     "create_diagonal",
@@ -30,6 +31,42 @@ __all__ = [
     "searchsorted",
     "sinc",
 ]
+
+
+def angle(z: Array, /, *, deg: bool = False, xp: ModuleType | None = None) -> Array:
+    """
+    Return the angle of a complex argument.
+
+    Parameters
+    ----------
+    z : array
+        A complex-valued or real-valued array.
+    deg : bool, optional
+        Return angle in degrees if True, radians if False (default).
+    xp : array_namespace, optional
+        The standard-compatible namespace for `z`. Default: infer.
+
+    Returns
+    -------
+    array
+        The counterclockwise angle from the positive real axis on the complex
+        plane in the range ``(-pi, pi]``.
+
+    Notes
+    -----
+    This function passes the imaginary and real parts of the argument to
+    ``xp.atan2`` to compute the result.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.angle(xp.asarray([1.0, 1.0j, 1 + 1j]), xp=xp)
+    Array([0.        , 1.57079633, 0.78539816], dtype=array_api_strict.float64)
+    """
+    if xp is None:
+        xp = array_namespace(z)
+    return _funcs.angle(z, deg=deg, xp=xp)
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array:

@@ -23,6 +23,7 @@ from ._utils._helpers import (
 from ._utils._typing import Array, Device, DType
 
 __all__ = [
+    "angle",
     "apply_where",
     "atleast_nd",
     "broadcast_shapes",
@@ -38,6 +39,24 @@ __all__ = [
 ]
 
 
+def angle(z: Array, /, *, deg: bool = False, xp: ModuleType) -> Array:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in array_api_extra._delegation."""
+    if xp.isdtype(z.dtype, "complex floating"):
+        zimag = xp.imag(z)
+        zreal = xp.real(z)
+    else:
+        if not xp.isdtype(z.dtype, "real floating"):
+            z = xp.astype(z, default_dtype(xp, device=_compat.device(z)))
+        zimag = xp.zeros_like(z)
+        zreal = z
+
+    a = xp.atan2(zimag, zreal)
+    if deg:
+        a *= 180 / xp.pi
+    return a
+
+
 @overload
 def apply_where(  # numpydoc ignore=GL08
     cond: Array,
@@ -49,7 +68,6 @@ def apply_where(  # numpydoc ignore=GL08
     kwargs: dict[str, Array] | None = None,
     xp: ModuleType | None = None,
 ) -> Array: ...
-
 
 @overload
 def apply_where(  # numpydoc ignore=GL08

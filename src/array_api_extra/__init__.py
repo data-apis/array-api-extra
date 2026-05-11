@@ -1,6 +1,7 @@
 """Extra array functions built on top of the array API standard."""
 
 from ._delegation import (
+    angle,
     argpartition,
     atleast_nd,
     cov,
@@ -32,6 +33,7 @@ __version__ = "0.10.2.dev0"
 # pylint: disable=duplicate-code
 __all__ = [
     "__version__",
+    "angle",
     "apply_where",
     "argpartition",
     "at",
