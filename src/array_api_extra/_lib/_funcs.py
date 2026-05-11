@@ -821,7 +821,7 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     return xp.asarray(xp.unique_values(xp.concat([a, b])))
 
 
-def angle(z: Array, deg: bool = False, *, xp: ModuleType | None = None) -> Array:
+def angle(z: Array, /, *, deg: bool = False, xp: ModuleType | None = None) -> Array:
     """
     Return the angle of the complex argument.
 
