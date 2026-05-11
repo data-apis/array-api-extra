@@ -23,6 +23,7 @@ from ._utils._helpers import (
 from ._utils._typing import Array, Device, DType
 
 __all__ = [
+    "angle",
     "apply_where",
     "atleast_nd",
     "broadcast_shapes",
@@ -820,7 +821,7 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     return xp.asarray(xp.unique_values(xp.concat([a, b])))
 
 
-def angle(z: Array, deg: bool = False, /, *, xp: ModuleType | None = None) -> Array:
+def angle(z: Array, deg: bool = False, *, xp: ModuleType | None = None) -> Array:
     """
     Return the angle of the complex argument.
 
@@ -835,19 +836,28 @@ def angle(z: Array, deg: bool = False, /, *, xp: ModuleType | None = None) -> Ar
 
     Returns
     -------
-    ndarray or scalar
+    array
         The counterclockwise angle from the positive real axis on the complex
         plane in the range ``(-pi, pi]``, with dtype as float64.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.angle(xp.asarray([1.0, 1.0j, 1 + 1j]), xp=xp)
+    Array([0.        , 1.57079633, 0.78539816], dtype=array_api_strict.float64)
     """
     if xp is None:
         xp = array_namespace(z)
     if xp.isdtype(z.dtype, "complex floating"):
-        zimage = xp.imag(z)
+        zimag = xp.imag(z)
         zreal = xp.real(z)
     else:
-        zimage = xp.zeros_like(z, dtype=xp.float64)
-        zreal = xp.astype(z, xp.float64)
-    a = xp.atan2(zimage, zreal)
+        if not xp.isdtype(z.dtype, "real floating"):
+            z = xp.astype(z, default_dtype(xp, device=_compat.device(z)))
+        zimag = xp.zeros_like(z)
+        zreal = z
+    a = xp.atan2(zimag, zreal)
     if deg:
         a = a * 180 / xp.pi
     return a

@@ -1891,11 +1891,55 @@ class TestAngle:
         res = angle(a)
         xp_assert_equal(res, expected)
 
+    def test_basic(self, xp: ModuleType):
+        x = xp.asarray(
+            [
+                1 + 3j,
+                np.sqrt(2) / 2.0 + 1j * np.sqrt(2) / 2,
+                1,
+                1j,
+                -1,
+                -1j,
+                1 - 3j,
+                -1 + 3j,
+            ],
+            dtype=xp.complex128,
+        )
+        expected = xp.asarray(
+            [
+                np.arctan(3.0 / 1.0),
+                np.arctan(1.0),
+                0,
+                np.pi / 2,
+                np.pi,
+                -np.pi / 2.0,
+                -np.arctan(3.0 / 1.0),
+                np.pi - np.arctan(3.0 / 1.0),
+            ],
+            dtype=xp.float64,
+        )
+        xp_assert_close(angle(x), expected, rtol=0, atol=1e-11)
+        xp_assert_close(angle(x, deg=True), expected * 180 / xp.pi, rtol=0, atol=1e-11)
+
+    def test_real(self, xp: ModuleType):
+        x = xp.asarray([0.0, -0.0, 1.0, -1.0])
+        expected = xp.asarray([0.0, xp.pi, 0.0, xp.pi], dtype=x.dtype)
+        xp_assert_close(angle(x), expected)
+
     def test_complex(self, xp: ModuleType):
         a = xp.asarray([1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j])
         expected = xp.asarray([np.pi / 4, -np.pi / 4, 3 * np.pi / 4, -3 * np.pi / 4])
         res = angle(a)
         xp_assert_equal(res, expected)
+
+    def test_integral(self, xp: ModuleType):
+        x = xp.asarray([0, -1, 1], dtype=xp.int32)
+        actual = angle(x)
+        expected = xp.asarray(
+            [0.0, xp.pi, 0.0], dtype=default_dtype(xp, device=get_device(x))
+        )
+        xp_assert_close(actual, expected)
+        assert actual.dtype == expected.dtype
 
     def test_2d(self, xp: ModuleType):
         a = xp.asarray([[1 + 1j, 1 - 1j], [-1 + 1j, -1 - 1j]])
