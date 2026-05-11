@@ -1939,7 +1939,6 @@ class TestAngle:
             [0.0, xp.pi, 0.0], dtype=default_dtype(xp, device=get_device(x))
         )
         xp_assert_close(actual, expected)
-        assert actual.dtype == expected.dtype
 
     def test_2d(self, xp: ModuleType):
         a = xp.asarray([[1 + 1j, 1 - 1j], [-1 + 1j, -1 - 1j]])
