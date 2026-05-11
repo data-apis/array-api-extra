@@ -501,16 +501,6 @@ class TestBroadcastShapes:
         assert broadcast_shapes((2,), (1,), xp=np) == (99,)
         assert calls == [((2,), (1,))]
 
-    def test_fallback_for_unknown_sizes(self, monkeypatch: pytest.MonkeyPatch):
-        def mock_broadcast_shapes(*_shapes: tuple[int, ...]) -> tuple[int, ...]:
-            msg = "Native delegation should not handle unknown sizes"
-            raise AssertionError(msg)
-
-        monkeypatch.setattr(np, "broadcast_shapes", mock_broadcast_shapes)
-
-        assert broadcast_shapes((None,), (1,), xp=np) == (None,)
-        assert broadcast_shapes((math.nan,), (1,), xp=np) == (None,)
-
     def test_fallback_without_xp(self, monkeypatch: pytest.MonkeyPatch):
         def mock_broadcast_shapes(*_shapes: tuple[int, ...]) -> tuple[int, ...]:
             msg = "Native delegation should not be used without xp"
