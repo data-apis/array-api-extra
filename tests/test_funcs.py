@@ -1924,7 +1924,7 @@ class TestAngle:
             expected * 180 / xp.pi,
             rtol=0,
             atol=1e-11,
-)
+        )
 
     def test_real(self, xp: ModuleType):
         x = xp.asarray([0.0, -0.0, 1.0, -1.0])
