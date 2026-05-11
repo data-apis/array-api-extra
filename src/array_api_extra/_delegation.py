@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 from types import ModuleType
-from typing import Literal, cast
+from typing import Literal
 
 from ._lib import _funcs
 from ._lib._utils._compat import (
@@ -137,8 +137,7 @@ def broadcast_shapes(
             or is_torch_namespace(xp)
         )
     ):
-        int_shapes = cast(tuple[tuple[int, ...], ...], shapes)
-        return cast(tuple[int | None, ...], xp.broadcast_shapes(*int_shapes))
+        return xp.broadcast_shapes(*shapes)
 
     return _funcs.broadcast_shapes(*shapes)
 
