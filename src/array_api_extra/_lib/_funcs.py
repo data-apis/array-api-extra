@@ -846,6 +846,8 @@ def angle(z: Array, /, *, deg: bool = False, xp: ModuleType | None = None) -> Ar
     >>> import array_api_extra as xpx
     >>> xpx.angle(xp.asarray([1.0, 1.0j, 1 + 1j]), xp=xp)
     Array([0.        , 1.57079633, 0.78539816], dtype=array_api_strict.float64)
+    >>> xpx.angle(xp.asarray([1.0, 1.0j, 1 + 1j]), deg=True, xp=xp)
+    Array([ 0., 90., 45.], dtype=array_api_strict.float64)
     """
     if xp is None:
         xp = array_namespace(z)
