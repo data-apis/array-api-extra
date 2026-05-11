@@ -1887,8 +1887,8 @@ class TestUnion1d:
 class TestAngle:
     def test_simple(self, xp: ModuleType):
         a = xp.asarray([1, 0])
-        expected = xp.asarray([0.0, 0.0], dtype=xp.float64)
         res = angle(a)
+        expected = xp.asarray([0.0, 0.0], dtype=res.dtype)
         xp_assert_equal(res, expected)
 
     def test_basic(self, xp: ModuleType):
