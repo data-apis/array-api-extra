@@ -1944,7 +1944,7 @@ class TestAngle:
     def test_2d(self, xp: ModuleType):
         a = xp.asarray([[1 + 1j, 1 - 1j], [-1 + 1j, -1 - 1j]])
         expected = xp.asarray(
-            [[np.pi / 4, -np.pi / 4], [3 * np.pi / 4, -3 * np.pi / 4]]
+            [[xp.pi / 4, -xp.pi / 4], [3 * xp.pi / 4, -3 * xp.pi / 4]]
         )
         res = angle(a)
         xp_assert_equal(res, expected)
