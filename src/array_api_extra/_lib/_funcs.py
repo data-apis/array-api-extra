@@ -840,6 +840,10 @@ def angle(z: Array, /, *, deg: bool = False, xp: ModuleType | None = None) -> Ar
         The counterclockwise angle from the positive real axis on the complex
         plane in the range ``(-pi, pi]``.
 
+    Notes
+    -----
+    A real input x is interpreted as x + 0j
+
     Examples
     --------
     >>> import array_api_strict as xp

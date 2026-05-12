@@ -6,6 +6,7 @@
     :nosignatures:
     :toctree: generated
 
+    angle
     apply_where
     argpartition
     at
@@ -26,5 +27,4 @@
     setdiff1d
     sinc
     union1d
-    angle
 ```
