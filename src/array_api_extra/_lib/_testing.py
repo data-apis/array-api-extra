@@ -37,7 +37,7 @@ def _check_ns_shape_dtype(
     check_dtype: bool,
     check_shape: bool,
     check_scalar: bool,
-) -> ModuleType:  # numpydoc ignore=RT03
+) -> tuple[Array, Array, ModuleType]:  # numpydoc ignore=RT03
     """
     Assert that namespace, shape and dtype of the two arrays match.
 
@@ -55,7 +55,7 @@ def _check_ns_shape_dtype(
 
     Returns
     -------
-    Arrays namespace.
+    Actual array, desired array, and their namespace.
     """
     actual_xp = array_namespace(actual)  # Raises on scalars and lists
     desired_xp = array_namespace(desired)
@@ -63,6 +63,16 @@ def _check_ns_shape_dtype(
     msg = f"namespaces do not match: {actual_xp} != f{desired_xp}"
     assert actual_xp == desired_xp, msg
 
+    if is_numpy_namespace(actual_xp) and check_scalar:
+        # only NumPy distinguishes between scalars and arrays; we do if check_scalar.
+        _msg = (
+            "array-ness does not match:\n Actual: "
+            f"{type(actual)}\n Desired: {type(desired)}"
+        )
+        assert np.isscalar(actual) == np.isscalar(desired), _msg
+
+    actual = desired_xp.asarray(actual)
+    desired = desired_xp.asarray(desired)
     # Dask uses nan instead of None for unknown shapes
     actual_shape = cast(tuple[float, ...], actual.shape)
     desired_shape = cast(tuple[float, ...], desired.shape)
@@ -90,16 +100,8 @@ def _check_ns_shape_dtype(
     if check_dtype:
         msg = f"dtypes do not match: {actual.dtype} != {desired.dtype}"
         assert actual.dtype == desired.dtype, msg
-
-    if is_numpy_namespace(actual_xp) and check_scalar:
-        # only NumPy distinguishes between scalars and arrays; we do if check_scalar.
-        _msg = (
-            "array-ness does not match:\n Actual: "
-            f"{type(actual)}\n Desired: {type(desired)}"
-        )
-        assert np.isscalar(actual) == np.isscalar(desired), _msg
-
-    return desired_xp
+    desired = desired_xp.broadcast_to(desired, actual.shape)
+    return actual, desired, desired_xp
 
 
 def _is_materializable(x: Array) -> bool:
@@ -169,7 +171,9 @@ def xp_assert_equal(
     xp_assert_close : Similar function for inexact equality checks.
     numpy.testing.assert_array_equal : Similar function for NumPy arrays.
     """
-    xp = _check_ns_shape_dtype(actual, desired, check_dtype, check_shape, check_scalar)
+    actual, desired, xp = _check_ns_shape_dtype(
+        actual, desired, check_dtype, check_shape, check_scalar
+    )
     if not _is_materializable(actual):
         return
     actual_np = as_numpy_array(actual, xp=xp)
@@ -211,7 +215,7 @@ def xp_assert_less(
     xp_assert_close : Similar function for inexact equality checks.
     numpy.testing.assert_array_equal : Similar function for NumPy arrays.
     """
-    xp = _check_ns_shape_dtype(x, y, check_dtype, check_shape, check_scalar)
+    x, y, xp = _check_ns_shape_dtype(x, y, check_dtype, check_shape, check_scalar)
     if not _is_materializable(x):
         return
     x_np = as_numpy_array(x, xp=xp)
@@ -267,7 +271,9 @@ def xp_assert_close(
     -----
     The default `atol` and `rtol` differ from `xp.all(xpx.isclose(a, b))`.
     """
-    xp = _check_ns_shape_dtype(actual, desired, check_dtype, check_shape, check_scalar)
+    actual, desired, xp = _check_ns_shape_dtype(
+        actual, desired, check_dtype, check_shape, check_scalar
+    )
     if not _is_materializable(actual):
         return
 
