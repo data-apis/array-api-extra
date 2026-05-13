@@ -140,6 +140,7 @@ def xp_assert_equal(
     desired: Array,
     *,
     err_msg: str = "",
+    verbose: bool = True,
     check_dtype: bool = True,
     check_shape: bool = True,
     check_scalar: bool = False,
@@ -155,6 +156,8 @@ def xp_assert_equal(
         The expected array (typically hardcoded).
     err_msg : str, optional
         Error message to display on failure.
+    verbose: bool, default: True
+        Whether to include the conflicting arrays in the error message on failure.
     check_dtype, check_shape : bool, default: True
         Whether to check agreement between actual and desired dtypes and shapes
     check_scalar : bool, default: False
@@ -171,7 +174,9 @@ def xp_assert_equal(
         return
     actual_np = as_numpy_array(actual, xp=xp)
     desired_np = as_numpy_array(desired, xp=xp)
-    np.testing.assert_array_equal(actual_np, desired_np, err_msg=err_msg)
+    np.testing.assert_array_equal(
+        actual_np, desired_np, err_msg=err_msg, verbose=verbose
+    )
 
 
 def xp_assert_less(
@@ -179,6 +184,7 @@ def xp_assert_less(
     y: Array,
     *,
     err_msg: str = "",
+    verbose: bool = True,
     check_dtype: bool = True,
     check_shape: bool = True,
     check_scalar: bool = False,
@@ -192,6 +198,8 @@ def xp_assert_less(
         The arrays to compare according to ``x < y`` (elementwise).
     err_msg : str, optional
         Error message to display on failure.
+    verbose: bool, default: True
+        Whether to include the conflicting arrays in the error message on failure.
     check_dtype, check_shape : bool, default: True
         Whether to check agreement between actual and desired dtypes and shapes
     check_scalar : bool, default: False
@@ -208,7 +216,7 @@ def xp_assert_less(
         return
     x_np = as_numpy_array(x, xp=xp)
     y_np = as_numpy_array(y, xp=xp)
-    np.testing.assert_array_less(x_np, y_np, err_msg=err_msg)
+    np.testing.assert_array_less(x_np, y_np, err_msg=err_msg, verbose=verbose)
 
 
 def xp_assert_close(
@@ -217,7 +225,9 @@ def xp_assert_close(
     *,
     rtol: float | None = None,
     atol: float = 0,
+    equal_nan: bool = True,
     err_msg: str = "",
+    verbose: bool = True,
     check_dtype: bool = True,
     check_shape: bool = True,
     check_scalar: bool = False,
@@ -235,8 +245,12 @@ def xp_assert_close(
         Relative tolerance. Default: dtype-dependent.
     atol : float, optional
         Absolute tolerance. Default: 0.
+    equal_nan : bool, default: True
+        Whether to consider NaNs in corresponding locations as equal.
     err_msg : str, optional
         Error message to display on failure.
+    verbose: bool, default: True
+        Whether to include the conflicting arrays in the error message on failure.
     check_dtype, check_shape : bool, default: True
         Whether to check agreement between actual and desired dtypes and shapes
     check_scalar : bool, default: False
@@ -273,7 +287,9 @@ def xp_assert_close(
         desired_np,
         rtol=rtol,  # pyright: ignore[reportArgumentType]
         atol=atol,
+        equal_nan=equal_nan,
         err_msg=err_msg,
+        verbose=verbose,
     )
 
 
