@@ -140,7 +140,7 @@ class TestApplyWhere:
             cond,
             (x, y),
             self.f1,
-            lambda x, y: mxp.astype(x - y, xp.int64),  # pyright: ignore[reportArgumentType]
+            lambda x, y: mxp.astype(x - y, xp.int64),  # pyright: ignore[reportArgumentType] # pyrefly: ignore[bad-argument-type]
         )
         assert actual.dtype == xp.int64
 

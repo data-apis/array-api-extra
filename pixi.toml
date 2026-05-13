@@ -71,7 +71,7 @@ actionlint = ">=1.7.12,<2"
 blacken-docs = ">=1.20.0,<2"
 pytest = ">=9.0.3,<10"
 validate-pyproject = ">=0.25,<0.26"
-pyrefly = ">=0.63.1,<0.64"
+pyrefly = ">=1.0.0,<1.1"
 zizmor = ">=1.24.1,<1.25"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
