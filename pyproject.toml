@@ -193,7 +193,7 @@ py-version = "3.11"
 reports.output-format = "colorized"
 messages_control.disable = [
   "design", # ignore heavily opinionated design checks
-  "fixme", #  allow FIXME comments
+  "fixme", # allow FIXME comments
   "line-too-long", # ruff handles this
   "unused-argument", # ruff handles this
   "missing-function-docstring", # numpydoc handles this
