@@ -71,8 +71,6 @@ def _check_ns_shape_dtype(
         )
         assert np.isscalar(actual) == np.isscalar(desired), _msg
 
-    actual = desired_xp.asarray(actual)
-    desired = desired_xp.asarray(desired)
     # Dask uses nan instead of None for unknown shapes
     actual_shape = cast(tuple[float, ...], actual.shape)
     desired_shape = cast(tuple[float, ...], desired.shape)
