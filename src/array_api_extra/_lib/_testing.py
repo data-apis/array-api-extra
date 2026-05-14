@@ -76,13 +76,14 @@ def _check_ns_shape_dtype(
     desired_shape = cast(tuple[float, ...], desired.shape)
     assert None not in actual_shape  # Requires explicit support
     assert None not in desired_shape
+
     if is_dask_namespace(desired_xp):
         if any(math.isnan(i) for i in actual_shape):
             actual.compute_chunk_sizes()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-            actual_shape = actual.shape
+            actual_shape = cast(tuple[float, ...], actual.shape)
         if any(math.isnan(i) for i in desired_shape):
             desired.compute_chunk_sizes()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-            desired_shape = desired.shape
+            desired_shape = cast(tuple[float, ...], desired.shape)
 
     if check_shape:
         msg = f"shapes do not match: {actual_shape} != f{desired_shape}"
@@ -92,8 +93,8 @@ def _check_ns_shape_dtype(
         # np.testing.assert_array_equal etc even when strict=False, but not for
         # non-materializable arrays.
         # This check excludes 0d arrays as they are special-cased in NumPy.
-        actual_size = math.prod(actual_shape)  # pyright: ignore[reportUnknownArgumentType]
-        desired_size = math.prod(desired_shape)  # pyright: ignore[reportUnknownArgumentType]
+        actual_size = math.prod(actual_shape)
+        desired_size = math.prod(desired_shape)
         msg = f"sizes do not match: {actual_size} != f{desired_size}"
         assert actual_size == desired_size, msg
 
