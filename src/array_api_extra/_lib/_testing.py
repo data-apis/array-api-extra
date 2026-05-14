@@ -78,9 +78,11 @@ def _check_ns_shape_dtype(
     assert None not in desired_shape
     if is_dask_namespace(desired_xp):
         if any(math.isnan(i) for i in actual_shape):
-            actual_shape = actual.compute().shape  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+            actual.compute_chunk_sizes()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+            actual_shape = actual.shape
         if any(math.isnan(i) for i in desired_shape):
-            desired_shape = desired.compute().shape  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+            desired.compute_chunk_sizes()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+            desired_shape = desired.shape
 
     if check_shape:
         msg = f"shapes do not match: {actual_shape} != f{desired_shape}"
