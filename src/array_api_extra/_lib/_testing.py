@@ -98,7 +98,7 @@ def _check_ns_shape_dtype(
     if check_dtype:
         msg = f"dtypes do not match: {actual.dtype} != {desired.dtype}"
         assert actual.dtype == desired.dtype, msg
-    desired = desired_xp.broadcast_to(desired, actual.shape)
+    desired = desired_xp.broadcast_to(desired, actual_shape)
     return actual, desired, desired_xp
 
 
