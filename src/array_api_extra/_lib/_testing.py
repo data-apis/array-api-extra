@@ -57,7 +57,7 @@ def _check_ns_shape_dtype(
     -------
     Actual array, desired array, and their namespace.
     """
-    actual_xp = array_namespace(actual)  # Raises on scalars and lists
+    actual_xp = array_namespace(actual)  # Raises on Python scalars and lists
     desired_xp = array_namespace(desired)
 
     msg = f"namespaces do not match: {actual_xp} != f{desired_xp}"
