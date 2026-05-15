@@ -102,7 +102,7 @@ This project exists thanks to the following contributors
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://steppi.github.io"><img src="https://avatars.githubusercontent.com/u/1953382?v=4?s=100" width="100px;" alt="Albert Steppi"/><br /><sub><b>Albert Steppi</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=steppi" title="Code">💻</a> <a href="#ideas-steppi" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=steppi" title="Tests">⚠️</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/prady0t"><img src="https://avatars.githubusercontent.com/u/99216956?v=4?s=100" width="100px;" alt="Pradyot Ranjan"/><br /><sub><b>Pradyot Ranjan</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=prady0t" title="Code">💻</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=prady0t" title="Documentation">📖</a> <a href="#ideas-prady0t" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/prady0t"><img src="https://avatars.githubusercontent.com/u/99216956?v=4?s=100" width="100px;" alt="Pradyot Ranjan"/><br /><sub><b>Pradyot Ranjan</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=prady0t" title="Code">💻</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=prady0t" title="Documentation">📖</a> <a href="#ideas-prady0t" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=prady0t" title="Tests">⚠️</a></td>
     </tr>
   </tbody>
 </table>
