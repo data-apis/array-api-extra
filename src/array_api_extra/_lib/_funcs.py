@@ -842,7 +842,7 @@ def angle(z: Array, /, *, deg: bool = False, xp: ModuleType | None = None) -> Ar
 
     Notes
     -----
-    A real input x is interpreted as x + 0j
+    Real input ``x`` is interpreted as ``x + 0j``.
 
     Examples
     --------
