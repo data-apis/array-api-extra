@@ -4,6 +4,8 @@ import importlib.metadata
 from typing import Any
 
 project = "array-api-extra"
+copyright = "Consortium for Python Data API Standards"
+author = "Consortium for Python Data API Standards"
 version = release = importlib.metadata.version("array_api_extra")
 
 extensions = [
@@ -56,7 +58,7 @@ intersphinx_mapping = {
     "array-api": ("https://data-apis.org/array-api/draft", None),
     "dask": ("https://docs.dask.org/en/stable", None),
     "numpy": ("https://numpy.org/doc/stable", None),
-    "jax": ("https://jax.readthedocs.io/en/latest", None),
+    "jax": ("https://docs.jax.dev/en/latest", None),
 }
 
 nitpick_ignore = [

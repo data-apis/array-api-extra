@@ -1,5 +1,13 @@
+# pyright: reportAttributeAccessIssue=false
+
+from typing import Any, cast
+
 import array_api_strict as xp
 from numpy.testing import assert_array_equal
+
+from vendor_tests.array_api_compat.common._typing import (  # type: ignore[import-not-found]
+    Array,
+)
 
 
 def test_vendor_compat():
@@ -14,6 +22,7 @@ def test_vendor_compat():
         is_dask_namespace,
         is_jax_array,
         is_jax_namespace,
+        is_lazy_array,
         is_numpy_array,
         is_numpy_namespace,
         is_pydata_sparse_array,
@@ -22,19 +31,22 @@ def test_vendor_compat():
         is_torch_namespace,
         is_writeable_array,
         size,
+        to_device,
     )
 
     x = xp.asarray([1, 2, 3])
     assert array_namespace(x) is xp
-    device(x)
+    to_device(x, device(x))
     assert is_array_api_obj(x)
     assert is_array_api_strict_namespace(xp)
+    x = cast(Array, x)
     assert not is_cupy_array(x)
     assert not is_cupy_namespace(xp)
     assert not is_dask_array(x)
     assert not is_dask_namespace(xp)
     assert not is_jax_array(x)
     assert not is_jax_namespace(xp)
+    assert not is_lazy_array(x)
     assert not is_numpy_array(x)
     assert not is_numpy_namespace(xp)
     assert not is_pydata_sparse_array(x)
@@ -46,17 +58,20 @@ def test_vendor_compat():
 
 
 def test_vendor_extra():
-    from .array_api_extra import atleast_nd
+    from .array_api_extra import atleast_nd  # type: ignore[import-not-found]
 
     x = xp.asarray(1)
+    x = cast(Array, x)
     y = atleast_nd(x, ndim=0)
     assert_array_equal(y, x)
 
 
 def test_vendor_extra_testing():
-    from .array_api_extra.testing import lazy_xp_function
+    from .array_api_extra.testing import (  # type: ignore[import-not-found]
+        lazy_xp_function,
+    )
 
-    def f(x):
+    def f(x: Any) -> Any:
         return x
 
     lazy_xp_function(f)
@@ -64,6 +79,8 @@ def test_vendor_extra_testing():
 
 def test_vendor_extra_uses_vendor_compat():
     from ._array_api_compat_vendor import array_namespace as n1
-    from .array_api_extra._lib._utils._compat import array_namespace as n2
+    from .array_api_extra._lib._utils._compat import (  # type: ignore[import-not-found]
+        array_namespace as n2,
+    )
 
     assert n1 is n2

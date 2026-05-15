@@ -1,0 +1,54 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests", ":automergeMinor"],
+  "dependencyDashboardTitle": "META: Dependency Dashboard",
+  "commitMessagePrefix": "deps:",
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "constraints": {
+    "pixi": ">=0.67.2"
+  },
+  "minimumReleaseAge": "14 days",
+  "packageRules": [{
+    "description": "Do not bump deps pinned with '~=' or '='.",
+    "matchManagers": ["pixi"],
+    "matchCurrentValue": "/^~?=/",
+    "enabled": false
+  }, {
+    "description": "Do not bump requires-python.",
+    "matchManagers": ["pep621"],
+    "matchPackageNames": ["python"],
+    "enabled": false
+  }, {
+    "description": "Schedule automerged GHA updates for the 15th of each month.",
+    "matchManagers": ["github-actions"],
+    "groupName": "gha",
+    "schedule": ["* * 15 * *"],
+    "automerge": true
+  }, {
+    "description": "Block PRs for updates blocked on dropping Python 3.11.",
+    "matchManagers": ["pixi"],
+    "matchUpdateTypes": ["major", "minor"],
+    "matchPackageNames": ["numpy", "sphinx", "sphinx-autodoc-typehints"],
+    "enabled": false
+  }, {
+    "description": "Block updating SciPy (bump manually alongside sklearn)",
+    "matchManagers": ["pixi"],
+    "matchUpdateTypes": ["major", "minor"],
+    "matchPackageNames": ["scipy"],
+    "enabled": false
+  }, {
+    "description": "Group Dask packages.",
+    "matchPackageNames": ["dask", "dask-core"],
+    "groupName": "dask"
+  }, {
+    "description": "Group JAX packages.",
+    "matchPackageNames": ["jax", "jaxlib"],
+    "groupName": "jax"
+  }, {
+    "description": "Schedule hypothesis monthly as releases are frequent.",
+    "matchManagers": ["pixi"],
+    "matchPackageNames": ["hypothesis"],
+    "schedule": ["* * 10 * *"]
+  }]
+}

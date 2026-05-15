@@ -4,3 +4,6 @@ github_checks:
 ignore:
   - "src/array_api_extra/_lib/_compat"
   - "src/array_api_extra/_lib/_typing"
+coverage:
+  status:
+    project: off
