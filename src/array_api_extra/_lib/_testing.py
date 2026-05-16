@@ -288,16 +288,12 @@ def xp_assert_close(
             rtol = 1e-7
 
     if hasattr(atol, "ndim"):
-        atol = as_numpy_array(atol, xp=xp)
-        if atol.ndim > 0:
-            msg = "atol must be a scalar or 0-D array"
-            raise TypeError(msg)
+        if atol.ndim == 0:
+            atol = as_numpy_array(atol, xp=xp)
 
     if hasattr(rtol, "ndim"):
-        rtol = as_numpy_array(rtol, xp=xp)
-        if rtol.ndim > 0:
-            msg = "rtol must be a scalar or 0-D array"
-            raise TypeError(msg)
+        if rtol.ndim == 0:
+            rtol = as_numpy_array(rtol, xp=xp)
 
     actual_np = as_numpy_array(actual, xp=xp)
     desired_np = as_numpy_array(desired, xp=xp)
