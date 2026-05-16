@@ -287,13 +287,13 @@ def xp_assert_close(
         else:
             rtol = 1e-7
 
-    if not isinstance(atol, float):
+    if hasattr(atol, "ndim"):
         atol = as_numpy_array(atol, xp=xp)
         if atol.ndim > 0:
             msg = "atol must be a scalar or 0-D array"
             raise TypeError(msg)
 
-    if not isinstance(rtol, float):
+    if hasattr(rtol, "ndim"):
         rtol = as_numpy_array(rtol, xp=xp)
         if rtol.ndim > 0:
             msg = "rtol must be a scalar or 0-D array"
