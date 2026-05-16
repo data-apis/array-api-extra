@@ -287,21 +287,20 @@ def xp_assert_close(
         else:
             rtol = 1e-7
 
-    if hasattr(atol, "ndim"):
-        if atol.ndim == 0:
-            atol = as_numpy_array(atol, xp=xp)
+    if hasattr(atol, "ndim") and atol.ndim == 0:  # pyright: ignore[reportAttributeAccessIssue]
+        atol = cast(Array, as_numpy_array(cast(Array, atol), xp=xp))  # pyright: ignore[reportInvalidCast]
 
-    if hasattr(rtol, "ndim"):
-        if rtol.ndim == 0:
-            rtol = as_numpy_array(rtol, xp=xp)
+    if hasattr(rtol, "ndim") and rtol.ndim == 0:  # pyright: ignore[reportAttributeAccessIssue,reportOptionalMemberAccess]
+        rtol = cast(Array, as_numpy_array(cast(Array, rtol), xp=xp))  # pyright: ignore[reportInvalidCast]
 
     actual_np = as_numpy_array(actual, xp=xp)
     desired_np = as_numpy_array(desired, xp=xp)
-    np.testing.assert_allclose(  # pyright: ignore[reportCallIssue]
+    np.testing.assert_allclose(  # pyright: ignore[reportCallIssue]  # pyrefly: ignore[no-matching-overload]
         actual_np,
         desired_np,
-        rtol=rtol,  # pyright: ignore[reportArgumentType]
-        atol=atol,
+        # https://github.com/numpy/numpy/issues/31449
+        rtol=rtol,  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        atol=atol,  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
         equal_nan=equal_nan,
         err_msg=err_msg,
         verbose=verbose,
