@@ -271,6 +271,8 @@ def xp_assert_close(
     Notes
     -----
     The default `atol` and `rtol` differ from `xp.all(xpx.isclose(a, b))`.
+
+    Array arguments to `atol` and `rtol` must be valid input to :py:func:`float`.
     """
     actual, desired, xp = _check_ns_shape_dtype(
         actual, desired, check_dtype, check_shape, check_scalar
@@ -286,21 +288,19 @@ def xp_assert_close(
             rtol = xp.finfo(actual.dtype).eps ** 0.5 * 4
         else:
             rtol = 1e-7
+    else:
+        rtol = float(rtol)
 
-    if hasattr(atol, "ndim") and atol.ndim == 0:  # pyright: ignore[reportAttributeAccessIssue]
-        atol = cast(Array, as_numpy_array(cast(Array, atol), xp=xp))  # pyright: ignore[reportInvalidCast]
-
-    if hasattr(rtol, "ndim") and rtol.ndim == 0:  # pyright: ignore[reportAttributeAccessIssue,reportOptionalMemberAccess]
-        rtol = cast(Array, as_numpy_array(cast(Array, rtol), xp=xp))  # pyright: ignore[reportInvalidCast]
+    atol = float(atol)
 
     actual_np = as_numpy_array(actual, xp=xp)
     desired_np = as_numpy_array(desired, xp=xp)
-    np.testing.assert_allclose(  # pyright: ignore[reportCallIssue]  # pyrefly: ignore[no-matching-overload]
+    np.testing.assert_allclose(  # pyright: ignore[reportCallIssue]
         actual_np,
         desired_np,
         # https://github.com/numpy/numpy/issues/31449
         rtol=rtol,  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
-        atol=atol,  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        atol=atol,
         equal_nan=equal_nan,
         err_msg=err_msg,
         verbose=verbose,
