@@ -228,8 +228,8 @@ def xp_assert_close(
     actual: Array,
     desired: Array,
     *,
-    rtol: float | None = None,
-    atol: float = 0,
+    rtol: float | Array | None = None,
+    atol: float | Array = 0,
     equal_nan: bool = True,
     err_msg: str = "",
     verbose: bool = True,
@@ -246,9 +246,9 @@ def xp_assert_close(
         The array produced by the tested function.
     desired : Array
         The expected array (typically hardcoded).
-    rtol : float, optional
+    rtol : float or Array, optional
         Relative tolerance. Default: dtype-dependent.
-    atol : float, optional
+    atol : float or Array, optional
         Absolute tolerance. Default: 0.
     equal_nan : bool, default: True
         Whether to consider NaNs in corresponding locations as equal.
@@ -286,6 +286,18 @@ def xp_assert_close(
             rtol = xp.finfo(actual.dtype).eps ** 0.5 * 4
         else:
             rtol = 1e-7
+
+    if not isinstance(atol, float):
+        atol = as_numpy_array(atol, xp=xp)
+        if atol.ndim > 0:
+            msg = "atol must be a scalar or 0-D array"
+            raise TypeError(msg)
+
+    if not isinstance(rtol, float):
+        rtol = as_numpy_array(rtol, xp=xp)
+        if rtol.ndim > 0:
+            msg = "rtol must be a scalar or 0-D array"
+            raise TypeError(msg)
 
     actual_np = as_numpy_array(actual, xp=xp)
     desired_np = as_numpy_array(desired, xp=xp)
