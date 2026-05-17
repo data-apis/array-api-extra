@@ -22,7 +22,7 @@ env:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -44,14 +44,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        environment:
-          - tests-py311
-          - tests-py314
-          - tests-numpy1
-          - tests-backends
-          - tests-backends-py311
-          - tests-nogil
-        runs-on: [ubuntu-latest]
+        include:
+          - environment: tests-py311
+            runs-on: ubuntu-latest
+          - environment: tests-py314
+            runs-on: ubuntu-slim
+          - environment: tests-numpy1
+            runs-on: ubuntu-slim
+          - environment: tests-nogil
+            runs-on: ubuntu-slim
+          - environment: tests-backends
+            runs-on: ubuntu-latest
+          - environment: tests-backends-py311
+            runs-on: ubuntu-latest
 
     environment:
       name: ci-checks
