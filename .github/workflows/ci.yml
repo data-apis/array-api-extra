@@ -44,14 +44,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        environment:
-          - tests-py311
-          - tests-py314
-          - tests-numpy1
-          - tests-backends
-          - tests-backends-py311
-          - tests-nogil
-        runs-on: [ubuntu-slim]
+        include:
+          - environment: tests-py311
+            runs-on: ubuntu-slim
+          - environment: tests-py314
+            runs-on: ubuntu-slim
+          - environment: tests-numpy1
+            runs-on: ubuntu-slim
+          - environment: tests-nogil
+            runs-on: ubuntu-slim
+          - environment: tests-backends
+            runs-on: ubuntu-latest
+          - environment: tests-backends-py311
+            runs-on: ubuntu-latest
 
     environment:
       name: ci-checks
