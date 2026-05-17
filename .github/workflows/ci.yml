@@ -46,7 +46,7 @@ jobs:
       matrix:
         include:
           - environment: tests-py311
-            runs-on: ubuntu-slim
+            runs-on: ubuntu-latest
           - environment: tests-py314
             runs-on: ubuntu-slim
           - environment: tests-numpy1
