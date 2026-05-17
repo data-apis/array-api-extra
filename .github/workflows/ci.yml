@@ -22,7 +22,7 @@ env:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -51,7 +51,7 @@ jobs:
           - tests-backends
           - tests-backends-py311
           - tests-nogil
-        runs-on: [ubuntu-latest]
+        runs-on: [ubuntu-slim]
 
     environment:
       name: ci-checks

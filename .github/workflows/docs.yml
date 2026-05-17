@@ -11,7 +11,7 @@ concurrency:
 jobs:
   docs-build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     permissions:
       contents: read
@@ -40,7 +40,7 @@ jobs:
     name: Deploy
     if: ${{ github.event.workflow_run.event == 'push' }}
     needs: docs-build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     permissions:
       contents: write # needed for the deploy step

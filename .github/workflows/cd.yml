@@ -20,7 +20,7 @@ on:
 jobs:
   dist:
     name: Create dist
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -37,7 +37,7 @@ jobs:
       id-token: write # for trusted publishing
       attestations: write # for trusted publishing
       contents: read
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.event_name == 'release' && github.event.action == 'published'
 
     steps:
