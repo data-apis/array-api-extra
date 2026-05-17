@@ -298,7 +298,6 @@ def xp_assert_close(
     np.testing.assert_allclose(  # pyright: ignore[reportCallIssue]
         actual_np,
         desired_np,
-        # https://github.com/numpy/numpy/issues/31449
         rtol=rtol,  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
         atol=atol,
         equal_nan=equal_nan,
