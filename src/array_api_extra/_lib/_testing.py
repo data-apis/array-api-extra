@@ -139,7 +139,7 @@ def as_numpy_array(array: Array, *, xp: ModuleType) -> np.typing.NDArray[Any]:
     # Try DLPack (works for JAX and other backends)
     if hasattr(array, "__dlpack__"):
         try:
-            return np.from_dlpack(array)  # ignore[reportArgumentType]
+            return np.from_dlpack(array)  # pyright: ignore[reportArgumentType]
         except (TypeError, BufferError):
             pass
 
