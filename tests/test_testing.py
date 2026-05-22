@@ -9,7 +9,6 @@ from typing_extensions import override
 from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._testing import (
     as_numpy_array,
-    default_xp,
     xp_assert_close,
     xp_assert_equal,
     xp_assert_less,
@@ -65,7 +64,7 @@ class TestAssertEqualCloseLess:
     @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
     def test_namespace(self, xp: ModuleType, func: Callable[..., None]):
         with pytest.raises(
-            AssertionError, match="Namespace of actual and desired arrays do not match"
+            AssertionError, match="Namespaces of actual and desired arrays do not match"
         ):
             func(xp.asarray(0), np.asarray(0))
         with pytest.raises(TypeError, match=r"array_namespace requires .* array input"):
@@ -73,13 +72,12 @@ class TestAssertEqualCloseLess:
         with pytest.raises(TypeError, match="list is not a supported array type"):
             func(xp.asarray([0]), [0])
         with (
-            default_xp(np),
             pytest.raises(
                 AssertionError,
-                match="Namespace of desired array does not match expectations",
+                match="Namespace of desired array does not match the `xp` argument",
             ),
         ):
-            func(xp.asarray(0), xp.asarray(0))
+            func(xp.asarray(0), xp.asarray(0), xp=np)
 
     @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
     def test_check_shape(self, xp: ModuleType, func: Callable[..., None]):

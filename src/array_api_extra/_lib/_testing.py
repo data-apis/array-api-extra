@@ -8,9 +8,6 @@ See also ..testing for public testing utilities.
 from __future__ import annotations
 
 import math
-from collections.abc import Generator
-from contextlib import contextmanager
-from contextvars import ContextVar
 from types import ModuleType
 from typing import Any, cast
 
@@ -32,45 +29,6 @@ from ._utils._compat import (
 from ._utils._typing import Array, Device
 
 __all__ = ["as_numpy_array", "xp_assert_close", "xp_assert_equal", "xp_assert_less"]
-
-_default_xp_ctxvar: ContextVar[ModuleType] = ContextVar("_default_xp")
-
-
-@contextmanager
-def default_xp(xp: ModuleType) -> Generator[None, None, None]:
-    """In all ``xp_assert_*`` function calls executed within this
-    context manager, test by default that the array namespace is
-    the provided across all arrays, unless one explicitly passes the ``xp=``
-    parameter.
-
-    Without this context manager, the default value for `xp` is the namespace
-    for the desired array (the second parameter of the tests).
-    """
-    token = _default_xp_ctxvar.set(xp)
-    try:
-        yield
-    finally:
-        _default_xp_ctxvar.reset(token)
-
-
-def _assert_matching_namespace(actual: Array, desired: Array, xp: ModuleType) -> None:
-    desired_arr_space = array_namespace(desired)
-    _msg = (
-        "Namespace of desired array does not match expectations "
-        "set by the `default_xp` context manager or by the `xp`"
-        "pytest fixture.\n"
-        f"Desired array's space: {desired_arr_space.__name__}\n"
-        f"Expected namespace: {xp.__name__}"
-    )
-    assert desired_arr_space == xp, _msg
-
-    actual_arr_space = array_namespace(actual)
-    _msg = (
-        "Namespace of actual and desired arrays do not match.\n"
-        f"Actual: {actual_arr_space.__name__}\n"
-        f"Desired: {xp.__name__}"
-    )
-    assert actual_arr_space == xp, _msg
 
 
 def _check_ns_shape_dtype(
@@ -95,6 +53,8 @@ def _check_ns_shape_dtype(
     check_scalar : bool, default: False
         NumPy only: whether to check agreement between actual and desired types -
         0d array vs scalar.
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
 
     Returns
     -------
@@ -103,12 +63,20 @@ def _check_ns_shape_dtype(
     actual_xp = array_namespace(actual)  # Raises on Python scalars and lists
     desired_xp = array_namespace(desired)
 
-    if xp is None:
-        try:
-            xp = _default_xp_ctxvar.get()
-        except LookupError:
-            xp = array_namespace(desired)
-    _assert_matching_namespace(actual, desired, xp)
+    if xp is not None:
+        _msg = (
+            "Namespace of desired array does not match the `xp` argument.\n"
+            f"Desired array's namespace: {desired_xp.__name__}\n"
+            f"Expected namespace: {xp.__name__}."
+        )
+        assert desired_xp == xp, _msg
+
+    _msg = (
+        "Namespaces of actual and desired arrays do not match.\n"
+        f"Actual: {actual_xp.__name__}\n"
+        f"Desired: {desired_xp.__name__}."
+    )
+    assert actual_xp == desired_xp, _msg
 
     if is_numpy_namespace(actual_xp) and check_scalar:
         # only NumPy distinguishes between scalars and arrays; we do if check_scalar.
@@ -215,6 +183,8 @@ def xp_assert_equal(
     check_scalar : bool, default: False
         NumPy only: whether to check agreement between actual and desired types -
         0d array vs scalar.
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
 
     See Also
     --------
@@ -260,6 +230,8 @@ def xp_assert_less(
     check_scalar : bool, default: False
         NumPy only: whether to check agreement between actual and desired types -
         0d array vs scalar.
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
 
     See Also
     --------
@@ -312,6 +284,8 @@ def xp_assert_close(
     check_scalar : bool, default: False
         NumPy only: whether to check agreement between actual and desired types -
         0d array vs scalar.
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
 
     See Also
     --------
