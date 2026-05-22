@@ -136,7 +136,6 @@ def as_numpy_array(array: Array, *, xp: ModuleType) -> np.typing.NDArray[Any]:
         cpu = cast(Device, jax.devices("cpu")[0])
         array = to_device(array, cpu)
 
-    # Try DLPack (works for JAX and other backends)
     if hasattr(array, "__dlpack__"):
         try:
             return np.from_dlpack(array)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
