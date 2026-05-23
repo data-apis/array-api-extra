@@ -8,12 +8,11 @@ import pytest
 import array_api_extra as xpx  # Let some tests bypass lazy_xp_function
 from array_api_extra import lazy_apply
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils import _compat
 from array_api_extra._lib._utils._compat import array_namespace, is_dask_array
 from array_api_extra._lib._utils._helpers import eager_shape
 from array_api_extra._lib._utils._typing import Array, Device
-from array_api_extra.testing import lazy_xp_function
+from array_api_extra.testing import assert_equal, lazy_xp_function
 
 lazy_xp_function(lazy_apply)
 
@@ -54,7 +53,7 @@ def test_lazy_apply_simple(
     x = xp.asarray([1, 2], dtype=xp.int16)
     expect = xp.broadcast_to(xp.astype(x + 1, getattr(xp, dtype)), shape)
     actual = lazy_apply(f, x, shape=shape, dtype=getattr(xp, dtype), as_numpy=as_numpy)
-    xp_assert_equal(actual, expect)
+    assert_equal(actual, expect)
 
 
 @as_numpy
@@ -67,7 +66,7 @@ def test_lazy_apply_broadcast(xp: ModuleType, as_numpy: bool):
     x = xp.asarray([1, 2], dtype=xp.int16)
     y = xp.asarray([[4], [5], [6]], dtype=xp.int32)
     z = lazy_apply(f, x, y, as_numpy=as_numpy)
-    xp_assert_equal(z, x + y)
+    assert_equal(z, x + y)
 
 
 @as_numpy
@@ -89,8 +88,8 @@ def test_lazy_apply_multi_output(xp: ModuleType, as_numpy: bool):
     )
     assert isinstance(actual, tuple)
     assert len(actual) == 2
-    xp_assert_equal(actual[0], expect[0])
-    xp_assert_equal(actual[1], expect[1])
+    assert_equal(actual[0], expect[0])
+    assert_equal(actual[1], expect[1])
 
 
 @pytest.mark.parametrize(
@@ -127,8 +126,8 @@ def test_lazy_apply_multi_output_broadcast_dtype(xp: ModuleType, as_numpy: bool)
     actual = lazy_apply(f, x, y, shape=((2,), (2,)), as_numpy=as_numpy)
     assert isinstance(actual, tuple)
     assert len(actual) == 2
-    xp_assert_equal(actual[0], expect[0])
-    xp_assert_equal(actual[1], expect[1])
+    assert_equal(actual[0], expect[0])
+    assert_equal(actual[1], expect[1])
 
 
 def test_lazy_apply_core_indices(da: ModuleType):
@@ -150,9 +149,9 @@ def test_lazy_apply_core_indices(da: ModuleType):
     # axis 0 is a "core axis" or "core index" (from xarray.apply_ufunc's
     # "core dimension").
     with pytest.raises(AssertionError):
-        xp_assert_equal(da.map_blocks(f, x_da), expect)
+        assert_equal(da.map_blocks(f, x_da), expect)
 
-    xp_assert_equal(lazy_apply(f, x_da), expect)
+    assert_equal(lazy_apply(f, x_da), expect)
 
 
 def test_lazy_apply_dont_run_on_meta(da: ModuleType):
@@ -167,7 +166,7 @@ def test_lazy_apply_dont_run_on_meta(da: ModuleType):
     x = da.arange(10)
     assert not x._meta.size
     y = lazy_apply(f, x)
-    xp_assert_equal(y, x + 1)
+    assert_equal(y, x + 1)
 
 
 def test_lazy_apply_dask_non_numpy_meta(da: ModuleType):
@@ -188,7 +187,7 @@ def test_lazy_apply_dask_non_numpy_meta(da: ModuleType):
 
     y = lazy_apply(f, x_da)
     assert array_namespace(y._meta) is cp  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-    xp_assert_equal(y.compute(), x_cp + 1)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+    assert_equal(y.compute(), x_cp + 1)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
 
 def test_dask_key(da: ModuleType):
@@ -233,7 +232,7 @@ def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
     # Single output
     with ctx:
         values = lazy_apply(mxp.unique_values, x, shape=(None,))
-        xp_assert_equal(xp.sort(values), xp.asarray([1, 2]))
+        assert_equal(xp.sort(values), xp.asarray([1, 2]))
 
     with ctx:
         # Multi output
@@ -243,8 +242,8 @@ def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
             shape=((None,), (None,)),
             dtype=(x.dtype, int_type),
         )
-        xp_assert_equal(values, xp.asarray([1, 2]))
-        xp_assert_equal(counts, xp.asarray([2, 3]))
+        assert_equal(values, xp.asarray([1, 2]))
+        assert_equal(counts, xp.asarray([2, 3]))
 
 
 def check_lazy_apply_none_shape_broadcast(x: Array) -> Array:
@@ -267,7 +266,7 @@ def test_lazy_apply_none_shape_broadcast(xp: ModuleType):
     """Broadcast from input array with unknown shape"""
     x = xp.asarray([1, 2, 2])
     actual = check_lazy_apply_none_shape_broadcast(x)
-    xp_assert_equal(actual, xp.asarray([2, 2]))
+    assert_equal(actual, xp.asarray([2, 2]))
 
 
 @pytest.mark.parametrize(
@@ -316,7 +315,7 @@ def test_lazy_apply_arraylike(xp: ModuleType):
 
     expect = xp.asarray(3)
     actual = lazy_apply(f, x, shape=(), dtype=expect.dtype)
-    xp_assert_equal(actual, expect)
+    assert_equal(actual, expect)
 
     # Multi output
     def g(x: Array) -> tuple[int, list[int]]:
@@ -324,8 +323,8 @@ def test_lazy_apply_arraylike(xp: ModuleType):
         return shape[0], list(shape)
 
     actual2 = lazy_apply(g, x, shape=((), (1,)), dtype=(expect.dtype, expect.dtype))
-    xp_assert_equal(actual2[0], xp.asarray(3))
-    xp_assert_equal(actual2[1], xp.asarray([3]))
+    assert_equal(actual2[0], xp.asarray(3))
+    assert_equal(actual2[1], xp.asarray([3]))
 
 
 def test_lazy_apply_scalars_and_nones(xp: ModuleType, library: Backend):
@@ -340,7 +339,7 @@ def test_lazy_apply_scalars_and_nones(xp: ModuleType, library: Backend):
 
     x = xp.asarray([1, 2])
     w = lazy_apply(f, x, None, 3)
-    xp_assert_equal(w, x + 3)
+    assert_equal(w, x + 3)
 
 
 def check_lazy_apply_kwargs(x: Array, expect_cls: type, as_numpy: bool) -> Array:
@@ -400,7 +399,7 @@ def test_lazy_apply_kwargs(xp: ModuleType, library: Backend, as_numpy: bool):
     x = xp.asarray(0)
     expect_cls = np.ndarray if as_numpy or library is Backend.DASK else type(x)
     actual = check_lazy_apply_kwargs(x, expect_cls, as_numpy)
-    xp_assert_equal(actual, x + 1)
+    assert_equal(actual, x + 1)
 
 
 class CustomError(Exception):
@@ -423,9 +422,7 @@ lazy_xp_function(raises, jax_jit=False)
 
 def test_lazy_apply_raises(xp: ModuleType):
     """
-    See Also
-    --------
-    test_testing.py::test_lazy_xp_function_eagerly_raises
+    See Also: test_testing.py::test_lazy_xp_function_eagerly_raises
     """
     x = xp.asarray(0)
 
