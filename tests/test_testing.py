@@ -63,12 +63,21 @@ class TestAssertEqualCloseLess:
     )
     @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
     def test_namespace(self, xp: ModuleType, func: Callable[..., None]):
-        with pytest.raises(AssertionError, match="namespaces do not match"):
+        with pytest.raises(
+            AssertionError, match="Namespaces of actual and desired arrays do not match"
+        ):
             func(xp.asarray(0), np.asarray(0))
         with pytest.raises(TypeError, match=r"array_namespace requires .* array input"):
             func(xp.asarray(0), 0)
         with pytest.raises(TypeError, match="list is not a supported array type"):
             func(xp.asarray([0]), [0])
+        with (
+            pytest.raises(
+                AssertionError,
+                match="Namespace of desired array does not match the `xp` argument",
+            ),
+        ):
+            func(xp.asarray(0), xp.asarray(0), xp=np)
 
     @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
     def test_check_shape(self, xp: ModuleType, func: Callable[..., None]):

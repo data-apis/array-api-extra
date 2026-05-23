@@ -37,6 +37,7 @@ def _check_ns_shape_dtype(
     check_dtype: bool,
     check_shape: bool,
     check_scalar: bool,
+    xp: ModuleType | None = None,
 ) -> tuple[Array, Array, ModuleType]:  # numpydoc ignore=RT03
     """
     Assert that namespace, shape and dtype of the two arrays match.
@@ -52,6 +53,8 @@ def _check_ns_shape_dtype(
     check_scalar : bool, default: False
         NumPy only: whether to check agreement between actual and desired types -
         0d array vs scalar.
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
 
     Returns
     -------
@@ -60,8 +63,20 @@ def _check_ns_shape_dtype(
     actual_xp = array_namespace(actual)  # Raises on Python scalars and lists
     desired_xp = array_namespace(desired)
 
-    msg = f"namespaces do not match: {actual_xp} != f{desired_xp}"
-    assert actual_xp == desired_xp, msg
+    if xp is not None:
+        _msg = (
+            "Namespace of desired array does not match the `xp` argument.\n"
+            f"Desired array's namespace: {desired_xp.__name__}\n"
+            f"Expected namespace: {xp.__name__}."
+        )
+        assert desired_xp == xp, _msg
+
+    _msg = (
+        "Namespaces of actual and desired arrays do not match.\n"
+        f"Actual: {actual_xp.__name__}\n"
+        f"Desired: {desired_xp.__name__}."
+    )
+    assert actual_xp == desired_xp, _msg
 
     if is_numpy_namespace(actual_xp) and check_scalar:
         # only NumPy distinguishes between scalars and arrays; we do if check_scalar.
@@ -154,6 +169,7 @@ def xp_assert_equal(
     check_dtype: bool = True,
     check_shape: bool = True,
     check_scalar: bool = False,
+    xp: ModuleType | None = None,
 ) -> None:
     """
     Array-API compatible version of `np.testing.assert_array_equal`.
@@ -173,6 +189,8 @@ def xp_assert_equal(
     check_scalar : bool, default: False
         NumPy only: whether to check agreement between actual and desired types -
         0d array vs scalar.
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
 
     See Also
     --------
@@ -180,7 +198,7 @@ def xp_assert_equal(
     numpy.testing.assert_array_equal : Similar function for NumPy arrays.
     """
     actual, desired, xp = _check_ns_shape_dtype(
-        actual, desired, check_dtype, check_shape, check_scalar
+        actual, desired, check_dtype, check_shape, check_scalar, xp
     )
     if not _is_materializable(actual):
         return
@@ -200,6 +218,7 @@ def xp_assert_less(
     check_dtype: bool = True,
     check_shape: bool = True,
     check_scalar: bool = False,
+    xp: ModuleType | None = None,
 ) -> None:
     """
     Array-API compatible version of `np.testing.assert_array_less`.
@@ -217,13 +236,15 @@ def xp_assert_less(
     check_scalar : bool, default: False
         NumPy only: whether to check agreement between actual and desired types -
         0d array vs scalar.
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
 
     See Also
     --------
     xp_assert_close : Similar function for inexact equality checks.
     numpy.testing.assert_array_equal : Similar function for NumPy arrays.
     """
-    x, y, xp = _check_ns_shape_dtype(x, y, check_dtype, check_shape, check_scalar)
+    x, y, xp = _check_ns_shape_dtype(x, y, check_dtype, check_shape, check_scalar, xp)
     if not _is_materializable(x):
         return
     x_np = as_numpy_array(x, xp=xp)
@@ -243,6 +264,7 @@ def xp_assert_close(
     check_dtype: bool = True,
     check_shape: bool = True,
     check_scalar: bool = False,
+    xp: ModuleType | None = None,
 ) -> None:
     """
     Array-API compatible version of `np.testing.assert_allclose`.
@@ -268,6 +290,8 @@ def xp_assert_close(
     check_scalar : bool, default: False
         NumPy only: whether to check agreement between actual and desired types -
         0d array vs scalar.
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
 
     See Also
     --------
@@ -282,7 +306,7 @@ def xp_assert_close(
     Array arguments to `atol` and `rtol` must be valid input to :py:func:`float`.
     """
     actual, desired, xp = _check_ns_shape_dtype(
-        actual, desired, check_dtype, check_shape, check_scalar
+        actual, desired, check_dtype, check_shape, check_scalar, xp
     )
     if not _is_materializable(actual):
         return
