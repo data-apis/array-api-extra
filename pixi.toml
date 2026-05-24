@@ -15,7 +15,10 @@ meson-python = "*"
 uv = "*" # interfaces with meson-python instead of pip
 
 [package.run-dependencies]
-array-api-compat = "*"
+# array-api-compat = "*"
+
+[pypi-dependencies]
+array-api-compat.git = "https://github.com/data-apis/array-api-compat"
 
 ### workspace environments ###
 
