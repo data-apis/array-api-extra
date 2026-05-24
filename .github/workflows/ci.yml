@@ -57,6 +57,8 @@ jobs:
             runs-on: ubuntu-latest
           - environment: tests-backends-py311
             runs-on: ubuntu-latest
+          - environment: tests-run-deps
+            runs-on: ubuntu-slim
 
     environment:
       name: ci-checks
@@ -76,7 +78,7 @@ jobs:
 
       - name: Test package
         # Save some time; also at the moment of writing coverage crashes on python 3.13t
-        if: ${{ matrix.environment != 'tests-nogil' }}
+        if: ${{ matrix.environment != 'tests-nogil' && matrix.environment != 'tests-run-deps' }}
         run: pixi run -e "${TASK_ENV}" tests-ci
         env:
           TASK_ENV: ${{ matrix.environment }}
@@ -84,6 +86,10 @@ jobs:
       - name: Test free-threading
         if: ${{ matrix.environment == 'tests-nogil' }}
         run: pixi run -e tests-nogil tests --parallel-threads=4
+
+      - name: Run dependency tests
+        if: ${{ matrix.environment == 'tests-run-deps' }}
+        run: pixi run tests-run-deps-cov
 
       - name: Upload coverage report
         if: ${{ matrix.environment != 'tests-nogil' }}

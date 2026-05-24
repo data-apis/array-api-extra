@@ -56,7 +56,7 @@ run.source = ["array_api_extra"]
 # mypy
 
 [tool.mypy]
-files = ["src", "tests", "vendor_tests"]
+files = ["src", "tests", "vendor_tests", "run_deps_tests"]
 python_version = "3.11"
 warn_unused_configs = true
 strict = true
@@ -79,6 +79,10 @@ disable_error_code = ["no-untyped-def"] # test(...) without -> None
 [[tool.mypy.overrides]]
 module = ["vendor_tests/array_api_compat/*"]
 ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["run_deps_tests/*"]
+disable_error_code = ["no-untyped-def"] # test(...) without -> None
 
 # pyrefly
 
@@ -107,10 +111,14 @@ errors = { unannotated-return = false }
 matches = "vendor_tests/*.py"
 errors = { unannotated-return = false }
 
+[[tool.pyrefly.sub-config]]
+matches = "run_deps_tests/*.py"
+errors = { unannotated-return = false }
+
 # pyright
 
 [tool.basedpyright]
-include = ["src", "tests", "vendor_tests"]
+include = ["src", "tests", "vendor_tests", "run_deps_tests"]
 exclude = ["vendor_tests/array_api_compat"]
 pythonVersion = "3.11"
 pythonPlatform = "All"
@@ -138,6 +146,7 @@ reportUnknownLambdaType = false
 executionEnvironments = [
   { root = "tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
   { root = "vendor_tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
+  { root = "run_deps_tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
   { root = "src" },
 ]
 
