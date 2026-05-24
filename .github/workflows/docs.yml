@@ -38,7 +38,7 @@ jobs:
 
   docs-deploy:
     name: Deploy
-    if: ${{ github.event.workflow_run.event == 'push' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs: docs-build
     runs-on: ubuntu-slim
 
