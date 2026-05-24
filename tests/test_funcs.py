@@ -22,6 +22,7 @@ from array_api_extra import (
     cov,
     create_diagonal,
     default_dtype,
+    diag_indices,
     expand_dims,
     isclose,
     isin,
@@ -33,6 +34,8 @@ from array_api_extra import (
     partition,
     setdiff1d,
     sinc,
+    tril_indices,
+    triu_indices,
     union1d,
 )
 from array_api_extra import (
@@ -57,6 +60,7 @@ lazy_xp_function(broadcast_shapes)
 lazy_xp_function(cov)
 lazy_xp_function(create_diagonal)
 lazy_xp_function(default_dtype)
+lazy_xp_function(diag_indices)
 lazy_xp_function(expand_dims)
 lazy_xp_function(isclose)
 lazy_xp_function(isin)
@@ -69,6 +73,8 @@ lazy_xp_function(partition)
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False)
 lazy_xp_function(sinc)
+lazy_xp_function(tril_indices)
+lazy_xp_function(triu_indices)
 lazy_xp_function(union1d, jax_jit=False)
 lazy_xp_function(xpx_searchsorted)
 lazy_xp_function(_funcs_searchsorted)
@@ -827,6 +833,133 @@ class TestDefaultDType:
         assert default_dtype(xp) == xp.float32
         assert default_dtype(xp, "real floating") == xp.float32
         assert default_dtype(xp, "complex floating") == xp.complex64
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
+class TestDiagIndices:
+    def test_basic(self, xp: ModuleType):
+        rows, cols = diag_indices(5)
+        ref_rows, ref_cols = np.diag_indices(5)
+        xp_assert_equal(rows, xp.asarray(ref_rows))
+        xp_assert_equal(cols, xp.asarray(ref_cols))
+
+    @pytest.mark.parametrize("n", [2, 4, 7])
+    @pytest.mark.parametrize("ndim", [1, 2, 3, 4])
+    def test_ndim(self, xp: ModuleType, n: int, ndim: int):
+        idx = diag_indices(n, ndim=ndim, xp=xp)
+        assert len(idx) == ndim
+        ref = np.diag_indices(n, ndim=ndim)
+        for got, expected in zip(idx, ref, strict=True):
+            xp_assert_equal(got, xp.asarray(expected))
+
+    def test_empty(self, xp: ModuleType):
+        rows, cols = diag_indices(0, xp=xp)
+        assert rows.shape == (0,)
+        assert cols.shape == (0,)
+
+    def test_validation(self, xp: ModuleType):
+        with pytest.raises(ValueError, match="`n` must be non-negative"):
+            _ = diag_indices(-1, xp=xp)
+        with pytest.raises(ValueError, match="`ndim` must be >= 1"):
+            _ = diag_indices(3, ndim=0, xp=xp)
+
+    def test_device(self, xp: ModuleType, device: Device):
+        default_device = get_device(xp.empty(0))
+        rows, cols = diag_indices(3, device=None, xp=xp)
+        assert get_device(rows) == default_device
+        assert get_device(cols) == default_device
+        rows, cols = diag_indices(3, device=device, xp=xp)
+        assert get_device(rows) == device
+        assert get_device(cols) == device
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange/nonzero", strict=False)
+@pytest.mark.xfail_xp_backend(
+    Backend.ARRAY_API_STRICTEST,
+    reason="generic path uses nonzero (data-dependent)",
+    strict=False,
+)
+@pytest.mark.parametrize(
+    ("xpx_fn", "np_fn"),
+    [(tril_indices, np.tril_indices), (triu_indices, np.triu_indices)],
+    ids=["tril", "triu"],
+)
+class TestTriIndices:
+    def test_basic(
+        self,
+        xp: ModuleType,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],
+    ):
+        rows, cols = xpx_fn(4)
+        ref_rows, ref_cols = np_fn(4)
+        xp_assert_equal(rows, xp.asarray(ref_rows))
+        xp_assert_equal(cols, xp.asarray(ref_cols))
+
+    @pytest.mark.parametrize("offset", [-2, -1, 0, 1, 2])
+    def test_offset(
+        self,
+        xp: ModuleType,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],
+        offset: int,
+    ):
+        rows, cols = xpx_fn(5, offset=offset, xp=xp)
+        ref_rows, ref_cols = np_fn(5, k=offset)
+        xp_assert_equal(rows, xp.asarray(ref_rows))
+        xp_assert_equal(cols, xp.asarray(ref_cols))
+
+    def test_rectangular(
+        self,
+        xp: ModuleType,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],
+    ):
+        rows, cols = xpx_fn(3, m=5, xp=xp)
+        ref_rows, ref_cols = np_fn(3, m=5)
+        xp_assert_equal(rows, xp.asarray(ref_rows))
+        xp_assert_equal(cols, xp.asarray(ref_cols))
+
+    @pytest.mark.xfail_xp_backend(
+        Backend.DASK, reason="dask: no 2D fancy indexing", strict=False
+    )
+    def test_use_to_read(
+        self,
+        xp: ModuleType,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],
+    ):
+        rng = np.random.default_rng(0)
+        a = rng.integers(0, 100, (4, 4))
+        a_xp = xp.asarray(a)
+        rows, cols = xpx_fn(4, xp=xp)
+        xp_assert_equal(a_xp[rows, cols], xp.asarray(a[np_fn(4)]))
+
+    def test_validation(
+        self,
+        xp: ModuleType,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],  # noqa: ARG002  # pytest param
+    ):
+        with pytest.raises(ValueError, match="`n` must be non-negative"):
+            _ = xpx_fn(-1, xp=xp)
+        with pytest.raises(ValueError, match="`m` must be non-negative"):
+            _ = xpx_fn(3, m=-1, xp=xp)
+
+    def test_device(
+        self,
+        xp: ModuleType,
+        device: Device,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],  # noqa: ARG002  # pytest param
+    ):
+        default_device = get_device(xp.empty(0))
+        rows, cols = xpx_fn(4, device=None, xp=xp)
+        assert get_device(rows) == default_device
+        assert get_device(cols) == default_device
+        rows, cols = xpx_fn(4, device=device, xp=xp)
+        assert get_device(rows) == device
+        assert get_device(cols) == device
 
 
 class TestExpandDims:
