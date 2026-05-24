@@ -9,6 +9,7 @@ from ._delegation import (
     expand_dims,
     isclose,
     isin,
+    kron,
     nan_to_num,
     one_hot,
     pad,
@@ -23,7 +24,6 @@ from ._lib._funcs import (
     angle,
     apply_where,
     default_dtype,
-    kron,
     nunique,
 )
 from ._lib._lazy import lazy_apply
