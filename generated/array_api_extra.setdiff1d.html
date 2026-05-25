@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="array_api_extra.sinc" href="array_api_extra.sinc.html"><link rel="prev" title="array_api_extra.partition" href="array_api_extra.partition.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="sinc" href="array_api_extra.sinc.html"><link rel="prev" title="partition" href="array_api_extra.partition.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>array_api_extra.setdiff1d - array-api-extra 0.10.2.dev0 documentation</title>
+        <title>setdiff1d - array-api-extra 0.10.2.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -193,34 +193,40 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">array-api-extra</a></li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../api-reference.html">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.angle.html">array_api_extra.angle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.apply_where.html">array_api_extra.apply_where</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.argpartition.html">array_api_extra.argpartition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.at.html">array_api_extra.at</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.atleast_nd.html">array_api_extra.atleast_nd</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.broadcast_shapes.html">array_api_extra.broadcast_shapes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.cov.html">array_api_extra.cov</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.create_diagonal.html">array_api_extra.create_diagonal</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.default_dtype.html">array_api_extra.default_dtype</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.expand_dims.html">array_api_extra.expand_dims</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.isclose.html">array_api_extra.isclose</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.isin.html">array_api_extra.isin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.kron.html">array_api_extra.kron</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.nan_to_num.html">array_api_extra.nan_to_num</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.nunique.html">array_api_extra.nunique</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.one_hot.html">array_api_extra.one_hot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.pad.html">array_api_extra.pad</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.partition.html">array_api_extra.partition</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">array_api_extra.setdiff1d</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.sinc.html">array_api_extra.sinc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.union1d.html">array_api_extra.union1d</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api-assorted.html">Assorted functions</a><input aria-label="Toggle navigation of Assorted functions" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.angle.html">angle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.apply_where.html">apply_where</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.argpartition.html">argpartition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.at.html">at</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.atleast_nd.html">atleast_nd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.broadcast_shapes.html">broadcast_shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.cov.html">cov</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.create_diagonal.html">create_diagonal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.default_dtype.html">default_dtype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.expand_dims.html">expand_dims</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.isclose.html">isclose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.isin.html">isin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.kron.html">kron</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.nan_to_num.html">nan_to_num</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.nunique.html">nunique</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.one_hot.html">one_hot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.pad.html">pad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.partition.html">partition</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">setdiff1d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.sinc.html">sinc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.union1d.html">union1d</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api-lazy.html">Tools for lazy backends</a><input aria-label="Toggle navigation of Tools for lazy backends" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.lazy_apply.html">array_api_extra.lazy_apply</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html">array_api_extra.testing.lazy_xp_function</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.patch_lazy_xp_functions.html">array_api_extra.testing.patch_lazy_xp_functions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api-testing.html">Testing utilities (<code class="docutils literal notranslate"><span class="pre">xpx.testing</span></code>)</a><input aria-label="Toggle navigation of Testing utilities (xpx.testing)" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_close.html">testing.assert_close</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_equal.html">testing.assert_equal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_less.html">testing.assert_less</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api-lazy.html">Tools for lazy backends</a><input aria-label="Toggle navigation of Tools for lazy backends" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.lazy_apply.html">lazy_apply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html">testing.lazy_xp_function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.patch_lazy_xp_functions.html">testing.patch_lazy_xp_functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
@@ -267,8 +273,8 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="array-api-extra-setdiff1d">
-<h1>array_api_extra.setdiff1d<a class="headerlink" href="#array-api-extra-setdiff1d" title="Link to this heading">¶</a></h1>
+          <section id="setdiff1d">
+<h1>setdiff1d<a class="headerlink" href="#setdiff1d" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="array_api_extra.setdiff1d">
 <span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">setdiff1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">assume_unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.setdiff1d" title="Link to this definition">¶</a></dt>
@@ -318,7 +324,7 @@ if the input is sorted.</p>
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">array_api_extra.sinc</div>
+                <div class="title">sinc</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -329,7 +335,7 @@ if the input is sorted.</p>
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">array_api_extra.partition</div>
+                <div class="title">partition</div>
                 
               </div>
             </a>
@@ -370,7 +376,7 @@ if the input is sorted.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">array_api_extra.setdiff1d</a><ul>
+<li><a class="reference internal" href="#">setdiff1d</a><ul>
 <li><a class="reference internal" href="#array_api_extra.setdiff1d"><code class="docutils literal notranslate"><span class="pre">setdiff1d()</span></code></a></li>
 </ul>
 </li>

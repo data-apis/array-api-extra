@@ -1,4 +1,4 @@
-# API Reference
+# Assorted functions
 
 ```{eval-rst}
 .. currentmodule:: array_api_extra

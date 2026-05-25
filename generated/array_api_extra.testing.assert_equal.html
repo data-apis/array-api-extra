@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="expand_dims" href="array_api_extra.expand_dims.html"><link rel="prev" title="create_diagonal" href="array_api_extra.create_diagonal.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="testing.assert_less" href="array_api_extra.testing.assert_less.html"><link rel="prev" title="testing.assert_close" href="array_api_extra.testing.assert_close.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>default_dtype - array-api-extra 0.10.2.dev0 documentation</title>
+        <title>testing.assert_equal - array-api-extra 0.10.2.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -193,7 +193,7 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">array-api-extra</a></li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../api-assorted.html">Assorted functions</a><input aria-label="Toggle navigation of Assorted functions" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api-assorted.html">Assorted functions</a><input aria-label="Toggle navigation of Assorted functions" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.angle.html">angle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.apply_where.html">apply_where</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.argpartition.html">argpartition</a></li>
@@ -202,7 +202,7 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.broadcast_shapes.html">broadcast_shapes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.cov.html">cov</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.create_diagonal.html">create_diagonal</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">default_dtype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.default_dtype.html">default_dtype</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.expand_dims.html">expand_dims</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.isclose.html">isclose</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.isin.html">isin</a></li>
@@ -217,9 +217,9 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.union1d.html">union1d</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api-testing.html">Testing utilities (<code class="docutils literal notranslate"><span class="pre">xpx.testing</span></code>)</a><input aria-label="Toggle navigation of Testing utilities (xpx.testing)" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api-testing.html">Testing utilities (<code class="docutils literal notranslate"><span class="pre">xpx.testing</span></code>)</a><input aria-label="Toggle navigation of Testing utilities (xpx.testing)" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_close.html">testing.assert_close</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_equal.html">testing.assert_equal</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">testing.assert_equal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_less.html">testing.assert_less</a></li>
 </ul>
 </li>
@@ -251,12 +251,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.default_dtype.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.testing.assert_equal.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.default_dtype.rst" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.testing.assert_equal.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -273,29 +273,45 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="default-dtype">
-<h1>default_dtype<a class="headerlink" href="#default-dtype" title="Link to this heading">¶</a></h1>
+          <section id="testing-assert-equal">
+<h1>testing.assert_equal<a class="headerlink" href="#testing-assert-equal" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.default_dtype">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">default_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'real</span> <span class="pre">floating'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.default_dtype" title="Link to this definition">¶</a></dt>
-<dd><p>Return the default dtype for the given namespace and device.</p>
-<p>This is a convenience shorthand for
-<code class="docutils literal notranslate"><span class="pre">xp.__array_namespace_info__().default_dtypes(device=device)[kind]</span></code>.</p>
+<dt class="sig sig-object py" id="array_api_extra.testing.assert_equal">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.testing.</span></span><span class="sig-name descname"><span class="pre">assert_equal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actual</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">err_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_scalar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.testing.assert_equal" title="Link to this definition">¶</a></dt>
+<dd><p>Check that two arrays are equal.</p>
+<p>This is an interface to <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_array_equal.html#numpy.testing.assert_array_equal" title="(in NumPy v2.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.testing.assert_array_equal()</span></code></a> which accepts
+any standard-compatible array and performs additional array namespace,
+shape, and dtype checks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>xp</strong> (<em>array_namespace</em>) – The standard-compatible namespace for which to get the default dtype.</p></li>
-<li><p><strong>kind</strong> (<em>{'real floating'</em><em>, </em><em>'complex floating'</em><em>, </em><em>'integral'</em><em>, </em><em>'indexing'}</em><em>, </em><em>optional</em>) – The kind of dtype to return. Default is ‘real floating’.</p></li>
-<li><p><strong>device</strong> (<em>Device</em><em>, </em><em>optional</em>) – The device for which to get the default dtype. Default: current device.</p></li>
+<li><p><strong>actual</strong> (<em>Array</em>) – The array produced by the tested function.</p></li>
+<li><p><strong>desired</strong> (<em>Array</em>) – The expected array (typically hardcoded).</p></li>
+<li><p><strong>err_msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Error message to display on failure.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default: True</em>) – Whether to include the conflicting arrays in the error message on failure.</p></li>
+<li><p><strong>check_dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default: True</em>) – Whether to check agreement between actual and desired dtypes.</p></li>
+<li><p><strong>check_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default: True</em>) – Whether to check agreement between actual and desired shapes.</p></li>
+<li><p><strong>check_scalar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default: False</em>) – NumPy only: whether to check agreement between actual and desired types —
+0-D <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> vs scalar (e.g. <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.double" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.double</span></code></a>).</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – A standard-compatible namespace which <cite>actual</cite> and <cite>desired</cite> must match.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The default dtype for the given namespace, kind, and device.</p>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><strong>ImportError</strong></a> – If <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v2.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a> is not importable in the Python environment.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="array_api_extra.testing.assert_close.html#array_api_extra.testing.assert_close" title="array_api_extra.testing.assert_close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assert_close</span></code></a></dt><dd><p>Similar function for inexact equality checks.</p>
+</dd>
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_array_equal.html#numpy.testing.assert_array_equal" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.testing.assert_array_equal</span></code></a></dt><dd><p>Similar function for NumPy arrays.</p>
+</dd>
+</dl>
+</div>
 </dd></dl>
 
 </section>
@@ -305,23 +321,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="array_api_extra.expand_dims.html">
+          <a class="next-page" href="array_api_extra.testing.assert_less.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">expand_dims</div>
+                <div class="title">testing.assert_less</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.create_diagonal.html">
+          <a class="prev-page" href="array_api_extra.testing.assert_close.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">create_diagonal</div>
+                <div class="title">testing.assert_close</div>
                 
               </div>
             </a>
@@ -362,8 +378,8 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">default_dtype</a><ul>
-<li><a class="reference internal" href="#array_api_extra.default_dtype"><code class="docutils literal notranslate"><span class="pre">default_dtype()</span></code></a></li>
+<li><a class="reference internal" href="#">testing.assert_equal</a><ul>
+<li><a class="reference internal" href="#array_api_extra.testing.assert_equal"><code class="docutils literal notranslate"><span class="pre">assert_equal()</span></code></a></li>
 </ul>
 </li>
 </ul>
