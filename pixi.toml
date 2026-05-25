@@ -25,6 +25,7 @@ lint = { features = ["py314", "lint"], solve-group = "py314" }
 docs = { features = ["py314", "docs"], solve-group = "py314" }
 tests = { features = ["py314", "tests"], solve-group = "py314" }
 tests-py314 = { features = ["py314", "tests"], solve-group = "py314" } # alias of tests
+tests-run-deps = { features = ["py314", "tests-run-deps"], solve-group = "py314" }
 
 # Some backends may pin numpy; use separate solve-group
 dev = { features = ["py314", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
@@ -116,6 +117,21 @@ tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-comp
 tests-ci = { depends-on = ["tests-cov", "tests-vendor"], description = "Run tests with coverage and vendor tests" }
 coverage = { cmd = "coverage html", depends-on = ["tests-cov"], description = "Generate test coverage html report", default-environment = "tests" }
 open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"], description = "Open test coverage report", default-environment = "tests" }
+
+# tests with only run dependencies
+[feature.tests-run-deps.dependencies]
+pytest = ">=9.0.3"
+pytest-cov = ">=7.1.0"
+
+[feature.tests-run-deps.tasks.tests-run-deps]
+cmd = "pytest -v run_deps_tests"
+description = "Run run-dependency tests"
+default-environment = "tests-run-deps"
+
+[feature.tests-run-deps.tasks.tests-run-deps-cov]
+cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20 run_deps_tests"
+description = "Run run-dependency tests with coverage"
+default-environment = "tests-run-deps"
 
 [feature.docs.dependencies]
 sphinx = ">=7.4.7"
