@@ -32,8 +32,8 @@ from ._lib._utils._helpers import jax_autojit, pickle_flatten, pickle_unflatten
 from ._lib._utils._typing import Array, Device
 
 __all__ = [
-    "assert_almost_equal_nulp",
     "assert_close",
+    "assert_close_nulp",
     "assert_equal",
     "assert_less",
     "lazy_xp_function",
@@ -919,7 +919,7 @@ def assert_less(
     np.testing.assert_array_less(x_np, y_np, err_msg=err_msg, verbose=verbose)
 
 
-def assert_almost_equal_nulp(
+def assert_close_nulp(
     actual: Array,
     desired: Array,
     *,
