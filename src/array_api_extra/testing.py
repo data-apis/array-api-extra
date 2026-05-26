@@ -749,6 +749,9 @@ def assert_close(
 
     Raises
     ------
+    AssertionError
+        If `actual` and `desired` are not equal up to the defined tolerance.
+
     ImportError
         If :mod:`numpy` is not importable in the Python environment.
 
@@ -843,6 +846,9 @@ def assert_equal(
 
     Raises
     ------
+    AssertionError
+        If `actual` and `desired` are not equal.
+
     ImportError
         If :mod:`numpy` is not importable in the Python environment.
 
@@ -901,6 +907,9 @@ def assert_less(
 
     Raises
     ------
+    AssertionError
+        If `x` is not strictly smaller than `y`, elementwise.
+
     ImportError
         If :mod:`numpy` is not importable in the Python environment.
 
@@ -943,9 +952,8 @@ def assert_close_nulp(
     desired : Array
         The expected array (typically hardcoded).
     nulp : int, optional
-        Maximum number of ULPs that the elements of `actual` and
-        `desired` can differ by.
-        Default: 1.
+        The maximum number of units in the last place
+        for the tolerance check. Default: ``1``.
     check_dtype : bool, default: True
         Whether to check agreement between actual and desired dtypes.
     check_shape : bool, default: True
@@ -958,13 +966,31 @@ def assert_close_nulp(
 
     Raises
     ------
+    AssertionError
+        If the spacing between `actual` and `desired` for one or more elements is \
+        larger than `nulp`.
+
     ImportError
         If :mod:`numpy` is not importable in the Python environment.
 
     See Also
     --------
     assert_close : Similar function for inexact equality checks.
-    numpy.testing.assert_array_almost_equal_nulp: Similar function for NumPy arrays.
+    numpy.spacing : Spacing calculation for NumPy arrays.
+    numpy.testing.assert_array_almost_equal_nulp : Similar function for NumPy arrays.
+
+    Notes
+    -----
+
+    This is a relatively robust method to compare two arrays whose amplitude is
+    variable.
+
+    An assertion is raised if the following condition is not met::
+
+        abs(actual - desired) <= nulp * spacing(maximum(abs(actual), abs(desired)))
+
+    where ``spacing(x)`` is the distance between ``x`` and the nearest adjacent number
+    representable by in the data type of ``x``.
     """
     actual, desired, xp, np = _check_ns_shape_dtype(
         actual, desired, check_dtype, check_shape, check_scalar, xp
