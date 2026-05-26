@@ -32,6 +32,7 @@ from ._lib._utils._helpers import jax_autojit, pickle_flatten, pickle_unflatten
 from ._lib._utils._typing import Array, Device
 
 __all__ = [
+    "assert_almost_equal_nulp",
     "assert_close",
     "assert_equal",
     "assert_less",
@@ -916,3 +917,44 @@ def assert_less(
     x_np = _as_numpy_array(x, xp=xp)
     y_np = _as_numpy_array(y, xp=xp)
     np.testing.assert_array_less(x_np, y_np, err_msg=err_msg, verbose=verbose)
+
+
+def assert_almost_equal_nulp(
+    actual: Array,
+    desired: Array,
+    *,
+    nulp: int = 1,
+    check_dtype: bool = True,
+    check_shape: bool = True,
+    check_scalar: bool = False,
+    xp: ModuleType | None = None,
+) -> None:
+    """
+    (TODO: improve docstring)
+    Parameters
+    ----------
+    actual : Array
+        The array produced by the tested function.
+    desired : Array
+        The expected array (typically hardcoded).
+    nulp : int, optional
+        Maximum number of ULPs that the elements of `actual` and
+        `desired` can differ by.
+        Default: 1.
+    check_dtype : bool, default: True
+        Whether to check agreement between actual and desired dtypes.
+    check_shape : bool, default: True
+        Whether to check agreement between actual and desired shapes.
+    check_scalar : bool, default: False
+        NumPy only: whether to check agreement between actual and desired types —
+        0-D :class:`numpy.ndarray` vs scalar (e.g. :class:`numpy.double`).
+    """
+    actual, desired, xp, np = _check_ns_shape_dtype(
+        actual, desired, check_dtype, check_shape, check_scalar, xp
+    )
+    if not _is_materializable(actual):
+        return
+    actual_np = _as_numpy_array(actual, xp=xp)
+    desired_np = _as_numpy_array(desired, xp=xp)
+    np.testing.assert_array_almost_equal_nulp(actual_np, desired_np, nulp=nulp)
+    # TODO: add tests
