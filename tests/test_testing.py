@@ -16,6 +16,7 @@ from array_api_extra._lib._utils._compat import (
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import (
     _as_numpy_array,
+    assert_almost_equal_nulp,
     assert_close,
     assert_equal,
     assert_less,
@@ -51,7 +52,9 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="hello"):
             func(xp.asarray([1, 2]), xp.asarray([2, 1]), err_msg="hello")
 
-    @pytest.mark.parametrize("func", [assert_equal, assert_close, assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_almost_equal_nulp]
+    )
     def test_shape_dtype(self, xp: ModuleType, func: Callable[..., None]):
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(xp.asarray([0]), xp.asarray([[0]]))
@@ -63,7 +66,9 @@ class TestAssertEqualCloseLess:
     @pytest.mark.skip_xp_backend(
         Backend.NUMPY_READONLY, reason="test other ns vs. numpy"
     )
-    @pytest.mark.parametrize("func", [assert_equal, assert_close, assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_almost_equal_nulp]
+    )
     def test_namespace(self, xp: ModuleType, func: Callable[..., None]):
         with pytest.raises(
             AssertionError, match="Namespaces of actual and desired arrays do not match"
@@ -81,7 +86,9 @@ class TestAssertEqualCloseLess:
         ):
             func(xp.asarray(0), xp.asarray(0), xp=np)
 
-    @pytest.mark.parametrize("func", [assert_equal, assert_close, assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_almost_equal_nulp]
+    )
     def test_check_shape(self, xp: ModuleType, func: Callable[..., None]):
         a = xp.asarray([1] if func is assert_less else [2])
         b = xp.asarray(2)
@@ -91,12 +98,20 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(a, b)
         func(a, b, check_shape=False)
-        with pytest.raises(AssertionError, match="Mismatched elements"):
-            func(a, c, check_shape=False)
-        with pytest.raises(AssertionError, match="sizes do not match"):
-            func(a, d, check_shape=False)
+        if func is not assert_almost_equal_nulp:
+            with pytest.raises(AssertionError, match="Mismatched elements"):
+                func(a, c, check_shape=False)
+            with pytest.raises(AssertionError, match="sizes do not match"):
+                func(a, d, check_shape=False)
+        else:
+            with pytest.raises(AssertionError, match="Arrays are not equal"):
+                func(a, c, check_shape=False)
+            with pytest.raises(AssertionError, match="sizes do not match"):
+                func(b, d, check_shape=False)
 
-    @pytest.mark.parametrize("func", [assert_equal, assert_close, assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_almost_equal_nulp]
+    )
     def test_check_dtype(self, xp: ModuleType, func: Callable[..., None]):
         a = xp.asarray(1 if func is assert_less else 2)
         b = xp.asarray(2, dtype=xp.int16)
@@ -105,10 +120,16 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="dtypes do not match"):
             func(a, b)
         func(a, b, check_dtype=False)
-        with pytest.raises(AssertionError, match="Mismatched elements"):
-            func(a, c, check_dtype=False)
+        if func is not assert_almost_equal_nulp:
+            with pytest.raises(AssertionError, match="Mismatched elements"):
+                func(a, c, check_dtype=False)
+        else:
+            with pytest.raises(AssertionError, match="Arrays are not equal"):
+                func(a, c, check_dtype=False)
 
-    @pytest.mark.parametrize("func", [assert_equal, assert_close, assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_almost_equal_nulp]
+    )
     @pytest.mark.xfail_xp_backend(
         Backend.SPARSE, reason="sparse [()] returns np.generic"
     )
@@ -125,8 +146,12 @@ class TestAssertEqualCloseLess:
                 func(a, b, check_scalar=True)
         else:
             func(a, b, check_scalar=True)
-        with pytest.raises(AssertionError, match="Mismatched elements"):
-            func(a, c, check_scalar=True)
+        if func is not assert_almost_equal_nulp:
+            with pytest.raises(AssertionError, match="Mismatched elements"):
+                func(a, c, check_scalar=True)
+        else:
+            with pytest.raises(AssertionError, match="Arrays are not equal"):
+                func(a, c, check_scalar=True)
 
     @pytest.mark.parametrize("dtype", ["int64", "float64"])
     def test_assert_close_tolerance(self, dtype: str, xp: ModuleType):
@@ -150,7 +175,9 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="Mismatched elements"):
             assert_less(xp.asarray([1, 1]), xp.asarray([2, 1]))
 
-    @pytest.mark.parametrize("func", [assert_equal, assert_close, assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_almost_equal_nulp]
+    )
     @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
     def test_none_shape(self, xp: ModuleType, func: Callable[..., None]):
@@ -166,8 +193,12 @@ class TestAssertEqualCloseLess:
             func(a, xp.asarray(2))
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(a, xp.asarray([2, 3]))
-        with pytest.raises(AssertionError, match="Mismatched elements"):
-            func(a, xp.asarray([0]))
+        if func is not assert_almost_equal_nulp:
+            with pytest.raises(AssertionError, match="Mismatched elements"):
+                func(a, xp.asarray([0]))
+        else:
+            with pytest.raises(AssertionError, match="Arrays are not equal"):
+                func(a, xp.asarray([0]))
 
         # desired has shape=(None, )
         a = xp.asarray([3] if func is assert_less else [2])
@@ -178,10 +209,16 @@ class TestAssertEqualCloseLess:
             func(xp.asarray(2), a)
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(xp.asarray([2, 3]), a)
-        with pytest.raises(AssertionError, match="Mismatched elements"):
-            func(xp.asarray([4]), a)
+        if func is not assert_almost_equal_nulp:
+            with pytest.raises(AssertionError, match="Mismatched elements"):
+                func(xp.asarray([4]), a)
+        else:
+            with pytest.raises(AssertionError, match="Arrays are not equal"):
+                func(xp.asarray([4]), a)
 
-    @pytest.mark.parametrize("func", [assert_equal, assert_close, assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_almost_equal_nulp]
+    )
     def test_device(self, xp: ModuleType, device: Device, func: Callable[..., None]):
         a = xp.asarray([1] if func is assert_less else [2], device=device)
         b = xp.asarray([2], device=device)
@@ -194,6 +231,21 @@ class TestAssertEqualCloseLess:
         # but in case of torch device='meta' we have to do it manually
         with pytest.raises(AssertionError, match="sizes do not match"):
             func(a, c, check_shape=False)
+
+    def test_assert_almost_equal_nulp(self, xp: ModuleType):
+        a = xp.asarray([1.0, 1e-10])
+        b = xp.asarray([1.0 + 2**-52, 0.0])
+        c = xp.asarray(
+            [
+                1.0 + 2 * 2**-52,
+                1e-10 + 2 * np.spacing(1e-10),
+            ]
+        )
+
+        assert_almost_equal_nulp(a, c, nulp=2)
+        assert_almost_equal_nulp(a, a, nulp=0)
+        with pytest.raises(AssertionError, match="Arrays are not equal"):
+            assert_almost_equal_nulp(a, b, nulp=0)
 
 
 def good_lazy(x: Array) -> Array:

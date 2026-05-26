@@ -930,7 +930,6 @@ def assert_almost_equal_nulp(
     xp: ModuleType | None = None,
 ) -> None:
     """
-    (TODO: improve docstring)
     Parameters
     ----------
     actual : Array
@@ -948,6 +947,16 @@ def assert_almost_equal_nulp(
     check_scalar : bool, default: False
         NumPy only: whether to check agreement between actual and desired types —
         0-D :class:`numpy.ndarray` vs scalar (e.g. :class:`numpy.double`).
+
+    Raises
+    ------
+    ImportError
+        If :mod:`numpy` is not importable in the Python environment.
+
+    See Also
+    --------
+    assert_close : Similar function for inexact equality checks.
+    numpy.testing.assert_array_almost_equal_nulp: Similar function for NumPy arrays.
     """
     actual, desired, xp, np = _check_ns_shape_dtype(
         actual, desired, check_dtype, check_shape, check_scalar, xp
@@ -957,4 +966,3 @@ def assert_almost_equal_nulp(
     actual_np = _as_numpy_array(actual, xp=xp)
     desired_np = _as_numpy_array(desired, xp=xp)
     np.testing.assert_array_almost_equal_nulp(actual_np, desired_np, nulp=nulp)
-    # TODO: add tests

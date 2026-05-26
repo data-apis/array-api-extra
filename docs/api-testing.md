@@ -13,6 +13,7 @@ These testing utilities are intended to help transition from using
     assert_close
     assert_equal
     assert_less
+    assert_almost_equal_nulp
 ```
 
 See also utilities specific to testing lazy backends in {doc}`api-lazy`.
