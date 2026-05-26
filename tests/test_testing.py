@@ -104,7 +104,7 @@ class TestAssertEqualCloseLess:
             with pytest.raises(AssertionError, match="sizes do not match"):
                 func(a, d, check_shape=False)
         else:
-            with pytest.raises(AssertionError, match="Arrays are not equal"):
+            with pytest.raises(AssertionError, match="not equal"):
                 func(a, c, check_shape=False)
             with pytest.raises(AssertionError, match="sizes do not match"):
                 func(b, d, check_shape=False)
@@ -124,7 +124,7 @@ class TestAssertEqualCloseLess:
             with pytest.raises(AssertionError, match="Mismatched elements"):
                 func(a, c, check_dtype=False)
         else:
-            with pytest.raises(AssertionError, match="Arrays are not equal"):
+            with pytest.raises(AssertionError, match="not equal"):
                 func(a, c, check_dtype=False)
 
     @pytest.mark.parametrize(
@@ -150,7 +150,7 @@ class TestAssertEqualCloseLess:
             with pytest.raises(AssertionError, match="Mismatched elements"):
                 func(a, c, check_scalar=True)
         else:
-            with pytest.raises(AssertionError, match="Arrays are not equal"):
+            with pytest.raises(AssertionError, match="not equal"):
                 func(a, c, check_scalar=True)
 
     @pytest.mark.parametrize("dtype", ["int64", "float64"])
@@ -197,7 +197,7 @@ class TestAssertEqualCloseLess:
             with pytest.raises(AssertionError, match="Mismatched elements"):
                 func(a, xp.asarray([0]))
         else:
-            with pytest.raises(AssertionError, match="Arrays are not equal"):
+            with pytest.raises(AssertionError, match="not equal"):
                 func(a, xp.asarray([0]))
 
         # desired has shape=(None, )
@@ -213,7 +213,7 @@ class TestAssertEqualCloseLess:
             with pytest.raises(AssertionError, match="Mismatched elements"):
                 func(xp.asarray([4]), a)
         else:
-            with pytest.raises(AssertionError, match="Arrays are not equal"):
+            with pytest.raises(AssertionError, match="not equal"):
                 func(xp.asarray([4]), a)
 
     @pytest.mark.parametrize(
@@ -245,7 +245,7 @@ class TestAssertEqualCloseLess:
 
         assert_almost_equal_nulp(a, c, nulp=2)
         assert_almost_equal_nulp(a, a, nulp=0)
-        with pytest.raises(AssertionError, match="Arrays are not equal"):
+        with pytest.raises(AssertionError, match="not equal to 0 ULP"):
             assert_almost_equal_nulp(a, b, nulp=0)
 
 
