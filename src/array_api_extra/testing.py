@@ -930,6 +930,12 @@ def assert_almost_equal_nulp(
     xp: ModuleType | None = None,
 ) -> None:
     """
+    Compare two arrays relatively to their spacing.
+
+    This is an interface to :func:`numpy.testing.assert_array_almost_equal_nulp`
+    which accepts any standard-compatible array and performs
+    additional array namespace, shape, and dtype checks.
+
     Parameters
     ----------
     actual : Array

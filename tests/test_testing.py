@@ -239,7 +239,8 @@ class TestAssertEqualCloseLess:
             [
                 1.0 + 2 * 2**-52,
                 1e-10 + 2 * np.spacing(1e-10),
-            ], dtype=a.dtype
+            ],
+            dtype=a.dtype,
         )
 
         assert_almost_equal_nulp(a, c, nulp=2)
