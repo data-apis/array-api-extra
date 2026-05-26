@@ -215,19 +215,28 @@ class TestAssertEqualCloseLess:
 
     def test_assert_close_nulp(self, xp: ModuleType):
         a = xp.asarray([1.0, 1e-10])
-        b = xp.asarray([1.0 + 2**-52, 0.0])
-        c = xp.asarray(
-            [
-                1.0 + 2 * 2**-52,
-                1e-10 + 2 * np.spacing(1e-10),
-            ],
-            dtype=a.dtype,
-        )
+        b = xp.asarray([1.0 + 2**-52, 1e-10])
 
-        assert_close_nulp(a, c, nulp=2)
         assert_close_nulp(a, a, nulp=0)
+
+        assert_close_nulp(a, b, nulp=2)
+        assert_close_nulp(a, b, nulp=1)
         with pytest.raises(AssertionError, match="not equal to 0 ULP"):
             assert_close_nulp(a, b, nulp=0)
+
+        c = xp.asarray([1.0 + 2 * 2**-52, 1e-10])
+
+        assert_close_nulp(a, c, nulp=3)
+        assert_close_nulp(a, c, nulp=2)
+        with pytest.raises(AssertionError, match="not equal to 1 ULP"):
+            assert_close_nulp(a, c)
+
+        d = xp.asarray([1.0, 1e-10 + 5 * np.spacing(1e-10)])
+        assert_close_nulp(a, d, nulp=6)
+        assert_close_nulp(a, d, nulp=5)
+
+        with pytest.raises(AssertionError, match="not equal to 4 ULP"):
+            assert_close_nulp(a, d, nulp=4)
 
 
 def good_lazy(x: Array) -> Array:
