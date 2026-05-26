@@ -41,6 +41,9 @@ class TestAsNumPyArray:
 
 
 class TestAssertEqualCloseLess:
+    def np_err_msg(self, func: object):
+        return "not equal" if func is assert_close_nulp else "Mismatched elements"
+
     @pytest.mark.parametrize("func", [assert_equal, assert_close])
     def test_assert_equal_close_basic(self, xp: ModuleType, func: Callable[..., None]):
         func(xp.asarray(0), xp.asarray(0))
@@ -98,16 +101,10 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(a, b)
         func(a, b, check_shape=False)
-        if func is not assert_close_nulp:
-            with pytest.raises(AssertionError, match="Mismatched elements"):
-                func(a, c, check_shape=False)
-            with pytest.raises(AssertionError, match="sizes do not match"):
-                func(a, d, check_shape=False)
-        else:
-            with pytest.raises(AssertionError, match="not equal"):
-                func(a, c, check_shape=False)
-            with pytest.raises(AssertionError, match="sizes do not match"):
-                func(b, d, check_shape=False)
+        with pytest.raises(AssertionError, match=self.np_err_msg(func)):
+            func(a, c, check_shape=False)
+        with pytest.raises(AssertionError, match="sizes do not match"):
+            func(a, d, check_shape=False)
 
     @pytest.mark.parametrize(
         "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
@@ -120,12 +117,8 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="dtypes do not match"):
             func(a, b)
         func(a, b, check_dtype=False)
-        if func is not assert_close_nulp:
-            with pytest.raises(AssertionError, match="Mismatched elements"):
-                func(a, c, check_dtype=False)
-        else:
-            with pytest.raises(AssertionError, match="not equal"):
-                func(a, c, check_dtype=False)
+        with pytest.raises(AssertionError, match=self.np_err_msg(func)):
+            func(a, c, check_dtype=False)
 
     @pytest.mark.parametrize(
         "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
@@ -146,12 +139,8 @@ class TestAssertEqualCloseLess:
                 func(a, b, check_scalar=True)
         else:
             func(a, b, check_scalar=True)
-        if func is not assert_close_nulp:
-            with pytest.raises(AssertionError, match="Mismatched elements"):
-                func(a, c, check_scalar=True)
-        else:
-            with pytest.raises(AssertionError, match="not equal"):
-                func(a, c, check_scalar=True)
+        with pytest.raises(AssertionError, match=self.np_err_msg(func)):
+            func(a, c, check_scalar=True)
 
     @pytest.mark.parametrize("dtype", ["int64", "float64"])
     def test_assert_close_tolerance(self, dtype: str, xp: ModuleType):
@@ -193,12 +182,8 @@ class TestAssertEqualCloseLess:
             func(a, xp.asarray(2))
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(a, xp.asarray([2, 3]))
-        if func is not assert_close_nulp:
-            with pytest.raises(AssertionError, match="Mismatched elements"):
-                func(a, xp.asarray([0]))
-        else:
-            with pytest.raises(AssertionError, match="not equal"):
-                func(a, xp.asarray([0]))
+        with pytest.raises(AssertionError, match=self.np_err_msg(func)):
+            func(a, xp.asarray([0]))
 
         # desired has shape=(None, )
         a = xp.asarray([3] if func is assert_less else [2])
@@ -209,12 +194,8 @@ class TestAssertEqualCloseLess:
             func(xp.asarray(2), a)
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(xp.asarray([2, 3]), a)
-        if func is not assert_close_nulp:
-            with pytest.raises(AssertionError, match="Mismatched elements"):
-                func(xp.asarray([4]), a)
-        else:
-            with pytest.raises(AssertionError, match="not equal"):
-                func(xp.asarray([4]), a)
+        with pytest.raises(AssertionError, match=self.np_err_msg(func)):
+            func(xp.asarray([4]), a)
 
     @pytest.mark.parametrize(
         "func", [assert_equal, assert_close, assert_less, assert_close_nulp]

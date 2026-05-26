@@ -981,7 +981,6 @@ def assert_close_nulp(
 
     Notes
     -----
-
     This is a relatively robust method to compare two arrays whose amplitude is
     variable.
 
