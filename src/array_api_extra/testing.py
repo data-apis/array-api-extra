@@ -947,6 +947,8 @@ def assert_almost_equal_nulp(
     check_scalar : bool, default: False
         NumPy only: whether to check agreement between actual and desired types —
         0-D :class:`numpy.ndarray` vs scalar (e.g. :class:`numpy.double`).
+    xp : array_namespace, optional
+        A standard-compatible namespace which `actual` and `desired` must match.
 
     Raises
     ------
