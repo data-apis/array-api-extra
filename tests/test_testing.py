@@ -231,7 +231,7 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="not equal to 1 ULP"):
             assert_close_nulp(a, c)
 
-        d = xp.asarray([1.0, 1e-10 + 5 * np.spacing(1e-10)])
+        d = xp.asarray([1.0, 1e-10 + 5 * np.spacing(1e-10)], dtype=xp.float64)
         assert_close_nulp(a, d, nulp=6)
         assert_close_nulp(a, d, nulp=5)
 
