@@ -136,7 +136,7 @@ default-environment = "tests-run-deps"
 [feature.docs.dependencies]
 sphinx = ">=7.4.7"
 furo = ">=2025.12.19"
-myst-parser = ">=5.0.0"
+myst-parser = ">=5.1.0"
 sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
