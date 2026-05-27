@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="create_diagonal" href="array_api_extra.create_diagonal.html"><link rel="prev" title="broadcast_shapes" href="array_api_extra.broadcast_shapes.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="testing.assert_equal" href="array_api_extra.testing.assert_equal.html"><link rel="prev" title="testing.assert_close" href="array_api_extra.testing.assert_close.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>cov - array-api-extra 0.10.2.dev0 documentation</title>
+        <title>testing.assert_close_nulp - array-api-extra 0.10.2.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -193,14 +193,14 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">array-api-extra</a></li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../api-assorted.html">Assorted functions</a><input aria-label="Toggle navigation of Assorted functions" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api-assorted.html">Assorted functions</a><input aria-label="Toggle navigation of Assorted functions" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.angle.html">angle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.apply_where.html">apply_where</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.argpartition.html">argpartition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.at.html">at</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.atleast_nd.html">atleast_nd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.broadcast_shapes.html">broadcast_shapes</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">cov</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.cov.html">cov</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.create_diagonal.html">create_diagonal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.default_dtype.html">default_dtype</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.expand_dims.html">expand_dims</a></li>
@@ -217,9 +217,9 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.union1d.html">union1d</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api-testing.html">Testing utilities (<code class="docutils literal notranslate"><span class="pre">xpx.testing</span></code>)</a><input aria-label="Toggle navigation of Testing utilities (xpx.testing)" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api-testing.html">Testing utilities (<code class="docutils literal notranslate"><span class="pre">xpx.testing</span></code>)</a><input aria-label="Toggle navigation of Testing utilities (xpx.testing)" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_close.html">testing.assert_close</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_close_nulp.html">testing.assert_close_nulp</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">testing.assert_close_nulp</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_equal.html">testing.assert_equal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_less.html">testing.assert_less</a></li>
 </ul>
@@ -252,12 +252,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.cov.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.testing.assert_close_nulp.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.cov.rst" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.testing.assert_close_nulp.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -274,91 +274,59 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="cov">
-<h1>cov<a class="headerlink" href="#cov" title="Link to this heading">¶</a></h1>
+          <section id="testing-assert-close-nulp">
+<h1>testing.assert_close_nulp<a class="headerlink" href="#testing-assert-close-nulp" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.cov">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">cov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.cov" title="Link to this definition">¶</a></dt>
-<dd><p>Estimate a covariance matrix (or a stack of covariance matrices).</p>
-<p>Covariance indicates the level to which two variables vary together.
-If we examine <em>N</em>-dimensional samples, <span class="math notranslate nohighlight">\(X = [x_1, x_2, ... x_N]^T\)</span>,
-each with <em>M</em> observations, then element <span class="math notranslate nohighlight">\(C_{ij}\)</span> of the
-<span class="math notranslate nohighlight">\(N    imes N\)</span> covariance matrix is the covariance of
-<span class="math notranslate nohighlight">\(x_i\)</span> and <span class="math notranslate nohighlight">\(x_j\)</span>. The element <span class="math notranslate nohighlight">\(C_{ii}\)</span> is the variance
-of <span class="math notranslate nohighlight">\(x_i\)</span>.</p>
-<p>With the exception of supporting batch input, this provides a subset of
-the functionality of <code class="docutils literal notranslate"><span class="pre">numpy.cov</span></code>.</p>
+<dt class="sig sig-object py" id="array_api_extra.testing.assert_close_nulp">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.testing.</span></span><span class="sig-name descname"><span class="pre">assert_close_nulp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actual</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">nulp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_scalar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.testing.assert_close_nulp" title="Link to this definition">¶</a></dt>
+<dd><p>Compare two arrays relatively to their spacing.</p>
+<p>This is an interface to <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_array_almost_equal_nulp.html#numpy.testing.assert_array_almost_equal_nulp" title="(in NumPy v2.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.testing.assert_array_almost_equal_nulp()</span></code></a>
+which accepts any standard-compatible array and performs
+additional array namespace, shape, and dtype checks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>m</strong> (<em>array</em>) – An array of shape <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">N,</span> <span class="pre">M)</span></code> whose innermost two dimensions
-contain <em>M</em> observations of <em>N</em> variables. That is,
-each row of <cite>m</cite> represents a variable, and each column a single
-observation of all those variables.</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>m</cite>. Default: infer.</p></li>
+<li><p><strong>actual</strong> (<em>Array</em>) – The array produced by the tested function.</p></li>
+<li><p><strong>desired</strong> (<em>Array</em>) – The expected array (typically hardcoded).</p></li>
+<li><p><strong>nulp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – The maximum number of units in the last place
+for the tolerance check. Default: <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>check_dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default: True</em>) – Whether to check agreement between actual and desired dtypes.</p></li>
+<li><p><strong>check_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default: True</em>) – Whether to check agreement between actual and desired shapes.</p></li>
+<li><p><strong>check_scalar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default: False</em>) – NumPy only: whether to check agreement between actual and desired types —
+0-D <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> vs scalar (e.g. <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.double" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.double</span></code></a>).</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – A standard-compatible namespace which <cite>actual</cite> and <cite>desired</cite> must match.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>An array having shape (…, N, N) whose innermost two dimensions represent
-the covariance matrix of the variables.</p>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.14)"><strong>AssertionError</strong></a> – If the spacing between <cite>actual</cite> and <cite>desired</cite> for one or more elements is         larger than <cite>nulp</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><strong>ImportError</strong></a> – If <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v2.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a> is not importable in the Python environment.</p></li>
+</ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_strict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xp</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
-</pre></div>
-</div>
-<p>Consider two variables, <span class="math notranslate nohighlight">\(x_0\)</span> and <span class="math notranslate nohighlight">\(x_1\)</span>, which
-correlate perfectly, but in opposite directions:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
-<span class="go">Array([[0, 1, 2],</span>
-<span class="go">       [2, 1, 0]], dtype=array_api_strict.int64)</span>
-</pre></div>
-</div>
-<p>Note how <span class="math notranslate nohighlight">\(x_0\)</span> increases while <span class="math notranslate nohighlight">\(x_1\)</span> decreases. The covariance
-matrix shows this clearly:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
-<span class="go">Array([[ 1., -1.],</span>
-<span class="go">       [-1.,  1.]], dtype=array_api_strict.float64)</span>
-</pre></div>
-</div>
-<p>Note that element <span class="math notranslate nohighlight">\(C_{0,1}\)</span>, which shows the correlation between
-<span class="math notranslate nohighlight">\(x_0\)</span> and <span class="math notranslate nohighlight">\(x_1\)</span>, is negative.</p>
-<p>Further, note how <cite>x</cite> and <cite>y</cite> are combined:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="o">-</span><span class="mf">2.1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="mf">4.3</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span>  <span class="mf">1.1</span><span class="p">,</span>  <span class="mf">0.12</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
-<span class="go">Array([[11.71      , -4.286     ],</span>
-<span class="go">       [-4.286     ,  2.14413333]], dtype=array_api_strict.float64)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
-<span class="go">Array(11.71, dtype=array_api_strict.float64)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
-<span class="go">Array(2.14413333, dtype=array_api_strict.float64)</span>
-</pre></div>
-</div>
-<p>Input with more than two dimensions is treated as a stack of
-two-dimensional input.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">stack</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">X</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
-<span class="go">Array([[[ 11.71      ,  -4.286     ],</span>
-<span class="go">        [ -4.286     ,   2.14413333]],</span>
-</pre></div>
-</div>
-<blockquote>
-<div><dl class="simple">
-<dt>[[ 46.84      , -17.144     ],</dt><dd><p>[-17.144     ,   8.57653333]]], dtype=array_api_strict.float64)</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="array_api_extra.testing.assert_close.html#array_api_extra.testing.assert_close" title="array_api_extra.testing.assert_close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assert_close</span></code></a></dt><dd><p>Similar function for inexact equality checks.</p>
+</dd>
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.spacing.html#numpy.spacing" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.spacing</span></code></a></dt><dd><p>Spacing calculation for NumPy arrays.</p>
+</dd>
+<dt><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_array_almost_equal_nulp.html#numpy.testing.assert_array_almost_equal_nulp" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.testing.assert_array_almost_equal_nulp</span></code></a></dt><dd><p>Similar function for NumPy arrays.</p>
 </dd>
 </dl>
-</div></blockquote>
+</div>
+<p class="rubric">Notes</p>
+<p>This is a relatively robust method to compare two arrays whose amplitude is
+variable.</p>
+<p>An assertion is raised if the following condition is not met:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">abs</span><span class="p">(</span><span class="n">actual</span> <span class="o">-</span> <span class="n">desired</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">nulp</span> <span class="o">*</span> <span class="n">spacing</span><span class="p">(</span><span class="n">maximum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">actual</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">desired</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">spacing(x)</span></code> is the distance between <code class="docutils literal notranslate"><span class="pre">x</span></code> and the nearest adjacent number
+representable by in the data type of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
 </dd></dl>
 
 </section>
@@ -368,23 +336,23 @@ two-dimensional input.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="array_api_extra.create_diagonal.html">
+          <a class="next-page" href="array_api_extra.testing.assert_equal.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">create_diagonal</div>
+                <div class="title">testing.assert_equal</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.broadcast_shapes.html">
+          <a class="prev-page" href="array_api_extra.testing.assert_close.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">broadcast_shapes</div>
+                <div class="title">testing.assert_close</div>
                 
               </div>
             </a>
@@ -425,8 +393,8 @@ two-dimensional input.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">cov</a><ul>
-<li><a class="reference internal" href="#array_api_extra.cov"><code class="docutils literal notranslate"><span class="pre">cov()</span></code></a></li>
+<li><a class="reference internal" href="#">testing.assert_close_nulp</a><ul>
+<li><a class="reference internal" href="#array_api_extra.testing.assert_close_nulp"><code class="docutils literal notranslate"><span class="pre">assert_close_nulp()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -444,6 +412,5 @@ two-dimensional input.</p>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

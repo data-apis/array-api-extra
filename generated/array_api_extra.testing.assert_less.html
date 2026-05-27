@@ -219,6 +219,7 @@
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api-testing.html">Testing utilities (<code class="docutils literal notranslate"><span class="pre">xpx.testing</span></code>)</a><input aria-label="Toggle navigation of Testing utilities (xpx.testing)" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_close.html">testing.assert_close</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_close_nulp.html">testing.assert_close_nulp</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_equal.html">testing.assert_equal</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">testing.assert_less</a></li>
 </ul>
@@ -297,7 +298,10 @@ shape, and dtype checks.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><strong>ImportError</strong></a> – If <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v2.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a> is not importable in the Python environment.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.14)"><strong>AssertionError</strong></a> – If <cite>x</cite> is not strictly smaller than <cite>y</cite>, elementwise.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><strong>ImportError</strong></a> – If <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v2.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a> is not importable in the Python environment.</p></li>
+</ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>

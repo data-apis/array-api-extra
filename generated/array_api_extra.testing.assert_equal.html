@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="testing.assert_less" href="array_api_extra.testing.assert_less.html"><link rel="prev" title="testing.assert_close" href="array_api_extra.testing.assert_close.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="testing.assert_less" href="array_api_extra.testing.assert_less.html"><link rel="prev" title="testing.assert_close_nulp" href="array_api_extra.testing.assert_close_nulp.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>testing.assert_equal - array-api-extra 0.10.2.dev0 documentation</title>
@@ -219,6 +219,7 @@
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api-testing.html">Testing utilities (<code class="docutils literal notranslate"><span class="pre">xpx.testing</span></code>)</a><input aria-label="Toggle navigation of Testing utilities (xpx.testing)" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_close.html">testing.assert_close</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_close_nulp.html">testing.assert_close_nulp</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">testing.assert_equal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_less.html">testing.assert_less</a></li>
 </ul>
@@ -297,7 +298,10 @@ shape, and dtype checks.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><strong>ImportError</strong></a> – If <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v2.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a> is not importable in the Python environment.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.14)"><strong>AssertionError</strong></a> – If <cite>actual</cite> and <cite>desired</cite> are not equal.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><strong>ImportError</strong></a> – If <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v2.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a> is not importable in the Python environment.</p></li>
+</ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
@@ -330,14 +334,14 @@ shape, and dtype checks.</p>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.testing.assert_close.html">
+          <a class="prev-page" href="array_api_extra.testing.assert_close_nulp.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">testing.assert_close</div>
+                <div class="title">testing.assert_close_nulp</div>
                 
               </div>
             </a>
