@@ -215,7 +215,7 @@ class TestAssertEqualCloseLess:
 
     def test_assert_close_nulp(self, xp: ModuleType):
         a = xp.asarray([1.0, 1e-10])
-        b = xp.asarray([1.0 + 2**-52, 1e-10])
+        b = xp.asarray([1.0 + 2**-52, 1e-10], dtype=xp.float64)
 
         assert_close_nulp(a, a, nulp=0)
 
