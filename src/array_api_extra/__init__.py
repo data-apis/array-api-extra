@@ -1,5 +1,6 @@
 """Extra array functions built on top of the array API standard."""
 
+from . import testing
 from ._delegation import (
     argpartition,
     atleast_nd,
@@ -55,5 +56,6 @@ __all__ = [
     "searchsorted",
     "setdiff1d",
     "sinc",
+    "testing",
     "union1d",
 ]
