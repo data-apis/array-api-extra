@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="testing.assert_equal" href="array_api_extra.testing.assert_equal.html"><link rel="prev" title="testing.assert_close" href="array_api_extra.testing.assert_close.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>testing.assert_close_nulp - array-api-extra 0.10.2.dev0 documentation</title>
+        <title>testing.assert_close_nulp - array-api-extra 0.10.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">array-api-extra 0.10.2.dev0 documentation</div></a>
+      <a href="../index.html"><div class="brand">array-api-extra 0.10.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  <span class="sidebar-brand-text">array-api-extra 0.10.2.dev0 documentation</span>
+  <span class="sidebar-brand-text">array-api-extra 0.10.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -286,15 +286,15 @@ additional array namespace, shape, and dtype checks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>actual</strong> (<em>Array</em>) – The array produced by the tested function.</p></li>
-<li><p><strong>desired</strong> (<em>Array</em>) – The expected array (typically hardcoded).</p></li>
-<li><p><strong>nulp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – The maximum number of units in the last place
+<li><p><strong>actual</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – The array produced by the tested function.</p></li>
+<li><p><strong>desired</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – The expected array (typically hardcoded).</p></li>
+<li><p><strong>nulp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – The maximum number of units in the last place
 for the tolerance check. Default: <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
-<li><p><strong>check_dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default: True</em>) – Whether to check agreement between actual and desired dtypes.</p></li>
-<li><p><strong>check_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default: True</em>) – Whether to check agreement between actual and desired shapes.</p></li>
-<li><p><strong>check_scalar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default: False</em>) – NumPy only: whether to check agreement between actual and desired types —
+<li><p><strong>check_dtype</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to check agreement between actual and desired dtypes.</p></li>
+<li><p><strong>check_shape</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to check agreement between actual and desired shapes.</p></li>
+<li><p><strong>check_scalar</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – NumPy only: whether to check agreement between actual and desired types —
 0-D <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> vs scalar (e.g. <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.double" title="(in NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.double</span></code></a>).</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – A standard-compatible namespace which <cite>actual</cite> and <cite>desired</cite> must match.</p></li>
+<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – A standard-compatible namespace which <cite>actual</cite> and <cite>desired</cite> must match.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -302,9 +302,6 @@ for the tolerance check. Default: <code class="docutils literal notranslate"><sp
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.14)"><strong>AssertionError</strong></a> – If the spacing between <cite>actual</cite> and <cite>desired</cite> for one or more elements is         larger than <cite>nulp</cite>.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><strong>ImportError</strong></a> – If <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v2.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a> is not importable in the Python environment.</p></li>
 </ul>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -318,6 +315,11 @@ for the tolerance check. Default: <code class="docutils literal notranslate"><sp
 </dd>
 </dl>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>This is a relatively robust method to compare two arrays whose amplitude is
 variable.</p>
@@ -406,7 +408,7 @@ representable by in the data type of <code class="docutils literal notranslate">
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=529e2ce1"></script>
+</div><script src="../_static/documentation_options.js?v=11e62b30"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>

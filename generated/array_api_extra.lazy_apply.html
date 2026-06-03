@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="testing.lazy_xp_function" href="array_api_extra.testing.lazy_xp_function.html"><link rel="prev" title="Tools for lazy backends" href="../api-lazy.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>lazy_apply - array-api-extra 0.10.2.dev0 documentation</title>
+        <title>lazy_apply - array-api-extra 0.10.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">array-api-extra 0.10.2.dev0 documentation</div></a>
+      <a href="../index.html"><div class="brand">array-api-extra 0.10.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  <span class="sidebar-brand-text">array-api-extra 0.10.2.dev0 documentation</span>
+  <span class="sidebar-brand-text">array-api-extra 0.10.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -279,14 +279,22 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="array_api_extra.lazy_apply">
 <span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">lazy_apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_numpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.lazy_apply" title="Link to this definition">¶</a></dt>
-<dd><p>Lazily apply an eager function.</p>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Overloads<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<span class="sphinx_autodoc_typehints-type">Callable[P, Array | ArrayLike]</span>), <strong>args</strong> (<span class="sphinx_autodoc_typehints-type">Array | complex | None</span>), <strong>shape</strong> (<span class="sphinx_autodoc_typehints-type">tuple[int | None, …] | None</span>), <strong>dtype</strong> (<span class="sphinx_autodoc_typehints-type">DType | None</span>), <strong>as_numpy</strong> (<span class="sphinx_autodoc_typehints-type">bool</span>), <strong>xp</strong> (<span class="sphinx_autodoc_typehints-type">ModuleType | None</span>), <strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type">P.kwargs</span>) → <span class="sphinx_autodoc_typehints-type">Array</span></p></li>
+<li><p><strong>func</strong> (<span class="sphinx_autodoc_typehints-type">Callable[P, Sequence[Array | ArrayLike]]</span>), <strong>args</strong> (<span class="sphinx_autodoc_typehints-type">Array | complex | None</span>), <strong>shape</strong> (<span class="sphinx_autodoc_typehints-type">Sequence[tuple[int | None, …]]</span>), <strong>dtype</strong> (<span class="sphinx_autodoc_typehints-type">Sequence[DType] | None</span>), <strong>as_numpy</strong> (<span class="sphinx_autodoc_typehints-type">bool</span>), <strong>xp</strong> (<span class="sphinx_autodoc_typehints-type">ModuleType | None</span>), <strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type">P.kwargs</span>) → <span class="sphinx_autodoc_typehints-type">tuple[Array, …]</span></p></li>
+</ul>
+</dd>
+</dl>
+<p>Lazily apply an eager function.</p>
 <p>If the backend of the input arrays is lazy, e.g. Dask or jitted JAX, the execution
 of the function is delayed until the graph is materialized; if it’s eager, the
 function is executed immediately.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> (<em>callable</em>) – <p>The function to apply.</p>
+<li><p><strong>func</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ParamSpec" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParamSpec</span></code></a>(<code class="docutils literal notranslate"><span class="pre">P</span></code>, bound= <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>)], <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a> | <a class="reference external" href="https://numpy.org/doc/stable/reference/typing.html#numpy.typing.ArrayLike" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ArrayLike</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a> | <a class="reference external" href="https://numpy.org/doc/stable/reference/typing.html#numpy.typing.ArrayLike" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ArrayLike</span></code></a>]]</span>) – <p>The function to apply.</p>
 <p>It must accept one or more array API compliant arrays as positional arguments.
 If <cite>as_numpy=True</cite>, inputs are converted to NumPy before they are passed to
 <cite>func</cite>.
@@ -294,25 +302,25 @@ It must return either a single array-like or a sequence of array-likes.</p>
 <p><cite>func</cite> must be a pure function, i.e. without side effects, as depending on the
 backend it may be executed more than once or never.</p>
 </p></li>
-<li><p><strong>*args</strong> (<em>Array</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><em>complex</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><em>None</em>) – <p>One or more Array API compliant arrays, Python scalars, or None’s.</p>
+<li><p><strong>*args</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – <p>One or more Array API compliant arrays, Python scalars, or None’s.</p>
 <p>If <cite>as_numpy=True</cite>, you need to be able to apply <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="(in NumPy v2.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.asarray()</span></code></a> to
 non-None args to convert them to NumPy; read notes below about specific
 backends.</p>
 </p></li>
-<li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em><em>, </em><em>...</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em><em>, </em><em>...</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – Output shape or sequence of output shapes, one for each output of <cite>func</cite>.
+<li><p><strong>shape</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>]] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Output shape or sequence of output shapes, one for each output of <cite>func</cite>.
 Default: assume single output and broadcast shapes of the input arrays.</p></li>
-<li><p><strong>dtype</strong> (<em>DType</em><em> | </em><em>Sequence</em><em>[</em><em>DType</em><em>]</em><em>, </em><em>optional</em>) – Output dtype or sequence of output dtypes, one for each output of <cite>func</cite>.
+<li><p><strong>dtype</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Output dtype or sequence of output dtypes, one for each output of <cite>func</cite>.
 dtype(s) must belong to the same array namespace as the input arrays.
 Default: infer the result type(s) from the input arrays.</p></li>
-<li><p><strong>as_numpy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – <dl class="simple">
+<li><p><strong>as_numpy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – <dl class="simple">
 <dt>If True, convert the input arrays to NumPy before passing them to <cite>func</cite>.</dt><dd><p>This is particularly useful to make NumPy-only functions, e.g. written in Cython</p>
 </dd>
 <dt>or Numba, work transparently with array API-compliant arrays.</dt><dd><p>Default: False.</p>
 </dd>
 </dl>
 </p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>args</cite>. Default: infer.</p></li>
-<li><p><strong>**kwargs</strong> (<em>Any</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass verbatim to <cite>func</cite>.
+<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The standard-compatible namespace for <cite>args</cite>. Default: infer.</p></li>
+<li><p><strong>**kwargs</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ParamSpecKwargs" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParamSpecKwargs</span></code></a></span>) – Additional keyword arguments to pass verbatim to <cite>func</cite>.
 They cannot contain Array objects.</p></li>
 </ul>
 </dd>
@@ -469,7 +477,7 @@ again by Dask.</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=529e2ce1"></script>
+</div><script src="../_static/documentation_options.js?v=11e62b30"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>

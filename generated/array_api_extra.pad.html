@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="partition" href="array_api_extra.partition.html"><link rel="prev" title="one_hot" href="array_api_extra.one_hot.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>pad - array-api-extra 0.10.2.dev0 documentation</title>
+        <title>pad - array-api-extra 0.10.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">array-api-extra 0.10.2.dev0 documentation</div></a>
+      <a href="../index.html"><div class="brand">array-api-extra 0.10.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  <span class="sidebar-brand-text">array-api-extra 0.10.2.dev0 documentation</span>
+  <span class="sidebar-brand-text">array-api-extra 0.10.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -283,16 +283,16 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>array</em>) – Input array.</p></li>
-<li><p><strong>pad_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>ints</em><em> or </em><em>sequence</em><em> of </em><em>pairs</em><em> of </em><em>ints</em>) – Pad the input array with this many elements from each side.
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – Input array.</p></li>
+<li><p><strong>pad_width</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]]</span>) – Pad the input array with this many elements from each side.
 If a sequence of tuples, <code class="docutils literal notranslate"><span class="pre">[(before_0,</span> <span class="pre">after_0),</span> <span class="pre">...</span> <span class="pre">(before_N,</span> <span class="pre">after_N)]</span></code>,
 each pair applies to the corresponding axis of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
 A single tuple, <code class="docutils literal notranslate"><span class="pre">(before,</span> <span class="pre">after)</span></code>, is equivalent to a list of <code class="docutils literal notranslate"><span class="pre">x.ndim</span></code>
 copies of this tuple.</p></li>
-<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Only “constant” mode is currently supported, which pads with
+<li><p><strong>mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'constant'</span></code>]</span>) – Only “constant” mode is currently supported, which pads with
 the value passed to <cite>constant_values</cite>.</p></li>
-<li><p><strong>constant_values</strong> (<em>python scalar</em><em>, </em><em>optional</em>) – Use this value to pad the input. Default is zero.</p></li>
-<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>x</cite>. Default: infer.</p></li>
+<li><p><strong>constant_values</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a></span>) – Use this value to pad the input. Default is zero.</p></li>
+<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The standard-compatible namespace for <cite>x</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -300,7 +300,7 @@ the value passed to <cite>constant_values</cite>.</p></li>
 padded with <code class="docutils literal notranslate"><span class="pre">pad_width</span></code> elements equal to <code class="docutils literal notranslate"><span class="pre">constant_values</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -382,7 +382,7 @@ padded with <code class="docutils literal notranslate"><span class="pre">pad_wid
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=529e2ce1"></script>
+</div><script src="../_static/documentation_options.js?v=11e62b30"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
