@@ -37,7 +37,7 @@ jobs:
       id-token: write # for trusted publishing
       attestations: write # for trusted publishing
       contents: read
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
 
     steps:
