@@ -757,3 +757,13 @@ def angle(z: Array, /, *, deg: bool = False, xp: ModuleType | None = None) -> Ar
     if deg:
         a = a * 180 / xp.pi
     return a
+
+
+def unravel_index(ind: Array, shape: tuple[int, ...], /) -> tuple[Array, ...]:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._delegation.py`."""
+    coords: list[Array] = []
+    for dim in reversed(shape):
+        coords.append(ind % dim)
+        ind = ind // dim
+    return tuple(reversed(coords))

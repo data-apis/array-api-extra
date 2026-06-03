@@ -19,6 +19,7 @@ from ._delegation import (
     setdiff1d,
     sinc,
     union1d,
+    unravel_index,
 )
 from ._lib._at import at
 from ._lib._funcs import (
@@ -58,4 +59,5 @@ __all__ = [
     "sinc",
     "testing",
     "union1d",
+    "unravel_index",
 ]

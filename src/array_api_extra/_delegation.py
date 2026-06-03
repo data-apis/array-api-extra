@@ -31,6 +31,7 @@ __all__ = [
     "pad",
     "searchsorted",
     "sinc",
+    "unravel_index",
 ]
 
 
@@ -1307,3 +1308,56 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
         return xp.union1d(a, b)
 
     return _funcs.union1d(a, b, xp=xp)
+
+
+def unravel_index(
+    ind: Array,
+    shape: tuple[int, ...],
+    /,
+    *,
+    xp: ModuleType | None = None,
+) -> tuple[Array, ...]:
+    """
+    Convert a flat index or array of flat indices into a tuple of coordinate arrays.
+
+    Parameters
+    ----------
+    ind : array
+        An integer array whose elements are indices into the flattened version
+        of an array of dimensions `shape`.
+
+    shape : tuple of ints
+        The shape to use for unraveling `indices`.
+
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    tuple of array
+        A tuple of unraveled indices. Each array in the tuple has the same shape
+        as the `indices` array.
+
+    Examples
+    --------
+    >>> import array_api_extra as xpx
+    >>> import array_api_strict as xp
+    >>> xpx.unravel_index(xp.asarray([1, 2, 3, 4, 5]), (4, 3))
+    (
+        Array([0, 0, 1, 1, 1], dtype=array_api_strict.int64),
+        Array([1, 2, 0, 1, 2], dtype=array_api_strict.int64),
+    )
+    """
+    if xp is None:
+        xp = array_namespace(ind)
+
+    if (
+        is_numpy_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_dask_namespace(xp)
+        or is_jax_namespace(xp)
+        or is_torch_namespace(xp)
+    ):
+        return xp.unravel_index(ind, shape)
+
+    return _funcs.unravel_index(ind, shape)
