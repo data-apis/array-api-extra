@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Callable, Iterator
 from types import ModuleType
 from typing import Any, cast, final
@@ -7,19 +8,21 @@ import pytest
 from typing_extensions import override
 
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._testing import (
-    as_numpy_array,
-    xp_assert_close,
-    xp_assert_equal,
-    xp_assert_less,
-)
 from array_api_extra._lib._utils._compat import (
     array_namespace,
     is_dask_namespace,
     is_jax_namespace,
 )
 from array_api_extra._lib._utils._typing import Array, Device
-from array_api_extra.testing import lazy_xp_function, patch_lazy_xp_functions
+from array_api_extra.testing import (
+    _as_numpy_array,
+    assert_close,
+    assert_close_nulp,
+    assert_equal,
+    assert_less,
+    lazy_xp_function,
+    patch_lazy_xp_functions,
+)
 
 # pyright: reportUnknownParameterType=false,reportMissingParameterType=false
 
@@ -27,18 +30,21 @@ from array_api_extra.testing import lazy_xp_function, patch_lazy_xp_functions
 class TestAsNumPyArray:
     def test_basic(self, xp: ModuleType):
         x = xp.asarray([1, 2, 3])
-        y = as_numpy_array(x, xp=xp)
-        xp_assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        y = _as_numpy_array(x, xp=xp)
+        assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     @pytest.mark.skip_xp_backend(Backend.TORCH, reason="materialize 'meta' device")
     def test_device(self, xp: ModuleType, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
-        y = as_numpy_array(x, xp=xp)
-        xp_assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        y = _as_numpy_array(x, xp=xp)
+        assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
 class TestAssertEqualCloseLess:
-    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close])
+    def np_err_msg(self, func: object):
+        return "not equal" if func is assert_close_nulp else "Mismatched elements"
+
+    @pytest.mark.parametrize("func", [assert_equal, assert_close])
     def test_assert_equal_close_basic(self, xp: ModuleType, func: Callable[..., None]):
         func(xp.asarray(0), xp.asarray(0))
         func(xp.asarray([1, 2]), xp.asarray([1, 2]))
@@ -49,7 +55,9 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="hello"):
             func(xp.asarray([1, 2]), xp.asarray([2, 1]), err_msg="hello")
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
+    )
     def test_shape_dtype(self, xp: ModuleType, func: Callable[..., None]):
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(xp.asarray([0]), xp.asarray([[0]]))
@@ -61,18 +69,31 @@ class TestAssertEqualCloseLess:
     @pytest.mark.skip_xp_backend(
         Backend.NUMPY_READONLY, reason="test other ns vs. numpy"
     )
-    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
+    )
     def test_namespace(self, xp: ModuleType, func: Callable[..., None]):
-        with pytest.raises(AssertionError, match="namespaces do not match"):
+        with pytest.raises(
+            AssertionError, match="Namespaces of actual and desired arrays do not match"
+        ):
             func(xp.asarray(0), np.asarray(0))
         with pytest.raises(TypeError, match=r"array_namespace requires .* array input"):
             func(xp.asarray(0), 0)
         with pytest.raises(TypeError, match="list is not a supported array type"):
             func(xp.asarray([0]), [0])
+        with (
+            pytest.raises(
+                AssertionError,
+                match="Namespace of desired array does not match the `xp` argument",
+            ),
+        ):
+            func(xp.asarray(0), xp.asarray(0), xp=np)
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
+    )
     def test_check_shape(self, xp: ModuleType, func: Callable[..., None]):
-        a = xp.asarray([1] if func is xp_assert_less else [2])
+        a = xp.asarray([1] if func is assert_less else [2])
         b = xp.asarray(2)
         c = xp.asarray(0)
         d = xp.asarray([2, 2])
@@ -80,31 +101,35 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(a, b)
         func(a, b, check_shape=False)
-        with pytest.raises(AssertionError, match="Mismatched elements"):
+        with pytest.raises(AssertionError, match=self.np_err_msg(func)):
             func(a, c, check_shape=False)
         with pytest.raises(AssertionError, match="sizes do not match"):
             func(a, d, check_shape=False)
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
+    )
     def test_check_dtype(self, xp: ModuleType, func: Callable[..., None]):
-        a = xp.asarray(1 if func is xp_assert_less else 2)
+        a = xp.asarray(1 if func is assert_less else 2)
         b = xp.asarray(2, dtype=xp.int16)
         c = xp.asarray(0, dtype=xp.int16)
 
         with pytest.raises(AssertionError, match="dtypes do not match"):
             func(a, b)
         func(a, b, check_dtype=False)
-        with pytest.raises(AssertionError, match="Mismatched elements"):
+        with pytest.raises(AssertionError, match=self.np_err_msg(func)):
             func(a, c, check_dtype=False)
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
+    )
     @pytest.mark.xfail_xp_backend(
         Backend.SPARSE, reason="sparse [()] returns np.generic"
     )
     def test_check_scalar(
         self, xp: ModuleType, library: Backend, func: Callable[..., None]
     ):
-        a = xp.asarray(1 if func is xp_assert_less else 2)
+        a = xp.asarray(1 if func is assert_less else 2)
         b = xp.asarray(2)[()]  # Note: only makes a difference on NumPy
         c = xp.asarray(0)
 
@@ -114,7 +139,7 @@ class TestAssertEqualCloseLess:
                 func(a, b, check_scalar=True)
         else:
             func(a, b, check_scalar=True)
-        with pytest.raises(AssertionError, match="Mismatched elements"):
+        with pytest.raises(AssertionError, match=self.np_err_msg(func)):
             func(a, c, check_scalar=True)
 
     @pytest.mark.parametrize("dtype", ["int64", "float64"])
@@ -123,23 +148,25 @@ class TestAssertEqualCloseLess:
         b = xp.asarray([102], dtype=getattr(xp, dtype))
 
         with pytest.raises(AssertionError, match="Mismatched elements"):
-            xp_assert_close(a, b)
+            assert_close(a, b)
 
-        xp_assert_close(a, b, rtol=0.03)
+        assert_close(a, b, rtol=0.03)
         with pytest.raises(AssertionError, match="Mismatched elements"):
-            xp_assert_close(a, b, rtol=0.01)
+            assert_close(a, b, rtol=0.01)
 
-        xp_assert_close(a, b, atol=3)
+        assert_close(a, b, atol=3)
         with pytest.raises(AssertionError, match="Mismatched elements"):
-            xp_assert_close(a, b, atol=1)
+            assert_close(a, b, atol=1)
 
     def test_assert_less(self, xp: ModuleType):
-        xp_assert_less(xp.asarray(-1), xp.asarray(0))
-        xp_assert_less(xp.asarray([1, 2]), xp.asarray([2, 3]))
+        assert_less(xp.asarray(-1), xp.asarray(0))
+        assert_less(xp.asarray([1, 2]), xp.asarray([2, 3]))
         with pytest.raises(AssertionError, match="Mismatched elements"):
-            xp_assert_less(xp.asarray([1, 1]), xp.asarray([2, 1]))
+            assert_less(xp.asarray([1, 1]), xp.asarray([2, 1]))
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
+    )
     @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
     def test_none_shape(self, xp: ModuleType, func: Callable[..., None]):
@@ -147,7 +174,7 @@ class TestAssertEqualCloseLess:
         can be compared to a real shape.
         """
         # actual has shape=(None, )
-        a = xp.asarray([1] if func is xp_assert_less else [2])
+        a = xp.asarray([1] if func is assert_less else [2])
         a = a[a > 0]
 
         func(a, xp.asarray([2]))
@@ -155,11 +182,11 @@ class TestAssertEqualCloseLess:
             func(a, xp.asarray(2))
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(a, xp.asarray([2, 3]))
-        with pytest.raises(AssertionError, match="Mismatched elements"):
+        with pytest.raises(AssertionError, match=self.np_err_msg(func)):
             func(a, xp.asarray([0]))
 
         # desired has shape=(None, )
-        a = xp.asarray([3] if func is xp_assert_less else [2])
+        a = xp.asarray([3] if func is assert_less else [2])
         a = a[a > 0]
 
         func(xp.asarray([2]), a)
@@ -167,12 +194,14 @@ class TestAssertEqualCloseLess:
             func(xp.asarray(2), a)
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(xp.asarray([2, 3]), a)
-        with pytest.raises(AssertionError, match="Mismatched elements"):
+        with pytest.raises(AssertionError, match=self.np_err_msg(func)):
             func(xp.asarray([4]), a)
 
-    @pytest.mark.parametrize("func", [xp_assert_equal, xp_assert_close, xp_assert_less])
+    @pytest.mark.parametrize(
+        "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
+    )
     def test_device(self, xp: ModuleType, device: Device, func: Callable[..., None]):
-        a = xp.asarray([1] if func is xp_assert_less else [2], device=device)
+        a = xp.asarray([1] if func is assert_less else [2], device=device)
         b = xp.asarray([2], device=device)
         c = xp.asarray([2, 2], device=device)
 
@@ -183,6 +212,31 @@ class TestAssertEqualCloseLess:
         # but in case of torch device='meta' we have to do it manually
         with pytest.raises(AssertionError, match="sizes do not match"):
             func(a, c, check_shape=False)
+
+    def test_assert_close_nulp(self, xp: ModuleType):
+        a = xp.asarray([1.0, 1e-10], dtype=xp.float64)
+        b = xp.asarray([1.0 + 2**-52, 1e-10], dtype=xp.float64)
+
+        assert_close_nulp(a, a, nulp=0)
+
+        assert_close_nulp(a, b, nulp=2)
+        assert_close_nulp(a, b, nulp=1)
+        with pytest.raises(AssertionError, match="not equal to 0 ULP"):
+            assert_close_nulp(a, b, nulp=0)
+
+        c = xp.asarray([1.0 + 2 * 2**-52, 1e-10], dtype=xp.float64)
+
+        assert_close_nulp(a, c, nulp=3)
+        assert_close_nulp(a, c, nulp=2)
+        with pytest.raises(AssertionError, match="not equal to 1 ULP"):
+            assert_close_nulp(a, c)
+
+        d = xp.asarray([1.0, 1e-10 + 5 * np.spacing(1e-10)], dtype=xp.float64)
+        assert_close_nulp(a, d, nulp=6)
+        assert_close_nulp(a, d, nulp=5)
+
+        with pytest.raises(AssertionError, match="not equal to 4 ULP"):
+            assert_close_nulp(a, d, nulp=4)
 
 
 def good_lazy(x: Array) -> Array:
@@ -233,15 +287,15 @@ lazy_xp_function(non_materializable5)
 def test_lazy_xp_function(xp: ModuleType):
     x = xp.asarray([1.0, 2.0])
 
-    xp_assert_equal(good_lazy(x), xp.asarray([2.0, 4.0]))
+    assert_equal(good_lazy(x), xp.asarray([2.0, 4.0]))
     # Not wrapped
-    xp_assert_equal(non_materializable(x), xp.asarray([1.0, 2.0]))
+    assert_equal(non_materializable(x), xp.asarray([1.0, 2.0]))
     # Wrapping explicitly disabled
-    xp_assert_equal(non_materializable2(x), xp.asarray([1.0, 2.0]))
-    xp_assert_equal(non_materializable3(x), xp.asarray([1.0, 2.0]))
+    assert_equal(non_materializable2(x), xp.asarray([1.0, 2.0]))
+    assert_equal(non_materializable3(x), xp.asarray([1.0, 2.0]))
 
     if is_jax_namespace(xp):
-        xp_assert_equal(non_materializable4(x), xp.asarray([1.0, 2.0]))
+        assert_equal(non_materializable4(x), xp.asarray([1.0, 2.0]))
         with pytest.raises(
             TypeError, match="Attempted boolean conversion of traced array"
         ):
@@ -260,8 +314,8 @@ def test_lazy_xp_function(xp: ModuleType):
             _ = non_materializable5(x)
 
     else:
-        xp_assert_equal(non_materializable4(x), xp.asarray([1.0, 2.0]))
-        xp_assert_equal(non_materializable5(x), xp.asarray([1.0, 2.0]))
+        assert_equal(non_materializable4(x), xp.asarray([1.0, 2.0]))
+        assert_equal(non_materializable5(x), xp.asarray([1.0, 2.0]))
 
 
 def static_params(x: Array, n: int, flag: bool = False) -> Array:
@@ -276,12 +330,12 @@ lazy_xp_function(static_params)
 
 def test_lazy_xp_function_static_params(xp: ModuleType):
     x = xp.asarray([1.0, 2.0])
-    xp_assert_equal(static_params(x, 1), xp.asarray([3.0, 6.0]))
-    xp_assert_equal(static_params(x, 1, True), xp.asarray([2.0, 4.0]))
-    xp_assert_equal(static_params(x, 1, False), xp.asarray([3.0, 6.0]))
-    xp_assert_equal(static_params(x, 0, False), xp.asarray([3.0, 6.0]))
-    xp_assert_equal(static_params(x, 1, flag=True), xp.asarray([2.0, 4.0]))
-    xp_assert_equal(static_params(x, n=1, flag=True), xp.asarray([2.0, 4.0]))
+    assert_equal(static_params(x, 1), xp.asarray([3.0, 6.0]))
+    assert_equal(static_params(x, 1, True), xp.asarray([2.0, 4.0]))
+    assert_equal(static_params(x, 1, False), xp.asarray([3.0, 6.0]))
+    assert_equal(static_params(x, 0, False), xp.asarray([3.0, 6.0]))
+    assert_equal(static_params(x, 1, flag=True), xp.asarray([2.0, 4.0]))
+    assert_equal(static_params(x, n=1, flag=True), xp.asarray([2.0, 4.0]))
 
 
 def test_lazy_xp_function_deprecated_static_argnames():
@@ -314,12 +368,12 @@ def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
         # eager JAX arrays are auto-converted to NumPy in eager JAX
         # and fail in jax.jit (which lazy_xp_function tests here)
         with pytest.raises((TypeError, AssertionError)):
-            xp_assert_equal(cast(Array, erf(x)), xp.asarray([1.0, 1.0]))
+            assert_equal(cast(Array, erf(x)), xp.asarray([1.0, 1.0]))
     else:
         # CuPy, Dask and sparse define __array_ufunc__ and dispatch accordingly
         # note that when sparse reduces to scalar it returns a np.generic, which
-        # would make xp_assert_equal fail.
-        xp_assert_equal(cast(Array, erf(x)), xp.asarray([1.0, 1.0]))
+        # would make assert_equal fail.
+        assert_equal(cast(Array, erf(x)), xp.asarray([1.0, 1.0]))
 
 
 class A:
@@ -412,7 +466,7 @@ class TestLazyXpFunctionClasses:
         x = xp.asarray([1.1, 2.2, 3.3])
         foo = B(x)
         bar = foo.k(x)
-        xp_assert_equal(bar.x, 2.0 * foo.x)
+        assert_equal(bar.x, 2.0 * foo.x)
 
     @pytest.mark.skip_xp_backend(Backend.DASK, reason="calls dask.compute()")
     def test_static_methods_wrapped(self, xp: ModuleType, library: Backend):
@@ -441,7 +495,7 @@ class TestLazyXpFunctionClasses:
     def test_circumvention(self, xp: ModuleType):
         x = xp.asarray([1.0, 2.0])
         y = eager.non_materializable5(x)
-        xp_assert_equal(y, x)
+        assert_equal(y, x)
 
 
 def dask_raises(x: Array) -> Array:
@@ -499,7 +553,7 @@ def test_lazy_xp_function_opaque_wrappers(xp: ModuleType):
     x = xp.asarray([1, 2])
     xp2 = array_namespace(x)  # Revert NUMPY_READONLY to array_api_compat.numpy
     res = check_opaque_wrapper(Wrapper(x), xp2)
-    xp_assert_equal(res.x, xp.asarray([2, 3]))
+    assert_equal(res.x, xp.asarray([2, 3]))
 
 
 def test_lazy_xp_function_opaque_wrappers_eagerly_raise(da: ModuleType):
@@ -529,7 +583,7 @@ def test_lazy_xp_function_recursive(xp: ModuleType):
     x.append(x)
     y = check_recursive(x)
     assert isinstance(y, list)
-    xp_assert_equal(cast(Array, y[0]), xp.asarray([2, 3]))
+    assert_equal(cast(Array, y[0]), xp.asarray([2, 3]))
     assert y[1] is y
 
 
@@ -558,7 +612,7 @@ lazy_xp_modules = [wrapped]
 def test_lazy_xp_modules(xp: ModuleType, library: Backend):
     x = xp.asarray([1.0, 2.0])
     y = naked.f(x)
-    xp_assert_equal(y, x)
+    assert_equal(y, x)
 
     if library.like(Backend.JAX):
         with pytest.raises(
@@ -570,7 +624,7 @@ def test_lazy_xp_modules(xp: ModuleType, library: Backend):
             wrapped.f(x)
     else:
         y = wrapped.f(x)
-        xp_assert_equal(y, x)
+        assert_equal(y, x)
 
 
 def test_patch_lazy_xp_functions_deprecated_monkeypatch(
@@ -580,7 +634,7 @@ def test_patch_lazy_xp_functions_deprecated_monkeypatch(
 
     x = xp.asarray([1.0, 2.0])
     y = non_materializable5(x)
-    xp_assert_equal(y, x)
+    assert_equal(y, x)
 
     with pytest.warns(DeprecationWarning, match="`monkeypatch` parameter"):
         _ = patch_lazy_xp_functions(request, monkeypatch, xp=xp)
@@ -590,7 +644,7 @@ def test_patch_lazy_xp_functions_deprecated_monkeypatch(
 
     monkeypatch.undo()
     y = non_materializable5(x)
-    xp_assert_equal(y, x)
+    assert_equal(y, x)
 
 
 def my_iter(x: Array) -> Iterator[Array]:
@@ -606,7 +660,22 @@ def test_patch_lazy_xp_functions_iter(xp: ModuleType):
     it = my_iter(x)
 
     assert isinstance(it, Iterator)
-    xp_assert_equal(next(it), x[0, :])
-    xp_assert_equal(next(it), x[1, :])
+    assert_equal(next(it), x[0, :])
+    assert_equal(next(it), x[1, :])
     with pytest.raises(StopIteration):
         _ = next(it)
+
+
+def test_import_dependencies():
+    _ = sys.modules.pop("numpy", None)
+    _ = sys.modules.pop("pytest", None)
+    _ = sys.modules.pop("array_api_extra", None)
+
+    import array_api_extra  # pyright: ignore[reportUnusedImport]
+    import array_api_extra.testing  # noqa: F401  # pyright: ignore[reportUnusedImport]
+    from array_api_extra.testing import (
+        lazy_xp_function,  # noqa: F401  # pyright: ignore[reportUnusedImport]
+    )
+
+    assert "numpy" not in sys.modules
+    assert "pytest" not in sys.modules

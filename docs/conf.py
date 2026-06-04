@@ -66,4 +66,6 @@ nitpick_ignore = [
     ("py:class", "_io.BytesIO"),
 ]
 
+templates_path = ["_templates"]
+
 always_document_param_types = True

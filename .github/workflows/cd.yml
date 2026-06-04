@@ -3,6 +3,10 @@ name: CD
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
   pull_request:
@@ -15,20 +19,23 @@ on:
 
 jobs:
   dist:
-    runs-on: ubuntu-latest
+    name: Create dist
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: hynek/build-and-inspect-python-package@fe0a0fb1925ca263d076ca4f2c13e93a6e92a33e # v2.17.0
 
   publish:
+    name: Publish
     needs: [dist]
     environment: pypi
     permissions:
-      id-token: write
-      attestations: write
+      id-token: write # for trusted publishing
+      attestations: write # for trusted publishing
       contents: read
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
@@ -44,4 +51,4 @@ jobs:
         with:
           subject-path: "dist/*"
 
-      - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
+      - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0

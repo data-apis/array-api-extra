@@ -407,7 +407,7 @@ def pickle_flatten(
             self, obj: object
         ) -> Literal[0, 1, None]:  # numpydoc ignore=GL08
             if isinstance(obj, cls):
-                instances.append(obj)  # type: ignore[arg-type]
+                instances.append(obj)
                 return 0
 
             typ_ = type(obj)

@@ -4,7 +4,8 @@
 :maxdepth: 2
 :hidden:
 self
-api-reference.md
+api-assorted.md
+api-testing.md
 api-lazy.md
 contributing.md
 contributors.md
@@ -28,6 +29,7 @@ It is currently used by:
 - [scikit-learn](https://github.com/scikit-learn/scikit-learn) — Machine
   Learning in Python.
 - [SysIdentPy](https://github.com/wilsonrljr/sysidentpy) — System Identification Using NARMAX Models.
+- [GLASS](https://github.com/glass-dev/glass) — Generator for Large Scale Structure.
 - *your library? Let us know!*
 
 (installation)=

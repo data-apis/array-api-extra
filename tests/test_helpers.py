@@ -6,7 +6,6 @@ import numpy as np
 import pytest
 
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import array_namespace
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._helpers import (
@@ -21,7 +20,7 @@ from array_api_extra._lib._utils._helpers import (
     pickle_unflatten,
 )
 from array_api_extra._lib._utils._typing import Array, Device, DType
-from array_api_extra.testing import lazy_xp_function
+from array_api_extra.testing import assert_equal, lazy_xp_function
 
 from .conftest import np_compat
 
@@ -62,7 +61,7 @@ class TestIn1D:
         x2 = xp.arange(n)
         expected = xp.asarray([True, True, False])
         actual = in1d(x1, x2)
-        xp_assert_equal(actual, expected)
+        assert_equal(actual, expected)
 
     def test_device(self, xp: ModuleType, device: Device):
         x1 = xp.asarray([3, 8, 20], device=device)
@@ -75,7 +74,7 @@ class TestIn1D:
         x2 = xp.asarray([0, 1, 2, 3, 4])
         expected = xp.asarray([True, False])
         actual = in1d(x1, x2, xp=xp)
-        xp_assert_equal(actual, expected)
+        assert_equal(actual, expected)
 
 
 class TestAsArrays:
@@ -366,16 +365,16 @@ class TestJAXAutoJIT:
             return x + 1 if k else x - 1
 
         # Basic recognition of static_argnames
-        xp_assert_equal(f(jnp.asarray([1, 2])), jnp.asarray([0, 1]))
-        xp_assert_equal(f(jnp.asarray([1, 2]), False), jnp.asarray([0, 1]))
-        xp_assert_equal(f(jnp.asarray([1, 2]), True), jnp.asarray([2, 3]))
-        xp_assert_equal(f(jnp.asarray([1, 2]), 1), jnp.asarray([2, 3]))
+        assert_equal(f(jnp.asarray([1, 2])), jnp.asarray([0, 1]))
+        assert_equal(f(jnp.asarray([1, 2]), False), jnp.asarray([0, 1]))
+        assert_equal(f(jnp.asarray([1, 2]), True), jnp.asarray([2, 3]))
+        assert_equal(f(jnp.asarray([1, 2]), 1), jnp.asarray([2, 3]))
 
         # static argument is not an ArrayLike
-        xp_assert_equal(f(jnp.asarray([1, 2]), "foo"), jnp.asarray([2, 3]))
+        assert_equal(f(jnp.asarray([1, 2]), "foo"), jnp.asarray([2, 3]))
 
         # static argument is not hashable, but serializable
-        xp_assert_equal(f(jnp.asarray([1, 2]), ["foo"]), jnp.asarray([2, 3]))
+        assert_equal(f(jnp.asarray([1, 2]), ["foo"]), jnp.asarray([2, 3]))
 
     def test_wrapper(self, jnp: ModuleType):
         @jax_autojit
@@ -384,7 +383,7 @@ class TestJAXAutoJIT:
 
         inp = Wrapper(jnp.asarray([1, 2]))
         out = f(inp).x
-        xp_assert_equal(out, jnp.asarray([2, 3]))
+        assert_equal(out, jnp.asarray([2, 3]))
 
     def test_static_hashable(self, jnp: ModuleType):
         """Static argument/return value is hashable, but not serializable"""
@@ -407,7 +406,7 @@ class TestJAXAutoJIT:
         assert isinstance(out, Wrapper)
         assert out.x[0] is winp.x[0]
         assert out.x[1] is not winp.x[1]
-        xp_assert_equal(out.x[1], winp.x[1])
+        assert_equal(out.x[1], winp.x[1])
 
     def test_arraylikes_are_static(self):
         pytest.importorskip("jax")
@@ -430,7 +429,7 @@ class TestJAXAutoJIT:
         inp = jnp.asarray([1, 2])
         out = f(inp)
         assert isinstance(out, Iterator)
-        xp_assert_equal(next(out), jnp.asarray([1, 2]))
-        xp_assert_equal(next(out), jnp.asarray([2, 3]))
+        assert_equal(next(out), jnp.asarray([1, 2]))
+        assert_equal(next(out), jnp.asarray([2, 3]))
         with pytest.raises(StopIteration):
             _ = next(out)

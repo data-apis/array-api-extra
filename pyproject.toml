@@ -4,7 +4,7 @@ build-backend = "mesonpy"
 
 [project]
 name = "array-api-extra"
-version = "0.10.2.dev0"
+version = "0.10.3"
 authors = [
   { name = "Lucas Colley", email = "lucas.colley8@gmail.com" },
   # { name = "Open Source Contributors" },  # https://github.com/pypi/warehouse/issues/14813
@@ -34,207 +34,6 @@ Homepage = "https://github.com/data-apis/array-api-extra"
 "Bug Tracker" = "https://github.com/data-apis/array-api-extra/issues"
 Changelog = "https://github.com/data-apis/array-api-extra/releases"
 
-# Pixi
-
-[tool.pixi.workspace]
-channels = ["https://prefix.dev/conda-forge"]
-platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
-preview = ["pixi-build"]
-
-### array-api-extra package definition ###
-
-[tool.pixi.package.build.backend]
-name = "pixi-build-python"
-version = "*"
-
-[tool.pixi.package.host-dependencies]
-meson-python = "*"
-uv = "*" # interfaces with meson-python instead of pip
-
-[tool.pixi.package.run-dependencies]
-array-api-compat = "*"
-
-### workspace environments ###
-
-[tool.pixi.environments]
-default = { features = ["py314"], solve-group = "py314" }
-lint = { features = ["py314", "lint"], solve-group = "py314" }
-docs = { features = ["py314", "docs"], solve-group = "py314" }
-tests = { features = ["py314", "tests"], solve-group = "py314" }
-tests-py314 = { features = ["py314", "tests"], solve-group = "py314" } # alias of tests
-
-# Some backends may pin numpy; use separate solve-group
-dev = { features = ["py314", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
-tests-backends = { features = ["py314", "tests", "backends"], solve-group = "backends" }
-tests-backends-py311 = { features = ["py311", "tests", "backends"] }
-
-# CUDA not available on free github actions and on some developers' PCs
-dev-cuda = { features = ["py314", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda = { features = ["py314", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda-py311 = { features = ["py311", "tests", "backends", "cuda-backends"] }
-
-# Ungrouped environments
-tests-numpy1 = ["py311", "tests", "numpy1"]
-tests-py311 = ["py311", "tests"]
-tests-nogil = ["nogil", "tests"]
-
-### default feature definition ###
-
-[tool.pixi.dev]
-# this pulls in array-api-extra's host and run dependencies
-array-api-extra.path = "."
-
-[tool.pixi.dependencies]
-array-api-extra.path = "."
-
-### non-default feature definitions ###
-
-[tool.pixi.feature.lint.dependencies]
-typing-extensions = ">=4.15.0"
-pylint = ">=4.0.5"
-mypy = ">=1.19.1"
-basedpyright = ">=1.39.0"
-numpydoc = ">=1.10.0,<2"
-# import dependencies for mypy:
-array-api-strict = ">=2.5,<2.6"
-numpy = ">=2.1.3"
-hypothesis = ">=6.151.9"
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
-dprint = ">=0.50.0,<0.51"
-lefthook = ">=2.1.4,<3"
-ruff = ">=0.15.9,<0.16"
-typos = ">=1.44.0,<2"
-actionlint = ">=1.7.12,<2"
-blacken-docs = ">=1.20.0,<2"
-pytest = ">=9.0.2,<10"
-validate-pyproject = ">=0.25,<0.26"
-# NOTE: don't add cupy, jax, pytorch, or sparse here,
-# as they slow down mypy and are not portable across target OSs
-
-[tool.pixi.feature.lint.tasks]
-lefthook = { cmd = "lefthook", description = "Run lefthook" }
-hooks = { cmd = "lefthook install", description = "Install pre-commit hooks" }
-pre-commit = { cmd = "lefthook run pre-commit", description = "Run pre-commit checks" }
-pylint = { cmd = "pylint array_api_extra", cwd = "src", description = "Lint with pylint" }
-mypy = { cmd = "mypy", description = "Type check with mypy" }
-pyright = { cmd = "basedpyright", description = "Type check with basedpyright" }
-ruff-check = { cmd = "ruff check --fix", description = "Lint with ruff" }
-ruff-format = { cmd = "ruff format", description = "Format with ruff" }
-dprint = { cmd = "dprint fmt", description = "Format with dprint" }
-typos = { cmd = "typos --write-changes --force-exclude", description = "Fix typos" }
-actionlint = { cmd = "actionlint", description = "Lint actions with actionlint" }
-blacken-docs = { cmd = "blacken-docs", description = "Format Python markdown blocks with Black" }
-validate-pyproject = { cmd = "validate-pyproject pyproject.toml", description = "Validate pyproject.toml" }
-numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with numpydoc" }
-lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters" }
-
-[tool.pixi.feature.tests.dependencies]
-pytest = ">=9.0.2"
-pytest-cov = ">=7.1.0"
-hypothesis = ">=6.151.9"
-array-api-strict = ">=2.5,<2.6"
-numpy = ">=1.22.0"
-scipy = ">=1.15.2,<2"
-
-[tool.pixi.feature.tests.tasks]
-tests = { cmd = "pytest -v", description = "Run tests" }
-tests-cov = { cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20", description = "Run tests with coverage" }
-
-clean-vendor-compat = { cmd = "rm -rf vendor_tests/array_api_compat", description = "Delete the existing vendored version of array-api-compat" }
-clean-vendor-extra = { cmd = "rm -rf vendor_tests/array_api_extra", description = "Delete the existing vendored version of array-api-extra" }
-copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/", depends-on = ["clean-vendor-compat"], description = "Vendor a clean copy of array-api-compat" }
-copy-vendor-extra = { cmd = "cp -r src/array_api_extra vendor_tests/", depends-on = ["clean-vendor-extra"], description = "Vendor a clean copy of array-api-extra" }
-tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-compat", "copy-vendor-extra"], description = "Check that array-api-extra and array-api-compat can be vendored together" }
-
-tests-ci = { depends-on = ["tests-cov", "tests-vendor"], description = "Run tests with coverage and vendor tests" }
-coverage = { cmd = "coverage html", depends-on = ["tests-cov"], description = "Generate test coverage html report" }
-open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"], description = "Open test coverage report" }
-
-[tool.pixi.feature.docs.dependencies]
-sphinx = ">=7.4.7"
-furo = ">=2025.12.19"
-myst-parser = ">=5.0.0"
-sphinx-copybutton = ">=0.5.2"
-sphinx-autodoc-typehints = ">=1.25.3"
-# Needed to import parsed modules with autodoc
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
-pytest = ">=9.0.2"
-typing-extensions = ">=4.15.0"
-numpy = ">=2.1.3"
-
-[tool.pixi.feature.docs.tasks]
-docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs", description = "Build docs" }
-open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs" }
-
-[tool.pixi.feature.dev.dependencies]
-ipython = ">=7.33.0"
-
-[tool.pixi.feature.dev.tasks]
-ipython = { cmd = "ipython", description = "Launch ipython" }
-
-[tool.pixi.feature.py311.dependencies]
-python = "~=3.11.0"
-
-[tool.pixi.feature.py314.dependencies]
-python = "~=3.14.0"
-
-[tool.pixi.feature.numpy1.dependencies]
-# Oldest NumPy version supported by scikit-learn.
-# Note that this is older than what SPEC0 recommends.
-numpy = "=1.24.1"
-
-# Backends that can run on CPU-only hosts
-# Note: JAX and PyTorch will install CPU variants.
-[tool.pixi.feature.backends.dependencies]
-pytorch = ">=2.10.0"
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
-sparse = ">=0.18.0"
-
-[tool.pixi.feature.backends.target.linux-64.dependencies]
-jax = ">=0.9.1"
-
-[tool.pixi.feature.backends.target.osx-64.dependencies]
-jax = ">=0.9.1"
-
-[tool.pixi.feature.backends.target.osx-arm64.dependencies]
-jax = ">=0.9.1"
-
-[tool.pixi.feature.backends.target.win-64.dependencies]
-# jax = "*"  # unavailable
-
-# Backends that require a GPU host and a CUDA driver.
-# Note that JAX and PyTorch automatically prefer CUDA variants
-# thanks to the `system-requirements` below, *if available*.
-# We request them explicitly below to ensure that we don't
-# quietly revert to CPU-only in the future, e.g. when CUDA 13
-# is released and CUDA 12 builds are dropped upstream.
-[tool.pixi.feature.cuda-backends]
-system-requirements = { cuda = "12" }
-
-[tool.pixi.feature.cuda-backends.target.linux.dependencies]
-cupy = ">=14.0.1"
-jaxlib = { version = ">=0.9.2", build = "cuda12*" }
-pytorch = { version = ">=2.10.0", build = "cuda12*" }
-
-[tool.pixi.feature.cuda-backends.target.osx.dependencies]
-# cupy = "*"  # unavailable
-# jaxlib = { version = "*", build = "cuda12*" }  # unavailable
-# pytorch = { version = "*", build = "cuda12*" }  # unavailable
-
-[tool.pixi.feature.cuda-backends.target.win.dependencies]
-cupy = ">=14.0.1"
-# jaxlib = { version = "*", build = "cuda12*" }  # unavailable
-pytorch = { version = ">=2.10.0", build = "cuda12*" }
-
-[tool.pixi.feature.nogil.dependencies]
-python-freethreading = "~=3.13.0"
-pytest-run-parallel = ">=0.8.2"
-numpy = ">=2.3.5"
-# pytorch = "*"  # Not available on Python 3.13t yet
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
-# sparse = "*"  # numba not available on Python 3.13t yet
-# jax = "*"  # ml_dtypes not available on Python 3.13t yet
-
 # pytest
 
 [tool.pytest.ini_options]
@@ -257,7 +56,7 @@ run.source = ["array_api_extra"]
 # mypy
 
 [tool.mypy]
-files = ["src", "tests"]
+files = ["src", "tests", "vendor_tests", "run_deps_tests"]
 python_version = "3.11"
 warn_unused_configs = true
 strict = true
@@ -273,10 +72,54 @@ ignore_missing_imports = true
 module = ["tests/*"]
 disable_error_code = ["no-untyped-def"] # test(...) without -> None
 
+[[tool.mypy.overrides]]
+module = ["vendor_tests/*"]
+disable_error_code = ["no-untyped-def"] # test(...) without -> None
+
+[[tool.mypy.overrides]]
+module = ["vendor_tests/array_api_compat/*"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["run_deps_tests/*"]
+disable_error_code = ["no-untyped-def"] # test(...) without -> None
+
+# pyrefly
+
+[tool.pyrefly.errors]
+# Redundant with mypy checks
+missing-import = false
+# extra checks from scipy/scipy-stubs
+implicit-abstract-class = "error"
+implicitly-defined-attribute = "error"
+missing-override-decorator = "error"
+missing-source = "ignore"
+not-required-key-access = "error"
+open-unpacking = "error"
+unannotated-attribute = "error"
+unannotated-parameter = "error"
+unannotated-return = "error"
+untyped-import = "error"
+unused-ignore = "error"
+variance-mismatch = "error"
+
+[[tool.pyrefly.sub-config]]
+matches = "tests/*.py"
+errors = { unannotated-return = false }
+
+[[tool.pyrefly.sub-config]]
+matches = "vendor_tests/*.py"
+errors = { unannotated-return = false }
+
+[[tool.pyrefly.sub-config]]
+matches = "run_deps_tests/*.py"
+errors = { unannotated-return = false }
+
 # pyright
 
 [tool.basedpyright]
-include = ["src", "tests"]
+include = ["src", "tests", "vendor_tests", "run_deps_tests"]
+exclude = ["vendor_tests/array_api_compat"]
 pythonVersion = "3.11"
 pythonPlatform = "All"
 typeCheckingMode = "all"
@@ -302,6 +145,8 @@ reportUnknownLambdaType = false
 
 executionEnvironments = [
   { root = "tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
+  { root = "vendor_tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
+  { root = "run_deps_tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
   { root = "src" },
 ]
 
@@ -357,7 +202,7 @@ py-version = "3.11"
 reports.output-format = "colorized"
 messages_control.disable = [
   "design", # ignore heavily opinionated design checks
-  "fixme", #  allow FIXME comments
+  "fixme", # allow FIXME comments
   "line-too-long", # ruff handles this
   "unused-argument", # ruff handles this
   "missing-function-docstring", # numpydoc handles this
@@ -374,6 +219,7 @@ checks = [
   "SA01", # data-apis/array-api-extra#87
   "ES01", # most docstrings do not need an extended summary
 ]
-exclude = [ # don't report on objects that match any of these regex
-  '.*test_*',
+exclude_files = [
+  '^tests/.*',
+  '^vendor_tests/.*',
 ]

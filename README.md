@@ -39,6 +39,7 @@ Used by:
 - [scikit-learn](https://github.com/scikit-learn/scikit-learn) — Machine
   Learning in Python.
 - [SysIdentPy](https://github.com/wilsonrljr/sysidentpy) — System Identification Using NARMAX Models.
+- [GLASS](https://github.com/glass-dev/glass) — Generator for Large Scale Structure.
 - *your library? Let us know!*
 
 ## Installation
@@ -89,7 +90,7 @@ This project exists thanks to the following contributors
       <td align="center" valign="top" width="14.28%"><a href="http://www.vanderplas.com/"><img src="https://avatars.githubusercontent.com/u/781659?v=4?s=100" width="100px;" alt="Jake Vanderplas"/><br /><sub><b>Jake Vanderplas</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/pulls?q=is%3Apr+reviewed-by%3Ajakevdp" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/KotlinIsland"><img src="https://avatars.githubusercontent.com/u/65446343?v=4?s=100" width="100px;" alt="kotlinisland"/><br /><sub><b>kotlinisland</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/pulls?q=is%3Apr+reviewed-by%3Akotlinisland" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/DetachHead"><img src="https://avatars.githubusercontent.com/u/57028336?v=4?s=100" width="100px;" alt="detachhead"/><br /><sub><b>detachhead</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/pulls?q=is%3Apr+reviewed-by%3Adetachhead" title="Reviewed Pull Requests">👀</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/NeilGirdhar"><img src="https://avatars.githubusercontent.com/u/730137?v=4?s=100" width="100px;" alt="Neil Girdhar"/><br /><sub><b>Neil Girdhar</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=NeilGirdhar" title="Code">💻</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=NeilGirdhar" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/NeilGirdhar"><img src="https://avatars.githubusercontent.com/u/730137?v=4?s=100" width="100px;" alt="Neil Girdhar"/><br /><sub><b>Neil Girdhar</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=NeilGirdhar" title="Code">💻</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=NeilGirdhar" title="Tests">⚠️</a> <a href="https://github.com/data-apis/array-api-extra/pulls?q=is%3Apr+reviewed-by%3ANeilGirdhar" title="Reviewed Pull Requests">👀</a></td>
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/lithomas1"><img src="https://avatars.githubusercontent.com/u/47963215?v=4?s=100" width="100px;" alt="Thomas Li"/><br /><sub><b>Thomas Li</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/issues?q=author%3Alithomas1" title="Bug reports">🐛</a> <a href="#tool-lithomas1" title="Tools">🔧</a></td>
@@ -102,6 +103,9 @@ This project exists thanks to the following contributors
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://steppi.github.io"><img src="https://avatars.githubusercontent.com/u/1953382?v=4?s=100" width="100px;" alt="Albert Steppi"/><br /><sub><b>Albert Steppi</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=steppi" title="Code">💻</a> <a href="#ideas-steppi" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=steppi" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/prady0t"><img src="https://avatars.githubusercontent.com/u/99216956?v=4?s=100" width="100px;" alt="Pradyot Ranjan"/><br /><sub><b>Pradyot Ranjan</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=prady0t" title="Code">💻</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=prady0t" title="Documentation">📖</a> <a href="#ideas-prady0t" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=prady0t" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lundybernard"><img src="https://avatars.githubusercontent.com/u/17297695?v=4?s=100" width="100px;" alt="Lundy Bernard"/><br /><sub><b>Lundy Bernard</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/pulls?q=is%3Apr+reviewed-by%3Alundybernard" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Cyril-36"><img src="https://avatars.githubusercontent.com/u/138621648?v=4?s=100" width="100px;" alt="Chaitanya Pudota"/><br /><sub><b>Chaitanya Pudota</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=Cyril-36" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
