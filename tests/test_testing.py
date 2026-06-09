@@ -81,10 +81,11 @@ class TestAssertEqualCloseLess:
             func(xp.asarray(0), 0)
         with pytest.raises(TypeError, match="list is not a supported array type"):
             func(xp.asarray([0]), [0])
+        func(xp.asarray(0), xp.asarray(1 if func is assert_less else 0), xp=xp)
         with (
             pytest.raises(
                 AssertionError,
-                match="Namespace of desired array does not match the `xp` argument",
+                match="Namespace of actual array does not match the `xp` argument",
             ),
         ):
             func(xp.asarray(0), xp.asarray(0), xp=np)
