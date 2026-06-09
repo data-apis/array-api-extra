@@ -62,8 +62,8 @@ a specific version, or vendor the library inside your own.
 
 ```{note}
 This library depends on `array-api-compat`. We aim for compatibility with
-the latest released version of array-api-compat, and your mileage may vary
-with older or dev versions.
+the latest released versions of the standard and array-api-compat,
+and your mileage may vary with older or dev/draft versions.
 ```
 
 (vendoring)=
