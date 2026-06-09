@@ -142,6 +142,8 @@ reportUnusedParameter = false
 reportImportCycles = false
 # PyRight can't trace types in lambdas
 reportUnknownLambdaType = false
+# conflicts with https://docs.astral.sh/ruff/rules/explicit-string-concatenation/
+reportImplicitStringConcatenation = false
 
 executionEnvironments = [
   { root = "tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
