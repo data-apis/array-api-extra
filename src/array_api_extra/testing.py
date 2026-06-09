@@ -774,6 +774,7 @@ def assert_close(
 
     Array arguments to `atol` and `rtol` must be valid input to :class:`float`.
     """
+    __tracebackhide__ = True
     actual, desired, xp, np = _check_ns_shape_dtype(
         actual, desired, check_dtype, check_shape, check_scalar, xp
     )
@@ -857,6 +858,7 @@ def assert_equal(
     assert_close : Similar function for inexact equality checks.
     numpy.testing.assert_array_equal : Similar function for NumPy arrays.
     """
+    __tracebackhide__ = True
     actual, desired, xp, np = _check_ns_shape_dtype(
         actual, desired, check_dtype, check_shape, check_scalar, xp
     )
@@ -918,6 +920,7 @@ def assert_less(
     assert_close : Similar function for inexact equality checks.
     numpy.testing.assert_array_less : Similar function for NumPy arrays.
     """
+    __tracebackhide__ = True
     x, y, xp, np = _check_ns_shape_dtype(
         x, y, check_dtype, check_shape, check_scalar, xp
     )
