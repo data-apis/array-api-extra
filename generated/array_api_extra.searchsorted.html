@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Contributing" href="../contributing.html"><link rel="prev" title="testing.lazy_xp_function" href="array_api_extra.testing.lazy_xp_function.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="setdiff1d" href="array_api_extra.setdiff1d.html"><link rel="prev" title="partition" href="array_api_extra.partition.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>testing.patch_lazy_xp_functions - array-api-extra 0.10.3 documentation</title>
+        <title>searchsorted - array-api-extra 0.10.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -193,7 +193,7 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">array-api-extra</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api-assorted.html">Assorted functions</a><input aria-label="Toggle navigation of Assorted functions" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api-assorted.html">Assorted functions</a><input aria-label="Toggle navigation of Assorted functions" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.angle.html">angle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.apply_where.html">apply_where</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.argpartition.html">argpartition</a></li>
@@ -212,7 +212,7 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.one_hot.html">one_hot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.pad.html">pad</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.partition.html">partition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.searchsorted.html">searchsorted</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">searchsorted</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.setdiff1d.html">setdiff1d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.sinc.html">sinc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.union1d.html">union1d</a></li>
@@ -225,10 +225,10 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.assert_less.html">testing.assert_less</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../api-lazy.html">Tools for lazy backends</a><input aria-label="Toggle navigation of Tools for lazy backends" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api-lazy.html">Tools for lazy backends</a><input aria-label="Toggle navigation of Tools for lazy backends" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.lazy_apply.html">lazy_apply</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html">testing.lazy_xp_function</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">testing.patch_lazy_xp_functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.testing.patch_lazy_xp_functions.html">testing.patch_lazy_xp_functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
@@ -253,12 +253,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.testing.patch_lazy_xp_functions.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.searchsorted.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.testing.patch_lazy_xp_functions.rst" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.searchsorted.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -275,64 +275,59 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="testing-patch-lazy-xp-functions">
-<h1>testing.patch_lazy_xp_functions<a class="headerlink" href="#testing-patch-lazy-xp-functions" title="Link to this heading">¶</a></h1>
+          <section id="searchsorted">
+<h1>searchsorted<a class="headerlink" href="#searchsorted" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.testing.patch_lazy_xp_functions">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.testing.</span></span><span class="sig-name descname"><span class="pre">patch_lazy_xp_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monkeypatch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.testing.patch_lazy_xp_functions" title="Link to this definition">¶</a></dt>
-<dd><p>Test lazy execution of functions tagged with <a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-func docutils literal notranslate"><span class="pre">lazy_xp_function()</span></code></a>.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">xp==jax.numpy</span></code>, search for all functions and methods which have been tagged
-with <a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-func docutils literal notranslate"><span class="pre">lazy_xp_function()</span></code></a> in the globals of the module that defines the current
-test, as well as in the <code class="docutils literal notranslate"><span class="pre">lazy_xp_modules</span></code> list in the globals of the same module,
-and wrap them with <a class="reference external" href="https://docs.jax.dev/en/latest/_autosummary/jax.jit.html#jax.jit" title="(in JAX)"><code class="xref py py-func docutils literal notranslate"><span class="pre">jax.jit()</span></code></a>.
-Unwrap them at the end of the test.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">xp==dask.array</span></code>, wrap the functions with a decorator that disables
-<code class="docutils literal notranslate"><span class="pre">compute()</span></code> and <code class="docutils literal notranslate"><span class="pre">persist()</span></code> and ensures that exceptions and warnings are raised
-eagerly.</p>
-<p>This function should be typically called by your library’s <cite>xp</cite> fixture that runs
-tests on multiple backends:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">[</span>
-    <span class="n">numpy</span><span class="p">,</span>
-    <span class="n">array_api_strict</span><span class="p">,</span>
-    <span class="n">pytest</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">numpy</span><span class="p">,</span> <span class="n">marks</span><span class="o">=</span><span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">thread_unsafe</span><span class="p">),</span>
-    <span class="n">pytest</span><span class="o">.</span><span class="n">param</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">marks</span><span class="o">=</span><span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">thread_unsafe</span><span class="p">),</span>
-<span class="p">])</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">xp</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="k">with</span> <span class="n">patch_lazy_xp_functions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">param</span><span class="p">):</span>
-        <span class="k">yield</span> <span class="n">request</span><span class="o">.</span><span class="n">param</span>
-</pre></div>
-</div>
-<p>but it can be otherwise be called by the test itself too.</p>
+<dt class="sig sig-object py" id="array_api_extra.searchsorted">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">searchsorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'left'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.searchsorted" title="Link to this definition">¶</a></dt>
+<dd><p>Find indices where elements should be inserted to maintain order.</p>
+<p>Find the indices into a sorted array <code class="docutils literal notranslate"><span class="pre">x1</span></code> such that if the elements in <code class="docutils literal notranslate"><span class="pre">x2</span></code>
+were inserted before the indices, the resulting array would remain sorted.</p>
+<p>The behavior of this function is similar to that of <cite>array_api.searchsorted</cite>,
+but it relaxes the requirement that <cite>x1</cite> must be one-dimensional.
+This function is vectorized, treating slices along the last axis
+as elements and preceding axes as batch (or “loop”) dimensions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>request</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">FixtureRequest</span></code></span>) – Pytest fixture, as acquired by the test itself or by one of its fixtures.</p></li>
-<li><p><strong>monkeypatch</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonkeyPatch</span></code> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Deprecated.</p></li>
-<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a></span>) – Array namespace to be tested.</p></li>
+<li><p><strong>x1</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – Input array. Should have a real-valued data type. Must be sorted in ascending
+order along the last axis.</p></li>
+<li><p><strong>x2</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – Array containing search values. Should have a real-valued data type. Must have
+the same shape as <code class="docutils literal notranslate"><span class="pre">x1</span></code> except along the last axis.</p></li>
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'left'</span></code>, <code class="docutils literal notranslate"><span class="pre">'right'</span></code>]</span>) – Argument controlling which index is returned if an element of <code class="docutils literal notranslate"><span class="pre">x2</span></code> is equal to
+one or more elements of <code class="docutils literal notranslate"><span class="pre">x1</span></code>: <code class="docutils literal notranslate"><span class="pre">'left'</span></code> returns the index of the first of
+these elements; <code class="docutils literal notranslate"><span class="pre">'right'</span></code> returns the next index after the last of these
+elements. Default: <code class="docutils literal notranslate"><span class="pre">'left'</span></code>.</p></li>
+<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The standard-compatible namespace for the array arguments. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Testing context manager.</p>
+<dd class="field-even"><p><strong>Array</strong> – An array of indices with the same shape as <code class="docutils literal notranslate"><span class="pre">x2</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/contextlib.html#contextlib.AbstractContextManager" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractContextManager</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span></p>
 </dd>
 </dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="array_api_extra.testing.lazy_xp_function.html#array_api_extra.testing.lazy_xp_function" title="array_api_extra.testing.lazy_xp_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lazy_xp_function</span></code></a></dt><dd><p>Tag a function to be tested on lazy backends.</p>
-</dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest.FixtureRequest</span></code></dt><dd><p><cite>request</cite> test function parameter.</p>
-</dd>
-</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_strict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mf">11.5</span><span class="p">,</span> <span class="mf">14.5</span><span class="p">,</span> <span class="mi">16</span><span class="p">]),</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array([0, 1, 5, 6], dtype=array_api_strict.int64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="mi">13</span><span class="p">),</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array(2, dtype=array_api_strict.int64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="mi">13</span><span class="p">),</span> <span class="n">side</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array(4, dtype=array_api_strict.int64)</span>
+</pre></div>
 </div>
-<p class="rubric">Notes</p>
-<p>This context manager monkey-patches modules and as such is thread unsafe
-on Dask and JAX. If you run your test suite with
-<a class="reference external" href="https://github.com/Quansight-Labs/pytest-run-parallel/">pytest-run-parallel</a>,
-you should mark these backends with <code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.thread_unsafe</span></code>, as shown in
-the example above.</p>
+<p><cite>searchsorted</cite> is vectorized along the last axis.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x1</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">,</span> <span class="mf">7.</span><span class="p">,</span> <span class="mf">8.</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x2</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">3.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.6</span><span class="p">,</span> <span class="mf">8.8</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array([[1, 3],</span>
+<span class="go">       [2, 4]], dtype=array_api_strict.int64)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -342,23 +337,23 @@ the example above.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../contributing.html">
+          <a class="next-page" href="array_api_extra.setdiff1d.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Contributing</div>
+                <div class="title">setdiff1d</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.testing.lazy_xp_function.html">
+          <a class="prev-page" href="array_api_extra.partition.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">testing.lazy_xp_function</div>
+                <div class="title">partition</div>
                 
               </div>
             </a>
@@ -399,8 +394,8 @@ the example above.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">testing.patch_lazy_xp_functions</a><ul>
-<li><a class="reference internal" href="#array_api_extra.testing.patch_lazy_xp_functions"><code class="docutils literal notranslate"><span class="pre">patch_lazy_xp_functions()</span></code></a></li>
+<li><a class="reference internal" href="#">searchsorted</a><ul>
+<li><a class="reference internal" href="#array_api_extra.searchsorted"><code class="docutils literal notranslate"><span class="pre">searchsorted()</span></code></a></li>
 </ul>
 </li>
 </ul>
