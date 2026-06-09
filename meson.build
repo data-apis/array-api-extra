@@ -11,6 +11,7 @@ sources = {
   'array_api_extra': files(
     'src/array_api_extra/__init__.py',
     'src/array_api_extra/_delegation.py',
+    'src/array_api_extra/py.typed',
     'src/array_api_extra/testing.py',
   ),
   'array_api_extra/_lib': files(
