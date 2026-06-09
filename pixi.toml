@@ -12,7 +12,6 @@ version = "*"
 
 [package.host-dependencies]
 meson-python = "*"
-uv = "*" # interfaces with meson-python instead of pip
 
 [package.run-dependencies]
 array-api-compat = "*"
