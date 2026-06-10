@@ -109,7 +109,7 @@ tests-cov = { cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --du
 
 clean-vendor-compat = { cmd = "rm -rf vendor_tests/array_api_compat", description = "Delete the existing vendored version of array-api-compat", default-environment = "tests" }
 clean-vendor-extra = { cmd = "rm -rf vendor_tests/array_api_extra", description = "Delete the existing vendored version of array-api-extra", default-environment = "tests" }
-copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/", depends-on = ["clean-vendor-compat"], description = "Vendor a clean copy of array-api-compat", default-environment = "tests" }
+copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/ && rm -rf vendor_tests/array_api_compat/vendor_tests && rm -rf vendor_tests/array_api_compat/tests", depends-on = ["clean-vendor-compat"], description = "Vendor a clean copy of array-api-compat", default-environment = "tests" }
 copy-vendor-extra = { cmd = "cp -r src/array_api_extra vendor_tests/", depends-on = ["clean-vendor-extra"], description = "Vendor a clean copy of array-api-extra", default-environment = "tests" }
 tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-compat", "copy-vendor-extra"], description = "Check that array-api-extra and array-api-compat can be vendored together", default-environment = "tests" }
 
