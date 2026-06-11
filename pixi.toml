@@ -210,7 +210,7 @@ pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
 [feature.nogil.dependencies]
 python-freethreading = "~=3.13.0"
-pytest-run-parallel = ">=0.8.2"
+pytest-run-parallel = ">=0.9.0"
 numpy = ">=2.3.5"
 # pytorch = "*"  # Not available on Python 3.13t yet
 dask-core = ">=2026.3.0" # No distributed, tornado, etc.
