@@ -149,7 +149,7 @@ docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs", description = "Build
 open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs", default-environment = "docs" }
 
 [feature.dev.dependencies]
-ipython = ">=9.13.0"
+ipython = ">=9.14.0"
 
 [feature.dev.tasks]
 ipython = { cmd = "ipython", description = "Launch ipython", default-environment = "dev" }
