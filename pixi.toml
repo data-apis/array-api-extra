@@ -194,7 +194,7 @@ jax = ">=0.9.2"
 system-requirements = { cuda = "12" }
 
 [feature.cuda-backends.target.linux.dependencies]
-cupy = ">=14.1.0"
+cupy = ">=14.1.1"
 jaxlib = { version = ">=0.9.2", build = "cuda12*" }
 pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
@@ -204,7 +204,7 @@ pytorch = { version = ">=2.10.0", build = "cuda12*" }
 # pytorch = { version = "*", build = "cuda12*" }  # unavailable
 
 [feature.cuda-backends.target.win.dependencies]
-cupy = ">=14.1.0"
+cupy = ">=14.1.1"
 # jaxlib = { version = "*", build = "cuda12*" }  # unavailable
 pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
