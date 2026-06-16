@@ -2031,6 +2031,19 @@ class TestNanMin:
         expected = -xp.inf
         assert res == expected
 
+    @pytest.mark.filterwarnings("ignore::RuntimeWarning")
+    def test_all_nan_slice_2d(self, xp: ModuleType):
+        a = xp.asarray(
+            [
+                [xp.nan, 5.0],
+                [xp.nan, 2.0],
+            ]
+        )
+
+        res = nanmin(a, axis=0, xp=xp)
+        expected = xp.asarray([xp.nan, 2.0])
+        assert_equal(res, expected)
+
     @pytest.mark.skip_xp_backend(
         Backend.TORCH, reason="Tensor.item() cannot be called on meta tensors"
     )
