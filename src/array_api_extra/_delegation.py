@@ -27,6 +27,7 @@ __all__ = [
     "isclose",
     "kron",
     "nan_to_num",
+    "nanmin",
     "one_hot",
     "pad",
     "searchsorted",
@@ -1318,3 +1319,44 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
         return xp.union1d(a, b)
 
     return _funcs.union1d(a, b, xp=xp)
+
+
+def nanmin(
+    a: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Return the minimum of the array elements along a given axis, ignoring NaNs.
+
+    Parameters
+    ----------
+    a : Array
+        Input array.
+
+    axis : int or tuple of ints or None, optional
+        Axis or axes along which the minimum is computed. The default is to compute
+        the minimum of the flattened array.
+
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array of minimum values along the given axis, ignoring NaNs.
+    """
+    if xp is None:
+        xp = array_namespace(a)
+
+    if (
+        is_numpy_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_dask_namespace(xp)
+        or is_jax_namespace(xp)
+    ):
+        return xp.nanmin(a, axis=axis)
+
+    return _funcs.nanmin(a, axis=axis, xp=xp)
