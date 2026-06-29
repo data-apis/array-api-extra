@@ -27,7 +27,7 @@ array-api-compat = "*"
 
 [environments]
 default = { features = ["py314"], solve-group = "py314" }
-lint = { features = ["py314", "lint"], solve-group = "py314" }
+lint = { features = ["py311", "lint"], solve-group = "py311" }
 docs = { features = ["py314", "docs"], solve-group = "py314" }
 tests = { features = ["py314", "tests"], solve-group = "py314" }
 tests-py314 = { features = ["py314", "tests"], solve-group = "py314" } # alias of tests
