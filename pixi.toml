@@ -180,7 +180,7 @@ dask-core = ">=2026.3.0" # No distributed, tornado, etc.
 sparse = ">=0.18.0"
 
 [feature.backends.target.unix.dependencies]
-jax = ">=0.9.2"
+jax = ">=0.10.1"
 
 # Backends that require a GPU host and a CUDA driver.
 # Note that JAX and PyTorch automatically prefer CUDA variants
@@ -197,7 +197,7 @@ cupy = ">=14.1.1"
 pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
 [feature.cuda-backends.target.linux.dependencies]
-jaxlib = { version = ">=0.9.2", build = "cuda12*" }
+jaxlib = { version = ">=0.10.1", build = "cuda12*" }
 
 [feature.nogil.dependencies]
 python-freethreading = "~=3.13.0"
