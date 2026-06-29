@@ -489,6 +489,7 @@ class TestAtLeastND:
         assert_equal(y, xp.asarray([[[[[[[[[3.0]], [[2.0]]]]]]]]]))
 
 
+@pytest.mark.filterwarnings("ignore:.*removed in v1.0.0.*:DeprecationWarning")
 class TestBroadcastShapes:
     def test_delegates_known_integer_shapes(self, monkeypatch: pytest.MonkeyPatch):
         calls = []
@@ -829,6 +830,7 @@ class TestDefaultDType:
         assert default_dtype(xp, "complex floating") == xp.complex64
 
 
+@pytest.mark.filterwarnings(r"ignore:.*removed in v1.0.0.*:DeprecationWarning")
 class TestExpandDims:
     def test_single_axis(self, xp: ModuleType):
         """Trivial case where xpx.expand_dims doesn't add anything to xp.expand_dims"""

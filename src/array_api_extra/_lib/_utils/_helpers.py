@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import functools
 import io
 import math
 import pickle
 import types
+import warnings
 from collections.abc import Callable, Generator, Iterable, Iterator
 from functools import wraps
 from types import ModuleType
@@ -48,6 +50,7 @@ T = TypeVar("T")
 __all__ = [
     "asarrays",
     "capabilities",
+    "deprecated",
     "eager_shape",
     "in1d",
     "is_python_scalar",
@@ -56,6 +59,26 @@ __all__ = [
     "pickle_flatten",
     "pickle_unflatten",
 ]
+
+
+def deprecated(
+    msg: str, stacklevel: int = 2
+) -> Callable[[Callable[P, T]], Callable[P, T]]:  # numpydoc ignore=PR01,RT01
+    """Deprecate a function by emitting a warning on use."""
+
+    def decorate(func: Callable[P, T]) -> Callable[P, T]:  # numpydoc ignore=GL08
+        @functools.wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:  # numpydoc ignore=GL08
+            warnings.warn(
+                msg,
+                category=DeprecationWarning,
+                stacklevel=stacklevel,
+            )
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorate
 
 
 def in1d(

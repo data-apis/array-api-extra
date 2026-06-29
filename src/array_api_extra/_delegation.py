@@ -15,7 +15,7 @@ from ._lib._utils._compat import (
     is_torch_namespace,
 )
 from ._lib._utils._compat import device as get_device
-from ._lib._utils._helpers import asarrays, eager_shape
+from ._lib._utils._helpers import asarrays, deprecated, eager_shape
 from ._lib._utils._typing import Array, DType
 
 __all__ = [
@@ -84,18 +84,22 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array
     return _funcs.atleast_nd(x, ndim=ndim, xp=xp)
 
 
+@deprecated(
+    "`xpx.broadcast_shapes` is deprecated and will be removed in v1.0.0. "
+    "`xp.broadcast_shapes` exists in the standard as of v2025.12."
+)
 def broadcast_shapes(
     *shapes: tuple[float | None, ...], xp: ModuleType | None = None
 ) -> tuple[int | None, ...]:
     """
     Compute the shape of the broadcasted arrays.
 
+    .. deprecated:: 0.11.0
+        :func:`broadcast_shapes` is deprecated and will be removed in v1.0.0.
+        :func:`array_api.broadcast_shapes` exists in the standard as of v2025.12.
+
     Duplicates :func:`numpy.broadcast_shapes`, with additional support for
     None and NaN sizes.
-
-    This is equivalent to ``xp.broadcast_arrays(arr1, arr2, ...)[0].shape``
-    without needing to worry about the backend potentially deep copying
-    the arrays.
 
     Parameters
     ----------
@@ -301,17 +305,24 @@ def create_diagonal(
     return _funcs.create_diagonal(x, offset=offset, xp=xp)
 
 
+@deprecated(
+    "`xpx.expand_dims` is deprecated and will be removed in v1.0.0. "
+    "`xp.expand_dims` with support for a tuple of ints in `axis` "
+    "exists in the standard as of v2025.12."
+)
 def expand_dims(
     a: Array, /, *, axis: int | tuple[int, ...] = (0,), xp: ModuleType | None = None
 ) -> Array:
     """
     Expand the shape of an array.
 
+    .. deprecated:: 0.11.0
+        :func:`expand_dims` is deprecated and will be removed in v1.0.0.
+        :func:`array_api.expand_dims` with support for a tuple of ints in `axis`
+        exists in the standard as of v2025.12.
+
     Insert (a) new axis/axes that will appear at the position(s) specified by
     `axis` in the expanded array shape.
-
-    This is ``xp.expand_dims`` for `axis` an int *or a tuple of ints*.
-    Roughly equivalent to ``numpy.expand_dims`` for NumPy arrays.
 
     Parameters
     ----------
@@ -805,7 +816,7 @@ def searchsorted(
     Find the indices into a sorted array ``x1`` such that if the elements in ``x2``
     were inserted before the indices, the resulting array would remain sorted.
 
-    The behavior of this function is similar to that of `array_api.searchsorted`,
+    The behavior of this function is similar to that of :func:`array_api.searchsorted`,
     but it relaxes the requirement that `x1` must be one-dimensional.
     This function is vectorized, treating slices along the last axis
     as elements and preceding axes as batch (or "loop") dimensions.
@@ -1221,8 +1232,8 @@ def isin(
     """
     Determine whether each element in `a` is present in `b`.
 
-    Return a boolean array of the same shape as `a` that is True for elements
-    that are in `b` and False otherwise.
+    This is :func:`array_api.isin`, with additional `assume_unique`
+    and `kind` parameters.
 
     Parameters
     ----------

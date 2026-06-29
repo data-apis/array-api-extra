@@ -24,6 +24,7 @@
     one_hot
     pad
     partition
+    searchsorted
     setdiff1d
     sinc
     union1d
