@@ -1,8 +1,15 @@
 [workspace]
 channels = ["https://prefix.dev/conda-forge"]
-platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+platforms = [
+  "linux-64",
+  "osx-64",
+  "osx-arm64",
+  "win-64",
+  { platform = "linux-64", cuda = "12.9" },
+  { platform = "win-64", cuda = "12.9" },
+]
 preview = ["pixi-build"]
-requires-pixi = ">=0.68.0"
+requires-pixi = ">=0.71.2"
 
 ### array-api-extra package definition ###
 
@@ -20,7 +27,7 @@ array-api-compat = "*"
 
 [environments]
 default = { features = ["py314"], solve-group = "py314" }
-lint = { features = ["py314", "lint"], solve-group = "py314" }
+lint = { features = ["py311", "lint"], solve-group = "py311" }
 docs = { features = ["py314", "docs"], solve-group = "py314" }
 tests = { features = ["py314", "tests"], solve-group = "py314" }
 tests-py314 = { features = ["py314", "tests"], solve-group = "py314" } # alias of tests
@@ -54,19 +61,19 @@ array-api-extra.path = "."
 
 [feature.lint.dependencies]
 typing-extensions = ">=4.15.0"
-pylint = ">=4.0.5"
-mypy = ">=1.20.2"
-basedpyright = ">=1.39.6"
+pylint = ">=4.0.6"
+mypy = ">=2.1.0"
+basedpyright = ">=1.39.8"
 numpydoc = ">=1.10.0,<2"
 # import dependencies for mypy:
 array-api-strict = ">=2.5,<2.6"
 numpy = ">=2.1.3"
 hypothesis = ">=6.153.2"
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
+dask-core = ">=2026.6.0" # No distributed, tornado, etc.
 dprint = ">=0.50.0,<0.51"
 lefthook = ">=2.1.9,<3"
-ruff = ">=0.15.15,<0.16"
-typos = ">=1.47.0,<2"
+ruff = ">=0.15.17,<0.16"
+typos = ">=1.47.2,<2"
 actionlint = ">=1.7.12,<2"
 blacken-docs = ">=1.20.0,<2"
 pytest = ">=9.0.3,<10"
@@ -139,7 +146,7 @@ myst-parser = ">=5.1.0"
 sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
+dask-core = ">=2026.6.0" # No distributed, tornado, etc.
 pytest = ">=9.0.3"
 typing-extensions = ">=4.15.0"
 numpy = ">=2.1.3"
@@ -149,7 +156,7 @@ docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs", description = "Build
 open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs", default-environment = "docs" }
 
 [feature.dev.dependencies]
-ipython = ">=9.14.0"
+ipython = ">=9.14.1"
 
 [feature.dev.tasks]
 ipython = { cmd = "ipython", description = "Launch ipython", default-environment = "dev" }
@@ -169,50 +176,34 @@ numpy = "=1.24.1"
 # Note: JAX and PyTorch will install CPU variants.
 [feature.backends.dependencies]
 pytorch = ">=2.10.0"
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
+dask-core = ">=2026.6.0" # No distributed, tornado, etc.
 sparse = ">=0.18.0"
 
-[feature.backends.target.linux-64.dependencies]
-jax = ">=0.9.2"
-
-[feature.backends.target.osx-64.dependencies]
-jax = ">=0.9.2"
-
-[feature.backends.target.osx-arm64.dependencies]
-jax = ">=0.9.2"
-
-[feature.backends.target.win-64.dependencies]
-# jax = "*"  # unavailable
+[feature.backends.target.unix.dependencies]
+jax = ">=0.10.1"
 
 # Backends that require a GPU host and a CUDA driver.
 # Note that JAX and PyTorch automatically prefer CUDA variants
-# thanks to the `system-requirements` below, *if available*.
+# thanks to the cuda platform specification, *if available*.
 # We request them explicitly below to ensure that we don't
 # quietly revert to CPU-only in the future, e.g. when CUDA 13
 # is released and CUDA 12 builds are dropped upstream.
 [feature.cuda-backends]
-system-requirements = { cuda = "12" }
+platforms = ["linux-64-cuda-12-9", "win-64-cuda-12-9"]
+
+[feature.cuda-backends.dependencies]
+cuda-version = "==12.9"
+cupy = ">=14.1.1"
+pytorch = { version = ">=2.10.0", build = "cuda12*" }
 
 [feature.cuda-backends.target.linux.dependencies]
-cupy = ">=14.1.1"
-jaxlib = { version = ">=0.9.2", build = "cuda12*" }
-pytorch = { version = ">=2.10.0", build = "cuda12*" }
-
-[feature.cuda-backends.target.osx.dependencies]
-# cupy = "*"  # unavailable
-# jaxlib = { version = "*", build = "cuda12*" }  # unavailable
-# pytorch = { version = "*", build = "cuda12*" }  # unavailable
-
-[feature.cuda-backends.target.win.dependencies]
-cupy = ">=14.1.1"
-# jaxlib = { version = "*", build = "cuda12*" }  # unavailable
-pytorch = { version = ">=2.10.0", build = "cuda12*" }
+jaxlib = { version = ">=0.10.1", build = "cuda12*" }
 
 [feature.nogil.dependencies]
 python-freethreading = "~=3.13.0"
-pytest-run-parallel = ">=0.9.0"
+pytest-run-parallel = ">=0.9.1"
 numpy = ">=2.3.5"
 # pytorch = "*"  # Not available on Python 3.13t yet
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
+dask-core = ">=2026.6.0" # No distributed, tornado, etc.
 # sparse = "*"  # numba not available on Python 3.13t yet
 # jax = "*"  # ml_dtypes not available on Python 3.13t yet
