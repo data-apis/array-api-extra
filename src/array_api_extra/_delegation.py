@@ -1311,7 +1311,7 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
 
 
 def unravel_index(
-    ind: Array,
+    indices: Array,
     shape: tuple[int, ...],
     /,
     *,
@@ -1322,7 +1322,7 @@ def unravel_index(
 
     Parameters
     ----------
-    ind : array
+    indices : array
         An integer array whose elements are indices into the flattened version
         of an array of dimensions `shape`.
 
@@ -1330,7 +1330,7 @@ def unravel_index(
         The shape to use for unraveling `indices`.
 
     xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
+        The standard-compatible namespace for `indices`. Default: infer.
 
     Returns
     -------
@@ -1342,14 +1342,20 @@ def unravel_index(
     --------
     >>> import array_api_extra as xpx
     >>> import array_api_strict as xp
-    >>> xpx.unravel_index(xp.asarray([1, 2, 3, 4, 5]), (4, 3))
+    >>> xs, ys = xpx.unravel_index(xp.asarray([1, 2, 4, 5, 6, 8]), (4, 3))
+    >>> xs, ys
     (
-        Array([0, 0, 1, 1, 1], dtype=array_api_strict.int64),
-        Array([1, 2, 0, 1, 2], dtype=array_api_strict.int64),
+        Array([0, 0, 1, 1, 2, 2], dtype=array_api_strict.int64),
+        Array([1, 2, 1, 2, 0, 2], dtype=array_api_strict.int64),
     )
+    >>> [(int(x), int(y)) for x, y in zip(xs, ys)]
+    [(0, 1), (0, 2), (1, 1), (1, 2), (2, 0), (2, 2)]
+    >>> xs, ys = xpx.unravel_index(xp.arange(6), (2, 2))
+    >>> [(int(x), int(y)) for x, y in zip(xs, ys)]
+    [(0, 0), (0, 1), (1, 0), (1, 1), (0, 0), (0, 1)]
     """
     if xp is None:
-        xp = array_namespace(ind)
+        xp = array_namespace(indices)
 
     if (
         is_numpy_namespace(xp)
@@ -1358,6 +1364,6 @@ def unravel_index(
         or is_jax_namespace(xp)
         or is_torch_namespace(xp)
     ):
-        return xp.unravel_index(ind, shape)
+        return xp.unravel_index(indices, shape)
 
-    return _funcs.unravel_index(ind, shape)
+    return _funcs.unravel_index(indices, shape)
