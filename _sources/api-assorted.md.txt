@@ -28,4 +28,5 @@
     setdiff1d
     sinc
     union1d
+    unravel_index
 ```
