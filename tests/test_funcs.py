@@ -1,3 +1,4 @@
+import inspect
 import math
 import warnings
 from collections.abc import Callable
@@ -38,6 +39,7 @@ from array_api_extra import (
 from array_api_extra import (
     searchsorted as xpx_searchsorted,
 )
+from array_api_extra._lib import _funcs as functions
 from array_api_extra._lib._backends import NUMPY_VERSION, Backend
 from array_api_extra._lib._funcs import searchsorted as _funcs_searchsorted
 from array_api_extra._lib._utils._compat import (
@@ -71,6 +73,18 @@ lazy_xp_function(sinc)
 lazy_xp_function(union1d, jax_jit=False)
 lazy_xp_function(xpx_searchsorted)
 lazy_xp_function(_funcs_searchsorted)
+
+
+def test_all_contains_all_public_functions():
+    public_functions = {
+        name
+        for name, obj in inspect.getmembers(functions, inspect.isfunction)
+        if not name.startswith("_") and obj.__module__ == functions.__name__
+    }
+    assert public_functions == set(functions.__all__), (
+        f"Missing from __all__: {sorted(public_functions - set(functions.__all__))}\t"
+        f"Extra in __all__: {sorted(set(functions.__all__) - public_functions)}"
+    )
 
 
 class TestApplyWhere:

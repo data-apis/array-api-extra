@@ -25,17 +25,25 @@ from ._utils._typing import Array, Device, DType
 __all__ = [
     "angle",
     "apply_where",
+    "argpartition",
     "atleast_nd",
     "broadcast_shapes",
     "cov",
     "create_diagonal",
+    "default_dtype",
     "expand_dims",
+    "isclose",
+    "isin",
     "kron",
+    "nan_to_num",
     "nunique",
+    "one_hot",
     "pad",
+    "partition",
     "searchsorted",
     "setdiff1d",
     "sinc",
+    "union1d",
 ]
 
 
