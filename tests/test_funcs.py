@@ -27,6 +27,7 @@ from array_api_extra import (
     isin,
     kron,
     nan_to_num,
+    nanmin,
     nunique,
     one_hot,
     pad,
@@ -2044,3 +2045,71 @@ class TestUnravelIndex:
         res = unravel_index(indices, shape, xp=xp)
         for res_arr, exp_arr in zip(res, expected, strict=True):
             assert_equal(res_arr, exp_arr)
+
+
+class TestNanMin:
+    def test_simple(self, xp: ModuleType):
+        a = xp.asarray([[1, 2], [3, xp.nan]])
+
+        # with the default `axis=None` a single scalar is returned
+        res = nanmin(a)
+        expected = 1.0
+        assert res == expected
+
+        res = nanmin(a, axis=0)
+        expected = xp.asarray([1.0, 2.0])
+        assert_equal(res, expected)
+
+        res = nanmin(a, axis=1)
+        expected = xp.asarray([1.0, 3.0])
+        assert_equal(res, expected)
+
+    def test_bigger(self, xp: ModuleType):
+        a = xp.asarray(
+            [
+                [1, xp.nan, 4, 5],
+                [xp.nan, -2, xp.nan, -4],
+                [2, 1, 3, xp.nan],
+            ]
+        )
+
+        res = nanmin(a, axis=0)
+        expected = xp.asarray([1.0, -2.0, 3.0, -4.0])
+        assert_equal(res, expected)
+
+        res = nanmin(a, axis=1)
+        expected = xp.asarray([1.0, -4.0, 1.0])
+        assert_equal(res, expected)
+
+    def test_with_infinity(self, xp: ModuleType):
+        a = xp.asarray([0.1, 1.0, xp.nan, xp.inf])
+        res = nanmin(a)
+        expected = 0.1
+        assert res == expected
+
+        a = xp.asarray([0.1, 1.0, xp.nan, -xp.inf])
+        res = nanmin(a)
+        expected = -xp.inf
+        assert res == expected
+
+    @pytest.mark.filterwarnings("ignore::RuntimeWarning")
+    def test_all_nan_slice_2d(self, xp: ModuleType):
+        a = xp.asarray(
+            [
+                [xp.nan, 5.0],
+                [xp.nan, 2.0],
+            ]
+        )
+
+        res = nanmin(a, axis=0, xp=xp)
+        expected = xp.asarray([xp.nan, 2.0])
+        assert_equal(res, expected)
+
+    @pytest.mark.skip_xp_backend(
+        Backend.TORCH, reason="Tensor.item() cannot be called on meta tensors"
+    )
+    @pytest.mark.parametrize("axis", [None, 0, 1])
+    def test_device(self, axis: int | None, xp: ModuleType, device: Device):
+        a = xp.asarray([[4, xp.nan, 1], [2, 5, xp.nan]], device=device)
+        res = nanmin(a, axis=axis)
+        assert get_device(res) == device

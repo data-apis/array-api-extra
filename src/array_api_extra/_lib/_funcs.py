@@ -767,3 +767,24 @@ def unravel_index(indices: Array, shape: tuple[int, ...], /) -> tuple[Array, ...
         coords.append(indices % dim)
         indices = indices // dim
     return tuple(reversed(coords))
+
+
+def nanmin(  # numpydoc ignore=PR01,RT01
+    a: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None,
+    xp: ModuleType,
+) -> Array:
+    """See docstring in `array_api_extra._delegation.py`."""
+    mask = xp.isnan(a)
+    device_a = _compat.device(a)
+    x = xp.min(
+        xp.where(mask, xp.asarray(+xp.inf, dtype=a.dtype, device=device_a), a),
+        axis=axis,
+    )
+    # Replace Infs from all NaN slices with NaN again
+    mask = xp.all(mask, axis=axis)
+    if xp.any(mask):
+        x = xp.where(mask, xp.asarray(xp.nan, dtype=x.dtype, device=device_a), x)
+    return x
