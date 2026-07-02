@@ -180,7 +180,7 @@ dask-core = ">=2026.6.0" # No distributed, tornado, etc.
 sparse = ">=0.18.0"
 
 [feature.backends.target.unix.dependencies]
-jax = ">=0.10.1"
+jax = ">=0.10.2"
 
 # Backends that require a GPU host and a CUDA driver.
 # Note that JAX and PyTorch automatically prefer CUDA variants
