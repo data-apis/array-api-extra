@@ -2,6 +2,7 @@ py.install_sources([
     '__init__.py',
     'conftest.py',
     'test_at.py',
+    'test_deprecation.py',
     'test_funcs.py',
     'test_helpers.py',
     'test_lazy.py',

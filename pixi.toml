@@ -1,8 +1,15 @@
 [workspace]
 channels = ["https://prefix.dev/conda-forge"]
-platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+platforms = [
+  "linux-64",
+  "osx-64",
+  "osx-arm64",
+  "win-64",
+  { platform = "linux-64", cuda = "12.9" },
+  { platform = "win-64", cuda = "12.9" },
+]
 preview = ["pixi-build"]
-requires-pixi = ">=0.68.0"
+requires-pixi = ">=0.71.2"
 
 ### array-api-extra package definition ###
 
@@ -12,7 +19,6 @@ version = "*"
 
 [package.host-dependencies]
 meson-python = "*"
-uv = "*" # interfaces with meson-python instead of pip
 
 [package.run-dependencies]
 array-api-compat = "*"
@@ -21,7 +27,7 @@ array-api-compat = "*"
 
 [environments]
 default = { features = ["py314"], solve-group = "py314" }
-lint = { features = ["py314", "lint"], solve-group = "py314" }
+lint = { features = ["py311", "lint"], solve-group = "py311" }
 docs = { features = ["py314", "docs"], solve-group = "py314" }
 tests = { features = ["py314", "tests"], solve-group = "py314" }
 tests-py314 = { features = ["py314", "tests"], solve-group = "py314" } # alias of tests
@@ -55,25 +61,25 @@ array-api-extra.path = "."
 
 [feature.lint.dependencies]
 typing-extensions = ">=4.15.0"
-pylint = ">=4.0.5"
-mypy = ">=1.20.2"
-basedpyright = ">=1.39.4"
+pylint = ">=4.0.6"
+mypy = ">=2.1.0"
+basedpyright = ">=1.39.8"
 numpydoc = ">=1.10.0,<2"
 # import dependencies for mypy:
 array-api-strict = ">=2.5,<2.6"
 numpy = ">=2.1.3"
-hypothesis = ">=6.152.2"
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
+hypothesis = ">=6.153.2"
+dask-core = ">=2026.6.0" # No distributed, tornado, etc.
 dprint = ">=0.50.0,<0.51"
-lefthook = ">=2.1.6,<3"
-ruff = ">=0.15.12,<0.16"
-typos = ">=1.46.1,<2"
+lefthook = ">=2.1.9,<3"
+ruff = ">=0.15.18,<0.16"
+typos = ">=1.47.2,<2"
 actionlint = ">=1.7.12,<2"
 blacken-docs = ">=1.20.0,<2"
-pytest = ">=9.0.3,<10"
+pytest = ">=9.1.0,<10"
 validate-pyproject = ">=0.25,<0.26"
-pyrefly = ">=1.0.0,<1.1"
-zizmor = ">=1.24.1,<1.25"
+pyrefly = ">=1.1.0,<1.2"
+zizmor = ">=1.25.2,<1.26"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
@@ -97,9 +103,9 @@ numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with nump
 lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters", default-environment = "lint" }
 
 [feature.tests.dependencies]
-pytest = ">=9.0.3"
+pytest = ">=9.1.0"
 pytest-cov = ">=7.1.0"
-hypothesis = ">=6.152.2"
+hypothesis = ">=6.153.2"
 array-api-strict = ">=2.5,<2.6"
 numpy = ">=1.22.0"
 scipy = ">=1.15.2,<2"
@@ -110,7 +116,7 @@ tests-cov = { cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --du
 
 clean-vendor-compat = { cmd = "rm -rf vendor_tests/array_api_compat", description = "Delete the existing vendored version of array-api-compat", default-environment = "tests" }
 clean-vendor-extra = { cmd = "rm -rf vendor_tests/array_api_extra", description = "Delete the existing vendored version of array-api-extra", default-environment = "tests" }
-copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/", depends-on = ["clean-vendor-compat"], description = "Vendor a clean copy of array-api-compat", default-environment = "tests" }
+copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/ && rm -rf vendor_tests/array_api_compat/vendor_tests && rm -rf vendor_tests/array_api_compat/tests", depends-on = ["clean-vendor-compat"], description = "Vendor a clean copy of array-api-compat", default-environment = "tests" }
 copy-vendor-extra = { cmd = "cp -r src/array_api_extra vendor_tests/", depends-on = ["clean-vendor-extra"], description = "Vendor a clean copy of array-api-extra", default-environment = "tests" }
 tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-compat", "copy-vendor-extra"], description = "Check that array-api-extra and array-api-compat can be vendored together", default-environment = "tests" }
 
@@ -120,7 +126,7 @@ open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"], de
 
 # tests with only run dependencies
 [feature.tests-run-deps.dependencies]
-pytest = ">=9.0.3"
+pytest = ">=9.1.0"
 pytest-cov = ">=7.1.0"
 
 [feature.tests-run-deps.tasks.tests-run-deps]
@@ -136,12 +142,12 @@ default-environment = "tests-run-deps"
 [feature.docs.dependencies]
 sphinx = ">=7.4.7"
 furo = ">=2025.12.19"
-myst-parser = ">=5.0.0"
+myst-parser = ">=5.1.0"
 sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=1.25.3"
 # Needed to import parsed modules with autodoc
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
-pytest = ">=9.0.3"
+dask-core = ">=2026.6.0" # No distributed, tornado, etc.
+pytest = ">=9.1.0"
 typing-extensions = ">=4.15.0"
 numpy = ">=2.1.3"
 
@@ -150,7 +156,7 @@ docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs", description = "Build
 open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs", default-environment = "docs" }
 
 [feature.dev.dependencies]
-ipython = ">=9.13.0"
+ipython = ">=9.14.1"
 
 [feature.dev.tasks]
 ipython = { cmd = "ipython", description = "Launch ipython", default-environment = "dev" }
@@ -169,51 +175,35 @@ numpy = "=1.24.1"
 # Backends that can run on CPU-only hosts
 # Note: JAX and PyTorch will install CPU variants.
 [feature.backends.dependencies]
-pytorch = ">=2.10.0"
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
+pytorch = ">=2.12.0"
+dask-core = ">=2026.6.0" # No distributed, tornado, etc.
 sparse = ">=0.18.0"
 
-[feature.backends.target.linux-64.dependencies]
-jax = ">=0.9.2"
-
-[feature.backends.target.osx-64.dependencies]
-jax = ">=0.9.2"
-
-[feature.backends.target.osx-arm64.dependencies]
-jax = ">=0.9.2"
-
-[feature.backends.target.win-64.dependencies]
-# jax = "*"  # unavailable
+[feature.backends.target.unix.dependencies]
+jax = ">=0.10.2"
 
 # Backends that require a GPU host and a CUDA driver.
 # Note that JAX and PyTorch automatically prefer CUDA variants
-# thanks to the `system-requirements` below, *if available*.
+# thanks to the cuda platform specification, *if available*.
 # We request them explicitly below to ensure that we don't
 # quietly revert to CPU-only in the future, e.g. when CUDA 13
 # is released and CUDA 12 builds are dropped upstream.
 [feature.cuda-backends]
-system-requirements = { cuda = "12" }
+platforms = ["linux-64-cuda-12-9", "win-64-cuda-12-9"]
+
+[feature.cuda-backends.dependencies]
+cuda-version = "==12.9"
+cupy = ">=14.1.1"
+pytorch = { version = ">=2.12.0", build = "cuda12*" }
 
 [feature.cuda-backends.target.linux.dependencies]
-cupy = ">=14.0.1"
-jaxlib = { version = ">=0.9.2", build = "cuda12*" }
-pytorch = { version = ">=2.10.0", build = "cuda12*" }
-
-[feature.cuda-backends.target.osx.dependencies]
-# cupy = "*"  # unavailable
-# jaxlib = { version = "*", build = "cuda12*" }  # unavailable
-# pytorch = { version = "*", build = "cuda12*" }  # unavailable
-
-[feature.cuda-backends.target.win.dependencies]
-cupy = ">=14.0.1"
-# jaxlib = { version = "*", build = "cuda12*" }  # unavailable
-pytorch = { version = ">=2.10.0", build = "cuda12*" }
+jaxlib = { version = ">=0.10.1", build = "cuda12*" }
 
 [feature.nogil.dependencies]
 python-freethreading = "~=3.13.0"
-pytest-run-parallel = ">=0.8.2"
+pytest-run-parallel = ">=0.9.1"
 numpy = ">=2.3.5"
 # pytorch = "*"  # Not available on Python 3.13t yet
-dask-core = ">=2026.3.0" # No distributed, tornado, etc.
+dask-core = ">=2026.6.0" # No distributed, tornado, etc.
 # sparse = "*"  # numba not available on Python 3.13t yet
 # jax = "*"  # ml_dtypes not available on Python 3.13t yet

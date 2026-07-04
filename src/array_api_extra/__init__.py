@@ -1,5 +1,6 @@
 """Extra array functions built on top of the array API standard."""
 
+from . import testing
 from ._delegation import (
     argpartition,
     atleast_nd,
@@ -18,6 +19,7 @@ from ._delegation import (
     setdiff1d,
     sinc,
     union1d,
+    unravel_index,
 )
 from ._lib._at import at
 from ._lib._funcs import (
@@ -28,7 +30,7 @@ from ._lib._funcs import (
 )
 from ._lib._lazy import lazy_apply
 
-__version__ = "0.10.2.dev0"
+__version__ = "0.11.1.dev0"
 
 # pylint: disable=duplicate-code
 __all__ = [
@@ -55,5 +57,7 @@ __all__ = [
     "searchsorted",
     "setdiff1d",
     "sinc",
+    "testing",
     "union1d",
+    "unravel_index",
 ]

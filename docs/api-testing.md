@@ -11,6 +11,7 @@ These testing utilities are intended to help transition from using
     :toctree: generated
 
     assert_close
+    assert_close_nulp
     assert_equal
     assert_less
 ```

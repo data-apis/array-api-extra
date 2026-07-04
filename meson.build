@@ -1,6 +1,6 @@
 project(
   'array-api-extra',
-  version: '0.10.2.dev0'
+  version: '0.11.1.dev0'
 )
 
 py = import('python').find_installation()
@@ -11,6 +11,7 @@ sources = {
   'array_api_extra': files(
     'src/array_api_extra/__init__.py',
     'src/array_api_extra/_delegation.py',
+    'src/array_api_extra/py.typed',
     'src/array_api_extra/testing.py',
   ),
   'array_api_extra/_lib': files(

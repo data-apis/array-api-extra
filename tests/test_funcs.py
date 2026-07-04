@@ -35,6 +35,7 @@ from array_api_extra import (
     setdiff1d,
     sinc,
     union1d,
+    unravel_index,
 )
 from array_api_extra import (
     searchsorted as xpx_searchsorted,
@@ -502,6 +503,7 @@ class TestAtLeastND:
         assert_equal(y, xp.asarray([[[[[[[[[3.0]], [[2.0]]]]]]]]]))
 
 
+@pytest.mark.filterwarnings("ignore:.*removed in v1.0.0.*:DeprecationWarning")
 class TestBroadcastShapes:
     def test_delegates_known_integer_shapes(self, monkeypatch: pytest.MonkeyPatch):
         calls = []
@@ -842,6 +844,7 @@ class TestDefaultDType:
         assert default_dtype(xp, "complex floating") == xp.complex64
 
 
+@pytest.mark.filterwarnings(r"ignore:.*removed in v1.0.0.*:DeprecationWarning")
 class TestExpandDims:
     def test_single_axis(self, xp: ModuleType):
         """Trivial case where xpx.expand_dims doesn't add anything to xp.expand_dims"""
@@ -1995,3 +1998,63 @@ class TestAngle:
     def test_device(self, xp: ModuleType, device: Device):
         a = xp.asarray([1 + 1j], device=device)
         assert get_device(angle(a)) == device
+
+
+class TestUnravelIndex:
+    def test_simple(self, xp: ModuleType):
+        indices = xp.asarray([22, 41, 37])
+        shape = (7, 6)
+        expected = (xp.asarray([3, 6, 6]), xp.asarray([4, 5, 1]))
+        res = unravel_index(indices, shape)
+        for res_arr, exp_arr in zip(res, expected, strict=True):
+            assert_equal(res_arr, exp_arr)
+
+        indices = xp.asarray([0, 1, 2, 3, 4, 5])
+        shape = (3, 2)
+        expected = (
+            xp.asarray([0, 0, 1, 1, 2, 2]),
+            xp.asarray([0, 1, 0, 1, 0, 1]),
+        )
+        res = unravel_index(indices, shape)
+        for res_arr, exp_arr in zip(res, expected, strict=True):
+            assert_equal(res_arr, exp_arr)
+
+    def test_indices_scalar(self, xp: ModuleType):
+        indices = xp.asarray(1621)
+        shape = (6, 7, 8, 9)
+        expected = (xp.asarray(3), xp.asarray(1), xp.asarray(4), xp.asarray(1))
+        res = unravel_index(indices, shape)
+        # a tuple of integers is expected
+        assert res == expected
+
+    def test_indices_2d(self, xp: ModuleType):
+        indices = xp.asarray([[1234], [5678]])
+        shape = (10, 10, 10, 10)
+        expected = (
+            xp.asarray([[1], [5]]),
+            xp.asarray([[2], [6]]),
+            xp.asarray([[3], [7]]),
+            xp.asarray([[4], [8]]),
+        )
+        res = unravel_index(indices, shape)
+        for res_arr, exp_arr in zip(res, expected, strict=True):
+            assert_equal(res_arr, exp_arr)
+
+    def test_device(self, xp: ModuleType, device: Device):
+        indices = xp.asarray([4, 1], device=device)
+        shape = (3, 2)
+        res = unravel_index(indices, shape)
+        for res_arr in res:
+            assert get_device(res_arr) == device
+
+    @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
+    def test_xp(self, xp: ModuleType):
+        indices = xp.asarray([1, 5])
+        shape = (3, 2)
+        expected = (
+            xp.asarray([0, 2]),
+            xp.asarray([1, 1]),
+        )
+        res = unravel_index(indices, shape, xp=xp)
+        for res_arr, exp_arr in zip(res, expected, strict=True):
+            assert_equal(res_arr, exp_arr)
