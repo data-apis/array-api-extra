@@ -796,7 +796,11 @@ def pad(
         # `torch/_numpy`'s implementation (avoids device transfers)
         pad_width_seq = _funcs.normalize_pad_width(pad_width, x.ndim)
         # torch.nn.functional.pad counts dimensions from the last one
-        flat_pad_width = [w for pair in reversed(pad_width_seq) for w in pair]
+        flat_pad_width = [
+            w
+            for pair in reversed(pad_width_seq)
+            for w in pair
+        ]
         return xp.nn.functional.pad(x, tuple(flat_pad_width), value=constant_values)
 
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)
