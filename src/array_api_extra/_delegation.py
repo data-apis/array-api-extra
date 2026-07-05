@@ -15,7 +15,12 @@ from ._lib._utils._compat import (
     is_torch_namespace,
 )
 from ._lib._utils._compat import device as get_device
-from ._lib._utils._helpers import asarrays, deprecated, eager_shape
+from ._lib._utils._helpers import (
+    asarrays,
+    deprecated,
+    eager_shape,
+    normalize_pad_width,
+)
 from ._lib._utils._typing import Array, DType
 
 __all__ = [
@@ -794,7 +799,7 @@ def pad(
     if is_torch_namespace(xp):
         # normalize `pad_width` on the host rather than through a tensor as done in
         # `torch/_numpy`'s implementation (avoids device transfers)
-        pad_width_seq = _funcs.normalize_pad_width(pad_width, x.ndim)
+        pad_width_seq = normalize_pad_width(pad_width, x.ndim)
         # torch.nn.functional.pad counts dimensions from the last one
         flat_pad_width = [
             w
