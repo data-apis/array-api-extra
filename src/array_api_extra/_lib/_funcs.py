@@ -19,6 +19,7 @@ from ._utils._helpers import (
     eager_shape,
     meta_namespace,
     ndindex,
+    normalize_pad_width,
 )
 from ._utils._typing import Array, Device, DType
 
@@ -536,22 +537,6 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
         xp.astype(xp.any(~mask), default_int),
         xp.sum(xp.astype(mask, default_int)),
     )
-
-
-def normalize_pad_width(
-    pad_width: int | tuple[int, int] | Sequence[tuple[int, int]],
-    ndim: int,
-) -> list[tuple[int, int]]:  # numpydoc ignore=PR01,RT01
-    """Normalize `pad_width` to a list of `ndim` (before, after) pairs of ints."""
-    if isinstance(pad_width, int):
-        return [(pad_width, pad_width)] * ndim
-    if (
-        isinstance(pad_width, tuple)
-        and len(pad_width) == 2
-        and all(isinstance(i, int) for i in pad_width)
-    ):
-        return [cast(tuple[int, int], pad_width)] * ndim
-    return cast(list[tuple[int, int]], list(pad_width))
 
 
 def pad(
