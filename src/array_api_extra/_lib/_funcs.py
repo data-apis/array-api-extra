@@ -19,6 +19,7 @@ from ._utils._helpers import (
     eager_shape,
     meta_namespace,
     ndindex,
+    normalize_pad_width,
 )
 from ._utils._typing import Array, Device, DType
 
@@ -546,17 +547,7 @@ def pad(
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
-    # make pad_width a list of length-2 tuples of ints
-    if isinstance(pad_width, int):
-        pad_width_seq = [(pad_width, pad_width)] * x.ndim
-    elif (
-        isinstance(pad_width, tuple)
-        and len(pad_width) == 2
-        and all(isinstance(i, int) for i in pad_width)
-    ):
-        pad_width_seq = [cast(tuple[int, int], pad_width)] * x.ndim
-    else:
-        pad_width_seq = cast(list[tuple[int, int]], list(pad_width))
+    pad_width_seq = normalize_pad_width(pad_width, x.ndim)
 
     slices: list[slice] = []
     newshape: list[int] = []

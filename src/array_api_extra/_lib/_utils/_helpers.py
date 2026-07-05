@@ -18,6 +18,7 @@ from typing import (
     Generic,
     Literal,
     ParamSpec,
+    Sequence,
     TypeAlias,
     TypeVar,
     cast,
@@ -54,6 +55,7 @@ __all__ = [
     "eager_shape",
     "in1d",
     "is_python_scalar",
+    "normalize_pad_width",
     "jax_autojit",
     "meta_namespace",
     "pickle_flatten",
@@ -608,3 +610,20 @@ def jax_autojit(
         return inner(wargs).obj
 
     return outer
+
+
+
+def normalize_pad_width(
+    pad_width: int | tuple[int, int] | Sequence[tuple[int, int]],
+    ndim: int,
+) -> list[tuple[int, int]]:  # numpydoc ignore=PR01,RT01
+    """Normalize `pad_width` to a list of `ndim` (before, after) pairs of ints."""
+    if isinstance(pad_width, int):
+        return [(pad_width, pad_width)] * ndim
+    if (
+        isinstance(pad_width, tuple)
+        and len(pad_width) == 2
+        and all(isinstance(i, int) for i in pad_width)
+    ):
+        return [cast(tuple[int, int], pad_width)] * ndim
+    return cast(list[tuple[int, int]], list(pad_width))
