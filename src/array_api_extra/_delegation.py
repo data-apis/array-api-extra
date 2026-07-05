@@ -791,12 +791,13 @@ def pad(
     ):
         return xp.pad(x, pad_width, mode, constant_values=constant_values)
 
-    # https://github.com/pytorch/pytorch/blob/cf76c05b4dc629ac989d1fb8e789d4fac04a095a/torch/_numpy/_funcs_impl.py#L2045-L2056
     if is_torch_namespace(xp):
-        pad_width = xp.asarray(pad_width)
-        pad_width = xp.broadcast_to(pad_width, (x.ndim, 2))
-        pad_width = xp.flip(pad_width, axis=(0,)).flatten()
-        return xp.nn.functional.pad(x, tuple(pad_width), value=constant_values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        # normalize `pad_width` on the host rather than through a tensor as done in
+        # `torch/_numpy`'s implementation (avoids device transfers)
+        pad_width_seq = _funcs.normalize_pad_width(pad_width, x.ndim)
+        # torch.nn.functional.pad counts dimensions from the last one
+        flat_pad_width = [w for pair in reversed(pad_width_seq) for w in pair]
+        return xp.nn.functional.pad(x, tuple(flat_pad_width), value=constant_values)
 
     return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)
 
