@@ -1054,14 +1054,12 @@ class TestIsClose:
         a = xp.asarray([0.01, 0.5, 0.8, 0.9, 1.00001], device=device, dtype=xp.float64)
         b = 1
         res = isclose(a, b)
-        assert get_device(res) == device
-        assert_equal(res, xp.asarray([False, False, False, False, True]))
+        assert_equal(res, xp.asarray([False, False, False, False, True], device=device))
 
         a = 0.1
         b = xp.asarray([0.01, 0.5, 0.8, 0.9, 0.100001], device=device, dtype=xp.float64)
         res = isclose(a, b)
-        assert get_device(res) == device
-        assert_equal(res, xp.asarray([False, False, False, False, True]))
+        assert_equal(res, xp.asarray([False, False, False, False, True], device=device))
 
 
 class TestKron:
