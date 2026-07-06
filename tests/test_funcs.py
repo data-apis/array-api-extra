@@ -892,7 +892,7 @@ class TestTriIndices:
         xpx_fn: Callable[..., tuple[Array, Array]],
         np_fn: Callable[..., tuple[Array, Array]],
     ):
-        rows, cols = xpx_fn(4)
+        rows, cols = xpx_fn(4, xp=xp)
         ref_rows, ref_cols = np_fn(4)
         assert_equal(rows, xp.asarray(ref_rows))
         assert_equal(cols, xp.asarray(ref_cols))
