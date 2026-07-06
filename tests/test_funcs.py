@@ -1674,7 +1674,7 @@ class TestIsIn:
 
         a = xp.asarray([0, 3, 6, 10], device=device)
         b = xp.asarray([1, 2, 3, 10], device=device)
-        expected = xp.asarray([True, False, True, False])
+        expected = xp.asarray([True, False, True, False], device=device)
         res = isin(a, b, assume_unique=True, invert=True)
         assert get_device(res) == device
         assert_equal(res, expected)
