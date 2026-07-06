@@ -10,11 +10,10 @@ import pytest
 from array_api_extra import at
 from array_api_extra._lib._at import _AtOp
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._testing import xp_assert_equal
 from array_api_extra._lib._utils._compat import array_namespace, is_writeable_array
 from array_api_extra._lib._utils._compat import device as get_device
 from array_api_extra._lib._utils._typing import Array, Device, SetIndex
-from array_api_extra.testing import lazy_xp_function
+from array_api_extra.testing import assert_equal, lazy_xp_function
 
 pytestmark = [
     pytest.mark.skip_xp_backend(
@@ -65,11 +64,11 @@ def assert_copy(
 
     if expect_copy:
         # Original has not been modified
-        xp_assert_equal(array, array_orig)
+        assert_equal(array, array_orig)
     elif expect_copy is False:
         # Original has been modified
         with pytest.raises(AssertionError):
-            xp_assert_equal(array, array_orig)
+            assert_equal(array, array_orig)
     # Test nothing for copy=None. Dask changes behaviour depending on
     # whether it's a special case of a bool mask with scalar RHS or not.
 
@@ -146,7 +145,7 @@ def test_update_ops(
     with assert_copy(x, copy):
         z = at_op(x, idx, op, y, copy=copy)
         assert isinstance(z, type(x))
-        xp_assert_equal(z, xp.asarray(expect))
+        assert_equal(z, xp.asarray(expect))
 
 
 @pytest.mark.parametrize("op", list(_AtOp))
@@ -192,12 +191,12 @@ def test_xp():
 def test_alternate_index_syntax():
     xp = cast(ModuleType, np)  # type: ignore[redundant-cast]  # pyright: ignore[reportInvalidCast]
     a = cast(Array, xp.asarray([1, 2, 3]))
-    xp_assert_equal(at(a, 0).set(4, copy=True), xp.asarray([4, 2, 3]))
-    xp_assert_equal(at(a)[0].set(4, copy=True), xp.asarray([4, 2, 3]))
+    assert_equal(at(a, 0).set(4, copy=True), xp.asarray([4, 2, 3]))
+    assert_equal(at(a)[0].set(4, copy=True), xp.asarray([4, 2, 3]))
 
     a_at = at(a)
-    xp_assert_equal(a_at[0].add(1, copy=True), xp.asarray([2, 2, 3]))
-    xp_assert_equal(a_at[1].add(2, copy=True), xp.asarray([1, 4, 3]))
+    assert_equal(a_at[0].add(1, copy=True), xp.asarray([2, 2, 3]))
+    assert_equal(a_at[1].add(2, copy=True), xp.asarray([1, 4, 3]))
 
     with pytest.raises(ValueError, match="Index"):
         _ = at(a).set(4)
@@ -269,7 +268,7 @@ def test_bool_mask_nd(xp: ModuleType):
     x = xp.asarray([[1, 2, 3], [4, 5, 6]])
     idx = xp.asarray([[True, False, False], [False, True, True]])
     z = at_op(x, idx, _AtOp.SET, 0)
-    xp_assert_equal(z, xp.asarray([[0, 2, 3], [4, 0, 0]]))
+    assert_equal(z, xp.asarray([[0, 2, 3], [4, 0, 0]]))
 
 
 @pytest.mark.parametrize("bool_mask", [False, True])
@@ -278,7 +277,7 @@ def test_no_inf_warnings(xp: ModuleType, bool_mask: bool):
     idx = ~xp.isinf(x) if bool_mask else slice(1, None)
     # inf - inf -> nan with a warning
     z = at_op(x, idx, _AtOp.SUBTRACT, math.inf)
-    xp_assert_equal(z, xp.asarray([math.inf, -math.inf, -math.inf]))
+    assert_equal(z, xp.asarray([math.inf, -math.inf, -math.inf]))
 
 
 @pytest.mark.parametrize(
@@ -324,7 +323,7 @@ def test_gh134(xp: ModuleType, bool_mask: bool, copy: bool | None):
 
     idx = xp.asarray(True) if bool_mask else ()
     z = at_op(y, idx, _AtOp.SET, 1, copy=copy)
-    xp_assert_equal(z, xp.asarray(1, dtype=x.dtype))
+    assert_equal(z, xp.asarray(1, dtype=x.dtype))
 
 
 def test_device(xp: ModuleType, device: Device):

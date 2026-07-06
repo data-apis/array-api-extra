@@ -39,11 +39,16 @@ pre-commit:
     - name: mypy
       glob: "*.{py,pyi}"
       run: pixi {run} mypy
+    - name: pyrefly
+      glob: "*.{py, pyi}"
+      run: pixi {run} pyrefly
     - name: typos
       stage_fixed: true
       run: pixi {run} typos
     - name: actionlint
       run: pixi {run} actionlint
+    - name: zizmor
+      run: pixi {run} zizmor
     - name: blacken-docs
       glob: "*.md"
       stage_fixed: true

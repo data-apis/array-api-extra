@@ -131,6 +131,9 @@ def xp(
     # Possibly wrap module with array_api_compat
     xp = array_namespace(xp.empty(0))
 
+    if library.like(Backend.ARRAY_API_STRICT):
+        xp.set_array_api_strict_flags(api_version="2025.12")
+
     if library == Backend.ARRAY_API_STRICTEST:
         with xp.ArrayAPIStrictFlags(
             boolean_indexing=False,

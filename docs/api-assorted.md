@@ -1,4 +1,4 @@
-# API Reference
+# Assorted functions
 
 ```{eval-rst}
 .. currentmodule:: array_api_extra
@@ -6,6 +6,7 @@
     :nosignatures:
     :toctree: generated
 
+    angle
     apply_where
     argpartition
     at
@@ -24,9 +25,11 @@
     one_hot
     pad
     partition
+    searchsorted
     setdiff1d
     sinc
     tril_indices
     triu_indices
     union1d
+    unravel_index
 ```
