@@ -1,3 +1,4 @@
+import inspect
 import math
 import warnings
 from collections.abc import Callable
@@ -12,6 +13,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 from typing_extensions import override
 
+import array_api_extra._delegation as delegated_func
 from array_api_extra import (
     angle,
     apply_where,
@@ -42,6 +44,7 @@ from array_api_extra import (
 from array_api_extra import (
     searchsorted as xpx_searchsorted,
 )
+from array_api_extra._lib import _funcs as functions
 from array_api_extra._lib._backends import NUMPY_VERSION, Backend
 from array_api_extra._lib._funcs import searchsorted as _funcs_searchsorted
 from array_api_extra._lib._utils._compat import (
@@ -78,6 +81,29 @@ lazy_xp_function(triu_indices)
 lazy_xp_function(union1d, jax_jit=False)
 lazy_xp_function(xpx_searchsorted)
 lazy_xp_function(_funcs_searchsorted)
+
+
+def test_all_contains_all_public_functions():
+    public_functions = {
+        name
+        for name, obj in inspect.getmembers(functions, inspect.isfunction)
+        if not name.startswith("_") and obj.__module__ == functions.__name__
+    }
+    missing = sorted(public_functions - set(functions.__all__))
+    extra = sorted(set(functions.__all__) - public_functions)
+    assert public_functions == set(functions.__all__), (
+        f"Missing from __all__: {missing}\tExtra in __all__: {extra}"
+    )
+    public_functions = {
+        name
+        for name, obj in inspect.getmembers(delegated_func, inspect.isfunction)
+        if not name.startswith("_") and obj.__module__ == delegated_func.__name__
+    }
+    missing = sorted(public_functions - set(delegated_func.__all__))
+    extra = sorted(set(delegated_func.__all__) - public_functions)
+    assert public_functions == set(delegated_func.__all__), (
+        f"Missing from __all__: {missing}\tExtra in __all__: {extra}"
+    )
 
 
 class TestApplyWhere:

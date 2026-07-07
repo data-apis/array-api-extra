@@ -24,6 +24,7 @@ from ._lib._utils._helpers import (
 from ._lib._utils._typing import Array, Device, DType
 
 __all__ = [
+    "argpartition",
     "atleast_nd",
     "broadcast_shapes",
     "cov",
@@ -31,14 +32,18 @@ __all__ = [
     "diag_indices",
     "expand_dims",
     "isclose",
+    "isin",
     "kron",
     "nan_to_num",
     "one_hot",
     "pad",
+    "partition",
     "searchsorted",
+    "setdiff1d",
     "sinc",
     "tril_indices",
     "triu_indices",
+    "union1d",
     "unravel_index",
 ]
 
