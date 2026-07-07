@@ -319,7 +319,7 @@ def diag_indices(
     """
     Return the indices to access the main diagonal of an array.
 
-    Equivalent to ``numpy.diag_indices``.
+    Equivalent to :func:`numpy.diag_indices`.
 
     Parameters
     ----------
@@ -1391,7 +1391,7 @@ def tril_indices(
     """
     Return the indices of the lower triangle of an ``(n, m)`` array.
 
-    Equivalent to ``numpy.tril_indices`` with parameter ``k`` renamed to
+    Equivalent to :func:`numpy.tril_indices` with parameter ``k`` renamed to
     ``offset`` to match ``xp.linalg.diagonal``'s naming.
 
     Parameters
@@ -1400,7 +1400,7 @@ def tril_indices(
         The row dimension of the array.
     offset : int, optional
         Diagonal offset; ``0`` (default) is the main diagonal. Corresponds
-        to ``k`` in ``numpy.tril_indices``.
+        to ``k`` in :func:`numpy.tril_indices`.
     m : int, optional
         The column dimension. If ``None`` (default), assumed equal to `n`.
     device : Device, optional
@@ -1416,7 +1416,7 @@ def tril_indices(
 
     Notes
     -----
-    The generic fallback uses ``xp.nonzero``, so namespaces without
+    The generic fallback uses :func`array_api.nonzero`, so namespaces without
     ``nonzero`` are not supported on that path.
 
     Examples
@@ -1463,8 +1463,8 @@ def triu_indices(
     """
     Return the indices of the upper triangle of an ``(n, m)`` array.
 
-    Equivalent to ``numpy.triu_indices`` with parameter ``k`` renamed to
-    ``offset`` to match ``xp.linalg.diagonal``'s naming.
+    Equivalent to :func:`numpy.triu_indices` with parameter ``k`` renamed to
+    ``offset`` to match :func:`array_api.linalg.diagonal`'s naming.
 
     Parameters
     ----------
@@ -1472,7 +1472,7 @@ def triu_indices(
         The row dimension of the array.
     offset : int, optional
         Diagonal offset; ``0`` (default) is the main diagonal. Corresponds
-        to ``k`` in ``numpy.triu_indices``.
+        to ``k`` in :func:`numpy.triu_indices`.
     m : int, optional
         The column dimension. If ``None`` (default), assumed equal to `n`.
     device : Device, optional
@@ -1488,7 +1488,7 @@ def triu_indices(
 
     Notes
     -----
-    The generic fallback uses ``xp.nonzero``, so namespaces without
+    The generic fallback uses :func:`array_api.nonzero`, so namespaces without
     ``nonzero`` are not supported on that path.
 
     Examples
