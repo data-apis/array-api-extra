@@ -8,7 +8,7 @@ import math
 import pickle
 import types
 import warnings
-from collections.abc import Callable, Generator, Iterable, Iterator
+from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from functools import wraps
 from types import ModuleType
 from typing import (
@@ -18,7 +18,6 @@ from typing import (
     Generic,
     Literal,
     ParamSpec,
-    Sequence,
     TypeAlias,
     TypeVar,
     cast,
@@ -55,9 +54,9 @@ __all__ = [
     "eager_shape",
     "in1d",
     "is_python_scalar",
-    "normalize_pad_width",
     "jax_autojit",
     "meta_namespace",
+    "normalize_pad_width",
     "pickle_flatten",
     "pickle_unflatten",
 ]
@@ -610,7 +609,6 @@ def jax_autojit(
         return inner(wargs).obj
 
     return outer
-
 
 
 def normalize_pad_width(
