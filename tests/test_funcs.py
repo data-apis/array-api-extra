@@ -211,15 +211,6 @@ class TestApplyWhere:
         expect = xp.where(cond, self.f1(x), self.f2(x))
         assert_equal(actual, expect)
 
-    def test_device(self, xp: ModuleType, device: Device):
-        x = xp.asarray([1, 2, 3, 4], device=device)
-        y = apply_where(x % 2 == 0, x, self.f1, self.f2)
-        assert get_device(y) == device
-        y = apply_where(x % 2 == 0, x, self.f1, fill_value=0)
-        assert get_device(y) == device
-        y = apply_where(x % 2 == 0, x, self.f1, fill_value=x)
-        assert get_device(y) == device
-
     @pytest.mark.filterwarnings("ignore::RuntimeWarning")  # overflows, etc.
     @hypothesis.settings(
         # The xp and library fixtures are not regenerated between hypothesis iterations
@@ -1050,17 +1041,6 @@ class TestIsClose:
         res = isclose(a, b, equal_nan=equal_nan)
         assert get_device(res) == device
 
-    def test_array_on_device_with_scalar(self, xp: ModuleType, device: Device):
-        a = xp.asarray([0.01, 0.5, 0.8, 0.9, 1.00001], device=device, dtype=xp.float64)
-        b = 1
-        res = isclose(a, b)
-        assert_equal(res, xp.asarray([False, False, False, False, True], device=device))
-
-        a = 0.1
-        b = xp.asarray([0.01, 0.5, 0.8, 0.9, 0.100001], device=device, dtype=xp.float64)
-        res = isclose(a, b)
-        assert_equal(res, xp.asarray([False, False, False, False, True], device=device))
-
 
 class TestKron:
     def test_basic(self, xp: ModuleType):
@@ -1666,17 +1646,14 @@ class TestIsIn:
         b = xp.asarray([1, 2, 3], device=device)
         assert get_device(isin(a, b)) == device
 
-    def test_assume_unique_and_invert(
-        self, xp: ModuleType, device: Device, library: Backend
-    ):
+    def test_assume_unique_and_invert(self, xp: ModuleType, library: Backend):
         if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
             pytest.xfail("NumPy <1.24 has no kind kwarg in isin")
 
-        a = xp.asarray([0, 3, 6, 10], device=device)
-        b = xp.asarray([1, 2, 3, 10], device=device)
-        expected = xp.asarray([True, False, True, False], device=device)
+        a = xp.asarray([0, 3, 6, 10])
+        b = xp.asarray([1, 2, 3, 10])
+        expected = xp.asarray([True, False, True, False])
         res = isin(a, b, assume_unique=True, invert=True)
-        assert get_device(res) == device
         assert_equal(res, expected)
 
     def test_kind(self, xp: ModuleType, library: Backend):

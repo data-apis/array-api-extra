@@ -13,6 +13,9 @@ from array_api_extra._lib._utils._compat import (
     is_dask_namespace,
     is_jax_namespace,
 )
+from array_api_extra._lib._utils._compat import (
+    device as get_device,
+)
 from array_api_extra._lib._utils._typing import Array, Device
 from array_api_extra.testing import (
     _as_numpy_array,
@@ -206,13 +209,25 @@ class TestAssertEqualCloseLess:
         b = xp.asarray([2], device=device)
         c = xp.asarray([2, 2], device=device)
 
-        func(a, b)
+        func(a, b, check_device=True)
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(a, c)
         # This is normally performed by np.testing.assert_array_equal etc.
         # but in case of torch device='meta' we have to do it manually
         with pytest.raises(AssertionError, match="sizes do not match"):
-            func(a, c, check_shape=False)
+            func(a, c, check_shape=False, check_device=False)
+
+        # Checks for non-default device
+        default_device = get_device(xp.empty(0))
+        if device != default_device:
+            d = xp.asarray([2], device=default_device)
+            with pytest.raises(AssertionError, match="Devices do not match"):
+                func(a, d)
+            func(a, d, check_device=False)
+            if getattr(device, "type", None) != "meta":
+                e = xp.asarray([0], device=default_device)
+                with pytest.raises(AssertionError, match=self.np_err_msg(func)):
+                    func(a, e, check_device=False)
 
     def test_assert_close_nulp(self, xp: ModuleType):
         a = xp.asarray([1.0, 1e-10], dtype=xp.float64)
