@@ -19,6 +19,7 @@ from ._utils._helpers import (
     eager_shape,
     meta_namespace,
     ndindex,
+    normalize_pad_width,
 )
 from ._utils._typing import Array, Device, DType
 
@@ -31,6 +32,7 @@ __all__ = [
     "cov",
     "create_diagonal",
     "default_dtype",
+    "diag_indices",
     "expand_dims",
     "isclose",
     "isin",
@@ -45,6 +47,8 @@ __all__ = [
     "sinc",
     "union1d",
     "unravel_index",
+    "tril_indices",
+    "triu_indices",
 ]
 
 
@@ -320,6 +324,59 @@ def create_diagonal(
     return xp.reshape(diag, (*batch_dims, n, n))
 
 
+def diag_indices(
+    n: int, /, *, ndim: int, device: Device | None, xp: ModuleType
+) -> tuple[Array, ...]:  # numpydoc ignore=PR01,RT01
+    """See docstring in array_api_extra._delegation."""
+    idx = xp.arange(n, device=device)
+    return (idx,) * ndim
+
+
+def _tri_indices(
+    n: int,
+    *,
+    offset: int,
+    m: int | None,
+    upper: bool,
+    device: Device | None,
+    xp: ModuleType,
+) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
+    """Shared implementation for `tril_indices` and `triu_indices`."""
+    cols = n if m is None else m
+    rows = xp.arange(n, device=device)[:, xp.newaxis]
+    cols_a = xp.arange(cols, device=device)[xp.newaxis, :]
+    delta = cols_a - rows
+    mask = delta >= offset if upper else delta <= offset
+    r, c = xp.nonzero(mask)
+    return (r, c)
+
+
+def tril_indices(
+    n: int,
+    /,
+    *,
+    offset: int,
+    m: int | None,
+    device: Device | None,
+    xp: ModuleType,
+) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
+    """See docstring in array_api_extra._delegation."""
+    return _tri_indices(n, offset=offset, m=m, upper=False, device=device, xp=xp)
+
+
+def triu_indices(
+    n: int,
+    /,
+    *,
+    offset: int,
+    m: int | None,
+    device: Device | None,
+    xp: ModuleType,
+) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
+    """See docstring in array_api_extra._delegation."""
+    return _tri_indices(n, offset=offset, m=m, upper=True, device=device, xp=xp)
+
+
 def default_dtype(
     xp: ModuleType,
     kind: Literal[
@@ -555,17 +612,7 @@ def pad(
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
-    # make pad_width a list of length-2 tuples of ints
-    if isinstance(pad_width, int):
-        pad_width_seq = [(pad_width, pad_width)] * x.ndim
-    elif (
-        isinstance(pad_width, tuple)
-        and len(pad_width) == 2
-        and all(isinstance(i, int) for i in pad_width)
-    ):
-        pad_width_seq = [cast(tuple[int, int], pad_width)] * x.ndim
-    else:
-        pad_width_seq = cast(list[tuple[int, int]], list(pad_width))
+    pad_width_seq = normalize_pad_width(pad_width, x.ndim)
 
     slices: list[slice] = []
     newshape: list[int] = []

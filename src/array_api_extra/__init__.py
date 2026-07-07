@@ -7,6 +7,7 @@ from ._delegation import (
     broadcast_shapes,
     cov,
     create_diagonal,
+    diag_indices,
     expand_dims,
     isclose,
     isin,
@@ -18,6 +19,8 @@ from ._delegation import (
     searchsorted,
     setdiff1d,
     sinc,
+    tril_indices,
+    triu_indices,
     union1d,
     unravel_index,
 )
@@ -44,6 +47,7 @@ __all__ = [
     "cov",
     "create_diagonal",
     "default_dtype",
+    "diag_indices",
     "expand_dims",
     "isclose",
     "isin",
@@ -58,6 +62,8 @@ __all__ = [
     "setdiff1d",
     "sinc",
     "testing",
+    "tril_indices",
+    "triu_indices",
     "union1d",
     "unravel_index",
 ]
