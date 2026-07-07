@@ -1416,7 +1416,7 @@ def tril_indices(
 
     Notes
     -----
-    The generic fallback uses :func`array_api.nonzero`, so namespaces without
+    The generic fallback uses :func:`array_api.nonzero`, so namespaces without
     ``nonzero`` are not supported on that path.
 
     Examples
