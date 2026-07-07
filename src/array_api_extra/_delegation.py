@@ -1392,7 +1392,7 @@ def tril_indices(
     Return the indices of the lower triangle of an ``(n, m)`` array.
 
     Equivalent to :func:`numpy.tril_indices` with parameter ``k`` renamed to
-    ``offset`` to match ``xp.linalg.diagonal``'s naming.
+    ``offset`` to match :func:`array_api.linalg.diagonal`'s naming.
 
     Parameters
     ----------
