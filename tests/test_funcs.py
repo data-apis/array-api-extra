@@ -41,6 +41,7 @@ from array_api_extra import (
     searchsorted as xpx_searchsorted,
 )
 from array_api_extra._lib import _funcs as functions
+import array_api_extra._delegation as delegated_func
 from array_api_extra._lib._backends import NUMPY_VERSION, Backend
 from array_api_extra._lib._funcs import searchsorted as _funcs_searchsorted
 from array_api_extra._lib._utils._compat import (
@@ -86,7 +87,15 @@ def test_all_contains_all_public_functions():
         f"Missing from __all__: {sorted(public_functions - set(functions.__all__))}\t"
         f"Extra in __all__: {sorted(set(functions.__all__) - public_functions)}"
     )
-
+    public_functions = {
+        name
+        for name, obj in inspect.getmembers(delegated_func, inspect.isfunction)
+        if not name.startswith("_") and obj.__module__ == delegated_func.__name__
+    }
+    assert public_functions == set(delegated_func.__all__), (
+        f"Missing from __all__: {sorted(public_functions - set(delegated_func.__all__))}\t"
+        f"Extra in __all__: {sorted(set(delegated_func.__all__) - public_functions)}"
+    )
 
 class TestApplyWhere:
     @staticmethod

@@ -19,18 +19,23 @@ from ._lib._utils._helpers import asarrays, deprecated, eager_shape
 from ._lib._utils._typing import Array, DType
 
 __all__ = [
+    "argpartition",
     "atleast_nd",
     "broadcast_shapes",
     "cov",
     "create_diagonal",
     "expand_dims",
     "isclose",
+    "isin",
     "kron",
     "nan_to_num",
     "one_hot",
     "pad",
+    "partition",
     "searchsorted",
+    "setdiff1d",
     "sinc",
+    "union1d",
     "unravel_index",
 ]
 
