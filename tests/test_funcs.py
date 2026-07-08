@@ -2272,3 +2272,12 @@ class TestNanMin:
         a = xp.asarray([[4, xp.nan, 1], [2, 5, xp.nan]], device=device)
         res = nanmin(a, axis=axis)
         assert get_device(res) == device
+
+    @pytest.mark.parametrize(
+        ("axis", "expected_list"), [(0, [2.0, 3.0, 1.0]), (1, [1.0, 2.0])]
+    )
+    def test_xp(self, axis: int | None, expected_list: list[float], xp: ModuleType):
+        a = xp.asarray([[4, xp.nan, 1], [2, 3, xp.nan]])
+        res = nanmin(a, axis=axis, xp=xp)
+        expected: Array = xp.asarray(expected_list)
+        assert_equal(res, expected)
