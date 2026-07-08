@@ -2251,6 +2251,10 @@ class TestNanMin:
         expected = -xp.inf
         assert res == expected
 
+    def test_scalar(self, xp: ModuleType):
+        a = xp.asarray(1.0)
+        assert nanmin(a) == 1.0
+
     @pytest.mark.filterwarnings("ignore:.*All-NaN slice*.:RuntimeWarning")
     def test_all_nan_slice_2d(self, xp: ModuleType):
         a = xp.asarray(
