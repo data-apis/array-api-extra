@@ -2279,5 +2279,5 @@ class TestNanMin:
     def test_xp(self, axis: int | None, expected_list: list[float], xp: ModuleType):
         a = xp.asarray([[4, xp.nan, 1], [2, 3, xp.nan]])
         res = nanmin(a, axis=axis, xp=xp)
-        expected: Array = xp.asarray(expected_list)
+        expected = xp.asarray(expected_list)
         assert_equal(res, expected)
