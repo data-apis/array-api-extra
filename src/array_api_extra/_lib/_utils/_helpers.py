@@ -8,7 +8,7 @@ import math
 import pickle
 import types
 import warnings
-from collections.abc import Callable, Generator, Iterable, Iterator
+from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from functools import wraps
 from types import ModuleType
 from typing import (
@@ -56,6 +56,7 @@ __all__ = [
     "is_python_scalar",
     "jax_autojit",
     "meta_namespace",
+    "normalize_pad_width",
     "pickle_flatten",
     "pickle_unflatten",
 ]
@@ -608,3 +609,19 @@ def jax_autojit(
         return inner(wargs).obj
 
     return outer
+
+
+def normalize_pad_width(
+    pad_width: int | tuple[int, int] | Sequence[tuple[int, int]],
+    ndim: int,
+) -> list[tuple[int, int]]:  # numpydoc ignore=PR01,RT01
+    """Normalize `pad_width` to a list of `ndim` (before, after) pairs of ints."""
+    if isinstance(pad_width, int):
+        return [(pad_width, pad_width)] * ndim
+    if (
+        isinstance(pad_width, tuple)
+        and len(pad_width) == 2
+        and all(isinstance(i, int) for i in pad_width)
+    ):
+        return [cast(tuple[int, int], pad_width)] * ndim
+    return cast(list[tuple[int, int]], list(pad_width))

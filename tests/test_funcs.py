@@ -1,3 +1,4 @@
+import inspect
 import math
 import warnings
 from collections.abc import Callable
@@ -12,6 +13,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 from typing_extensions import override
 
+import array_api_extra._delegation as delegated_func
 from array_api_extra import (
     angle,
     apply_where,
@@ -22,6 +24,7 @@ from array_api_extra import (
     cov,
     create_diagonal,
     default_dtype,
+    diag_indices,
     expand_dims,
     isclose,
     isin,
@@ -34,12 +37,15 @@ from array_api_extra import (
     partition,
     setdiff1d,
     sinc,
+    tril_indices,
+    triu_indices,
     union1d,
     unravel_index,
 )
 from array_api_extra import (
     searchsorted as xpx_searchsorted,
 )
+from array_api_extra._lib import _funcs as functions
 from array_api_extra._lib._backends import NUMPY_VERSION, Backend
 from array_api_extra._lib._funcs import searchsorted as _funcs_searchsorted
 from array_api_extra._lib._utils._compat import (
@@ -58,6 +64,7 @@ lazy_xp_function(broadcast_shapes)
 lazy_xp_function(cov)
 lazy_xp_function(create_diagonal)
 lazy_xp_function(default_dtype)
+lazy_xp_function(diag_indices)
 lazy_xp_function(expand_dims)
 lazy_xp_function(isclose)
 lazy_xp_function(isin)
@@ -70,9 +77,34 @@ lazy_xp_function(partition)
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False)
 lazy_xp_function(sinc)
+lazy_xp_function(tril_indices)
+lazy_xp_function(triu_indices)
 lazy_xp_function(union1d, jax_jit=False)
 lazy_xp_function(xpx_searchsorted)
 lazy_xp_function(_funcs_searchsorted)
+
+
+def test_all_contains_all_public_functions():
+    public_functions = {
+        name
+        for name, obj in inspect.getmembers(functions, inspect.isfunction)
+        if not name.startswith("_") and obj.__module__ == functions.__name__
+    }
+    missing = sorted(public_functions - set(functions.__all__))
+    extra = sorted(set(functions.__all__) - public_functions)
+    assert public_functions == set(functions.__all__), (
+        f"Missing from __all__: {missing}\tExtra in __all__: {extra}"
+    )
+    public_functions = {
+        name
+        for name, obj in inspect.getmembers(delegated_func, inspect.isfunction)
+        if not name.startswith("_") and obj.__module__ == delegated_func.__name__
+    }
+    missing = sorted(public_functions - set(delegated_func.__all__))
+    extra = sorted(set(delegated_func.__all__) - public_functions)
+    assert public_functions == set(delegated_func.__all__), (
+        f"Missing from __all__: {missing}\tExtra in __all__: {extra}"
+    )
 
 
 class TestApplyWhere:
@@ -829,6 +861,133 @@ class TestDefaultDType:
         assert default_dtype(xp) == xp.float32
         assert default_dtype(xp, "real floating") == xp.float32
         assert default_dtype(xp, "complex floating") == xp.complex64
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
+class TestDiagIndices:
+    def test_basic(self, xp: ModuleType):
+        rows, cols = diag_indices(5, xp=xp)
+        ref_rows, ref_cols = np.diag_indices(5)
+        assert_equal(rows, xp.asarray(ref_rows))
+        assert_equal(cols, xp.asarray(ref_cols))
+
+    @pytest.mark.parametrize("n", [2, 4, 7])
+    @pytest.mark.parametrize("ndim", [1, 2, 3, 4])
+    def test_ndim(self, xp: ModuleType, n: int, ndim: int):
+        idx = diag_indices(n, ndim=ndim, xp=xp)
+        assert len(idx) == ndim
+        ref = np.diag_indices(n, ndim=ndim)
+        for got, expected in zip(idx, ref, strict=True):
+            assert_equal(got, xp.asarray(expected))
+
+    def test_empty(self, xp: ModuleType):
+        rows, cols = diag_indices(0, xp=xp)
+        assert rows.shape == (0,)
+        assert cols.shape == (0,)
+
+    def test_validation(self, xp: ModuleType):
+        with pytest.raises(ValueError, match="`n` must be non-negative"):
+            _ = diag_indices(-1, xp=xp)
+        with pytest.raises(ValueError, match="`ndim` must be >= 1"):
+            _ = diag_indices(3, ndim=0, xp=xp)
+
+    def test_device(self, xp: ModuleType, device: Device):
+        default_device = get_device(xp.empty(0))
+        rows, cols = diag_indices(3, device=None, xp=xp)
+        assert get_device(rows) == default_device
+        assert get_device(cols) == default_device
+        rows, cols = diag_indices(3, device=device, xp=xp)
+        assert get_device(rows) == device
+        assert get_device(cols) == device
+
+
+@pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange/nonzero", strict=False)
+@pytest.mark.xfail_xp_backend(
+    Backend.ARRAY_API_STRICTEST,
+    reason="generic path uses nonzero (data-dependent)",
+    strict=False,
+)
+@pytest.mark.parametrize(
+    ("xpx_fn", "np_fn"),
+    [(tril_indices, np.tril_indices), (triu_indices, np.triu_indices)],
+    ids=["tril", "triu"],
+)
+class TestTriIndices:
+    def test_basic(
+        self,
+        xp: ModuleType,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],
+    ):
+        rows, cols = xpx_fn(4, xp=xp)
+        ref_rows, ref_cols = np_fn(4)
+        assert_equal(rows, xp.asarray(ref_rows))
+        assert_equal(cols, xp.asarray(ref_cols))
+
+    @pytest.mark.parametrize("offset", [-2, -1, 0, 1, 2])
+    def test_offset(
+        self,
+        xp: ModuleType,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],
+        offset: int,
+    ):
+        rows, cols = xpx_fn(5, offset=offset, xp=xp)
+        ref_rows, ref_cols = np_fn(5, k=offset)
+        assert_equal(rows, xp.asarray(ref_rows))
+        assert_equal(cols, xp.asarray(ref_cols))
+
+    def test_rectangular(
+        self,
+        xp: ModuleType,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],
+    ):
+        rows, cols = xpx_fn(3, m=5, xp=xp)
+        ref_rows, ref_cols = np_fn(3, m=5)
+        assert_equal(rows, xp.asarray(ref_rows))
+        assert_equal(cols, xp.asarray(ref_cols))
+
+    @pytest.mark.xfail_xp_backend(
+        Backend.DASK, reason="dask: no 2D fancy indexing", strict=False
+    )
+    def test_use_to_read(
+        self,
+        xp: ModuleType,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],
+    ):
+        rng = np.random.default_rng(0)
+        a = rng.integers(0, 100, (4, 4))
+        a_xp = xp.asarray(a)
+        rows, cols = xpx_fn(4, xp=xp)
+        assert_equal(a_xp[rows, cols], xp.asarray(a[np_fn(4)]))
+
+    def test_validation(
+        self,
+        xp: ModuleType,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],  # noqa: ARG002  # pytest param
+    ):
+        with pytest.raises(ValueError, match="`n` must be non-negative"):
+            _ = xpx_fn(-1, xp=xp)
+        with pytest.raises(ValueError, match="`m` must be non-negative"):
+            _ = xpx_fn(3, m=-1, xp=xp)
+
+    def test_device(
+        self,
+        xp: ModuleType,
+        device: Device,
+        xpx_fn: Callable[..., tuple[Array, Array]],
+        np_fn: Callable[..., tuple[Array, Array]],  # noqa: ARG002  # pytest param
+    ):
+        default_device = get_device(xp.empty(0))
+        rows, cols = xpx_fn(4, device=None, xp=xp)
+        assert get_device(rows) == default_device
+        assert get_device(cols) == default_device
+        rows, cols = xpx_fn(4, device=device, xp=xp)
+        assert get_device(rows) == device
+        assert get_device(cols) == device
 
 
 @pytest.mark.filterwarnings(r"ignore:.*removed in v1.0.0.*:DeprecationWarning")

@@ -15,6 +15,7 @@
     cov
     create_diagonal
     default_dtype
+    diag_indices
     expand_dims
     isclose
     isin
@@ -28,6 +29,8 @@
     searchsorted
     setdiff1d
     sinc
+    tril_indices
+    triu_indices
     union1d
     unravel_index
 ```
