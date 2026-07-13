@@ -21,6 +21,7 @@
     isin
     kron
     nan_to_num
+    nanmin
     nunique
     one_hot
     pad

@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="isin" href="array_api_extra.isin.html"><link rel="prev" title="expand_dims" href="array_api_extra.expand_dims.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="nunique" href="array_api_extra.nunique.html"><link rel="prev" title="nan_to_num" href="array_api_extra.nan_to_num.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>isclose - array-api-extra 0.11.1.dev0 documentation</title>
+        <title>nanmin - array-api-extra 0.11.1.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -205,11 +205,11 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.default_dtype.html">default_dtype</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.diag_indices.html">diag_indices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.expand_dims.html">expand_dims</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">isclose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.isclose.html">isclose</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.isin.html">isin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.kron.html">kron</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.nan_to_num.html">nan_to_num</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.nanmin.html">nanmin</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">nanmin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.nunique.html">nunique</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.one_hot.html">one_hot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.pad.html">pad</a></li>
@@ -258,12 +258,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.isclose.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.nanmin.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.isclose.rst" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.nanmin.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -280,71 +280,40 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="isclose">
-<h1>isclose<a class="headerlink" href="#isclose" title="Link to this heading">¶</a></h1>
+          <section id="nanmin">
+<h1>nanmin<a class="headerlink" href="#nanmin" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.isclose">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">isclose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equal_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.isclose" title="Link to this definition">¶</a></dt>
-<dd><p>Return a boolean array where two arrays are element-wise equal within a tolerance.</p>
-<p>The tolerance values are positive, typically very small numbers. The relative
-difference <code class="docutils literal notranslate"><span class="pre">(rtol</span> <span class="pre">*</span> <span class="pre">abs(b))</span></code> and the absolute difference <cite>atol</cite> are added together
-to compare against the absolute difference between <cite>a</cite> and <cite>b</cite>.</p>
-<p>NaNs are treated as equal if they are in the same place and if <code class="docutils literal notranslate"><span class="pre">equal_nan=True</span></code>.
-Infs are treated as equal if they are in the same place and of the same sign in both
-arrays.</p>
+<dt class="sig sig-object py" id="array_api_extra.nanmin">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">nanmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.nanmin" title="Link to this definition">¶</a></dt>
+<dd><p>Return the minimum of the array elements along a given axis, ignoring NaNs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a></span>) – Input objects to compare. At least one must be an array.</p></li>
-<li><p><strong>b</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a></span>) – Input objects to compare. At least one must be an array.</p></li>
-<li><p><strong>rtol</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – The relative tolerance parameter (see Notes).</p></li>
-<li><p><strong>atol</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – The absolute tolerance parameter (see Notes).</p></li>
-<li><p><strong>equal_nan</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to compare NaN’s as equal. If True, NaN’s in <cite>a</cite> will be considered
-equal to NaN’s in <cite>b</cite> in the output array.</p></li>
-<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The standard-compatible namespace for <cite>a</cite> and <cite>b</cite>. Default: infer.</p></li>
+<li><p><strong>a</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – Input array.</p></li>
+<li><p><strong>axis</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Axis or axes along which the minimum is computed. The default is to compute
+the minimum of the flattened array.</p></li>
+<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The standard-compatible namespace for <cite>a</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A boolean array of shape broadcasted from <cite>a</cite> and <cite>b</cite>, containing <code class="docutils literal notranslate"><span class="pre">True</span></code> where
-<cite>a</cite> is close to <cite>b</cite>, and <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+<dd class="field-even"><p>An array of minimum values along the given axis, ignoring NaNs.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span></p>
 </dd>
 </dl>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The default <cite>atol</cite> is not appropriate for comparing numbers with magnitudes much
-smaller than one (see notes).</p>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference external" href="https://docs.python.org/3/library/math.html#math.isclose" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">math.isclose</span></code></a></dt><dd><p>Similar function in stdlib for Python scalars.</p>
-</dd>
-</dl>
-</div>
-<p class="rubric">Notes</p>
-<p>For finite values, <cite>isclose</cite> uses the following equation to test whether two
-floating point values are equivalent:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">absolute</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">atol</span> <span class="o">+</span> <span class="n">rtol</span> <span class="o">*</span> <span class="n">absolute</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_strict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">Array(1., dtype=array_api_strict.float64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">Array([4., 3., 2., 1.], dtype=array_api_strict.float64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">Array([1., 2.], dtype=array_api_strict.float64)</span>
 </pre></div>
 </div>
-<p>Unlike the built-in <cite>math.isclose</cite>,
-the above equation is not symmetric in <cite>a</cite> and <cite>b</cite>,
-so that <code class="docutils literal notranslate"><span class="pre">isclose(a,</span> <span class="pre">b)</span></code> might be different from <code class="docutils literal notranslate"><span class="pre">isclose(b,</span> <span class="pre">a)</span></code> in some rare
-cases.</p>
-<p>The default value of <cite>atol</cite> is not appropriate when the reference value <cite>b</cite> has
-magnitude smaller than one. For example, it is unlikely that <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">=</span> <span class="pre">1e-9</span></code> and
-<code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">=</span> <span class="pre">2e-9</span></code> should be considered “close”, yet <code class="docutils literal notranslate"><span class="pre">isclose(1e-9,</span> <span class="pre">2e-9)</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>
-with default settings. Be sure to select <cite>atol</cite> for the use case at hand, especially
-for defining the threshold below which a non-zero value in <cite>a</cite> will be considered
-“close” to a very small or zero value in <cite>b</cite>.</p>
-<p>The comparison of <cite>a</cite> and <cite>b</cite> uses standard broadcasting, which means that <cite>a</cite> and
-<cite>b</cite> need not have the same shape in order for <code class="docutils literal notranslate"><span class="pre">isclose(a,</span> <span class="pre">b)</span></code> to evaluate to
-<code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
-<p><cite>isclose</cite> is not defined for non-numeric data types.
-<code class="docutils literal notranslate"><span class="pre">bool</span></code> is considered a numeric data-type for this purpose.</p>
 </dd></dl>
 
 </section>
@@ -354,23 +323,23 @@ for defining the threshold below which a non-zero value in <cite>a</cite> will b
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="array_api_extra.isin.html">
+          <a class="next-page" href="array_api_extra.nunique.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">isin</div>
+                <div class="title">nunique</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.expand_dims.html">
+          <a class="prev-page" href="array_api_extra.nan_to_num.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">expand_dims</div>
+                <div class="title">nan_to_num</div>
                 
               </div>
             </a>
@@ -411,8 +380,8 @@ for defining the threshold below which a non-zero value in <cite>a</cite> will b
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">isclose</a><ul>
-<li><a class="reference internal" href="#array_api_extra.isclose"><code class="docutils literal notranslate"><span class="pre">isclose()</span></code></a></li>
+<li><a class="reference internal" href="#">nanmin</a><ul>
+<li><a class="reference internal" href="#array_api_extra.nanmin"><code class="docutils literal notranslate"><span class="pre">nanmin()</span></code></a></li>
 </ul>
 </li>
 </ul>
