@@ -2269,7 +2269,7 @@ class TestNanMin:
         assert_equal(res, expected)
 
     @pytest.mark.skip_xp_backend(
-        Backend.TORCH, reason="Tensor.item() cannot be called on meta tensors"
+        Backend.TORCH, reason="torch.nanmin does not support tensors on meta device"
     )
     @pytest.mark.parametrize("axis", [None, 0, 1])
     def test_device(self, axis: int | None, xp: ModuleType, device: Device):
