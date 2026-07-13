@@ -35,6 +35,7 @@ __all__ = [
     "isin",
     "kron",
     "nan_to_num",
+    "nanmin",
     "one_hot",
     "pad",
     "partition",
@@ -1583,3 +1584,54 @@ def unravel_index(
         return xp.unravel_index(indices, shape)
 
     return _funcs.unravel_index(indices, shape)
+
+
+def nanmin(
+    a: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Return the minimum of the array elements along a given axis, ignoring NaNs.
+
+    Parameters
+    ----------
+    a : Array
+        Input array.
+    axis : int or tuple of ints or None, optional
+        Axis or axes along which the minimum is computed. The default is to compute
+        the minimum of the flattened array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array of minimum values along the given axis, ignoring NaNs.
+
+    Examples
+    --------
+    >>> import array_api_extra as xpx
+    >>> import array_api_strict as xp
+    >>> a = xp.asarray([[5, 3, xp.nan, 1], [4, xp.nan, 2, xp.nan]])
+    >>> xpx.nanmin(a)
+    Array(1., dtype=array_api_strict.float64)
+    >>> xpx.nanmin(a, axis=0)
+    Array([4., 3., 2., 1.], dtype=array_api_strict.float64)
+    >>> xpx.nanmin(a, axis=1)
+    Array([1., 2.], dtype=array_api_strict.float64)
+    """
+    if xp is None:
+        xp = array_namespace(a)
+
+    if (
+        is_numpy_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_dask_namespace(xp)
+        or is_jax_namespace(xp)
+    ):
+        return xp.nanmin(a, axis=axis)
+
+    return _funcs.nanmin(a, axis=axis, xp=xp)
