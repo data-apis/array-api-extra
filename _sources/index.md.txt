@@ -41,8 +41,6 @@ It is currently used by:
 
 ```shell
 uv add array-api-extra
-# or
-python -m pip install array-api-extra
 ```
 
 And
@@ -50,8 +48,6 @@ And
 
 ```shell
 pixi add array-api-extra
-# or
-mamba install array-api-extra
 ```
 
 ```{warning}
