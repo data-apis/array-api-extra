@@ -295,9 +295,9 @@ This will be later expanded to provide test coverage for other lazy backends.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Function to be tested, or a tuple containing an (uninstantiated) class and a
+<li><p><strong>func</strong> (<em>callable</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><em>type</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – Function to be tested, or a tuple containing an (uninstantiated) class and a
 method name to specify a class method to be tested.</p></li>
-<li><p><strong>allow_dask_compute</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – <p>Whether <cite>func</cite> is allowed to internally materialize the Dask graph, or maximum
+<li><p><strong>allow_dask_compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Whether <cite>func</cite> is allowed to internally materialize the Dask graph, or maximum
 number of times it is allowed to do so. This is typically triggered by
 <code class="docutils literal notranslate"><span class="pre">bool()</span></code>, <code class="docutils literal notranslate"><span class="pre">float()</span></code>, or <code class="docutils literal notranslate"><span class="pre">np.asarray()</span></code>.</p>
 <p>Set to 1 if you are aware that <cite>func</cite> converts the input parameters to NumPy and
@@ -315,7 +315,7 @@ of times.</p>
 <p>Default: False, meaning that <cite>func</cite> must be fully lazy and never materialize the
 graph.</p>
 </p></li>
-<li><p><strong>jax_jit</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – <p>Set to True to replace <cite>func</cite> with a smart variant of <code class="docutils literal notranslate"><span class="pre">jax.jit(func)</span></code> after
+<li><p><strong>jax_jit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>Set to True to replace <cite>func</cite> with a smart variant of <code class="docutils literal notranslate"><span class="pre">jax.jit(func)</span></code> after
 calling the <a class="reference internal" href="array_api_extra.testing.patch_lazy_xp_functions.html#array_api_extra.testing.patch_lazy_xp_functions" title="array_api_extra.testing.patch_lazy_xp_functions"><code class="xref py py-func docutils literal notranslate"><span class="pre">patch_lazy_xp_functions()</span></code></a> test helper with <code class="docutils literal notranslate"><span class="pre">xp=jax.numpy</span></code>.
 This is the default behaviour.
 Set to False if <cite>func</cite> is only compatible with eager (non-jitted) JAX.</p>
@@ -335,8 +335,8 @@ internally consume the function’s outputs.</p>
 </div>
 <p>Default: True.</p>
 </p></li>
-<li><p><strong>static_argnums</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Deprecated</span></code></span>) – Deprecated; ignored.</p></li>
-<li><p><strong>static_argnames</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Deprecated</span></code></span>) – Deprecated; ignored.</p></li>
+<li><p><strong>static_argnums</strong> (<em>Deprecated</em>) – Deprecated; ignored.</p></li>
+<li><p><strong>static_argnames</strong> (<em>Deprecated</em>) – Deprecated; ignored.</p></li>
 </ul>
 </dd>
 </dl>

@@ -291,16 +291,16 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a></span>) – The standard-compatible namespace for which to get the default dtype.</p></li>
-<li><p><strong>kind</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'real</span> <span class="pre">floating'</span></code>, <code class="docutils literal notranslate"><span class="pre">'complex</span> <span class="pre">floating'</span></code>, <code class="docutils literal notranslate"><span class="pre">'integral'</span></code>, <code class="docutils literal notranslate"><span class="pre">'indexing'</span></code>]</span>) – The kind of dtype to return. Default is ‘real floating’.</p></li>
-<li><p><strong>device</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The device for which to get the default dtype. Default: current device.</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em>) – The standard-compatible namespace for which to get the default dtype.</p></li>
+<li><p><strong>kind</strong> (<em>{'real floating'</em><em>, </em><em>'complex floating'</em><em>, </em><em>'integral'</em><em>, </em><em>'indexing'}</em><em>, </em><em>optional</em>) – The kind of dtype to return. Default is ‘real floating’.</p></li>
+<li><p><strong>device</strong> (<em>Device</em><em>, </em><em>optional</em>) – The device for which to get the default dtype. Default: current device.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The default dtype for the given namespace, kind, and device.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span></p>
+<dd class="field-odd"><p>dtype</p>
 </dd>
 </dl>
 </dd></dl>

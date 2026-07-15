@@ -297,11 +297,11 @@ the functionality of <code class="docutils literal notranslate"><span class="pre
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>m</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – An array of shape <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">N,</span> <span class="pre">M)</span></code> whose innermost two dimensions
+<li><p><strong>m</strong> (<em>array</em>) – An array of shape <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">N,</span> <span class="pre">M)</span></code> whose innermost two dimensions
 contain <em>M</em> observations of <em>N</em> variables. That is,
 each row of <cite>m</cite> represents a variable, and each column a single
 observation of all those variables.</p></li>
-<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The standard-compatible namespace for <cite>m</cite>. Default: infer.</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>m</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -309,7 +309,7 @@ observation of all those variables.</p></li>
 the covariance matrix of the variables.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span></p>
+<dd class="field-odd"><p>array</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>

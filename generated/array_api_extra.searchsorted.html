@@ -295,22 +295,22 @@ as elements and preceding axes as batch (or “loop”) dimensions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x1</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – Input array. Should have a real-valued data type. Must be sorted in ascending
+<li><p><strong>x1</strong> (<em>Array</em>) – Input array. Should have a real-valued data type. Must be sorted in ascending
 order along the last axis.</p></li>
-<li><p><strong>x2</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – Array containing search values. Should have a real-valued data type. Must have
+<li><p><strong>x2</strong> (<em>Array</em>) – Array containing search values. Should have a real-valued data type. Must have
 the same shape as <code class="docutils literal notranslate"><span class="pre">x1</span></code> except along the last axis.</p></li>
-<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'left'</span></code>, <code class="docutils literal notranslate"><span class="pre">'right'</span></code>]</span>) – Argument controlling which index is returned if an element of <code class="docutils literal notranslate"><span class="pre">x2</span></code> is equal to
+<li><p><strong>side</strong> (<em>{'left'</em><em>, </em><em>'right'}</em><em>, </em><em>optional</em>) – Argument controlling which index is returned if an element of <code class="docutils literal notranslate"><span class="pre">x2</span></code> is equal to
 one or more elements of <code class="docutils literal notranslate"><span class="pre">x1</span></code>: <code class="docutils literal notranslate"><span class="pre">'left'</span></code> returns the index of the first of
 these elements; <code class="docutils literal notranslate"><span class="pre">'right'</span></code> returns the next index after the last of these
 elements. Default: <code class="docutils literal notranslate"><span class="pre">'left'</span></code>.</p></li>
-<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The standard-compatible namespace for the array arguments. Default: infer.</p></li>
+<li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for the array arguments. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>Array</strong> – An array of indices with the same shape as <code class="docutils literal notranslate"><span class="pre">x2</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span></p>
+<dd class="field-odd"><p>integer array</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
