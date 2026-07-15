@@ -1496,10 +1496,46 @@ class TestPad:
         padded = pad(a, 2)
         assert padded.shape == (6, 7, 8)
 
+    def test_edge(self, xp: ModuleType):
+        a = xp.asarray([1, 2, 3])
+        padded = pad(a, (2, 1), mode="edge")
+        assert_equal(padded, xp.asarray([1, 1, 1, 2, 3, 3]))
+
+    def test_edge_ndim(self, xp: ModuleType):
+        a = xp.asarray([[1, 2], [3, 4]])
+        padded = pad(a, ((1, 2), (2, 1)), mode="edge")
+        expected = xp.asarray(
+            [
+                [1, 1, 1, 2, 2],
+                [1, 1, 1, 2, 2],
+                [3, 3, 3, 4, 4],
+                [3, 3, 3, 4, 4],
+                [3, 3, 3, 4, 4],
+            ]
+        )
+        assert_equal(padded, expected)
+
+    def test_wrap(self, xp: ModuleType):
+        a = xp.asarray([1, 2, 3])
+        padded = pad(a, (5, 4), mode="wrap")
+        assert_equal(padded, xp.asarray([2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1]))
+
+    def test_wrap_ndim(self, xp: ModuleType):
+        a = xp.asarray([[1, 2], [3, 4]])
+        padded = pad(a, ((1, 1), (1, 1)), mode="wrap")
+        expected = xp.asarray([[4, 3, 4, 3], [2, 1, 2, 1], [4, 3, 4, 3], [2, 1, 2, 1]])
+        assert_equal(padded, expected)
+
+    @pytest.mark.parametrize("mode", ["edge", "wrap"])
+    def test_empty_axis(self, xp: ModuleType, mode: str):
+        a = xp.asarray([])
+        with pytest.raises(ValueError, match="can't extend empty axis"):
+            _ = pad(a, 1, mode=mode)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+
     def test_mode_not_implemented(self, xp: ModuleType):
         a = xp.asarray([1, 2, 3])
-        with pytest.raises(NotImplementedError, match="Only `'constant'`"):
-            _ = pad(a, 2, mode="edge")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        with pytest.raises(NotImplementedError, match="Unsupported padding mode"):
+            _ = pad(a, 2, mode="reflect")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     def test_device(self, xp: ModuleType, device: Device):
         a = xp.asarray(0.0, device=device)

@@ -809,7 +809,7 @@ def one_hot(
 def pad(
     x: Array,
     pad_width: int | tuple[int, int] | Sequence[tuple[int, int]],
-    mode: Literal["constant"] = "constant",
+    mode: Literal["constant", "edge", "wrap"] = "constant",
     *,
     constant_values: complex = 0,
     xp: ModuleType | None = None,
@@ -828,8 +828,9 @@ def pad(
         A single tuple, ``(before, after)``, is equivalent to a list of ``x.ndim``
         copies of this tuple.
     mode : str, optional
-        Only "constant" mode is currently supported, which pads with
-        the value passed to `constant_values`.
+        Padding mode. "constant" pads with the value passed to
+        `constant_values`, "edge" pads with the edge values of the array, and
+        "wrap" pads by wrapping values from the opposite edge.
     constant_values : python scalar, optional
         Use this value to pad the input. Default is zero.
     xp : array_namespace, optional
@@ -839,12 +840,12 @@ def pad(
     -------
     array
         The input array,
-        padded with ``pad_width`` elements equal to ``constant_values``.
+        padded according to ``mode``.
     """
     xp = array_namespace(x) if xp is None else xp
 
-    if mode != "constant":
-        msg = "Only `'constant'` mode is currently supported"
+    if mode not in {"constant", "edge", "wrap"}:
+        msg = f"Unsupported padding mode {mode!r}"
         raise NotImplementedError(msg)
 
     if (
@@ -853,9 +854,12 @@ def pad(
         or is_jax_namespace(xp)
         or is_pydata_sparse_namespace(xp)
     ):
-        return xp.pad(x, pad_width, mode, constant_values=constant_values)
+        if mode == "constant":
+            return xp.pad(x, pad_width, mode, constant_values=constant_values)
+        if not is_pydata_sparse_namespace(xp):
+            return xp.pad(x, pad_width, mode)
 
-    if is_torch_namespace(xp):
+    if mode == "constant" and is_torch_namespace(xp):
         # normalize `pad_width` on the host rather than through a tensor as done in
         # `torch/_numpy`'s implementation (avoids device transfers)
         pad_width_seq = normalize_pad_width(pad_width, x.ndim)
@@ -863,7 +867,7 @@ def pad(
         flat_pad_width = [w for pair in reversed(pad_width_seq) for w in pair]
         return xp.nn.functional.pad(x, tuple(flat_pad_width), value=constant_values)
 
-    return _funcs.pad(x, pad_width, constant_values=constant_values, xp=xp)
+    return _funcs.pad(x, pad_width, mode=mode, constant_values=constant_values, xp=xp)
 
 
 def searchsorted(

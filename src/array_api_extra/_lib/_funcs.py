@@ -609,19 +609,74 @@ def pad(
     x: Array,
     pad_width: int | tuple[int, int] | Sequence[tuple[int, int]],
     *,
+    mode: Literal["constant", "edge", "wrap"] = "constant",
     constant_values: complex = 0,
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
     pad_width_seq = normalize_pad_width(pad_width, x.ndim)
 
-    slices: list[slice] = []
-    newshape: list[int] = []
-    for ax, w_tpl in enumerate(pad_width_seq):
+    if len(pad_width_seq) != x.ndim:
+        msg = f"expected {x.ndim} pairs of pad widths, got {len(pad_width_seq)}"
+        raise ValueError(msg)
+
+    for w_tpl in pad_width_seq:
         if len(w_tpl) != 2:
             msg = f"expect a 2-tuple (before, after), got {w_tpl}."
             raise ValueError(msg)
+        if w_tpl[0] < 0 or w_tpl[1] < 0:
+            msg = "index can't contain negative values"
+            raise ValueError(msg)
 
+    if mode != "constant":
+        for axis, (before, after) in enumerate(pad_width_seq):
+            if before == 0 and after == 0:
+                continue
+
+            axis_size = eager_shape(x)[axis]
+            if axis_size == 0:
+                msg = f"can't extend empty axis {axis} using mode {mode!r}"
+                raise ValueError(msg)
+
+            parts: list[Array] = []
+            if mode == "edge":
+                shape = list(eager_shape(x))
+                if before:
+                    before_slice = [slice(None)] * x.ndim
+                    before_slice[axis] = slice(0, 1)
+                    shape[axis] = before
+                    parts.append(xp.broadcast_to(x[tuple(before_slice)], tuple(shape)))
+
+                parts.append(x)
+
+                if after:
+                    after_slice = [slice(None)] * x.ndim
+                    after_slice[axis] = slice(-1, None)
+                    shape[axis] = after
+                    parts.append(xp.broadcast_to(x[tuple(after_slice)], tuple(shape)))
+            else:
+                before_repeats, before_remainder = divmod(before, axis_size)
+                after_repeats, after_remainder = divmod(after, axis_size)
+
+                if before_remainder:
+                    before_slice = [slice(None)] * x.ndim
+                    before_slice[axis] = slice(axis_size - before_remainder, None)
+                    parts.append(x[tuple(before_slice)])
+                parts.extend([x] * before_repeats)
+                parts.append(x)
+                parts.extend([x] * after_repeats)
+                if after_remainder:
+                    after_slice = [slice(None)] * x.ndim
+                    after_slice[axis] = slice(0, after_remainder)
+                    parts.append(x[tuple(after_slice)])
+
+            x = xp.concat(parts, axis=axis)
+
+        return x
+
+    slices: list[slice] = []
+    newshape: list[int] = []
+    for ax, w_tpl in enumerate(pad_width_seq):
         sh = eager_shape(x)[ax]
 
         if w_tpl[0] == 0 and w_tpl[1] == 0:
