@@ -60,7 +60,7 @@ array-api-extra.path = "."
 ### non-default feature definitions ###
 
 [feature.lint.dependencies]
-typing-extensions = ">=4.15.0"
+typing-extensions = ">=4.16.0"
 pylint = ">=4.0.6"
 mypy = ">=2.1.0"
 basedpyright = ">=1.39.8"
@@ -148,7 +148,7 @@ sphinx-autodoc-typehints = "==3.7.0" # pin due to https://github.com/tox-dev/sph
 # Needed to import parsed modules with autodoc
 dask-core = ">=2026.6.0" # No distributed, tornado, etc.
 pytest = ">=9.1.1"
-typing-extensions = ">=4.15.0"
+typing-extensions = ">=4.16.0"
 numpy = ">=2.1.3"
 
 [feature.docs.tasks]
