@@ -197,7 +197,7 @@ cupy = ">=14.1.1"
 pytorch = { version = ">=2.12.0", build = "cuda12*" }
 
 [feature.cuda-backends.target.linux.dependencies]
-jaxlib = { version = ">=0.10.1", build = "cuda12*" }
+jaxlib = { version = ">=0.10.2", build = "cuda12*" }
 
 [feature.nogil.dependencies]
 python-freethreading = "~=3.13.0"
