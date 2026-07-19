@@ -14,6 +14,7 @@ from ._delegation import (
     kron,
     nan_to_num,
     nanmin,
+    nunique,
     one_hot,
     pad,
     partition,
@@ -30,7 +31,6 @@ from ._lib._funcs import (
     angle,
     apply_where,
     default_dtype,
-    nunique,
 )
 from ._lib._lazy import lazy_apply
 

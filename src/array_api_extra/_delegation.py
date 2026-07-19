@@ -9,14 +9,17 @@ from ._lib._utils._compat import (
     array_namespace,
     is_cupy_namespace,
     is_dask_namespace,
+    is_jax_array,
     is_jax_namespace,
     is_numpy_namespace,
     is_pydata_sparse_namespace,
     is_torch_namespace,
+    size,
 )
 from ._lib._utils._compat import device as get_device
 from ._lib._utils._helpers import (
     asarrays,
+    capabilities,
     deprecated,
     eager_shape,
     normalize_pad_width,
@@ -36,6 +39,7 @@ __all__ = [
     "kron",
     "nan_to_num",
     "nanmin",
+    "nunique",
     "one_hot",
     "pad",
     "partition",
@@ -727,6 +731,48 @@ def nan_to_num(
         return xp.nan_to_num(y, nan=fill_value)
 
     return _funcs.nan_to_num(y, fill_value=fill_value, xp=xp)
+
+
+def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
+    """
+    Count the number of unique elements in an array.
+
+    Compatible with JAX and Dask, whose laziness would be otherwise
+    problematic.
+
+    Parameters
+    ----------
+    x : Array
+        Input array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array: 0-dimensional integer array
+        The number of unique elements in `x`. It can be lazy.
+    """
+    if xp is None:
+        xp = array_namespace(x)
+
+    if is_jax_array(x):
+        # size= is JAX-specific
+        # https://github.com/data-apis/array-api/issues/883
+        _, counts = xp.unique_counts(x, size=size(x))
+        return (counts > 0).sum()
+
+    if is_numpy_namespace(xp) or is_cupy_namespace(xp):
+        values = xp.unique(x, equal_nan=False)
+        return xp.asarray(eager_shape(values)[0], device=get_device(x))
+
+    if (
+        is_torch_namespace(xp)
+        and capabilities(xp, device=get_device(x))["data-dependent shapes"]
+    ):
+        values = xp.unique(x)
+        return xp.asarray(eager_shape(values)[0], device=get_device(x))
+
+    return _funcs.nunique(x, xp=xp)
 
 
 def one_hot(

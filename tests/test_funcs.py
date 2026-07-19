@@ -1441,6 +1441,27 @@ class TestNanToNum:
 
 
 class TestNUnique:
+    @pytest.mark.skip_xp_backend(
+        Backend.ARRAY_API_STRICT, reason="array-agnostic fallback"
+    )
+    @pytest.mark.skip_xp_backend(
+        Backend.ARRAY_API_STRICTEST, reason="array-agnostic fallback"
+    )
+    @pytest.mark.skip_xp_backend(Backend.DASK, reason="array-agnostic fallback")
+    @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="array-agnostic fallback")
+    def test_delegates(
+        self,
+        xp: ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        def fallback(*_args: object, **_kwargs: object) -> Array:
+            msg = "array-agnostic fallback should not be used"
+            raise AssertionError(msg)
+
+        monkeypatch.setattr(functions, "nunique", fallback)
+        a = xp.asarray([1, 1, 2])
+        assert_equal(nunique(a), xp.asarray(2))
+
     def test_simple(self, xp: ModuleType):
         a = xp.asarray([[1, 1], [0, 2], [2, 2]])
         assert_equal(nunique(a), xp.asarray(3))
