@@ -166,7 +166,16 @@ def broadcast_shapes(
     return _funcs.broadcast_shapes(*shapes)
 
 
-def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
+def cov(
+    m: Array,
+    /,
+    *,
+    axis: int = -1,
+    correction: int | float = 1,
+    fweights: Array | None = None,
+    aweights: Array | None = None,
+    xp: ModuleType | None = None,
+) -> Array:
     """
     Estimate a covariance matrix (or a stack of covariance matrices).
 
@@ -177,16 +186,44 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     :math:`x_i` and :math:`x_j`. The element :math:`C_{ii}` is the variance
     of :math:`x_i`.
 
-    With the exception of supporting batch input, this provides a subset of
-    the functionality of ``numpy.cov``.
+    Extends ``numpy.cov`` with support for batch input and array-api
+    backends. Naming follows the array-api conventions used elsewhere in
+    this library (``axis``, ``correction``) rather than the numpy spellings
+    (``rowvar``, ``bias``, ``ddof``); see Notes for the mapping.
 
     Parameters
     ----------
     m : array
         An array of shape ``(..., N, M)`` whose innermost two dimensions
-        contain *M* observations of *N* variables. That is,
-        each row of `m` represents a variable, and each column a single
-        observation of all those variables.
+        contain *M* observations of *N* variables by default. The axis of
+        observations is controlled by `axis`.
+    axis : int, optional
+        Axis of `m` containing the observations. Default: ``-1`` (the last
+        axis), matching the array-api convention. Use ``axis=-2`` (or ``0``
+        for 2-D input) to treat each column as a variable, which
+        corresponds to ``rowvar=False`` in ``numpy.cov``.
+    correction : int or float, optional
+        Degrees of freedom correction: normalization divides by
+        ``N - correction`` (for unweighted input). Default: ``1``, which
+        gives the unbiased estimate (matches ``numpy.cov`` default of
+        ``bias=False``). Set to ``0`` for the biased estimate (``N``
+        normalization). Corresponds to ``ddof`` in ``numpy.cov`` and to
+        ``correction`` in ``numpy.var``/``std`` and ``torch.cov``.
+        Non-integer values are allowed for advanced use cases: the
+        unbiased correction for weighted observations depends on the
+        sum and dispersion of the weights and is generally not an
+        integer, and autocorrelated data may also require a fractional
+        correction. Non-integer ``correction`` routes through the
+        generic implementation because ``numpy.cov``'s ``ddof`` and
+        ``torch.cov``'s ``correction`` both require integers.
+    fweights : array, optional
+        1-D array of integer frequency weights: the number of times each
+        observation is repeated. Same as ``fweights`` in
+        ``numpy.cov``/``torch.cov``.
+    aweights : array, optional
+        1-D array of observation-vector weights (analytic weights). Larger
+        values mark more important observations. Same as ``aweights`` in
+        ``numpy.cov``/``torch.cov``.
     xp : array_namespace, optional
         The standard-compatible namespace for `m`. Default: infer.
 
@@ -195,6 +232,23 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     array
         An array having shape (..., N, N) whose innermost two dimensions represent
         the covariance matrix of the variables.
+
+    Notes
+    -----
+    Mapping from ``numpy.cov`` to this function::
+
+        numpy.cov(m, rowvar=True)           -> cov(m, axis=-1)   # default
+        numpy.cov(m, rowvar=False)          -> cov(m, axis=-2)
+        numpy.cov(m, bias=True)             -> cov(m, correction=0)
+        numpy.cov(m, ddof=k)                -> cov(m, correction=k)
+        numpy.cov(m, fweights=f)            -> cov(m, fweights=f)
+        numpy.cov(m, aweights=a)            -> cov(m, aweights=a)
+
+    Unlike ``numpy.cov``, a ``RuntimeWarning`` for non-positive effective
+    degrees of freedom is only emitted on the unweighted path. The
+    weighted path omits the check so that lazy backends (e.g. Dask) can
+    stay lazy end-to-end; choose ``correction`` and weights such that the
+    effective normalizer is positive.
 
     Examples
     --------
@@ -247,18 +301,54 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
     """
 
     if xp is None:
-        xp = array_namespace(m)
+        xp = array_namespace(m, fweights, aweights)
 
-    if (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_torch_namespace(xp)
-        or is_dask_namespace(xp)
-        or is_jax_namespace(xp)
-    ) and m.ndim <= 2:
-        return xp.cov(m)
+    # Validate axis against m.ndim.
+    ndim = max(m.ndim, 1)
+    if not -ndim <= axis < ndim:
+        msg = f"axis {axis} is out of bounds for array of dimension {m.ndim}"
+        raise IndexError(msg)
 
-    return _funcs.cov(m, xp=xp)
+    # Normalize: observations on the last axis. After this, every backend
+    # sees the same convention and we never need to deal with `rowvar`.
+    if m.ndim >= 2 and axis not in (-1, m.ndim - 1):
+        m = xp.moveaxis(m, axis, -1)
+
+    # `numpy.cov` (and cupy/dask/jax) require integer `ddof`; `torch.cov`
+    # requires integer `correction`. For non-integer-valued `correction`,
+    # fall through to the generic implementation.
+    integer_correction = isinstance(correction, int) or correction.is_integer()
+    has_weights = fweights is not None or aweights is not None
+
+    if m.ndim <= 2 and integer_correction:
+        if is_torch_namespace(xp):
+            fw = None if fweights is None else xp.asarray(fweights)
+            aw = None if aweights is None else xp.asarray(aweights)
+            return xp.cov(m, correction=int(correction), fweights=fw, aweights=aw)
+        # `dask.array.cov` forces `.compute()` whenever weights are given:
+        # its internal `if fact <= 0` check on a lazy 0-D scalar triggers
+        # materialization. Route to the generic impl, which is fully lazy
+        # because it only does sum/matmul and skips that scalar check.
+        if (
+            is_numpy_namespace(xp)
+            or is_cupy_namespace(xp)
+            or is_jax_namespace(xp)
+            or (is_dask_namespace(xp) and not has_weights)
+        ):
+            return xp.cov(
+                m,
+                ddof=int(correction),
+                fweights=fweights,
+                aweights=aweights,
+            )
+
+    return _funcs.cov(
+        m,
+        correction=correction,
+        fweights=fweights,
+        aweights=aweights,
+        xp=xp,
+    )
 
 
 def create_diagonal(
