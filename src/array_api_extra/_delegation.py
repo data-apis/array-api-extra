@@ -761,16 +761,12 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
         _, counts = xp.unique_counts(x, size=size(x))
         return (counts > 0).sum()
 
-    if is_numpy_namespace(xp) or is_cupy_namespace(xp):
-        values = xp.unique(x, equal_nan=False)
-        return xp.asarray(eager_shape(values)[0], device=get_device(x))
-
-    if (
+    if is_numpy_namespace(xp) or is_cupy_namespace(xp) or (
         is_torch_namespace(xp)
         and capabilities(xp, device=get_device(x))["data-dependent shapes"]
     ):
-        values = xp.unique(x)
-        return xp.asarray(eager_shape(values)[0], device=get_device(x))
+        _, counts = xp.unique_counts(x)
+        return xp.asarray(size(counts), device=get_device(x))
 
     return _funcs.nunique(x, xp=xp)
 
