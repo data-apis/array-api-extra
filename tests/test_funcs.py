@@ -30,6 +30,7 @@ from array_api_extra import (
     isin,
     kron,
     nan_to_num,
+    nanmax,
     nanmin,
     nunique,
     one_hot,
@@ -2303,5 +2304,86 @@ class TestNanMin:
     def test_xp(self, axis: int | None, expected_list: list[float], xp: ModuleType):
         a = xp.asarray([[4, xp.nan, 1], [2, 3, xp.nan]])
         res = nanmin(a, axis=axis, xp=xp)
+        expected = xp.asarray(expected_list)
+        assert_equal(res, expected)
+
+
+class TestNanMax:
+    def test_simple(self, xp: ModuleType):
+        a = xp.asarray([[5, 3], [6, xp.nan]])
+
+        # with the default `axis=None` a single scalar is returned
+        res = nanmax(a)
+        expected = 6.0
+        assert res == expected
+
+        res = nanmax(a, axis=0)
+        expected = xp.asarray([6.0, 3.0])
+        assert_equal(res, expected)
+
+        res = nanmax(a, axis=1)
+        expected = xp.asarray([5.0, 6.0])
+        assert_equal(res, expected)
+
+    def test_bigger(self, xp: ModuleType):
+        a = xp.asarray(
+            [
+                [1, xp.nan, 4, 5],
+                [xp.nan, 2, xp.nan, 4],
+                [6, 1, 3, xp.nan],
+            ]
+        )
+
+        res = nanmax(a, axis=0)
+        expected = xp.asarray([6.0, 2.0, 4.0, 5.0])
+        assert_equal(res, expected)
+
+        res = nanmax(a, axis=1)
+        expected = xp.asarray([5.0, 4.0, 6.0])
+        assert_equal(res, expected)
+
+    def test_with_infinity(self, xp: ModuleType):
+        a = xp.asarray([0.1, 5.0, xp.nan, -xp.inf])
+        res = nanmax(a)
+        expected = 5.0
+        assert res == expected
+
+        a = xp.asarray([3.0, 10.0, xp.nan, xp.inf])
+        res = nanmax(a)
+        expected = xp.inf
+        assert res == expected
+
+    def test_scalar(self, xp: ModuleType):
+        a = xp.asarray(1.0)
+        assert nanmax(a) == 1.0
+
+    @pytest.mark.filterwarnings("ignore:.*All-NaN slice*.:RuntimeWarning")
+    def test_all_nan_slice_2d(self, xp: ModuleType):
+        a = xp.asarray(
+            [
+                [xp.nan, 5.0],
+                [xp.nan, 2.0],
+            ]
+        )
+
+        res = nanmax(a, axis=0, xp=xp)
+        expected = xp.asarray([xp.nan, 5.0])
+        assert_equal(res, expected)
+
+    @pytest.mark.skip_xp_backend(
+        Backend.TORCH, reason="torch.nanmax does not support tensors on meta device"
+    )
+    @pytest.mark.parametrize("axis", [None, 0, 1])
+    def test_device(self, axis: int | None, xp: ModuleType, device: Device):
+        a = xp.asarray([[4, xp.nan, 1], [2, 5, xp.nan]], device=device)
+        res = nanmax(a, axis=axis)
+        assert get_device(res) == device
+
+    @pytest.mark.parametrize(
+        ("axis", "expected_list"), [(0, [4.0, 3.0, 1.0]), (1, [4.0, 3.0])]
+    )
+    def test_xp(self, axis: int | None, expected_list: list[float], xp: ModuleType):
+        a = xp.asarray([[4, xp.nan, 1], [2, 3, xp.nan]])
+        res = nanmax(a, axis=axis, xp=xp)
         expected = xp.asarray(expected_list)
         assert_equal(res, expected)

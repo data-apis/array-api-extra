@@ -38,6 +38,7 @@ __all__ = [
     "isin",
     "kron",
     "nan_to_num",
+    "nanmax",
     "nanmin",
     "nunique",
     "one_hot",
@@ -1677,3 +1678,54 @@ def nanmin(
         return xp.nanmin(a, axis=axis)
 
     return _funcs.nanmin(a, axis=axis, xp=xp)
+
+
+def nanmax(
+    a: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    xp: ModuleType | None = None,
+) -> Array:
+    """
+    Return the maximum of the array elements along a given axis, ignoring NaNs.
+
+    Parameters
+    ----------
+    a : Array
+        Input array.
+    axis : int or tuple of ints or None, optional
+        Axis or axes along which the maximum is computed. The default is to compute
+        the maximum of the flattened array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array of maximum values along the given axis, ignoring NaNs.
+
+    Examples
+    --------
+    >>> import array_api_extra as xpx
+    >>> import array_api_strict as xp
+    >>> a = xp.asarray([[5, 3, xp.nan, 6], [4, xp.nan, 2, xp.nan]])
+    >>> xpx.nanmax(a)
+    Array(6., dtype=array_api_strict.float64)
+    >>> xpx.nanmax(a, axis=0)
+    Array([5., 3., 2., 6.], dtype=array_api_strict.float64)
+    >>> xpx.nanmax(a, axis=1)
+    Array([6., 4.], dtype=array_api_strict.float64)
+    """
+    if xp is None:
+        xp = array_namespace(a)
+
+    if (
+        is_numpy_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_dask_namespace(xp)
+        or is_jax_namespace(xp)
+    ):
+        return xp.nanmax(a, axis=axis)
+
+    return _funcs.nanmax(a, axis=axis, xp=xp)

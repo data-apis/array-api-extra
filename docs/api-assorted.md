@@ -21,6 +21,7 @@
     isin
     kron
     nan_to_num
+    nanmax
     nanmin
     nunique
     one_hot
