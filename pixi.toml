@@ -175,7 +175,7 @@ numpy = "=1.24.1"
 # Backends that can run on CPU-only hosts
 # Note: JAX and PyTorch will install CPU variants.
 [feature.backends.dependencies]
-pytorch = ">=2.12.0"
+pytorch = ">=2.12.1"
 dask-core = ">=2026.7.0" # No distributed, tornado, etc.
 sparse = ">=0.19.0"
 
@@ -194,7 +194,7 @@ platforms = ["linux-64-cuda-12-9", "win-64-cuda-12-9"]
 [feature.cuda-backends.dependencies]
 cuda-version = "==12.9"
 cupy = ">=14.1.1"
-pytorch = { version = ">=2.12.0", build = "cuda12*" }
+pytorch = { version = ">=2.12.1", build = "cuda12*" }
 
 [feature.cuda-backends.target.linux.dependencies]
 jaxlib = { version = ">=0.10.2", build = "cuda12*" }
