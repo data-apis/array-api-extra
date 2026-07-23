@@ -100,8 +100,8 @@ class NumPyReadOnly:
                 # namedtuple wants positional args; plain tuple/list wants an iterable.
                 items = (as_readonly(i) for i in o)
                 if hasattr(o, "_fields"):
-                    return type(o)(*items)  # type: ignore[arg-type,return-value] # pyright: ignore[reportArgumentType]
-                return type(o)(items)  # type: ignore[return-value]
+                    return type(o)(*items)  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
+                return type(o)(items)
 
             return o
 
