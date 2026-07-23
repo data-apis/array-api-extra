@@ -11,7 +11,6 @@ from ._utils import _compat, _helpers
 from ._utils._compat import (
     array_namespace,
     is_dask_namespace,
-    is_jax_array,
 )
 from ._utils._helpers import (
     asarrays,
@@ -550,34 +549,8 @@ def nan_to_num(  # numpydoc ignore=PR01,RT01
     return x
 
 
-def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
-    """
-    Count the number of unique elements in an array.
-
-    Compatible with JAX and Dask, whose laziness would be otherwise
-    problematic.
-
-    Parameters
-    ----------
-    x : Array
-        Input array.
-    xp : array_namespace, optional
-        The standard-compatible namespace for `x`. Default: infer.
-
-    Returns
-    -------
-    array: 0-dimensional integer array
-        The number of unique elements in `x`. It can be lazy.
-    """
-    if xp is None:
-        xp = array_namespace(x)
-
-    if is_jax_array(x):
-        # size= is JAX-specific
-        # https://github.com/data-apis/array-api/issues/883
-        _, counts = xp.unique_counts(x, size=_compat.size(x))
-        return (counts > 0).sum()
-
+def nunique(x: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._delegation.py`."""
     # There are 3 general use cases:
     # 1. backend has unique_counts and it returns an array with known shape
     # 2. backend has unique_counts and it returns a None-sized array;
