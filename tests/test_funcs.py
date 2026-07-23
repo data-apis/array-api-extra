@@ -766,6 +766,22 @@ class TestCov:
         with pytest.raises((ValueError, RuntimeError)):
             _ = cov(m, correction=0.5, aweights=w_bad)
 
+    def test_torch_autograd(self, torch: ModuleType):
+        # The batched (generic) path must not detach gradients or mutate the
+        # input tensor in place, as `xp.asarray` does on torch.
+        xp = torch
+        rng = np.random.default_rng(20260417)
+        m = xp.asarray(rng.random((4, 3, 20)), dtype=xp.float64)
+        m.requires_grad_(True)
+        # cov returns the array-api `Array` type; at runtime it is a torch
+        # tensor, so cast to access autograd attributes without type errors.
+        c = cast(Any, cov(m))  # batched -> generic path
+        assert c.requires_grad
+        assert m.requires_grad  # input tensor not mutated
+        c.sum().backward()
+        assert m.grad is not None
+        assert bool(xp.all(xp.isfinite(m.grad)))
+
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
 class TestOneHot:

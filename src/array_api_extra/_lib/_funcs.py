@@ -256,7 +256,9 @@ def cov(
     xp: ModuleType,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
-    m = xp.asarray(m)
+    # NB: no `xp.asarray(m)` here. The delegation layer already guarantees `m`
+    # is an array (it calls `array_namespace(m)` and reads `m.ndim`), and on
+    # torch `xp.asarray` detaches gradients and mutates the caller's tensor.
     dtype = (
         xp.float64 if xp.isdtype(m.dtype, "integral") else xp.result_type(m, xp.float64)
     )
