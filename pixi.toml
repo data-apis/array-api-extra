@@ -153,7 +153,12 @@ numpy = ">=2.1.3"
 
 [feature.docs.tasks]
 docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs", description = "Build docs", default-environment = "docs" }
+
+[feature.docs.target.unix.tasks]
 open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs", default-environment = "docs" }
+
+[feature.docs.target.win.tasks]
+open-docs = { cmd = "cmd /c start build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs", default-environment = "docs" }
 
 [feature.dev.dependencies]
 ipython = ">=9.15.0"
