@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-from types import EllipsisType
+from types import EllipsisType, ModuleType
 from typing import Protocol, TypeAlias
 
 # TODO import from typing (requires Python >=3.12)
 from typing_extensions import override
 
 # TODO: use array-api-typing once it is available
+
+ArrayNamespace: TypeAlias = ModuleType
 
 class Array(Protocol):  # pylint: disable=missing-class-docstring
     # Unary operations
@@ -78,7 +80,7 @@ class Array(Protocol):  # pylint: disable=missing-class-docstring
     def __int__(self) -> int: ...
 
     # Misc methods (frequently not implemented in Arrays wrapped by array-api-compat)
-    # def __array_namespace__(*, api_version: str | None) -> ModuleType: ...
+    # def __array_namespace__(*, api_version: str | None) -> ArrayNamespace: ...
     # def __dlpack__(
     #     *,
     #     stream: int | Any | None = None,
@@ -102,4 +104,4 @@ GetIndex: TypeAlias = (
     SetIndex | None | tuple[int | slice | EllipsisType | None | Array, ...]
 )
 
-__all__ = ["Array", "DType", "Device", "GetIndex", "SetIndex"]
+__all__ = ["Array", "ArrayNamespace", "DType", "Device", "GetIndex", "SetIndex"]

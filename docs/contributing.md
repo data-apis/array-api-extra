@@ -47,7 +47,7 @@ See [the tracker for adding delegation][delegation-tracker].
   `_funcs`.
 - Simplify the signature in `_funcs.py` to remove impossible arguments now that
   it is only called internally via `_delegation`. For example, the `xp`
-  parameter can be changed from type `ModuleType | None` to `ModuleType`.
+  parameter can be changed from type `ArrayNamespace | None` to `ArrayNamespace`.
 - Don't worry if you are not sure how to do some of the above steps or think you
   might have done something wrong -
   [make a PR!](https://github.com/data-apis/array-api-extra/pulls)

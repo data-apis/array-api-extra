@@ -1,7 +1,6 @@
 """Delegation to existing implementations for Public API Functions."""
 
 from collections.abc import Sequence
-from types import ModuleType
 from typing import Literal
 
 from ._lib import _funcs
@@ -24,7 +23,7 @@ from ._lib._utils._helpers import (
     eager_shape,
     normalize_pad_width,
 )
-from ._lib._utils._typing import Array, Device, DType
+from ._lib._utils._typing import Array, ArrayNamespace, Device, DType
 
 __all__ = [
     "argpartition",
@@ -54,7 +53,7 @@ __all__ = [
 ]
 
 
-def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array:
+def atleast_nd(x: Array, /, *, ndim: int, xp: ArrayNamespace | None = None) -> Array:
     """
     Recursively expand the dimension of an array to at least `ndim`.
 
@@ -108,7 +107,7 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType | None = None) -> Array
     "`xp.broadcast_shapes` exists in the standard as of v2025.12."
 )
 def broadcast_shapes(
-    *shapes: tuple[float | None, ...], xp: ModuleType | None = None
+    *shapes: tuple[float | None, ...], xp: ArrayNamespace | None = None
 ) -> tuple[int | None, ...]:
     """
     Compute the shape of the broadcasted arrays.
@@ -167,7 +166,7 @@ def broadcast_shapes(
     return _funcs.broadcast_shapes(*shapes)
 
 
-def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
+def cov(m: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     """
     Estimate a covariance matrix (or a stack of covariance matrices).
 
@@ -263,7 +262,7 @@ def cov(m: Array, /, *, xp: ModuleType | None = None) -> Array:
 
 
 def create_diagonal(
-    x: Array, /, *, offset: int = 0, xp: ModuleType | None = None
+    x: Array, /, *, offset: int = 0, xp: ArrayNamespace | None = None
 ) -> Array:
     """
     Construct a diagonal array.
@@ -325,7 +324,7 @@ def create_diagonal(
 
 
 def diag_indices(
-    n: int, /, *, ndim: int = 2, device: Device | None = None, xp: ModuleType
+    n: int, /, *, ndim: int = 2, device: Device | None = None, xp: ArrayNamespace
 ) -> tuple[Array, ...]:
     """
     Return the indices to access the main diagonal of an array.
@@ -379,7 +378,7 @@ def diag_indices(
     "exists in the standard as of v2025.12."
 )
 def expand_dims(
-    a: Array, /, *, axis: int | tuple[int, ...] = (0,), xp: ModuleType | None = None
+    a: Array, /, *, axis: int | tuple[int, ...] = (0,), xp: ArrayNamespace | None = None
 ) -> Array:
     """
     Expand the shape of an array.
@@ -475,7 +474,7 @@ def isclose(
     rtol: float = 1e-05,
     atol: float = 1e-08,
     equal_nan: bool = False,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Return a boolean array where two arrays are element-wise equal within a tolerance.
@@ -565,7 +564,7 @@ def kron(
     b: Array | complex,
     /,
     *,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Kronecker product of two arrays.
@@ -660,7 +659,7 @@ def nan_to_num(
     /,
     *,
     fill_value: int | float = 0.0,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Replace NaN with zero and infinity with large finite numbers (default behaviour).
@@ -734,7 +733,7 @@ def nan_to_num(
     return _funcs.nan_to_num(y, fill_value=fill_value, xp=xp)
 
 
-def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
+def nunique(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     """
     Count the number of unique elements in an array.
 
@@ -762,9 +761,13 @@ def nunique(x: Array, /, *, xp: ModuleType | None = None) -> Array:
         _, counts = xp.unique_counts(x, size=size(x))
         return (counts > 0).sum()
 
-    if is_numpy_namespace(xp) or is_cupy_namespace(xp) or (
-        is_torch_namespace(xp)
-        and capabilities(xp, device=get_device(x))["data-dependent shapes"]
+    if (
+        is_numpy_namespace(xp)
+        or is_cupy_namespace(xp)
+        or (
+            is_torch_namespace(xp)
+            and capabilities(xp, device=get_device(x))["data-dependent shapes"]
+        )
     ):
         _, counts = xp.unique_counts(x)
         return xp.asarray(size(counts), device=get_device(x))
@@ -779,7 +782,7 @@ def one_hot(
     *,
     dtype: DType | None = None,
     axis: int = -1,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     One-hot encode the given indices.
@@ -855,7 +858,7 @@ def pad(
     mode: Literal["constant"] = "constant",
     *,
     constant_values: complex = 0,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Pad the input array.
@@ -915,7 +918,7 @@ def searchsorted(
     /,
     *,
     side: Literal["left", "right"] = "left",
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Find indices where elements should be inserted to maintain order.
@@ -994,7 +997,7 @@ def setdiff1d(
     /,
     *,
     assume_unique: bool = False,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Find the set difference of two arrays.
@@ -1041,7 +1044,7 @@ def setdiff1d(
     return _funcs.setdiff1d(x1, x2, assume_unique=assume_unique, xp=xp)
 
 
-def sinc(x: Array, /, *, xp: ModuleType | None = None) -> Array:
+def sinc(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     r"""
     Return the normalized sinc function.
 
@@ -1141,7 +1144,7 @@ def partition(
     /,
     axis: int | None = -1,
     *,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Return a partitioned copy of an array.
@@ -1238,7 +1241,7 @@ def argpartition(
     /,
     axis: int | None = -1,
     *,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Perform an indirect partition along the given axis.
@@ -1334,7 +1337,7 @@ def isin(
     assume_unique: bool = False,
     invert: bool = False,
     kind: str | None = None,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Determine whether each element in `a` is present in `b`.
@@ -1385,7 +1388,7 @@ def isin(
     return _funcs.isin(a, b, assume_unique=assume_unique, invert=invert, xp=xp)
 
 
-def union1d(a: Array, b: Array, /, *, xp: ModuleType | None = None) -> Array:
+def union1d(a: Array, b: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     """
     Find the union of two arrays.
 
@@ -1435,7 +1438,7 @@ def tril_indices(
     offset: int = 0,
     m: int | None = None,
     device: Device | None = None,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> tuple[Array, Array]:
     """
     Return the indices of the lower triangle of an ``(n, m)`` array.
@@ -1507,7 +1510,7 @@ def triu_indices(
     offset: int = 0,
     m: int | None = None,
     device: Device | None = None,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> tuple[Array, Array]:
     """
     Return the indices of the upper triangle of an ``(n, m)`` array.
@@ -1575,7 +1578,7 @@ def unravel_index(
     shape: tuple[int, ...],
     /,
     *,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> tuple[Array, ...]:
     """
     Convert a flat index or array of flat indices into a tuple of coordinate arrays.
@@ -1634,7 +1637,7 @@ def nanmin(
     /,
     *,
     axis: int | tuple[int, ...] | None = None,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Return the minimum of the array elements along a given axis, ignoring NaNs.
@@ -1685,7 +1688,7 @@ def nanmax(
     /,
     *,
     axis: int | tuple[int, ...] | None = None,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Return the maximum of the array elements along a given axis, ignoring NaNs.

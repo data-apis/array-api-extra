@@ -3,7 +3,7 @@
 import math
 import warnings
 from collections.abc import Callable, Sequence
-from types import ModuleType, NoneType
+from types import NoneType
 from typing import Literal, cast, overload
 
 from ._at import at
@@ -20,7 +20,7 @@ from ._utils._helpers import (
     ndindex,
     normalize_pad_width,
 )
-from ._utils._typing import Array, Device, DType
+from ._utils._typing import Array, ArrayNamespace, Device, DType
 
 __all__ = [
     "angle",
@@ -62,7 +62,7 @@ def apply_where(  # numpydoc ignore=GL08
     /,
     *,
     kwargs: dict[str, Array] | None = None,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array: ...
 
 
@@ -75,7 +75,7 @@ def apply_where(  # numpydoc ignore=GL08
     *,
     fill_value: Array | complex,
     kwargs: dict[str, Array] | None = None,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array: ...
 
 
@@ -88,7 +88,7 @@ def apply_where(  # numpydoc ignore=PR01,PR02
     *,
     fill_value: Array | complex | None = None,
     kwargs: dict[str, Array] | None = None,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Run one of two elementwise functions depending on a condition.
@@ -184,7 +184,7 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
     fill_value: Array | int | float | complex | bool | None,
     *args: Array,
     kwkeys: list[str],
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:
     """Helper of `apply_where`. On Dask, this runs on a single chunk."""
 
@@ -223,7 +223,7 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
     return at(out, cond).set(temp1)
 
 
-def atleast_nd(x: Array, /, *, ndim: int, xp: ModuleType) -> Array:
+def atleast_nd(x: Array, /, *, ndim: int, xp: ArrayNamespace) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
 
@@ -260,7 +260,7 @@ def broadcast_shapes(  # numpydoc ignore=PR01,RT01
     return tuple(out)
 
 
-def cov(m: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
+def cov(m: Array, /, *, xp: ArrayNamespace) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     m = xp.asarray(m, copy=True)
     dtype = (
@@ -294,7 +294,7 @@ def one_hot(
     /,
     num_classes: int,
     *,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
     # TODO: Benchmark whether this is faster on the NumPy backend:
@@ -307,7 +307,7 @@ def one_hot(
 
 
 def create_diagonal(
-    x: Array, /, *, offset: int = 0, xp: ModuleType
+    x: Array, /, *, offset: int = 0, xp: ArrayNamespace
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     x_shape = eager_shape(x)
@@ -326,7 +326,7 @@ def create_diagonal(
 
 
 def diag_indices(
-    n: int, /, *, ndim: int, device: Device | None, xp: ModuleType
+    n: int, /, *, ndim: int, device: Device | None, xp: ArrayNamespace
 ) -> tuple[Array, ...]:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     idx = xp.arange(n, device=device)
@@ -340,7 +340,7 @@ def _tri_indices(
     m: int | None,
     upper: bool,
     device: Device | None,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
     """Shared implementation for `tril_indices` and `triu_indices`."""
     cols = n if m is None else m
@@ -359,7 +359,7 @@ def tril_indices(
     offset: int,
     m: int | None,
     device: Device | None,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     return _tri_indices(n, offset=offset, m=m, upper=False, device=device, xp=xp)
@@ -372,14 +372,14 @@ def triu_indices(
     offset: int,
     m: int | None,
     device: Device | None,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     return _tri_indices(n, offset=offset, m=m, upper=True, device=device, xp=xp)
 
 
 def default_dtype(
-    xp: ModuleType,
+    xp: ArrayNamespace,
     kind: Literal[
         "real floating", "complex floating", "integral", "indexing"
     ] = "real floating",
@@ -416,7 +416,9 @@ def default_dtype(
         raise ValueError(msg) from e
 
 
-def expand_dims(a: Array, /, *, axis: tuple[int, ...] = (0,), xp: ModuleType) -> Array:
+def expand_dims(
+    a: Array, /, *, axis: tuple[int, ...] = (0,), xp: ArrayNamespace
+) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     for i in sorted(axis):
@@ -431,7 +433,7 @@ def isclose(
     rtol: float = 1e-05,
     atol: float = 1e-08,
     equal_nan: bool = False,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
     a, b = asarrays(a, b, xp=xp)
@@ -476,7 +478,7 @@ def kron(
     b: Array,
     /,
     *,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in array_api_extra._delegation."""
 
@@ -514,14 +516,14 @@ def nan_to_num(  # numpydoc ignore=PR01,RT01
     /,
     fill_value: int | float = 0.0,
     *,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
 
     def perform_replacements(  # numpydoc ignore=PR01,RT01
         x: Array,
         fill_value: int | float,
-        xp: ModuleType,
+        xp: ArrayNamespace,
     ) -> Array:
         """Internal function to perform the replacements."""
         x = xp.where(xp.isnan(x), fill_value, x)
@@ -550,7 +552,7 @@ def nan_to_num(  # numpydoc ignore=PR01,RT01
     return x
 
 
-def nunique(x: Array, /, *, xp: ModuleType) -> Array:  # numpydoc ignore=PR01,RT01
+def nunique(x: Array, /, *, xp: ArrayNamespace) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
     # There are 3 general use cases:
     # 1. backend has unique_counts and it returns an array with known shape
@@ -584,7 +586,7 @@ def pad(
     pad_width: int | tuple[int, int] | Sequence[tuple[int, int]],
     *,
     constant_values: complex = 0,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
     pad_width_seq = normalize_pad_width(pad_width, x.ndim)
@@ -626,7 +628,7 @@ def searchsorted(
     /,
     *,
     side: Literal["left", "right"] = "left",
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
@@ -660,7 +662,7 @@ def setdiff1d(
     /,
     *,
     assume_unique: bool = False,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
 
@@ -677,7 +679,7 @@ def setdiff1d(
     return x1_[_helpers.in1d(x1_, x2_, assume_unique=True, invert=True, xp=xp)]
 
 
-def sinc(x: Array, /, *, xp: ModuleType) -> Array:
+def sinc(x: Array, /, *, xp: ArrayNamespace) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
 
@@ -696,7 +698,7 @@ def partition(  # numpydoc ignore=PR01,RT01
     /,
     axis: int = -1,
     *,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
     return xp.sort(x, axis=axis, stable=False)
@@ -708,7 +710,7 @@ def argpartition(  # numpydoc ignore=PR01,RT01
     /,
     axis: int = -1,
     *,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
     return xp.argsort(x, axis=axis, stable=False)
@@ -721,7 +723,7 @@ def isin(  # numpydoc ignore=PR01,RT01
     *,
     assume_unique: bool = False,
     invert: bool = False,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
     original_a_shape = a.shape
@@ -733,7 +735,7 @@ def isin(  # numpydoc ignore=PR01,RT01
     )
 
 
-def union1d(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
+def union1d(a: Array, b: Array, /, *, xp: ArrayNamespace) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._delegation.py`."""
     a = xp.reshape(a, (-1,))
@@ -742,7 +744,7 @@ def union1d(a: Array, b: Array, /, *, xp: ModuleType) -> Array:
     return xp.asarray(xp.unique_values(xp.concat([a, b])))
 
 
-def angle(z: Array, /, *, deg: bool = False, xp: ModuleType | None = None) -> Array:
+def angle(z: Array, /, *, deg: bool = False, xp: ArrayNamespace | None = None) -> Array:
     """
     Return the angle of the complex argument.
 
@@ -805,7 +807,7 @@ def nanmin(  # numpydoc ignore=PR01,RT01
     /,
     *,
     axis: int | tuple[int, ...] | None,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
     mask = xp.isnan(a)
@@ -826,7 +828,7 @@ def nanmax(  # numpydoc ignore=PR01,RT01
     /,
     *,
     axis: int | tuple[int, ...] | None,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> Array:
     """See docstring in `array_api_extra._delegation.py`."""
     mask = xp.isnan(a)
