@@ -1,7 +1,6 @@
 import math
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
-from types import ModuleType
 from typing import cast
 
 import numpy as np
@@ -12,7 +11,12 @@ from array_api_extra._lib._at import _AtOp
 from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._utils._compat import array_namespace, is_writeable_array
 from array_api_extra._lib._utils._compat import device as get_device
-from array_api_extra._lib._utils._typing import Array, Device, SetIndex
+from array_api_extra._lib._utils._typing import (
+    Array,
+    ArrayNamespace,
+    Device,
+    SetIndex,
+)
 from array_api_extra.testing import assert_equal, lazy_xp_function
 
 pytestmark = [
@@ -29,7 +33,7 @@ def at_op(
     op: _AtOp,
     y: Array | object,
     copy: bool | None = None,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:
     """
     Wrapper around at(x, idx).op(y, copy=copy, xp=xp).
@@ -116,7 +120,7 @@ def assert_copy(
     ],
 )
 def test_update_ops(
-    xp: ModuleType,
+    xp: ArrayNamespace,
     copy: bool | None,
     op: _AtOp,
     y: float,
@@ -149,7 +153,7 @@ def test_update_ops(
 
 
 @pytest.mark.parametrize("op", list(_AtOp))
-def test_copy_default(xp: ModuleType, library: Backend, op: _AtOp):
+def test_copy_default(xp: ArrayNamespace, library: Backend, op: _AtOp):
     """
     Test that the default copy behaviour is False for writeable arrays
     and True for read-only ones.
@@ -189,7 +193,7 @@ def test_xp():
 
 
 def test_alternate_index_syntax():
-    xp = cast(ModuleType, np)  # type: ignore[redundant-cast]  # pyright: ignore[reportInvalidCast]
+    xp = cast(ArrayNamespace, np)  # type: ignore[redundant-cast]  # pyright: ignore[reportInvalidCast]
     a = cast(Array, xp.asarray([1, 2, 3]))
     assert_equal(at(a, 0).set(4, copy=True), xp.asarray([4, 2, 3]))
     assert_equal(at(a)[0].set(4, copy=True), xp.asarray([4, 2, 3]))
@@ -208,7 +212,7 @@ def test_alternate_index_syntax():
 @pytest.mark.parametrize("bool_mask", [False, True])
 @pytest.mark.parametrize("op", list(_AtOp))
 def test_incompatible_dtype(
-    xp: ModuleType,
+    xp: ArrayNamespace,
     library: Backend,
     op: _AtOp,
     copy: bool | None,
@@ -264,7 +268,7 @@ def test_incompatible_dtype(
     assert z is None or z.dtype == x.dtype
 
 
-def test_bool_mask_nd(xp: ModuleType):
+def test_bool_mask_nd(xp: ArrayNamespace):
     x = xp.asarray([[1, 2, 3], [4, 5, 6]])
     idx = xp.asarray([[True, False, False], [False, True, True]])
     z = at_op(x, idx, _AtOp.SET, 0)
@@ -272,7 +276,7 @@ def test_bool_mask_nd(xp: ModuleType):
 
 
 @pytest.mark.parametrize("bool_mask", [False, True])
-def test_no_inf_warnings(xp: ModuleType, bool_mask: bool):
+def test_no_inf_warnings(xp: ArrayNamespace, bool_mask: bool):
     x = xp.asarray([math.inf, 1.0, 2.0])
     idx = ~xp.isinf(x) if bool_mask else slice(1, None)
     # inf - inf -> nan with a warning
@@ -303,7 +307,7 @@ def test_no_inf_warnings(xp: ModuleType, bool_mask: bool):
     ],
 )
 @pytest.mark.parametrize("bool_mask", [False, True])
-def test_gh134(xp: ModuleType, bool_mask: bool, copy: bool | None):
+def test_gh134(xp: ArrayNamespace, bool_mask: bool, copy: bool | None):
     """
     Test that xpx.at doesn't encroach in a bug of dask.array.Array.__setitem__, which
     blindly assumes that chunk contents are writeable np.ndarray objects:
@@ -326,7 +330,7 @@ def test_gh134(xp: ModuleType, bool_mask: bool, copy: bool | None):
     assert_equal(z, xp.asarray(1, dtype=x.dtype))
 
 
-def test_device(xp: ModuleType, device: Device):
+def test_device(xp: ArrayNamespace, device: Device):
     x = xp.asarray([1, 2, 3], device=device)
 
     y = xp.asarray([4, 5], device=device)

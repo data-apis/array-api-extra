@@ -1,5 +1,4 @@
 import contextlib
-from types import ModuleType
 from typing import cast
 
 import numpy as np
@@ -11,7 +10,7 @@ from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._utils import _compat
 from array_api_extra._lib._utils._compat import array_namespace, is_dask_array
 from array_api_extra._lib._utils._helpers import eager_shape
-from array_api_extra._lib._utils._typing import Array, Device
+from array_api_extra._lib._utils._typing import Array, ArrayNamespace, Device
 from array_api_extra.testing import assert_equal, lazy_xp_function
 
 lazy_xp_function(lazy_apply)
@@ -38,7 +37,11 @@ as_numpy = pytest.mark.parametrize(
 @pytest.mark.parametrize("shape", [(2,), (3, 2)])
 @pytest.mark.parametrize("dtype", ["int32", "float64"])
 def test_lazy_apply_simple(
-    xp: ModuleType, library: Backend, shape: tuple[int, ...], dtype: str, as_numpy: bool
+    xp: ArrayNamespace,
+    library: Backend,
+    shape: tuple[int, ...],
+    dtype: str,
+    as_numpy: bool,
 ):
     def f(x: Array) -> Array:
         xp2 = array_namespace(x)
@@ -57,7 +60,7 @@ def test_lazy_apply_simple(
 
 
 @as_numpy
-def test_lazy_apply_broadcast(xp: ModuleType, as_numpy: bool):
+def test_lazy_apply_broadcast(xp: ArrayNamespace, as_numpy: bool):
     """Test that default shape and dtype are broadcasted from the inputs."""
 
     def f(x: Array, y: Array) -> Array:
@@ -70,7 +73,7 @@ def test_lazy_apply_broadcast(xp: ModuleType, as_numpy: bool):
 
 
 @as_numpy
-def test_lazy_apply_multi_output(xp: ModuleType, as_numpy: bool):
+def test_lazy_apply_multi_output(xp: ArrayNamespace, as_numpy: bool):
     def f(x: Array) -> tuple[Array, Array]:
         xp2 = array_namespace(x)
         y = x + xp2.asarray(2, dtype=xp2.int8)  # Sparse: bad dtype propagation
@@ -108,7 +111,7 @@ def test_lazy_apply_multi_output(xp: ModuleType, as_numpy: bool):
         ),
     ],
 )
-def test_lazy_apply_multi_output_broadcast_dtype(xp: ModuleType, as_numpy: bool):
+def test_lazy_apply_multi_output_broadcast_dtype(xp: ArrayNamespace, as_numpy: bool):
     """
     If dtype is omitted and there are multiple shapes, use the same
     dtype for all output arrays, broadcasted from the inputs
@@ -130,7 +133,7 @@ def test_lazy_apply_multi_output_broadcast_dtype(xp: ModuleType, as_numpy: bool)
     assert_equal(actual[1], expect[1])
 
 
-def test_lazy_apply_core_indices(da: ModuleType):
+def test_lazy_apply_core_indices(da: ArrayNamespace):
     """
     Test that a function that performs reductions along axes does so
     globally and not locally to each Dask chunk.
@@ -154,7 +157,7 @@ def test_lazy_apply_core_indices(da: ModuleType):
     assert_equal(lazy_apply(f, x_da), expect)
 
 
-def test_lazy_apply_dont_run_on_meta(da: ModuleType):
+def test_lazy_apply_dont_run_on_meta(da: ArrayNamespace):
     """Test that Dask won't try running func on the meta array,
     as it may have minimum size requirements.
     """
@@ -169,7 +172,7 @@ def test_lazy_apply_dont_run_on_meta(da: ModuleType):
     assert_equal(y, x + 1)
 
 
-def test_lazy_apply_dask_non_numpy_meta(da: ModuleType):
+def test_lazy_apply_dask_non_numpy_meta(da: ArrayNamespace):
     """Test Dask wrapping around a meta-namespace other than numpy."""
     # At the moment of writing, of all Array API namespaces CuPy is
     # the only one that Dask supports.
@@ -190,7 +193,7 @@ def test_lazy_apply_dask_non_numpy_meta(da: ModuleType):
     assert_equal(y.compute(), x_cp + 1)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
 
-def test_dask_key(da: ModuleType):
+def test_dask_key(da: ArrayNamespace):
     """Test that the function name is visible on the Dask dashboard and in metrics."""
 
     def helloworld(x: Array) -> Array:
@@ -211,7 +214,7 @@ def test_dask_key(da: ModuleType):
     assert "helloworld" in prefixes
 
 
-def test_lazy_apply_none_shape_in_args(xp: ModuleType, library: Backend):
+def test_lazy_apply_none_shape_in_args(xp: ArrayNamespace, library: Backend):
     x = xp.asarray([1, 1, 2, 2, 2])
 
     # TODO mxp = meta_namespace(x, xp=xp)
@@ -262,7 +265,7 @@ lazy_xp_function(check_lazy_apply_none_shape_broadcast)
 @pytest.mark.skip_xp_backend(Backend.JAX, reason="boolean indexing")
 @pytest.mark.skip_xp_backend(Backend.JAX_GPU, reason="boolean indexing")
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
-def test_lazy_apply_none_shape_broadcast(xp: ModuleType):
+def test_lazy_apply_none_shape_broadcast(xp: ArrayNamespace):
     """Broadcast from input array with unknown shape"""
     x = xp.asarray([1, 2, 2])
     actual = check_lazy_apply_none_shape_broadcast(x)
@@ -291,7 +294,7 @@ def test_lazy_apply_none_shape_broadcast(xp: ModuleType):
         ),
     ],
 )
-def test_lazy_apply_device(xp: ModuleType, as_numpy: bool, device: Device):
+def test_lazy_apply_device(xp: ArrayNamespace, as_numpy: bool, device: Device):
     def f(x: Array) -> Array:
         xp2 = array_namespace(x)
         # Deliberately forgetting to add device here to test that the
@@ -304,7 +307,7 @@ def test_lazy_apply_device(xp: ModuleType, as_numpy: bool, device: Device):
     assert _compat.device(y) == device
 
 
-def test_lazy_apply_arraylike(xp: ModuleType):
+def test_lazy_apply_arraylike(xp: ArrayNamespace):
     """Wrapped func returns an array-like"""
     x = xp.asarray([1, 2, 3])
 
@@ -327,7 +330,7 @@ def test_lazy_apply_arraylike(xp: ModuleType):
     assert_equal(actual2[1], xp.asarray([3]))
 
 
-def test_lazy_apply_scalars_and_nones(xp: ModuleType, library: Backend):
+def test_lazy_apply_scalars_and_nones(xp: ArrayNamespace, library: Backend):
     def f(x: Array, y: None, z: int | Array) -> Array:
         mxp = array_namespace(x, y, z)
         mtyp = type(mxp.asarray(0))
@@ -393,7 +396,7 @@ lazy_xp_function(check_lazy_apply_kwargs)
 
 
 @as_numpy
-def test_lazy_apply_kwargs(xp: ModuleType, library: Backend, as_numpy: bool):
+def test_lazy_apply_kwargs(xp: ArrayNamespace, library: Backend, as_numpy: bool):
     """When as_numpy=True, search and replace arrays in the (nested) keywords arguments
     with numpy arrays, and leave the rest untouched."""
     x = xp.asarray(0)
@@ -420,7 +423,7 @@ def raises(x: Array) -> Array:
 lazy_xp_function(raises, jax_jit=False)
 
 
-def test_lazy_apply_raises(xp: ModuleType):
+def test_lazy_apply_raises(xp: ArrayNamespace):
     """
     See Also: test_testing.py::test_lazy_xp_function_eagerly_raises
     """

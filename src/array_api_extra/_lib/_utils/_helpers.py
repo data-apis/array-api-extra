@@ -10,7 +10,6 @@ import types
 import warnings
 from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from functools import wraps
-from types import ModuleType
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -32,7 +31,7 @@ from ._compat import (
     is_numpy_array,
     is_torch_namespace,
 )
-from ._typing import Array, Device
+from ._typing import Array, ArrayNamespace, Device
 
 if TYPE_CHECKING:  # pragma: no cover
     # TODO import from typing (requires Python >=3.12 and >=3.13)
@@ -89,7 +88,7 @@ def in1d(
     *,
     assume_unique: bool = False,
     invert: bool = False,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> Array:  # numpydoc ignore=PR01,RT01
     """
     Check whether each element of an array is also present in a second array.
@@ -155,7 +154,7 @@ def is_python_scalar(x: object) -> TypeIs[complex]:  # numpydoc ignore=PR01,RT01
 def asarrays(
     a: Array | complex,
     b: Array | complex,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> tuple[Array, Array]:
     """
     Ensure both `a` and `b` are arrays.
@@ -281,8 +280,8 @@ def eager_shape(x: Array, /, axis: int | None = None) -> tuple[int, ...]:
 
 
 def meta_namespace(
-    *arrays: Array | complex | None, xp: ModuleType | None = None
-) -> ModuleType:
+    *arrays: Array | complex | None, xp: ArrayNamespace | None = None
+) -> ArrayNamespace:
     """
     Get the namespace of Dask chunks.
 
@@ -310,7 +309,7 @@ def meta_namespace(
 
 
 def capabilities(
-    xp: ModuleType, *, device: Device | None = None
+    xp: ArrayNamespace, *, device: Device | None = None
 ) -> dict[str, int | None]:
     """
     Return patched ``xp.__array_namespace_info__().capabilities()``.

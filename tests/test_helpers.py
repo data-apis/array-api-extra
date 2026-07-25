@@ -1,5 +1,4 @@
 from collections.abc import Iterator
-from types import ModuleType
 from typing import TYPE_CHECKING, Generic, TypeVar, cast
 
 import numpy as np
@@ -19,7 +18,7 @@ from array_api_extra._lib._utils._helpers import (
     pickle_flatten,
     pickle_unflatten,
 )
-from array_api_extra._lib._utils._typing import Array, Device, DType
+from array_api_extra._lib._utils._typing import Array, ArrayNamespace, Device, DType
 from array_api_extra.testing import assert_equal, lazy_xp_function
 
 from .conftest import np_compat
@@ -56,20 +55,20 @@ class TestIn1D:
             ),
         ],
     )
-    def test_no_invert_assume_unique(self, xp: ModuleType, n: int):
+    def test_no_invert_assume_unique(self, xp: ArrayNamespace, n: int):
         x1 = xp.asarray([3, 8, 20])
         x2 = xp.arange(n)
         expected = xp.asarray([True, True, False])
         actual = in1d(x1, x2)
         assert_equal(actual, expected)
 
-    def test_device(self, xp: ModuleType, device: Device):
+    def test_device(self, xp: ArrayNamespace, device: Device):
         x1 = xp.asarray([3, 8, 20], device=device)
         x2 = xp.asarray([2, 3, 4], device=device)
         assert get_device(in1d(x1, x2)) == device
 
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="xp=xp")
-    def test_xp(self, xp: ModuleType):
+    def test_xp(self, xp: ArrayNamespace):
         x1 = xp.asarray([1, 6])
         x2 = xp.asarray([0, 1, 2, 3, 4])
         expected = xp.asarray([True, False])
@@ -106,7 +105,7 @@ class TestAsArrays:
         ],
     )
     def test_array_vs_scalar(
-        self, dtype: str, b: complex, defined: bool, xp: ModuleType
+        self, dtype: str, b: complex, defined: bool, xp: ArrayNamespace
     ):
         a = xp.asarray(1, dtype=getattr(xp, dtype))
 
@@ -121,7 +120,7 @@ class TestAsArrays:
         assert xar.dtype == xa.dtype
         assert xbr.dtype == xb.dtype
 
-    def test_scalar_vs_scalar(self, xp: ModuleType):
+    def test_scalar_vs_scalar(self, xp: ArrayNamespace):
         a, b = asarrays(1, 2.2, xp=xp)
         assert a.dtype == xp.asarray(1).dtype  # Default dtype
         assert b.dtype == xp.asarray(2.2).dtype  # Default dtype; not broadcasted
@@ -144,7 +143,7 @@ class TestAsArrays:
 
     @pytest.mark.parametrize("a_type", ALL_TYPES)
     @pytest.mark.parametrize("b_type", ALL_TYPES)
-    def test_array_vs_array(self, a_type: str, b_type: str, xp: ModuleType):
+    def test_array_vs_array(self, a_type: str, b_type: str, xp: ArrayNamespace):
         """
         Test that when both inputs of asarray are already Array API objects,
         they are returned unchanged.
@@ -176,7 +175,7 @@ def test_ndindex(shape: tuple[int, ...]):
 
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
-def test_eager_shape(xp: ModuleType, library: Backend):
+def test_eager_shape(xp: ArrayNamespace, library: Backend):
     a = xp.asarray([1, 2, 3])
     # Lazy arrays, like Dask, have an eager shape until you slice them with
     # a lazy boolean mask
@@ -197,30 +196,30 @@ def test_eager_shape(xp: ModuleType, library: Backend):
 
 class TestMetaNamespace:
     @pytest.mark.skip_xp_backend(Backend.NUMPY_READONLY, reason="namespace tests")
-    def test_basic(self, xp: ModuleType, library: Backend):
+    def test_basic(self, xp: ArrayNamespace, library: Backend):
         args = None, xp.asarray(0), 1
         expect = np_compat if library is Backend.DASK else xp
         assert meta_namespace(*args) is expect
 
-    def test_dask_metas(self, da: ModuleType):
+    def test_dask_metas(self, da: ArrayNamespace):
         cp = pytest.importorskip("cupy")
         cp_compat = array_namespace(cp.empty(0))
         args = None, da.from_array(cp.asarray(0)), 1
         assert meta_namespace(*args) is cp_compat
 
-    def test_xp(self, xp: ModuleType):
+    def test_xp(self, xp: ArrayNamespace):
         args = None, xp.asarray(0), 1
         assert meta_namespace(*args, xp=xp) in (xp, np_compat)
 
 
 class TestCapabilities:
-    def test_basic(self, xp: ModuleType):
+    def test_basic(self, xp: ArrayNamespace):
         expect = {"boolean indexing", "data-dependent shapes"}
         if xp.__array_api_version__ >= "2024.12":
             expect.add("max dimensions")
         assert capabilities(xp).keys() == expect
 
-    def test_device(self, xp: ModuleType, library: Backend, device: Device):
+    def test_device(self, xp: ArrayNamespace, library: Backend, device: Device):
         expect_keys = {"boolean indexing", "data-dependent shapes"}
         if xp.__array_api_version__ >= "2024.12":
             expect_keys.add("max dimensions")
@@ -359,7 +358,7 @@ class TestPickleFlatten:
 
 
 class TestJAXAutoJIT:
-    def test_basic(self, jnp: ModuleType):
+    def test_basic(self, jnp: ArrayNamespace):
         @jax_autojit
         def f(x: Array, k: object = False) -> Array:
             return x + 1 if k else x - 1
@@ -376,7 +375,7 @@ class TestJAXAutoJIT:
         # static argument is not hashable, but serializable
         assert_equal(f(jnp.asarray([1, 2]), ["foo"]), jnp.asarray([2, 3]))
 
-    def test_wrapper(self, jnp: ModuleType):
+    def test_wrapper(self, jnp: ArrayNamespace):
         @jax_autojit
         def f(w: Wrapper[Array]) -> Wrapper[Array]:
             return Wrapper(w.x + 1)
@@ -385,7 +384,7 @@ class TestJAXAutoJIT:
         out = f(inp).x
         assert_equal(out, jnp.asarray([2, 3]))
 
-    def test_static_hashable(self, jnp: ModuleType):
+    def test_static_hashable(self, jnp: ArrayNamespace):
         """Static argument/return value is hashable, but not serializable"""
 
         class C:
@@ -421,7 +420,7 @@ class TestJAXAutoJIT:
         assert isinstance(out, list)
         assert out == [3, 4]
 
-    def test_iterators(self, jnp: ModuleType):
+    def test_iterators(self, jnp: ArrayNamespace):
         @jax_autojit
         def f(x: Array) -> Iterator[Array]:
             return (x + i for i in range(2))

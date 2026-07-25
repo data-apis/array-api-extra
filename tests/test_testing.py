@@ -13,7 +13,7 @@ from array_api_extra._lib._utils._compat import (
     is_dask_namespace,
     is_jax_namespace,
 )
-from array_api_extra._lib._utils._typing import Array, Device
+from array_api_extra._lib._utils._typing import Array, ArrayNamespace, Device
 from array_api_extra.testing import (
     _as_numpy_array,
     assert_close,
@@ -28,13 +28,13 @@ from array_api_extra.testing import (
 
 
 class TestAsNumPyArray:
-    def test_basic(self, xp: ModuleType):
+    def test_basic(self, xp: ArrayNamespace):
         x = xp.asarray([1, 2, 3])
         y = _as_numpy_array(x, xp=xp)
         assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     @pytest.mark.skip_xp_backend(Backend.TORCH, reason="materialize 'meta' device")
-    def test_device(self, xp: ModuleType, device: Device):
+    def test_device(self, xp: ArrayNamespace, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         y = _as_numpy_array(x, xp=xp)
         assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
@@ -45,7 +45,9 @@ class TestAssertEqualCloseLess:
         return "not equal" if func is assert_close_nulp else "Mismatched elements"
 
     @pytest.mark.parametrize("func", [assert_equal, assert_close])
-    def test_assert_equal_close_basic(self, xp: ModuleType, func: Callable[..., None]):
+    def test_assert_equal_close_basic(
+        self, xp: ArrayNamespace, func: Callable[..., None]
+    ):
         func(xp.asarray(0), xp.asarray(0))
         func(xp.asarray([1, 2]), xp.asarray([1, 2]))
 
@@ -58,7 +60,7 @@ class TestAssertEqualCloseLess:
     @pytest.mark.parametrize(
         "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
     )
-    def test_shape_dtype(self, xp: ModuleType, func: Callable[..., None]):
+    def test_shape_dtype(self, xp: ArrayNamespace, func: Callable[..., None]):
         with pytest.raises(AssertionError, match="shapes do not match"):
             func(xp.asarray([0]), xp.asarray([[0]]))
 
@@ -72,7 +74,7 @@ class TestAssertEqualCloseLess:
     @pytest.mark.parametrize(
         "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
     )
-    def test_namespace(self, xp: ModuleType, func: Callable[..., None]):
+    def test_namespace(self, xp: ArrayNamespace, func: Callable[..., None]):
         with pytest.raises(
             AssertionError, match="Namespaces of actual and desired arrays do not match"
         ):
@@ -93,7 +95,7 @@ class TestAssertEqualCloseLess:
     @pytest.mark.parametrize(
         "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
     )
-    def test_check_shape(self, xp: ModuleType, func: Callable[..., None]):
+    def test_check_shape(self, xp: ArrayNamespace, func: Callable[..., None]):
         a = xp.asarray([1] if func is assert_less else [2])
         b = xp.asarray(2)
         c = xp.asarray(0)
@@ -110,7 +112,7 @@ class TestAssertEqualCloseLess:
     @pytest.mark.parametrize(
         "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
     )
-    def test_check_dtype(self, xp: ModuleType, func: Callable[..., None]):
+    def test_check_dtype(self, xp: ArrayNamespace, func: Callable[..., None]):
         a = xp.asarray(1 if func is assert_less else 2)
         b = xp.asarray(2, dtype=xp.int16)
         c = xp.asarray(0, dtype=xp.int16)
@@ -128,7 +130,7 @@ class TestAssertEqualCloseLess:
         Backend.SPARSE, reason="sparse [()] returns np.generic"
     )
     def test_check_scalar(
-        self, xp: ModuleType, library: Backend, func: Callable[..., None]
+        self, xp: ArrayNamespace, library: Backend, func: Callable[..., None]
     ):
         a = xp.asarray(1 if func is assert_less else 2)
         b = xp.asarray(2)[()]  # Note: only makes a difference on NumPy
@@ -144,7 +146,7 @@ class TestAssertEqualCloseLess:
             func(a, c, check_scalar=True)
 
     @pytest.mark.parametrize("dtype", ["int64", "float64"])
-    def test_assert_close_tolerance(self, dtype: str, xp: ModuleType):
+    def test_assert_close_tolerance(self, dtype: str, xp: ArrayNamespace):
         a = xp.asarray([100], dtype=getattr(xp, dtype))
         b = xp.asarray([102], dtype=getattr(xp, dtype))
 
@@ -159,7 +161,7 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="Mismatched elements"):
             assert_close(a, b, atol=1)
 
-    def test_assert_less(self, xp: ModuleType):
+    def test_assert_less(self, xp: ArrayNamespace):
         assert_less(xp.asarray(-1), xp.asarray(0))
         assert_less(xp.asarray([1, 2]), xp.asarray([2, 3]))
         with pytest.raises(AssertionError, match="Mismatched elements"):
@@ -170,7 +172,7 @@ class TestAssertEqualCloseLess:
     )
     @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
-    def test_none_shape(self, xp: ModuleType, func: Callable[..., None]):
+    def test_none_shape(self, xp: ArrayNamespace, func: Callable[..., None]):
         """On Dask and other lazy backends, test that a shape with NaN's or None's
         can be compared to a real shape.
         """
@@ -201,7 +203,9 @@ class TestAssertEqualCloseLess:
     @pytest.mark.parametrize(
         "func", [assert_equal, assert_close, assert_less, assert_close_nulp]
     )
-    def test_device(self, xp: ModuleType, device: Device, func: Callable[..., None]):
+    def test_device(
+        self, xp: ArrayNamespace, device: Device, func: Callable[..., None]
+    ):
         a = xp.asarray([1] if func is assert_less else [2], device=device)
         b = xp.asarray([2], device=device)
         c = xp.asarray([2, 2], device=device)
@@ -214,7 +218,7 @@ class TestAssertEqualCloseLess:
         with pytest.raises(AssertionError, match="sizes do not match"):
             func(a, c, check_shape=False)
 
-    def test_assert_close_nulp(self, xp: ModuleType):
+    def test_assert_close_nulp(self, xp: ArrayNamespace):
         a = xp.asarray([1.0, 1e-10], dtype=xp.float64)
         b = xp.asarray([1.0 + 2**-52, 1e-10], dtype=xp.float64)
 
@@ -285,7 +289,7 @@ lazy_xp_function(non_materializable4, jax_jit=False, allow_dask_compute=1)
 lazy_xp_function(non_materializable5)
 
 
-def test_lazy_xp_function(xp: ModuleType):
+def test_lazy_xp_function(xp: ArrayNamespace):
     x = xp.asarray([1.0, 2.0])
 
     assert_equal(good_lazy(x), xp.asarray([2.0, 4.0]))
@@ -329,7 +333,7 @@ def static_params(x: Array, n: int, flag: bool = False) -> Array:
 lazy_xp_function(static_params)
 
 
-def test_lazy_xp_function_static_params(xp: ModuleType):
+def test_lazy_xp_function_static_params(xp: ArrayNamespace):
     x = xp.asarray([1.0, 2.0])
     assert_equal(static_params(x, 1), xp.asarray([3.0, 6.0]))
     assert_equal(static_params(x, 1, True), xp.asarray([2.0, 4.0]))
@@ -359,7 +363,7 @@ except ImportError:
 
 @pytest.mark.skip_xp_backend(Backend.TORCH_GPU, reason="device->host copy")
 @pytest.mark.filterwarnings("ignore:__array_wrap__:DeprecationWarning")  # PyTorch
-def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
+def test_lazy_xp_function_cython_ufuncs(xp: ArrayNamespace, library: Backend):
     pytest.importorskip("scipy")
     assert erf is not None
     x = xp.asarray([6.0, 7.0])
@@ -380,7 +384,7 @@ def test_lazy_xp_function_cython_ufuncs(xp: ModuleType, library: Backend):
 class A:
     def __init__(self, x: Array):
         xp = array_namespace(x)
-        self._xp: ModuleType = xp
+        self._xp: ArrayNamespace = xp
         self.x: Any = np.asarray(x)
 
     def f(self, y: Array) -> Array:
@@ -397,7 +401,7 @@ class B(A):
     @override
     def __init__(self, x: Array):  # pyright: ignore[reportMissingSuperCall]
         xp = array_namespace(x)
-        self._xp: ModuleType = xp
+        self._xp: ArrayNamespace = xp
         self.x: Any = xp.asarray(x)
 
     @override
@@ -447,7 +451,7 @@ class TestLazyXpFunctionClasses:
     @pytest.mark.skip_xp_backend(Backend.CUPY, reason="converts to NumPy")
     @pytest.mark.skip_xp_backend(Backend.JAX_GPU, reason="converts to NumPy")
     @pytest.mark.skip_xp_backend(Backend.TORCH_GPU, reason="converts to NumPy")
-    def test_lazy_xp_function_classes(self, xp: ModuleType, library: Backend):
+    def test_lazy_xp_function_classes(self, xp: ArrayNamespace, library: Backend):
         x = xp.asarray([1.1, 2.2, 3.3])
         y = xp.asarray([1.0, 2.0, 3.0])
         foo = A(x)
@@ -461,7 +465,7 @@ class TestLazyXpFunctionClasses:
 
         assert foo.h(y)
 
-    def test_static_methods_preserved(self, xp: ModuleType):
+    def test_static_methods_preserved(self, xp: ArrayNamespace):
         # Tests that static methods stay static methods when
         # lazy_xp_function is applied.
         x = xp.asarray([1.1, 2.2, 3.3])
@@ -470,7 +474,7 @@ class TestLazyXpFunctionClasses:
         assert_equal(bar.x, 2.0 * foo.x)
 
     @pytest.mark.skip_xp_backend(Backend.DASK, reason="calls dask.compute()")
-    def test_static_methods_wrapped(self, xp: ModuleType, library: Backend):
+    def test_static_methods_wrapped(self, xp: ArrayNamespace, library: Backend):
         x = xp.asarray([1.1, 2.2, 3.3])
         foo = B(x)
 
@@ -483,7 +487,7 @@ class TestLazyXpFunctionClasses:
             assert isinstance(foo.j(x), B)
 
     @pytest.mark.skip_xp_backend(Backend.DASK, reason="calls dask.compute()")
-    def test_class_methods_wrapped(self, xp: ModuleType, library: Backend):
+    def test_class_methods_wrapped(self, xp: ArrayNamespace, library: Backend):
         x = xp.asarray([1.1, 2.2, 3.3])
         if library.like(Backend.JAX):
             with pytest.raises(
@@ -493,7 +497,7 @@ class TestLazyXpFunctionClasses:
         else:
             assert isinstance(B.w(x), B)
 
-    def test_circumvention(self, xp: ModuleType):
+    def test_circumvention(self, xp: ArrayNamespace):
         x = xp.asarray([1.0, 2.0])
         y = eager.non_materializable5(x)
         assert_equal(y, x)
@@ -513,7 +517,7 @@ def dask_raises(x: Array) -> Array:
 lazy_xp_function(dask_raises)
 
 
-def test_lazy_xp_function_eagerly_raises(da: ModuleType):
+def test_lazy_xp_function_eagerly_raises(da: ArrayNamespace):
     """Test that the pattern::
 
         with pytest.raises(Exception):
@@ -537,7 +541,7 @@ class Wrapper:
         self.x = x
 
 
-def check_opaque_wrapper(w: Wrapper, xp: ModuleType) -> Wrapper:
+def check_opaque_wrapper(w: Wrapper, xp: ArrayNamespace) -> Wrapper:
     assert isinstance(w, Wrapper)
     assert array_namespace(w.x) == xp
     return Wrapper(w.x + 1)
@@ -546,7 +550,7 @@ def check_opaque_wrapper(w: Wrapper, xp: ModuleType) -> Wrapper:
 lazy_xp_function(check_opaque_wrapper)
 
 
-def test_lazy_xp_function_opaque_wrappers(xp: ModuleType):
+def test_lazy_xp_function_opaque_wrappers(xp: ArrayNamespace):
     """
     Test that function input and output can be wrapped into arbitrary
     serializable Python objects, even if jax.jit does not support them.
@@ -557,7 +561,7 @@ def test_lazy_xp_function_opaque_wrappers(xp: ModuleType):
     assert_equal(res.x, xp.asarray([2, 3]))
 
 
-def test_lazy_xp_function_opaque_wrappers_eagerly_raise(da: ModuleType):
+def test_lazy_xp_function_opaque_wrappers_eagerly_raise(da: ArrayNamespace):
     """
     Like `test_lazy_xp_function_eagerly_raises`, but the returned object is
     wrapped in an opaque wrapper.
@@ -578,7 +582,7 @@ def check_recursive(x: list[object]) -> list[object]:
 lazy_xp_function(check_recursive)
 
 
-def test_lazy_xp_function_recursive(xp: ModuleType):
+def test_lazy_xp_function_recursive(xp: ArrayNamespace):
     """Test that inputs and outputs can be recursive data structures."""
     x: list[object] = [xp.asarray([1, 2])]
     x.append(x)
@@ -610,7 +614,7 @@ lazy_xp_function(wrapped.f)
 lazy_xp_modules = [wrapped]
 
 
-def test_lazy_xp_modules(xp: ModuleType, library: Backend):
+def test_lazy_xp_modules(xp: ArrayNamespace, library: Backend):
     x = xp.asarray([1.0, 2.0])
     y = naked.f(x)
     assert_equal(y, x)
@@ -656,7 +660,7 @@ def my_iter(x: Array) -> Iterator[Array]:
 lazy_xp_function(my_iter)
 
 
-def test_patch_lazy_xp_functions_iter(xp: ModuleType):
+def test_patch_lazy_xp_functions_iter(xp: ArrayNamespace):
     x = xp.asarray([[1.0, 2.0], [3.0, 4.0]])
     it = my_iter(x)
 

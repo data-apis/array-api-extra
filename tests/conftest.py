@@ -2,7 +2,6 @@
 
 from collections.abc import Callable, Generator
 from functools import partial, wraps
-from types import ModuleType
 from typing import ParamSpec, TypeVar, cast
 
 import numpy as np
@@ -12,7 +11,7 @@ from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._testing import xfail
 from array_api_extra._lib._utils._compat import array_namespace
 from array_api_extra._lib._utils._compat import device as get_device
-from array_api_extra._lib._utils._typing import Device
+from array_api_extra._lib._utils._typing import ArrayNamespace, Device
 from array_api_extra.testing import patch_lazy_xp_functions
 
 T = TypeVar("T")
@@ -115,7 +114,7 @@ class NumPyReadOnly:
 @pytest.fixture
 def xp(
     library: Backend, request: pytest.FixtureRequest
-) -> Generator[ModuleType]:  # numpydoc ignore=PR01,RT03
+) -> Generator[ArrayNamespace]:  # numpydoc ignore=PR01,RT03
     """
     Parameterized fixture that iterates on all libraries.
 
@@ -194,7 +193,7 @@ def _setup_torch(library: Backend) -> None:
 @pytest.fixture(params=[Backend.DASK.pytest_param()])
 def da(
     request: pytest.FixtureRequest,
-) -> Generator[ModuleType]:  # numpydoc ignore=PR01,RT01
+) -> Generator[ArrayNamespace]:  # numpydoc ignore=PR01,RT01
     """Variant of the `xp` fixture that only yields dask.array."""
     xp = pytest.importorskip("dask.array")
     xp = array_namespace(xp.empty(0))
@@ -205,7 +204,7 @@ def da(
 @pytest.fixture(params=[Backend.JAX.pytest_param(), Backend.JAX_GPU.pytest_param()])
 def jnp(
     request: pytest.FixtureRequest,
-) -> Generator[ModuleType]:  # numpydoc ignore=PR01,RT01
+) -> Generator[ArrayNamespace]:  # numpydoc ignore=PR01,RT01
     """Variant of the `xp` fixture that only yields jax.numpy."""
     xp = pytest.importorskip("jax.numpy")
     _setup_jax(request.param)
@@ -214,7 +213,9 @@ def jnp(
 
 
 @pytest.fixture(params=[Backend.TORCH, Backend.TORCH_GPU])
-def torch(request: pytest.FixtureRequest) -> ModuleType:  # numpydoc ignore=PR01,RT01
+def torch(
+    request: pytest.FixtureRequest,
+) -> ArrayNamespace:  # numpydoc ignore=PR01,RT01
     """Variant of the `xp` fixture that only yields torch."""
     xp = pytest.importorskip("torch")
     xp = array_namespace(xp.empty(0))
@@ -224,7 +225,7 @@ def torch(request: pytest.FixtureRequest) -> ModuleType:  # numpydoc ignore=PR01
 
 @pytest.fixture
 def device(
-    library: Backend, xp: ModuleType
+    library: Backend, xp: ArrayNamespace
 ) -> Device:  # numpydoc ignore=PR01,RT01,RT03
     """
     Return a valid device for the backend.

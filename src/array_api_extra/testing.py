@@ -32,7 +32,7 @@ from ._lib._utils._compat import (
     device as get_device,
 )
 from ._lib._utils._helpers import jax_autojit, pickle_flatten, pickle_unflatten
-from ._lib._utils._typing import Array, Device
+from ._lib._utils._typing import Array, ArrayNamespace, Device
 
 __all__ = [
     "assert_close",
@@ -294,7 +294,7 @@ def patch_lazy_xp_functions(
     request: pytest.FixtureRequest,
     monkeypatch: pytest.MonkeyPatch | None = None,
     *,
-    xp: ModuleType,
+    xp: ArrayNamespace,
 ) -> contextlib.AbstractContextManager[None]:
     """
     Test lazy execution of functions tagged with :func:`lazy_xp_function`.
@@ -551,7 +551,7 @@ def _dask_wrap(
     return wrapper
 
 
-def _require_numpy() -> ModuleType:  # numpydoc ignore=RT01
+def _require_numpy() -> ArrayNamespace:  # numpydoc ignore=RT01
     """
     Import and return `numpy` if it is available, otherwise raise informative error.
     """
@@ -574,8 +574,8 @@ def _check_ns_shape_dtype_device(
     check_shape: bool,
     check_scalar: bool,
     check_device: bool,
-    xp: ModuleType | None = None,
-) -> tuple[Array, Array, ModuleType, ModuleType]:  # numpydoc ignore=RT03
+    xp: ArrayNamespace | None = None,
+) -> tuple[Array, Array, ArrayNamespace, ArrayNamespace]:  # numpydoc ignore=RT03
     """
     Assert that namespace, shape and dtype of the two arrays match.
 
@@ -681,7 +681,7 @@ def _is_materializable(x: Array) -> bool:  # numpydoc ignore=PR01,RT01
 
 
 def _as_numpy_array(  # numpydoc ignore=PR01,RT01
-    array: Array, *, xp: ModuleType
+    array: Array, *, xp: ArrayNamespace
 ) -> np.typing.NDArray[Any]:
     """
     Convert array to NumPy, bypassing GPU-CPU transfer guards and densification guards.
@@ -727,7 +727,7 @@ def assert_close(
     check_shape: bool = True,
     check_scalar: bool = False,
     check_device: bool = True,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> None:
     """
     Check that two arrays are close, up to tolerance ``atol + rtol * abs(desired)``.
@@ -834,7 +834,7 @@ def assert_equal(
     check_shape: bool = True,
     check_scalar: bool = False,
     check_device: bool = True,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> None:
     """
     Check that two arrays are equal.
@@ -901,7 +901,7 @@ def assert_less(
     check_shape: bool = True,
     check_scalar: bool = False,
     check_device: bool = True,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> None:
     """
     Check that two arrays are ordered by less than.
@@ -963,7 +963,7 @@ def assert_close_nulp(
     check_shape: bool = True,
     check_scalar: bool = False,
     check_device: bool = True,
-    xp: ModuleType | None = None,
+    xp: ArrayNamespace | None = None,
 ) -> None:
     """
     Compare two arrays relatively to their spacing.
