@@ -186,9 +186,9 @@ def cov(
     :math:`x_i` and :math:`x_j`. The element :math:`C_{ii}` is the variance
     of :math:`x_i`.
 
-    Extends ``numpy.cov`` with support for batch input and array-api
-    backends. Naming follows the array-api conventions used elsewhere in
-    this library (``axis``, ``correction``) rather than the numpy spellings
+    Extends ``numpy.cov`` with support for batch input.
+    Naming follows the array API conventions used elsewhere in
+    this library (``axis``, ``correction``) rather than the NumPy spellings
     (``rowvar``, ``bias``, ``ddof``); see Notes for the mapping.
 
     Parameters
@@ -244,11 +244,11 @@ def cov(
         numpy.cov(m, fweights=f)            -> cov(m, fweights=f)
         numpy.cov(m, aweights=a)            -> cov(m, aweights=a)
 
-    Unlike ``numpy.cov``, a ``RuntimeWarning`` for non-positive effective
-    degrees of freedom is only emitted on the unweighted path. The
-    weighted path omits the check so that lazy backends (e.g. Dask) can
-    stay lazy end-to-end; choose ``correction`` and weights such that the
-    effective normalizer is positive.
+    A ``RuntimeWarning`` is emitted for non-positive effective degrees of
+    freedom when the effective normalizer can be checked without materializing
+    a lazy array. When the normalizer itself is lazy (e.g. for weighted Dask
+    inputs), this check is skipped; choose ``correction`` and weights such that
+    it is positive.
 
     Examples
     --------
