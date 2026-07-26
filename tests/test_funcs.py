@@ -845,7 +845,7 @@ class TestCov:
         assert_close(actual, da.asarray(desired))
 
     def test_weights_dof_warning_eager(self):
-        xp = array_namespace(cast(Array, np.empty(0)))
+        xp = array_namespace(cast(Array, cast(object, np.empty(0))))
         m = xp.asarray([[1.0, 2.0], [3.0, 4.0]])
         weights = xp.asarray([1.0, 1.0])
 
