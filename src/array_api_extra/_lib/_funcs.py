@@ -281,7 +281,8 @@ def cov(
     )
 
     m = atleast_nd(m, ndim=2, xp=xp)
-    m = xp.astype(m, dtype)
+    # Preserve the historical no-alias guarantee even when the dtype already matches.
+    m = xp.astype(m, dtype, copy=True)
 
     # Validate weight shapes (eager metadata, lazy-safe). Native backends
     # validate themselves; this covers the generic path (array-api-strict,
@@ -294,9 +295,16 @@ def cov(
         if w_in.ndim != 1:
             msg = f"`{name}` must be 1-D, got ndim={w_in.ndim}"
             raise ValueError(msg)
-        if w_in.shape[0] != n_obs:
+        weight_length = w_in.shape[0]
+        if (
+            weight_length is not None
+            and n_obs is not None
+            and not math.isnan(weight_length)
+            and not math.isnan(n_obs)
+            and weight_length != n_obs
+        ):
             msg = (
-                f"`{name}` has length {w_in.shape[0]} but `m` has {n_obs} observations"
+                f"`{name}` has length {weight_length} but `m` has {n_obs} observations"
             )
             raise ValueError(msg)
 
@@ -315,15 +323,9 @@ def cov(
     else:
         w = fw * aw
 
-    m_shape = eager_shape(m)
     if w is None:
         avg = xp.mean(m, axis=-1, keepdims=True)
-        fact = m_shape[-1] - correction
-        if fact <= 0:
-            warnings.warn(
-                "Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2
-            )
-            fact = 0
+        fact = eager_shape(m, axis=-1)[0] - correction
     else:
         v1 = xp.sum(w, axis=-1)
         avg = xp.sum(m * w, axis=-1, keepdims=True) / v1
@@ -331,6 +333,25 @@ def cov(
             fact = v1 - correction
         else:
             fact = v1 - correction * xp.sum(w * aw, axis=-1) / v1
+
+    if not _compat.is_lazy_array(fact):
+        # Weights are cast to `dtype`, so a complex input produces a complex
+        # normalizer with a zero imaginary part. Complex ordering is undefined;
+        # compare its real component instead.
+        if w is not None:
+            fact_array = cast(Array, fact)
+            fact_to_check = (
+                xp.real(fact_array)
+                if xp.isdtype(fact_array.dtype, "complex floating")
+                else fact_array
+            )
+        else:
+            fact_to_check = fact
+        if fact_to_check <= 0:
+            warnings.warn(
+                "Degrees of freedom <= 0 for slice", RuntimeWarning, stacklevel=2
+            )
+            fact = 0
 
     m_c = m - avg
     m_w = m_c if w is None else m_c * w
