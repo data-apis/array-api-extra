@@ -1,7 +1,7 @@
 """Delegation to existing implementations for Public API Functions."""
 
-from collections.abc import Sequence
-from typing import Literal
+from collections.abc import Callable, Sequence
+from typing import Any, Literal
 
 from ._lib import _funcs
 from ._lib._utils._compat import (
@@ -26,6 +26,7 @@ from ._lib._utils._helpers import (
 from ._lib._utils._typing import Array, ArrayNamespace, Device, DType
 
 __all__ = [
+    "apply_along_axis",
     "argpartition",
     "atleast_nd",
     "broadcast_shapes",
@@ -1732,3 +1733,45 @@ def nanmax(
         return xp.nanmax(a, axis=axis)
 
     return _funcs.nanmax(a, axis=axis, xp=xp)
+
+
+def apply_along_axis(
+    func1d: Callable[..., Array],
+    axis: int,
+    arr: Array,
+    *args: Any,
+    xp: ArrayNamespace | None = None,
+    **kwargs: Any,
+) -> Array:
+    """
+    Apply a function to 1-D slices along a given axis.
+
+    Parameters
+    ----------
+    func1d : callable
+        Function to apply to 1-D slices of `arr`.
+    axis : int
+        Axis along which `func1d` is applied.
+    arr : Array
+        Input array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `arr`. Default: infer.
+
+    Returns
+    -------
+    Array
+        The output array formed by applying `func1d` to each 1-D slice.
+    """
+    if xp is None:
+        xp = array_namespace(arr)
+    if (
+        is_numpy_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_dask_namespace(xp)
+        or is_jax_namespace(xp)
+    ):
+        return xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
+
+    return _funcs.apply_along_axis(
+        func1d, axis, arr, *args, **kwargs
+    )

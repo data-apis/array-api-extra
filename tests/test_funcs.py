@@ -15,6 +15,7 @@ from typing_extensions import override
 import array_api_extra._delegation as delegated_func
 from array_api_extra import (
     angle,
+    apply_along_axis,
     apply_where,
     argpartition,
     at,
@@ -105,6 +106,79 @@ def test_all_contains_all_public_functions():
     assert public_functions == set(delegated_func.__all__), (
         f"Missing from __all__: {missing}\tExtra in __all__: {extra}"
     )
+
+
+class TestApplyAlongAxis:
+    @pytest.mark.xfail_xp_backend(
+        Backend.DASK,
+        reason="Dask apply_along_axis infers output shape differently",
+        strict=False,
+    )
+    def test_simple(self, xp: ArrayNamespace):
+        x = xp.asarray([[1, 2, 3], [4, 5, 6]])
+        actual = apply_along_axis(
+            lambda row: row + 1,
+            axis=1,
+            arr=x,
+        )
+        expected = xp.asarray([[2, 3, 4], [5, 6, 7]])
+        assert_equal(actual, expected)
+
+    @pytest.mark.xfail_xp_backend(
+        Backend.DASK,
+        reason="Dask implementation computes eagerly",
+        strict=False,
+    )
+    @pytest.mark.xfail_xp_backend(
+        Backend.SPARSE,
+        reason="Sparse cannot stack scalar arrays with different fill values",
+        strict=False,
+    )
+    def test_scalar_output(self, xp: ArrayNamespace):
+        x = xp.asarray([[1, 2, 3], [4, 5, 6]])
+        actual = apply_along_axis(
+            xp.sum,
+            axis=1,
+            arr=x,
+        )
+        expected = xp.asarray([6, 15])
+        assert_equal(actual, expected)
+
+    @pytest.mark.xfail_xp_backend(
+        Backend.DASK,
+        reason="Dask implementation computes eagerly",
+        strict=False,
+    )
+    def test_negative_axis(self, xp: ArrayNamespace):
+        x = xp.asarray([[1, 2, 3], [4, 5, 6]])
+        actual = apply_along_axis(
+            lambda row: xp.flip(row, axis=0),
+            axis=-1,
+            arr=x,
+        )
+        expected = xp.asarray([[3, 2, 1], [6, 5, 4]])
+        assert_equal(actual, expected)
+
+    @pytest.mark.xfail_xp_backend(
+        Backend.SPARSE,
+        reason="Sparse cannot stack scalar arrays with different fill values",
+        strict=False,
+    )
+    def test_3d_scalar_output(self, xp: ArrayNamespace):
+        arr_np = np.arange(24).reshape(2, 3, 4)
+        x = xp.asarray(arr_np)
+        expected = np.apply_along_axis(
+            np.sum,
+            1,
+            arr_np,
+            None,
+        )
+        actual = apply_along_axis(
+            xp.sum,
+            axis=1,
+            arr=x,
+        )
+        assert_equal(actual, xp.asarray(expected))
 
 
 class TestApplyWhere:

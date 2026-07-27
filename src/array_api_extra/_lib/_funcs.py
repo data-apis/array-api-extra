@@ -4,7 +4,7 @@ import math
 import warnings
 from collections.abc import Callable, Sequence
 from types import NoneType
-from typing import Literal, cast, overload
+from typing import Any, Literal, cast, overload
 
 from ._at import at
 from ._utils import _compat, _helpers
@@ -24,6 +24,7 @@ from ._utils._typing import Array, ArrayNamespace, Device, DType
 
 __all__ = [
     "angle",
+    "apply_along_axis",
     "apply_where",
     "argpartition",
     "atleast_nd",
@@ -231,6 +232,47 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ArrayNamespace) -> Array:
         x = xp.expand_dims(x, axis=0)
         x = atleast_nd(x, ndim=ndim, xp=xp)
     return x
+
+
+def apply_along_axis(
+    func1d: Callable[..., Array],
+    axis: int,
+    arr: Array,
+    /,
+    *args: Any,
+    **kwargs: Any,
+) -> Array:
+    """Apply a function to 1-D slices along a given axis."""
+    if axis < 0:
+        axis += arr.ndim
+
+    if not 0 <= axis < arr.ndim:
+        msg = f"axis {axis} is out of bounds for array of dimension {arr.ndim}"
+        raise ValueError(msg)
+
+    if kwargs is None:
+        kwargs = {}
+
+    if not isinstance(args, tuple):
+        args = (args,)
+
+    xp = array_namespace(arr)
+    perm = tuple(i for i in range(arr.ndim) if i != axis) + (axis,)
+    arr = xp.permute_dims(arr, perm)
+    leading_shape = arr.shape[:-1]
+    arr = xp.reshape(arr, (-1, arr.shape[-1]))
+    results = [func1d(slice, *args, **kwargs) for slice in xp.unstack(arr, axis=0)]
+
+    if not all(hasattr(result, "dtype") for result in results):
+        results = [xp.asarray(result, dtype=arr.dtype) for result in results]
+
+    out = xp.stack(results, axis=0)
+    out = xp.reshape(out, leading_shape + out.shape[1:])
+    before = tuple(range(axis))
+    after = tuple(range(axis, len(leading_shape)))
+    res = tuple(range(len(leading_shape), out.ndim))
+    perm = before + res + after
+    return xp.permute_dims(out, perm)
 
 
 # `float` in signature to accept `math.nan` for Dask.
