@@ -175,6 +175,13 @@ class TestApplyAlongAxis:
         )
         assert_equal(actual, xp.asarray(expected))
 
+    def test_axis_out_of_bounds(self, xp: ArrayNamespace):
+        x = xp.asarray([[1, 2, 3], [4, 5, 6]])
+        with pytest.raises(ValueError, match="out of bounds"):
+            _ = functions.apply_along_axis(lambda row: row, 2, x)
+        with pytest.raises(ValueError, match="out of bounds"):
+            _ = functions.apply_along_axis(lambda row: row, -3, x)
+
 
 class TestApplyWhere:
     @staticmethod
