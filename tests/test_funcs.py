@@ -167,12 +167,7 @@ class TestApplyAlongAxis:
     def test_3d_scalar_output(self, xp: ArrayNamespace):
         arr_np = np.arange(24).reshape(2, 3, 4)
         x = xp.asarray(arr_np)
-        expected = np.apply_along_axis(
-            np.sum,
-            1,
-            arr_np,
-            None,
-        )
+        expected = np.apply_along_axis(lambda a: np.sum(a), 1, arr_np)  # noqa: PLW0108
         actual = apply_along_axis(
             xp.sum,
             axis=1,

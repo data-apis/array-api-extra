@@ -1754,8 +1754,12 @@ def apply_along_axis(
         Axis along which `func1d` is applied.
     arr : Array
         Input array.
+    *args : Any
+        Additional positional arguments to pass to `func1d`.
     xp : array_namespace, optional
         The standard-compatible namespace for `arr`. Default: infer.
+    **kwargs : Any
+        Additional keyword arguments to pass to `func1d`.
 
     Returns
     -------
@@ -1772,6 +1776,4 @@ def apply_along_axis(
     ):
         return xp.apply_along_axis(func1d, axis, arr, *args, **kwargs)
 
-    return _funcs.apply_along_axis(
-        func1d, axis, arr, *args, **kwargs
-    )
+    return _funcs.apply_along_axis(func1d, axis, arr, *args, **kwargs)

@@ -242,7 +242,8 @@ def apply_along_axis(
     *args: Any,
     **kwargs: Any,
 ) -> Array:
-    """Apply a function to 1-D slices along a given axis."""
+    # numpydoc ignore=PR01,RT01
+    """See docstring in array_api_extra._delegation."""
     if axis < 0:
         axis += arr.ndim
 
@@ -250,14 +251,8 @@ def apply_along_axis(
         msg = f"axis {axis} is out of bounds for array of dimension {arr.ndim}"
         raise ValueError(msg)
 
-    if kwargs is None:
-        kwargs = {}
-
-    if not isinstance(args, tuple):
-        args = (args,)
-
     xp = array_namespace(arr)
-    perm = tuple(i for i in range(arr.ndim) if i != axis) + (axis,)
+    perm = (*(i for i in range(arr.ndim) if i != axis), axis)
     arr = xp.permute_dims(arr, perm)
     leading_shape = arr.shape[:-1]
     arr = xp.reshape(arr, (-1, arr.shape[-1]))
