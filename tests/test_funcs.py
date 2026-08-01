@@ -182,6 +182,20 @@ class TestApplyAlongAxis:
         with pytest.raises(ValueError, match="out of bounds"):
             _ = functions.apply_along_axis(lambda row: row, -3, x)
 
+    @pytest.mark.xfail_xp_backend(
+        Backend.SPARSE,
+        reason="Sparse cannot stack scalar arrays with different fill values",
+        strict=False,
+    )
+    def test_non_array_output(self, xp: ArrayNamespace):
+        x = xp.asarray([[1, 2, 3], [4, 5, 6]])
+        actual = functions.apply_along_axis(
+            lambda row: int(row[0]) + 1,  # type: ignore[arg-type,return-value]  # pyright: ignore[reportArgumentType]
+            1,
+            x,
+        )
+        assert_equal(actual, xp.asarray([2, 5]))
+
 
 class TestApplyWhere:
     @staticmethod
