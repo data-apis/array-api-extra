@@ -23,6 +23,7 @@
     nan_to_num
     nanmax
     nanmin
+    nansum
     nunique
     one_hot
     pad

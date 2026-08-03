@@ -39,6 +39,7 @@ __all__ = [
     "nan_to_num",
     "nanmax",
     "nanmin",
+    "nansum",
     "nunique",
     "one_hot",
     "pad",
@@ -842,3 +843,17 @@ def nanmax(  # numpydoc ignore=PR01,RT01
     if xp.any(mask):
         x = xp.where(mask, xp.asarray(xp.nan, dtype=x.dtype, device=device_a), x)
     return x
+
+
+def nansum(  # numpydoc ignore=PR01,RT01
+    a: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None,
+    xp: ArrayNamespace,
+) -> Array:
+    """See docstring in `array_api_extra._delegation.py`."""
+    mask = xp.isnan(a)
+    device_a = _compat.device(a)
+    zero = xp.asarray(0, dtype=a.dtype, device=device_a)
+    return xp.sum(xp.where(mask, zero, a), axis=axis)
