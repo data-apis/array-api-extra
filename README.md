@@ -40,6 +40,13 @@ Used by:
   Learning in Python.
 - [SysIdentPy](https://github.com/wilsonrljr/sysidentpy) — System Identification Using NARMAX Models.
 - [GLASS](https://github.com/glass-dev/glass) — Generator for Large Scale Structure.
+- [pyRiemann](https://github.com/pyRiemann/pyRiemann) — Machine learning with multivariate data,
+  using the Riemannian geometry of symmetric (resp. Hermitian) positive definite (SPD) (resp. HPD) matrices.
+- [bilby](https://github.com/bilby-dev/bilby) — A user-friendly Bayesian inference library.
+- [ccdproc](https://github.com/astropy/ccdproc) — Astropy affiliated package
+  for basic data reductions of CCD images.
+- [ASPIRE](https://github.com/mj-will/aspire) — Framework for reusing existing posterior
+  samples to obtain new results at a reduced cost.
 - *your library? Let us know!*
 
 ## Installation
