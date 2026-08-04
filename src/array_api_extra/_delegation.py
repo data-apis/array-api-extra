@@ -39,6 +39,7 @@ __all__ = [
     "nan_to_num",
     "nanmax",
     "nanmin",
+    "nansum",
     "nunique",
     "one_hot",
     "pad",
@@ -1732,3 +1733,54 @@ def nanmax(
         return xp.nanmax(a, axis=axis)
 
     return _funcs.nanmax(a, axis=axis, xp=xp)
+
+
+def nansum(
+    a: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    xp: ArrayNamespace | None = None,
+) -> Array:
+    """
+    Return the sum of the array elements along a given axis, ignoring NaNs.
+
+    Parameters
+    ----------
+    a : Array
+        Input array.
+    axis : int or tuple of ints or None, optional
+        Axis or axes along which the sum is computed. The default is to compute
+        the sum of the flattened array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array of sum values along the given axis, ignoring NaNs.
+
+    Examples
+    --------
+    >>> import array_api_extra as xpx
+    >>> import array_api_strict as xp
+    >>> a = xp.asarray([[5, 3, xp.nan, 1], [4, xp.nan, 2, xp.nan]])
+    >>> xpx.nansum(a)
+    Array(15., dtype=array_api_strict.float64)
+    >>> xpx.nansum(a, axis=0)
+    Array([9., 3., 2., 1.], dtype=array_api_strict.float64)
+    >>> xpx.nansum(a, axis=1)
+    Array([9., 6.], dtype=array_api_strict.float64)
+    """
+    if xp is None:
+        xp = array_namespace(a)
+
+    if (
+        is_numpy_namespace(xp)
+        or is_cupy_namespace(xp)
+        or is_dask_namespace(xp)
+        or is_jax_namespace(xp)
+    ):
+        return xp.nansum(a, axis=axis)
+
+    return _funcs.nansum(a, axis=axis, xp=xp)
