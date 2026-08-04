@@ -1780,6 +1780,7 @@ def nansum(
         or is_cupy_namespace(xp)
         or is_dask_namespace(xp)
         or is_jax_namespace(xp)
+        or is_torch_namespace(xp)
     ):
         return xp.nansum(a, axis=axis)
 
