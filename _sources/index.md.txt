@@ -28,8 +28,12 @@ It is currently used by:
   scientific computing.
 - [scikit-learn](https://github.com/scikit-learn/scikit-learn) — Machine
   Learning in Python.
+- [pyRiemann](https://github.com/pyRiemann/pyRiemann) — Machine learning for multivariate data through the Riemannian geometry of positive definite matrices.
 - [SysIdentPy](https://github.com/wilsonrljr/sysidentpy) — System Identification Using NARMAX Models.
+- [bilby](https://github.com/bilby-dev/bilby) — A unified framework for stochastic sampling packages and gravitational-wave inference.
+- [ccdproc](https://github.com/astropy/ccdproc) — Astropy affiliated package for reducing optical/IR CCD data.
 - [GLASS](https://github.com/glass-dev/glass) — Generator for Large Scale Structure.
+- [ASPIRE](https://github.com/mj-will/aspire) — Accelerated Sequential Posterior Inference via REuse.
 - *your library? Let us know!*
 
 (installation)=
