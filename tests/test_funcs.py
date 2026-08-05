@@ -617,6 +617,27 @@ class TestCov:
         expect = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]], dtype=xp.complex128)
         assert_close(actual, expect)
 
+    def test_complex_with_weights(self, xp: ArrayNamespace):
+        m = np.asarray(
+            [[1 + 1j, 2 + 2j, 4 + 1j], [3 - 1j, 5 + 2j, 7 + 0j]],
+            dtype=np.complex128,
+        )
+        weights = np.asarray([1.0, 2.0, 1.0])
+        correction = 0.5  # Force the generic implementation.
+
+        weight_sum = weights.sum()
+        avg = (m * weights).sum(axis=-1, keepdims=True) / weight_sum
+        centered = m - avg
+        normalizer = weight_sum - correction * (weights**2).sum() / weight_sum
+        expected = (centered * weights) @ centered.conj().T / normalizer
+
+        actual = cov(
+            xp.asarray(m),
+            correction=correction,
+            aweights=xp.asarray(weights),
+        )
+        assert_close(actual, xp.asarray(expected))
+
     def test_empty(self, xp: ArrayNamespace):
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
@@ -667,6 +688,186 @@ class TestCov:
         ref_list = [np.cov(m_) for m_ in np.reshape(m, (-1, n_var, n_obs))]
         ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
         assert_close(res, xp.asarray(ref))
+
+    @pytest.mark.parametrize("bias", [True, False, 0, 1])
+    def test_bias(self, xp: ArrayNamespace, bias: bool):
+        # `bias` maps to `correction`: bias=True -> correction=0, bias=False -> 1.
+        x = np.array([-2.1, -1, 4.3])
+        y = np.array([3, 1.1, 0.12])
+        X = np.stack((x, y), axis=0)
+        ref = np.cov(X, bias=bias)
+        assert_close(
+            cov(xp.asarray(X, dtype=xp.float64), correction=0 if bias else 1),
+            xp.asarray(ref, dtype=xp.float64),
+            rtol=1e-6,
+        )
+
+    @pytest.mark.parametrize("bias", [True, False, 0, 1])
+    def test_bias_batch(self, xp: ArrayNamespace, bias: bool):
+        rng = np.random.default_rng(8847643423)
+        batch_shape = (3, 4)
+        n_var, n_obs = 3, 20
+        m = rng.random((*batch_shape, n_var, n_obs))
+        res = cov(xp.asarray(m), correction=0 if bias else 1)
+        ref_list = [np.cov(m_, bias=bias) for m_ in np.reshape(m, (-1, n_var, n_obs))]
+        ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
+        assert_close(res, xp.asarray(ref))
+
+    def test_correction(self, xp: ArrayNamespace):
+        rng = np.random.default_rng(20260417)
+        m = rng.random((3, 20))
+        for correction in (0, 1, 2):
+            ref = np.cov(m, ddof=correction)
+            res = cov(xp.asarray(m), correction=correction)
+            assert_close(res, xp.asarray(ref))
+
+    def test_correction_float(self, xp: ArrayNamespace):
+        # Float correction: reference computed by hand (numpy.cov rejects
+        # non-integer ddof; our generic path supports it).
+        rng = np.random.default_rng(20260417)
+        m = rng.random((3, 20))
+        n = m.shape[-1]
+        centered = m - m.mean(axis=-1, keepdims=True)
+        ref = centered @ centered.T / (n - 1.5)
+        res = cov(xp.asarray(m), correction=1.5)
+        assert_close(res, xp.asarray(ref))
+
+    def test_axis(self, xp: ArrayNamespace):
+        rng = np.random.default_rng(20260417)
+        m = rng.random((20, 3))  # observations on axis 0
+        ref = np.cov(m, rowvar=False)
+        res = cov(xp.asarray(m), axis=0)
+        assert_close(res, xp.asarray(ref))
+        res_neg = cov(xp.asarray(m), axis=-2)
+        assert_close(res_neg, xp.asarray(ref))
+
+    def test_frequency_weights(self, xp: ArrayNamespace):
+        rng = np.random.default_rng(20260417)
+        m = rng.random((3, 10))
+        fw = np.asarray([1, 2, 1, 3, 1, 2, 1, 1, 2, 1], dtype=np.int64)
+        ref = np.cov(m, fweights=fw)
+        res = cov(xp.asarray(m), fweights=xp.asarray(fw))
+        assert_close(res, xp.asarray(ref))
+
+    def test_weights(self, xp: ArrayNamespace):
+        rng = np.random.default_rng(20260417)
+        m = rng.random((3, 10))
+        aw = rng.random(10)
+        ref = np.cov(m, aweights=aw)
+        res = cov(xp.asarray(m), aweights=xp.asarray(aw))
+        assert_close(res, xp.asarray(ref))
+
+    def test_both_weights(self, xp: ArrayNamespace):
+        rng = np.random.default_rng(20260417)
+        m = rng.random((3, 10))
+        fw = np.asarray([1, 2, 1, 3, 1, 2, 1, 1, 2, 1], dtype=np.int64)
+        aw = rng.random(10)
+        for correction in (0, 1, 2):
+            ref = np.cov(m, ddof=correction, fweights=fw, aweights=aw)
+            res = cov(
+                xp.asarray(m),
+                correction=correction,
+                fweights=xp.asarray(fw),
+                aweights=xp.asarray(aw),
+            )
+            assert_close(res, xp.asarray(ref))
+
+    def test_batch_with_weights(self, xp: ArrayNamespace):
+        rng = np.random.default_rng(20260417)
+        batch_shape = (2, 3)
+        n_var, n_obs = 3, 15
+        m = rng.random((*batch_shape, n_var, n_obs))
+        aw = rng.random(n_obs)
+        res = cov(xp.asarray(m), aweights=xp.asarray(aw))
+        ref_list = [np.cov(m_, aweights=aw) for m_ in np.reshape(m, (-1, n_var, n_obs))]
+        ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
+        assert_close(res, xp.asarray(ref))
+
+    def test_axis_with_weights(self, xp: ArrayNamespace):
+        # axis=-2 (observations on first of 2D) combined with weights:
+        # verifies that moveaxis and weight alignment cooperate.
+        rng = np.random.default_rng(20260417)
+        m = rng.random((15, 3))  # observations on axis 0
+        aw = rng.random(15)
+        fw = np.asarray([1, 2, 1, 3, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1], dtype=np.int64)
+        ref = np.cov(m, rowvar=False, fweights=fw, aweights=aw)
+        res = cov(
+            xp.asarray(m),
+            axis=-2,
+            fweights=xp.asarray(fw),
+            aweights=xp.asarray(aw),
+        )
+        assert_close(res, xp.asarray(ref))
+
+    def test_axis_out_of_bounds(self, xp: ArrayNamespace):
+        m = xp.asarray([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        with pytest.raises(IndexError):
+            _ = cov(m, axis=5)
+
+    def test_weights_wrong_ndim(self, xp: ArrayNamespace):
+        m = xp.asarray([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        w2d = xp.asarray([[1.0, 1.0, 1.0], [1.0, 1.0, 1.0]])
+        # Non-integer correction forces the generic path where the
+        # validation lives; native backends raise for the same reason.
+        with pytest.raises((ValueError, TypeError)):
+            _ = cov(m, correction=0.5, fweights=w2d)
+        with pytest.raises((ValueError, TypeError)):
+            _ = cov(m, correction=0.5, aweights=w2d)
+
+    def test_weights_wrong_length(self, xp: ArrayNamespace):
+        m = xp.asarray([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        w_bad = xp.asarray([1.0, 1.0])  # expected length 3
+        with pytest.raises((ValueError, RuntimeError)):
+            _ = cov(m, correction=0.5, fweights=w_bad)
+        with pytest.raises((ValueError, RuntimeError)):
+            _ = cov(m, correction=0.5, aweights=w_bad)
+
+    def test_weights_unknown_length(self, da: ArrayNamespace):
+        m_np = np.asarray([[1.0, 2.0, 3.0], [4.0, 6.0, 8.0]])
+        weights_np = np.asarray([1.0, 2.0, 3.0])
+        keep_np = np.asarray([True, False, True])
+
+        keep = da.asarray(keep_np)
+        m = da.asarray(m_np)[:, keep]
+        weights = da.asarray(weights_np)[keep]
+        assert math.isnan(m.shape[-1])
+        assert math.isnan(weights.shape[0])
+
+        actual = cov(m, aweights=weights)
+        desired = np.cov(m_np[:, keep_np], aweights=weights_np[keep_np])
+        assert_close(actual, da.asarray(desired))
+
+    def test_weights_dof_warning_eager(self):
+        xp = array_namespace(cast(Array, cast(object, np.empty(0))))
+        m = xp.asarray([[1.0, 2.0], [3.0, 4.0]])
+        weights = xp.asarray([1.0, 1.0])
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            _ = cov(m, correction=2.5, aweights=weights)
+        assert any(
+            isinstance(warning.message, RuntimeWarning)
+            and "Degrees of freedom <= 0" in str(warning.message)
+            for warning in caught
+        )
+
+    def test_torch_autograd(self, torch: ArrayNamespace):
+        # The batched (generic) path must not detach gradients or mutate the
+        # input tensor in place, as `xp.asarray` does on torch.
+        xp = torch
+        rng = np.random.default_rng(20260417)
+        m = xp.asarray(rng.random((4, 3, 20)), dtype=xp.float64)
+        m.requires_grad_(True)
+        m_before = m.detach().clone()
+        # cov returns the array-api `Array` type; at runtime it is a torch
+        # tensor, so cast to access autograd attributes without type errors.
+        c = cast(Any, cov(m))  # batched -> generic path
+        assert c.requires_grad
+        assert m.requires_grad  # input tensor not mutated
+        assert_equal(m.detach(), m_before)
+        c.sum().backward()
+        assert m.grad is not None
+        assert bool(xp.all(xp.isfinite(m.grad)))
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
