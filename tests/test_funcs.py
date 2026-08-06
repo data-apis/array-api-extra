@@ -23,6 +23,7 @@ from array_api_extra import (
     cov,
     create_diagonal,
     default_dtype,
+    deg2rad,
     diag_indices,
     expand_dims,
     isclose,
@@ -35,6 +36,7 @@ from array_api_extra import (
     one_hot,
     pad,
     partition,
+    rad2deg,
     setdiff1d,
     sinc,
     tril_indices,
@@ -64,6 +66,7 @@ lazy_xp_function(broadcast_shapes)
 lazy_xp_function(cov)
 lazy_xp_function(create_diagonal)
 lazy_xp_function(default_dtype)
+lazy_xp_function(deg2rad)
 lazy_xp_function(diag_indices)
 lazy_xp_function(expand_dims)
 lazy_xp_function(isclose)
@@ -74,6 +77,7 @@ lazy_xp_function(nunique)
 lazy_xp_function(one_hot)
 lazy_xp_function(pad)
 lazy_xp_function(partition)
+lazy_xp_function(rad2deg)
 # FIXME calls in1d which calls xp.unique_values without size
 lazy_xp_function(setdiff1d, jax_jit=False)
 lazy_xp_function(sinc)
@@ -2170,6 +2174,65 @@ class TestAngle:
     def test_device(self, xp: ArrayNamespace, device: Device):
         a = xp.asarray([1 + 1j], device=device)
         assert get_device(angle(a)) == device
+
+
+class TestDeg2Rad:
+    def test_basic(self, xp: ArrayNamespace):
+        x = xp.asarray([0.0, 90.0, 180.0, 270.0, 360.0])
+        expected = xp.asarray([0.0, xp.pi / 2, xp.pi, 3 * xp.pi / 2, 2 * xp.pi])
+        assert_close(deg2rad(x, xp=xp), expected)
+
+    @pytest.mark.parametrize("dtype_name", ["int32", "int64"])
+    def test_integral(self, xp: ArrayNamespace, dtype_name: str):
+        x = xp.asarray([0, 90, 180], dtype=getattr(xp, dtype_name))
+        actual = deg2rad(x, xp=xp)
+        expected = xp.asarray(
+            [0.0, xp.pi / 2, xp.pi], dtype=default_dtype(xp, device=get_device(x))
+        )
+        assert actual.dtype == expected.dtype
+        assert_close(actual, expected)
+
+    def test_complex(self, xp: ArrayNamespace):
+        x = xp.asarray([180 + 90j], dtype=xp.complex64)
+        actual = deg2rad(x, xp=xp)
+        expected = xp.asarray([xp.pi + xp.pi / 2 * 1j], dtype=x.dtype)
+        assert actual.dtype == x.dtype
+        assert_close(actual, expected)
+
+    def test_bool(self, xp: ArrayNamespace):
+        x = xp.asarray([True])
+        with pytest.raises(TypeError, match="integral, real floating, or complex"):
+            deg2rad(x, xp=xp)
+
+
+class TestRad2Deg:
+    def test_basic(self, xp: ArrayNamespace):
+        x = xp.asarray([0.0, xp.pi / 2, xp.pi, 3 * xp.pi / 2, 2 * xp.pi])
+        expected = xp.asarray([0.0, 90.0, 180.0, 270.0, 360.0])
+        assert_close(rad2deg(x, xp=xp), expected)
+
+    @pytest.mark.parametrize("dtype_name", ["int32", "int64"])
+    def test_integral(self, xp: ArrayNamespace, dtype_name: str):
+        x = xp.asarray([0, 1, 2], dtype=getattr(xp, dtype_name))
+        actual = rad2deg(x, xp=xp)
+        expected = xp.asarray(
+            [0.0, 180 / xp.pi, 360 / xp.pi],
+            dtype=default_dtype(xp, device=get_device(x)),
+        )
+        assert actual.dtype == expected.dtype
+        assert_close(actual, expected)
+
+    def test_complex(self, xp: ArrayNamespace):
+        x = xp.asarray([xp.pi + xp.pi / 2 * 1j], dtype=xp.complex64)
+        actual = rad2deg(x, xp=xp)
+        expected = xp.asarray([180 + 90j], dtype=x.dtype)
+        assert actual.dtype == x.dtype
+        assert_close(actual, expected)
+
+    def test_bool(self, xp: ArrayNamespace):
+        x = xp.asarray([True])
+        with pytest.raises(TypeError, match="integral, real floating, or complex"):
+            rad2deg(x, xp=xp)
 
 
 class TestUnravelIndex:
