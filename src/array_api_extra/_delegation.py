@@ -655,10 +655,10 @@ def kron(
 
 
 def nan_to_num(
-    x: Array | float | complex,
+    x: Array | complex,
     /,
     *,
-    fill_value: int | float = 0.0,
+    fill_value: float = 0.0,
     xp: ArrayNamespace | None = None,
 ) -> Array:
     """

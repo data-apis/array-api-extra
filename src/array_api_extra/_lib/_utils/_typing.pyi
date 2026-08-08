@@ -1,7 +1,5 @@
 """Static typing helpers."""
 
-from __future__ import annotations
-
 from types import EllipsisType, ModuleType
 from typing import Protocol, TypeAlias
 
@@ -92,16 +90,15 @@ class Array(Protocol):  # pylint: disable=missing-class-docstring
     # def to_device(device: Device, /, *, stream: int | Any | None = None) -> Array: ...
 
 class DType(Protocol):  # pylint: disable=missing-class-docstring
-    pass
-
+    ...
 class Device(Protocol):  # pylint: disable=missing-class-docstring
-    pass
+    ...
 
 SetIndex: TypeAlias = (
     int | slice | EllipsisType | Array | tuple[int | slice | EllipsisType | Array, ...]
 )
 GetIndex: TypeAlias = (
-    SetIndex | None | tuple[int | slice | EllipsisType | None | Array, ...]
+    SetIndex | tuple[int | slice | EllipsisType | Array | None, ...] | None
 )
 
 __all__ = ["Array", "ArrayNamespace", "DType", "Device", "GetIndex", "SetIndex"]

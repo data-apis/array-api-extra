@@ -389,7 +389,7 @@ class TestJAXAutoJIT:
 
         class C:
             def __reduce__(self) -> object:  # type: ignore[override]  # pyright: ignore[reportIncompatibleMethodOverride,reportImplicitOverride]
-                raise Exception()
+                raise Exception()  # noqa: TRY002
 
         @jax_autojit
         def f(x: object) -> object:

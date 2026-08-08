@@ -1412,7 +1412,7 @@ class TestNanToNum:
         self,
         xp: ArrayNamespace,
         in_vals: Array,
-        fill_value: int | float,
+        fill_value: float,
         out_vals: Array,
     ) -> None:
         a = xp.asarray(in_vals)
@@ -1664,7 +1664,7 @@ class TestSinc:
         assert_close(w, xp.flip(w, axis=0))
 
     @pytest.mark.parametrize("x", [0, 1 + 3j])
-    def test_dtype(self, xp: ArrayNamespace, x: int | complex):
+    def test_dtype(self, xp: ArrayNamespace, x: complex):
         with pytest.raises(ValueError, match="real floating data type"):
             _ = sinc(xp.asarray(x))
 
