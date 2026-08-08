@@ -31,6 +31,7 @@ __all__ = [
     "cov",
     "create_diagonal",
     "default_dtype",
+    "deg2rad",
     "diag_indices",
     "expand_dims",
     "isclose",
@@ -43,6 +44,7 @@ __all__ = [
     "one_hot",
     "pad",
     "partition",
+    "rad2deg",
     "searchsorted",
     "setdiff1d",
     "sinc",
@@ -790,6 +792,18 @@ def angle(z: Array, /, *, deg: bool = False, xp: ArrayNamespace | None = None) -
     if deg:
         a = a * 180 / xp.pi
     return a
+
+
+def deg2rad(x: Array, /, *, xp: ArrayNamespace) -> Array:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._delegation.py`."""
+    return x * xp.pi / 180
+
+
+def rad2deg(x: Array, /, *, xp: ArrayNamespace) -> Array:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._delegation.py`."""
+    return x * 180 / xp.pi
 
 
 def unravel_index(indices: Array, shape: tuple[int, ...], /) -> tuple[Array, ...]:
