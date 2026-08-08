@@ -428,7 +428,7 @@ def pickle_flatten(
         @override
         def persistent_id(
             self, obj: object
-        ) -> Literal[0, 1, None]:  # numpydoc ignore=GL08
+        ) -> Literal[0, 1] | None:  # numpydoc ignore=GL08
             if isinstance(obj, cls):
                 instances.append(obj)
                 return 0
@@ -445,7 +445,7 @@ def pickle_flatten(
                 # Note: a class that defines __slots__ without defining __getstate__
                 # cannot be pickled with __reduce__(), but can with __reduce_ex__(5)
                 _ = obj.__reduce_ex__(pickle.HIGHEST_PROTOCOL)
-            except Exception:  # pylint: disable=broad-exception-caught
+            except Exception:  # pylint: disable=broad-exception-caught  # noqa: BLE001
                 rest.append(obj)
                 return 1
 

@@ -181,7 +181,7 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
     cond: Array,
     f1: Callable[..., Array],
     f2: Callable[..., Array] | None,
-    fill_value: Array | int | float | complex | bool | None,
+    fill_value: Array | complex | bool | None,
     *args: Array,
     kwkeys: list[str],
     xp: ArrayNamespace,
@@ -514,7 +514,7 @@ def kron(
 def nan_to_num(  # numpydoc ignore=PR01,RT01
     x: Array,
     /,
-    fill_value: int | float = 0.0,
+    fill_value: float = 0.0,
     *,
     xp: ArrayNamespace,
 ) -> Array:
@@ -522,7 +522,7 @@ def nan_to_num(  # numpydoc ignore=PR01,RT01
 
     def perform_replacements(  # numpydoc ignore=PR01,RT01
         x: Array,
-        fill_value: int | float,
+        fill_value: float,
         xp: ArrayNamespace,
     ) -> Array:
         """Internal function to perform the replacements."""

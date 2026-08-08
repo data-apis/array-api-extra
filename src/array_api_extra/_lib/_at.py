@@ -282,7 +282,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
                 "    at(x)[idx].set(value)\n"
                 "(same for all other methods)."
             )
-            raise ValueError(msg)
+            raise ValueError(msg)  # noqa: TRY004
 
         if copy not in (True, False, None):
             msg = f"copy must be True, False, or None; got {copy!r}"
