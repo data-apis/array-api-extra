@@ -2,6 +2,7 @@
 
 from . import testing
 from ._delegation import (
+    apply_along_axis,
     argpartition,
     atleast_nd,
     broadcast_shapes,
@@ -41,6 +42,7 @@ __version__ = "0.11.1.dev0"
 __all__ = [
     "__version__",
     "angle",
+    "apply_along_axis",
     "apply_where",
     "argpartition",
     "at",
