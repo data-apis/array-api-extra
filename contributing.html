@@ -333,8 +333,8 @@ if you prefer this to the <code class="docutils literal notranslate"><span class
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/data-apis/array-api-extra/issues/new">Open an issue</a> to
 propose the new function. You may want to wait for initial feedback on the
-issue before diving into an implementation. Feel free to skip this step if
-there is already an open issue for the function.</p></li>
+issue before diving into an implementation.
+Skip this step if there is already an open issue for the function.</p></li>
 <li><p>Add the implementation of your function to
 <code class="docutils literal notranslate"><span class="pre">src/array_api_extra/_lib/_funcs.py</span></code>.</p>
 <ul>
@@ -352,23 +352,23 @@ are supposed to be tested.</p></li>
 </ul>
 </li>
 <li><p>Add your function to <code class="docutils literal notranslate"><span class="pre">docs/api-reference.md</span></code>.</p></li>
-<li><p><a class="reference external" href="https://github.com/data-apis/array-api-extra/pulls">Make a PR!</a></p></li>
+<li><p>Don’t worry if you are not sure how to do some of the above steps or think you
+might have done something wrong -
+<a class="reference external" href="https://github.com/data-apis/array-api-extra/pulls">make a PR!</a></p></li>
 </ul>
-</section>
-<section id="how-to-add-delegation-to-a-function">
-<h2>How to add delegation to a function<a class="headerlink" href="#how-to-add-delegation-to-a-function" title="Link to this heading">¶</a></h2>
-<p>See <a class="reference external" href="https://github.com/data-apis/array-api-extra/issues/100">the tracker for adding delegation</a>.</p>
+<section id="delegation">
+<h3>Delegation<a class="headerlink" href="#delegation" title="Link to this heading">¶</a></h3>
+<p>Many new functions should also have ‘delegation’ to existing implementations in
+known array libraries added. This can happen in the same PR which adds the function,
+or in a follow-up PR.</p>
 <ul class="simple">
-<li><p>If you would like to discuss the task before diving into the implementation,
-click on the three dots next to the function on the tracker issue, and choose
-“Convert to sub-issue”.</p></li>
 <li><p>Create a function in <code class="docutils literal notranslate"><span class="pre">src/array_api_extra/_delegation.py</span></code> with a signature
 matching the function in <code class="docutils literal notranslate"><span class="pre">src/array_api_extra/_lib/_funcs.py</span></code>, and move the
 docstring to the new function. Leave a one-line docstring in <code class="docutils literal notranslate"><span class="pre">_funcs.py</span></code>,
 pointing to <code class="docutils literal notranslate"><span class="pre">_delegation.py</span></code> to see the full docstring.</p></li>
 <li><p>Also move the initial <code class="docutils literal notranslate"><span class="pre">array_namespace</span></code> call and any input validation over to
 the new function.</p></li>
-<li><p>Add delegation to backends using the <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">_delegate</span></code> pattern. See
+<li><p>Add delegation to backends using the <code class="docutils literal notranslate"><span class="pre">if_*_namespace</span></code> functions. See
 <code class="docutils literal notranslate"><span class="pre">src/array_api_extra/_lib/_backends.py</span></code> for the full list of backends we have
 worked with so far.</p></li>
 <li><p>After all delegation layers, return the result from the implementation in
@@ -376,10 +376,8 @@ worked with so far.</p></li>
 <li><p>Simplify the signature in <code class="docutils literal notranslate"><span class="pre">_funcs.py</span></code> to remove impossible arguments now that
 it is only called internally via <code class="docutils literal notranslate"><span class="pre">_delegation</span></code>. For example, the <code class="docutils literal notranslate"><span class="pre">xp</span></code>
 parameter can be changed from type <code class="docutils literal notranslate"><span class="pre">ArrayNamespace</span> <span class="pre">|</span> <span class="pre">None</span></code> to <code class="docutils literal notranslate"><span class="pre">ArrayNamespace</span></code>.</p></li>
-<li><p>Don’t worry if you are not sure how to do some of the above steps or think you
-might have done something wrong -
-<a class="reference external" href="https://github.com/data-apis/array-api-extra/pulls">make a PR!</a></p></li>
 </ul>
+</section>
 </section>
 </section>
 
@@ -447,8 +445,10 @@ might have done something wrong -
             <ul>
 <li><a class="reference internal" href="#">Contributing</a><ul>
 <li><a class="reference internal" href="#development-workflow">Development workflow</a></li>
-<li><a class="reference internal" href="#how-to-contribute-a-new-function">How to contribute a new function</a></li>
-<li><a class="reference internal" href="#how-to-add-delegation-to-a-function">How to add delegation to a function</a></li>
+<li><a class="reference internal" href="#how-to-contribute-a-new-function">How to contribute a new function</a><ul>
+<li><a class="reference internal" href="#delegation">Delegation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
