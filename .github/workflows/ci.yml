@@ -42,12 +42,16 @@ jobs:
     name: ${{ matrix.environment }} (${{ matrix.platform }})
     runs-on: >-
       ${{ matrix.platform == 'macos' && 'macos-latest'
+       || matrix.platform == 'windows' && 'windows-latest'
        || matrix.platform == 'linux-arm' && 'ubuntu-24.04-arm'
        || matrix.x64_runner || 'ubuntu-slim' }}
+    defaults:
+      run:
+        shell: bash # Windows defaults to pwsh, where ${VAR} isn't expansion
     strategy:
       fail-fast: false
       matrix:
-        platform: [linux-x64, linux-arm, macos]
+        platform: [linux-x64, linux-arm, macos, windows]
         environment:
           - tests-py311
           - tests-py314
@@ -92,3 +96,4 @@ jobs:
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: ${{ matrix.platform }}
