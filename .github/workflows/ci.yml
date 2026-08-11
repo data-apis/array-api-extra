@@ -68,6 +68,11 @@ jobs:
           # Non-default pixi task (default: tests-ci)
           - {environment: tests-nogil, task: "tests --parallel-threads=4", no-coverage: true}
           - {environment: tests-run-deps, task: tests-run-deps-cov}
+        exclude:
+          - {
+              environment: tests-nogil,
+              platform: macos,
+            } # https://github.com/data-apis/array-api-extra/issues/900
 
     environment:
       name: ci-checks
