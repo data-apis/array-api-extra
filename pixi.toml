@@ -1,4 +1,6 @@
 [workspace]
+name = "array-api-extra"
+description = "Extra array functions built on top of the array API standard."
 channels = ["https://prefix.dev/conda-forge"]
 platforms = [
   "linux-64",
@@ -128,7 +130,7 @@ hooks = {
   default-environment = "lint",
 }
 pre-commit = {
-  description = "Run pre-commit checks",
+  description = "Run pre-commit checks on staged files",
   cmd = "lefthook run pre-commit",
   default-environment = "lint",
 }
