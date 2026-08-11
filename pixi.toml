@@ -99,23 +99,23 @@ typing-extensions = ">=4.16.0"
 pylint = ">=4.0.6"
 mypy = ">=2.3.0"
 basedpyright = ">=1.39.8"
-numpydoc = ">=1.10.0,<2"
+numpydoc = ">=1.10.0"
 # import dependencies for mypy:
-array-api-strict = ">=2.6.1,<2.7"
+array-api-strict = ">=2.6.1"
 numpy = ">=2.1.3"
 hypothesis = ">=6.155.7"
 dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
-dprint = ">=0.50.0,<0.51"
-lefthook = ">=2.1.10,<3"
-ruff = ">=0.16.0,<0.17"
-typos = ">=1.48.0,<2"
-actionlint = ">=1.7.12,<2"
-blacken-docs = ">=1.20.0,<2"
-pytest = ">=9.1.1,<10"
-validate-pyproject = ">=0.25,<0.26"
-pyrefly = ">=1.1.1,<1.2"
-zizmor = ">=1.28.0,<1.29"
-tombi = ">=1.2.6,<1.3"
+dprint = ">=0.50.0"
+lefthook = ">=2.1.10"
+ruff = ">=0.16.0"
+typos = ">=1.48.0"
+actionlint = ">=1.7.12"
+blacken-docs = ">=1.20.0"
+pytest = ">=9.1.1"
+validate-pyproject = ">=0.25"
+pyrefly = ">=1.1.1"
+zizmor = ">=1.28.0"
+tombi = ">=1.2.6"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
@@ -218,9 +218,9 @@ lint = {
 pytest = ">=9.1.1"
 pytest-cov = ">=7.1.0"
 hypothesis = ">=6.155.7"
-array-api-strict = ">=2.6.1,<2.7"
+array-api-strict = ">=2.6.1"
 numpy = ">=1.22.0"
-scipy = ">=1.15.2,<2"
+scipy = ">=1.15.2"
 
 [feature.tests.tasks]
 tests = {
