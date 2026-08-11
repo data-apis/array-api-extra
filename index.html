@@ -242,6 +242,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="library-design.html">Library Design</a></li>
 </ul>
 
 </div>
@@ -288,15 +289,14 @@
 <h1>array-api-extra<a class="headerlink" href="#array-api-extra" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>This is a library housing “array-agnostic” implementations of functions built on
-top of <a class="reference external" href="https://data-apis.org/array-api/">the Python array API standard</a>, as
-well as delegation to existing implementations for known array library backends.</p>
+<p>This is a library housing extra array functions built on
+top of <a class="reference external" href="https://data-apis.org/array-api/">the Python array API standard</a>.</p>
 <p>The intended users of this library are “array-consuming” libraries which are
 using <a class="reference external" href="https://data-apis.org/array-api-compat/">array-api-compat</a> to make their
 own library’s functions array-agnostic. In this library, they will find a set of
 tools which provide <em>extra</em> functionality on top of the array API standard,
-which other array-consuming libraries in a similar position have found useful
-themselves.</p>
+which other array-consuming libraries in a similar position have
+themselves found useful.</p>
 <p>It is currently used by:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/scipy/scipy">SciPy</a> — Fundamental algorithms for
@@ -323,22 +323,57 @@ Learning in Python.</p></li>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>add<span class="w"> </span>array-api-extra
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This library currently provides no backwards-compatibility guarantees!
-If you require stability, it is recommended to pin <code class="docutils literal notranslate"><span class="pre">array-api-extra</span></code> to
-a specific version, or vendor the library inside your own.</p>
-</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This library depends on <code class="docutils literal notranslate"><span class="pre">array-api-compat</span></code>. We aim for compatibility with
 the latest released versions of the standard and array-api-compat,
-and your mileage may vary with older or dev/draft versions.</p>
+and your mileage may vary with older versions.</p>
 </div>
 </section>
+<section id="versioning">
+<h2>Versioning<a class="headerlink" href="#versioning" title="Link to this heading">¶</a></h2>
+<p>This project uses <a class="reference external" href="https://jacobtomlinson.dev/effver/">EffVer</a>.</p>
+<ul class="simple">
+<li><p>To bump from version <code class="docutils literal notranslate"><span class="pre">x.y.z</span></code> to <code class="docutils literal notranslate"><span class="pre">x.(y+1).0</span></code> of array-api-extra, expect that
+you may need to put in some work.</p></li>
+<li><p>To bump from version <code class="docutils literal notranslate"><span class="pre">x.y.z</span></code> to <code class="docutils literal notranslate"><span class="pre">x.y.(z+1)</span></code>, any work needed on your side
+should be minimal. Please open an issue if this is not the case!</p></li>
+</ul>
+</section>
+<section id="usage">
+<span id="id2"></span><h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
+<p>Typical usage of this library looks like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
+
+<span class="o">...</span>
+<span class="n">xp</span> <span class="o">=</span> <span class="n">array_namespace</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># use functions from `xp` as normal</span>
+<span class="o">...</span>
+<span class="k">return</span> <span class="n">xpx</span><span class="o">.</span><span class="n">atleast_nd</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>  <span class="c1"># use functions from `xpx`, passing `xp=xp`</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Functions in this library assume input arrays <em>are arrays</em> (not “array-likes”) and that
+the namespace passed as <code class="docutils literal notranslate"><span class="pre">xp</span></code> (if given) is compatible with the standard -
+in most cases, it should come from array-api-compat’s <code class="docutils literal notranslate"><span class="pre">array_namespace</span></code>.
+Calling functions without providing an <code class="docutils literal notranslate"><span class="pre">xp</span></code> argument means that <code class="docutils literal notranslate"><span class="pre">array_namespace</span></code>
+is called internally on the input arrays to determine the namespace.</p>
+</div>
+<p>In the examples shown in the docstrings of functions from this library,
+<a class="reference external" href="https://data-apis.org/array-api-strict/">array-api-strict</a> is used as the array
+namespace <code class="docutils literal notranslate"><span class="pre">xp</span></code>. In reality, code using this library will be written to work with
+any compatible array namespace as <code class="docutils literal notranslate"><span class="pre">xp</span></code>, not any particular implementation.</p>
+<p>Some functions may only work with specific array libraries supported by
+array-api-compat. This should be clearly indicated in the docs - please open an
+issue if this is not the case!</p>
+</section>
 <section id="vendoring">
-<span id="id2"></span><h2>Vendoring<a class="headerlink" href="#vendoring" title="Link to this heading">¶</a></h2>
-<p>To vendor the library, clone
+<span id="id3"></span><h2>Vendoring<a class="headerlink" href="#vendoring" title="Link to this heading">¶</a></h2>
+<p>If stability is important for your library, it is recommended to either pin
+array-api-extra to a specific (micro or meso) version, or vendor array-api-extra
+inside your library.</p>
+<p>To achieve the latter, clone
 <a class="reference external" href="https://github.com/data-apis/array-api-extra">the array-api-extra repository</a>
 and copy it into the appropriate place in your library, like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="o">-</span><span class="n">a</span> <span class="n">array</span><span class="o">-</span><span class="n">api</span><span class="o">-</span><span class="n">extra</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">array_api_extra</span> <span class="n">mylib</span><span class="o">/</span><span class="n">vendored</span><span class="o">/</span>
@@ -380,91 +415,6 @@ top-level array-api-compat if present:</p>
 <p class="admonition-title">Tip</p>
 <p>See <a class="reference external" href="https://github.com/scipy/scipy/blob/main/scipy/_external/_array_api_compat_vendor.py">an example of this in SciPy</a>.</p>
 </div>
-</section>
-<section id="versioning">
-<h2>Versioning<a class="headerlink" href="#versioning" title="Link to this heading">¶</a></h2>
-<p>This project uses <a class="reference external" href="https://jacobtomlinson.dev/effver/">EffVer</a>. TL;DR:</p>
-<ul class="simple">
-<li><p>To bump from version <code class="docutils literal notranslate"><span class="pre">x.y.z</span></code> to <code class="docutils literal notranslate"><span class="pre">x.(y+1).0</span></code> of array-api-extra, expect that
-you may need to put in some work.</p></li>
-<li><p>To bump from version <code class="docutils literal notranslate"><span class="pre">x.y.z</span></code> to <code class="docutils literal notranslate"><span class="pre">x.y.(z+1)</span></code>, any work needed on your side
-should be minimal. Please open an issue if this is not the case!</p></li>
-</ul>
-</section>
-<section id="usage">
-<span id="id3"></span><h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
-<p>Typical usage of this library looks like:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
-
-<span class="o">...</span>
-<span class="n">xp</span> <span class="o">=</span> <span class="n">array_namespace</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># use functions from `xp` as normal</span>
-<span class="o">...</span>
-<span class="k">return</span> <span class="n">xpx</span><span class="o">.</span><span class="n">atleast_nd</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>  <span class="c1"># use functions from `xpx`, passing `xp=xp`</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Functions in this library assume input arrays <em>are arrays</em> (not “array-likes”) and that
-the namespace passed as <code class="docutils literal notranslate"><span class="pre">xp</span></code> (if given) is compatible with the standard -
-this means that it should come from array-api-compat’s <code class="docutils literal notranslate"><span class="pre">array_namespace</span></code>,
-or otherwise be compatible with the standard.</p>
-<p>Calling functions without providing an <code class="docutils literal notranslate"><span class="pre">xp</span></code> argument means that <code class="docutils literal notranslate"><span class="pre">array_namespace</span></code>
-is called internally to determine the namespace.</p>
-</div>
-<p>In the examples shown in the docstrings of functions from this library,
-<a class="reference external" href="https://data-apis.org/array-api-strict/">array-api-strict</a> is used as the array
-namespace <code class="docutils literal notranslate"><span class="pre">xp</span></code>. In reality, code using this library will be written to work with
-any compatible array namespace as <code class="docutils literal notranslate"><span class="pre">xp</span></code>, not any particular implementation.</p>
-<p>Some functions may only work with specific array libraries supported by
-array-api-compat. This should be clearly indicated in the docs - please open an
-issue if this is not the case!</p>
-</section>
-<section id="scope">
-<span id="id4"></span><h2>Scope<a class="headerlink" href="#scope" title="Link to this heading">¶</a></h2>
-<p>Functions that are in-scope for this library will:</p>
-<ul class="simple">
-<li><p>Implement functionality which does not already exist in the array API
-standard.</p></li>
-<li><p>Implement functionality which may be generally useful across various
-libraries.</p></li>
-<li><p>Be implemented with type annotations and
-<a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">numpydoc-style docstrings</a>.</p></li>
-<li><p>Be tested against array-api-strict and various existing backends.</p></li>
-</ul>
-<p>Functions are implemented purely in terms of the array API standard where
-possible. Where functions must use library-specific helpers for libraries
-supported by array-api-compat, this will be clearly marked in their API
-reference page.</p>
-<p>Delegation is added for some functions to use native implementations for the
-given array type, instead of the array-agnostic implementations, as this may
-increase performance.</p>
-<p>In particular, the following kinds of function are also in-scope:</p>
-<ul class="simple">
-<li><p>Functions which implement
-<a class="reference external" href="https://data-apis.org/array-api/latest/extensions/index.html">array API standard extension</a>
-functions in terms of functions from the base standard.</p></li>
-<li><p>Functions which add functionality (e.g. extra parameters) to functions from
-the standard.</p></li>
-</ul>
-<p>The following features are currently out-of-scope for this library:</p>
-<ul class="simple">
-<li><p>Functions which accept “array-like” input, or standard-incompatible
-namespaces.</p>
-<ul>
-<li><p>It is possible to prepare input arrays and a standard-compatible namespace
-via array-api-compat downstream in consumer libraries. The <code class="docutils literal notranslate"><span class="pre">xp</span></code> argument can
-also be omitted to infer the standard-compatible namespace using
-<code class="docutils literal notranslate"><span class="pre">array_namespace</span></code> internally.</p></li>
-</ul>
-</li>
-<li><p>Functions which are specific to a particular domain.</p>
-<ul>
-<li><p>These functions may belong better in an array-consuming library which is
-specific to that domain.</p></li>
-</ul>
-</li>
-</ul>
 </section>
 </section>
 
@@ -522,10 +472,9 @@ specific to that domain.</p></li>
             <ul>
 <li><a class="reference internal" href="#">array-api-extra</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#vendoring">Vendoring</a></li>
 <li><a class="reference internal" href="#versioning">Versioning</a></li>
 <li><a class="reference internal" href="#usage">Usage</a></li>
-<li><a class="reference internal" href="#scope">Scope</a></li>
+<li><a class="reference internal" href="#vendoring">Vendoring</a></li>
 </ul>
 </li>
 </ul>
