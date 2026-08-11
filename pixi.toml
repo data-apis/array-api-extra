@@ -10,6 +10,7 @@ platforms = [
 ]
 preview = ["pixi-build"]
 requires-pixi = ">=0.71.2"
+exclude-newer = "7d"
 
 ### array-api-extra package definition ###
 
