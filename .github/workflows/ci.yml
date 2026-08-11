@@ -39,26 +39,31 @@ jobs:
         run: pixi run -e lint lint
 
   checks:
-    name: Test ${{ matrix.environment }}
-    runs-on: ${{ matrix.runs-on }}
+    name: ${{ matrix.environment }} (${{ matrix.platform }})
+    runs-on: >-
+      ${{ matrix.platform == 'macos' && 'macos-latest'
+       || matrix.platform == 'linux-arm' && 'ubuntu-24.04-arm'
+       || matrix.x64_runner || 'ubuntu-slim' }}
     strategy:
       fail-fast: false
       matrix:
+        platform: [linux-x64, linux-arm, macos]
+        environment:
+          - tests-py311
+          - tests-py314
+          - tests-numpy1
+          - tests-nogil
+          - tests-backends
+          - tests-backends-py311
+          - tests-run-deps
         include:
-          - environment: tests-py311
-            runs-on: ubuntu-latest
-          - environment: tests-py314
-            runs-on: ubuntu-slim
-          - environment: tests-numpy1
-            runs-on: ubuntu-slim
-          - environment: tests-nogil
-            runs-on: ubuntu-slim
-          - environment: tests-backends
-            runs-on: ubuntu-latest
-          - environment: tests-backends-py311
-            runs-on: ubuntu-latest
-          - environment: tests-run-deps
-            runs-on: ubuntu-slim
+          # Full x64 image is faster than ubuntu-slim for the slowest jobs
+          - {environment: tests-py311, x64_runner: ubuntu-latest}
+          - {environment: tests-backends, x64_runner: ubuntu-latest}
+          - {environment: tests-backends-py311, x64_runner: ubuntu-latest}
+          # Non-default pixi task (default: tests-ci)
+          - {environment: tests-nogil, task: "tests --parallel-threads=4", no-coverage: true}
+          - {environment: tests-run-deps, task: tests-run-deps-cov}
 
     environment:
       name: ci-checks
@@ -76,23 +81,14 @@ jobs:
           cache: true
           environments: ${{ matrix.environment }}
 
-      - name: Test package
-        # Save some time; also at the moment of writing coverage crashes on python 3.13t
-        if: ${{ matrix.environment != 'tests-nogil' && matrix.environment != 'tests-run-deps' }}
-        run: pixi run -e "${TASK_ENV}" tests-ci
+      - name: Test
+        run: pixi run -e "${TASK_ENV}" ${TASK}
         env:
           TASK_ENV: ${{ matrix.environment }}
-
-      - name: Test free-threading
-        if: ${{ matrix.environment == 'tests-nogil' }}
-        run: pixi run -e tests-nogil tests --parallel-threads=4
-
-      - name: Run dependency tests
-        if: ${{ matrix.environment == 'tests-run-deps' }}
-        run: pixi run tests-run-deps-cov
+          TASK: ${{ matrix.task || 'tests-ci' }}
 
       - name: Upload coverage report
-        if: ${{ matrix.environment != 'tests-nogil' }}
+        if: ${{ !matrix.no-coverage }}
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
