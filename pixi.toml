@@ -9,7 +9,7 @@ platforms = [
   { platform = "win-64", cuda = "12.9" },
 ]
 preview = ["pixi-build"]
-requires-pixi = ">=0.71.2"
+requires-pixi = ">=0.73.0"  # for TOML 1.1 support
 exclude-newer = "7d"
 
 ### array-api-extra package definition ###
@@ -85,8 +85,8 @@ tests-nogil = ["py314t", "nogil", "tests"]
 
 ### default feature definition ###
 
-[dev]
 # this pulls in array-api-extra's host dependencies
+[dev]
 array-api-extra.path = "."
 
 [dependencies]
@@ -366,30 +366,19 @@ dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
 sparse = ">=0.19.0"
 
 [feature.backends.target.unix.dependencies]
-jax = ">=0.10.2"
+jax = ">=0.10.2"  # waiting for https://github.com/conda-forge/jaxlib-feedstock/pull/326
 
 # Backends that require a GPU host and a CUDA driver.
-# Note that JAX and PyTorch automatically prefer CUDA variants
-# thanks to the cuda platform specification, *if available*.
-# We request them explicitly below to ensure that we don't
-# quietly revert to CPU-only in the future, e.g. when CUDA 13
-# is released and CUDA 12 builds are dropped upstream.
 [feature.cuda-backends]
 platforms = ["linux-64-cuda-12-9", "win-64-cuda-12-9"]
 
 [feature.cuda-backends.dependencies]
 cuda-version = "==12.9"
 cupy = ">=14.1.1"
-pytorch = {
-  version = ">=2.12.0",
-  build = "cuda12*",
-}
+pytorch = ">=2.12.0"
 
 [feature.cuda-backends.target.linux.dependencies]
-jaxlib = {
-  version = ">=0.10.2",
-  build = "cuda12*",
-}
+jaxlib = ">=0.10.2"
 
 [feature.nogil.dependencies]
 pytest-run-parallel = ">=0.9.1"
