@@ -257,7 +257,7 @@ clean-vendor-extra = {
 copy-vendor-compat = {
   description = "Vendor a clean copy of array-api-compat",
   depends-on = ["clean-vendor-compat"],
-  cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/ && rm -rf vendor_tests/array_api_compat/vendor_tests && rm -rf vendor_tests/array_api_compat/tests",
+  cmd = "cp -r $(python -c 'import array_api_compat, pathlib; print(pathlib.Path(array_api_compat.__file__).parent)') vendor_tests/ && rm -rf vendor_tests/array_api_compat/vendor_tests && rm -rf vendor_tests/array_api_compat/tests",
   default-environment = "tests",
 }
 copy-vendor-extra = {
