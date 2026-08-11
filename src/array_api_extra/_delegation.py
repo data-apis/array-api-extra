@@ -341,6 +341,13 @@ def deg2rad(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     array
         The corresponding angles in radians. Integral inputs are converted to the
         default floating-point dtype.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.deg2rad(xp.asarray([0, 90, 180]), xp=xp)
+    Array([0.        , 1.57079633, 3.14159265], dtype=array_api_strict.float64)
     """
     if xp is None:
         xp = array_namespace(x)
@@ -380,6 +387,13 @@ def rad2deg(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     array
         The corresponding angles in degrees. Integral inputs are converted to the
         default floating-point dtype.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.rad2deg(xp.asarray([0.0, xp.pi / 2, xp.pi]), xp=xp)
+    Array([  0.,  90., 180.], dtype=array_api_strict.float64)
     """
     if xp is None:
         xp = array_namespace(x)
