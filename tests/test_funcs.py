@@ -2180,7 +2180,7 @@ class TestDeg2Rad:
     def test_basic(self, xp: ArrayNamespace):
         x = xp.asarray([0.0, 90.0, 180.0, 270.0, 360.0])
         expected = xp.asarray([0.0, xp.pi / 2, xp.pi, 3 * xp.pi / 2, 2 * xp.pi])
-        assert_close(deg2rad(x, xp=xp), expected)
+        assert_close(deg2rad(x), expected)
 
     @pytest.mark.parametrize("dtype_name", ["int32", "int64"])
     def test_integral(self, xp: ArrayNamespace, dtype_name: str):
@@ -2202,14 +2202,18 @@ class TestDeg2Rad:
     def test_bool(self, xp: ArrayNamespace):
         x = xp.asarray([True])
         with pytest.raises(TypeError, match="integral, real floating, or complex"):
-            deg2rad(x, xp=xp)
+            _ = deg2rad(x, xp=xp)
+
+    def test_device(self, xp: ArrayNamespace, device: Device):
+        x = xp.asarray([0.0, 90.0, 180.0], device=device)
+        assert get_device(deg2rad(x)) == device
 
 
 class TestRad2Deg:
     def test_basic(self, xp: ArrayNamespace):
         x = xp.asarray([0.0, xp.pi / 2, xp.pi, 3 * xp.pi / 2, 2 * xp.pi])
         expected = xp.asarray([0.0, 90.0, 180.0, 270.0, 360.0])
-        assert_close(rad2deg(x, xp=xp), expected)
+        assert_close(rad2deg(x), expected)
 
     @pytest.mark.parametrize("dtype_name", ["int32", "int64"])
     def test_integral(self, xp: ArrayNamespace, dtype_name: str):
@@ -2232,7 +2236,11 @@ class TestRad2Deg:
     def test_bool(self, xp: ArrayNamespace):
         x = xp.asarray([True])
         with pytest.raises(TypeError, match="integral, real floating, or complex"):
-            rad2deg(x, xp=xp)
+            _ = rad2deg(x, xp=xp)
+
+    def test_device(self, xp: ArrayNamespace, device: Device):
+        x = xp.asarray([0.0, xp.pi / 2, xp.pi], device=device)
+        assert get_device(rad2deg(x)) == device
 
 
 class TestUnravelIndex:
