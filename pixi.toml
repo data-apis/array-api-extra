@@ -47,7 +47,7 @@ tests-cuda-py311 = { features = ["py311", "tests", "backends", "cuda-backends"] 
 # Ungrouped environments
 tests-numpy1 = ["py311", "tests", "numpy1"]
 tests-py311 = ["py311", "tests"]
-tests-nogil = ["nogil", "tests"]
+tests-nogil = ["py314t", "nogil", "tests"]
 
 ### default feature definition ###
 
@@ -171,6 +171,9 @@ python = "~=3.11.0"
 [feature.py314.dependencies]
 python = "~=3.14.0"
 
+[feature.py314t.dependencies]
+python-freethreading = "~=3.14.0"
+
 [feature.numpy1.dependencies]
 # Oldest NumPy version supported by scikit-learn.
 # Note that this is older than what SPEC0 recommends.
@@ -204,7 +207,6 @@ pytorch = { version = ">=2.12.0", build = "cuda12*" }
 jaxlib = { version = ">=0.10.2", build = "cuda12*" }
 
 [feature.nogil.dependencies]
-python-freethreading = "~=3.13.0"
 pytest-run-parallel = ">=0.9.1"
 numpy = ">=2.3.5"
 # pytorch = "*"  # Not available on Python 3.13t yet
