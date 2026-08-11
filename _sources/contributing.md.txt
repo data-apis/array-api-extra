@@ -1,10 +1,49 @@
 # Contributing
 
-Contributions are welcome from any "array-consuming" library contributors who
-have found themselves writing private array-agnostic functions in the process of
-converting code to consume the standard.
-
 Thanks to [all contributors](contributors.md) so far!
+
+## Development workflow
+
+Development of array-api-extra is made easy with [Pixi](https://pixi.sh/latest/):
+
+- [Clone the repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
+  at <https://github.com/data-apis/array-api-extra>.
+- `cd array-api-extra`.
+- [Install Pixi](https://pixi.sh/latest/#installation).
+
+All development tasks are then available via `pixi run`:
+
+```bash
+pixi run tests      # run the tests
+pixi run open-docs  # build and preview the docs
+pixi run lint       # run the full lint suite
+pixi run ipython    # spawn an ipython prompt with array-api-extra installed
+pixi run hooks      # install pre-commit hooks
+```
+
+```{tip}
+Run `pixi task list` for a full list of available tasks.
+```
+
+Alternative environments are available for the test tasks:
+
+```bash
+pixi run --environment=tests-numpy1 tests    # test with numpy<2 installed
+pixi run --environment=tests-backends tests  # test with additional CPU array backends
+pixi run --environment=tests-cuda tests      # test with CUDA array backends
+```
+
+```{tip}
+Run `pixi info` for a full list of environments and their tasks.
+```
+
+````{note}
+You may also enter an activated developer environment shell,
+if you prefer this to the `pixi run` task workflow:
+
+```bash
+pixi shell --environment=dev
+````
 
 ## How to contribute a new function
 
@@ -51,99 +90,3 @@ See [the tracker for adding delegation][delegation-tracker].
 - Don't worry if you are not sure how to do some of the above steps or think you
   might have done something wrong -
   [make a PR!](https://github.com/data-apis/array-api-extra/pulls)
-
-## Development workflow
-
-If you are an experienced contributor to Python packages, feel free to develop
-however you feel comfortable! However, if you would like some guidance,
-development of array-api-extra is made easy with
-[Pixi](https://pixi.sh/latest/):
-
-- [Clone the repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
-  at <https://github.com/data-apis/array-api-extra>.
-- `cd array-api-extra`.
-- [Install Pixi](https://pixi.sh/latest/#installation).
-- To enter a development environment (if you prefer this to the `pixi run` interface):
-
-```
-pixi shell -e dev
-```
-
-- To run the tests:
-
-```
-pixi run tests
-```
-
-- To build the docs locally:
-
-```
-pixi run docs
-```
-
-- To build and preview the docs locally:
-
-```
-pixi run open-docs
-```
-
-- To install pre-commit hooks:
-
-```
-pixi run hooks
-```
-
-- To run pre-commit checks on staged files:
-
-```
-pixi run pre-commit
-```
-
-- To run the full lint suite:
-
-```
-pixi run --environment=lint lint
-```
-
-- To enter an interactive Python prompt:
-
-```
-pixi run ipython
-```
-
-- To run individual parts of the lint suite separately (for example):
-
-```
-pixi run --environment=lint pyright
-pixi run --environment=lint dprint
-```
-
-- To generate the coverage report:
-
-```
-pixi run coverage
-```
-
-- To generate and display the coverage report:
-
-```
-pixi run open-coverage
-```
-
-Alternative environments are available with a subset of the dependencies and
-tasks available in the `dev` environment:
-
-```
-pixi shell --environment=docs
-pixi shell --environment=tests
-pixi shell --environment=tests-backends
-pixi shell --environment=lint
-```
-
-If you run on a host with CUDA hardware, you can enable extra tests:
-
-```
-pixi shell --environment=dev-cuda
-pixi shell --environment=tests-cuda
-pixi run --environment=tests-cuda tests
-```
