@@ -51,6 +51,7 @@ from array_api_extra._lib._backends import NUMPY_VERSION, Backend
 from array_api_extra._lib._funcs import searchsorted as _funcs_searchsorted
 from array_api_extra._lib._utils._compat import (
     array_namespace,
+    is_jax_namespace,
     is_torch_namespace,
 )
 from array_api_extra._lib._utils._compat import device as get_device
@@ -2028,6 +2029,8 @@ class TestSearchsorted:
         xp: ArrayNamespace,
         searchsorted: Callable[..., Array],
     ):
+        if nans_x and is_jax_namespace(xp):
+            pytest.xfail("https://github.com/jax-ml/jax/issues/39887")
         if nans_x and is_torch_namespace(xp) and searchsorted == xpx_searchsorted:
             pytest.skip("torch sorts NaNs differently")
         if isinstance(shape, tuple) and searchsorted == _funcs_searchsorted:
