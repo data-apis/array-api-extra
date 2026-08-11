@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="default_dtype" href="array_api_extra.default_dtype.html"><link rel="prev" title="cov" href="array_api_extra.cov.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="searchsorted" href="array_api_extra.searchsorted.html"><link rel="prev" title="partition" href="array_api_extra.partition.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>create_diagonal - array-api-extra 0.11.1.dev0 documentation</title>
+        <title>rad2deg - array-api-extra 0.11.1.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -201,7 +201,7 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.atleast_nd.html">atleast_nd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.broadcast_shapes.html">broadcast_shapes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.cov.html">cov</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">create_diagonal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="array_api_extra.create_diagonal.html">create_diagonal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.default_dtype.html">default_dtype</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.deg2rad.html">deg2rad</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.diag_indices.html">diag_indices</a></li>
@@ -217,7 +217,7 @@
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.one_hot.html">one_hot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.pad.html">pad</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.partition.html">partition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="array_api_extra.rad2deg.html">rad2deg</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">rad2deg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.searchsorted.html">searchsorted</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.setdiff1d.html">setdiff1d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="array_api_extra.sinc.html">sinc</a></li>
@@ -262,12 +262,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.create_diagonal.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/docs/generated/array_api_extra.rad2deg.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.create_diagonal.rst" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/docs/generated/array_api_extra.rad2deg.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -284,25 +284,22 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="create-diagonal">
-<h1>create_diagonal<a class="headerlink" href="#create-diagonal" title="Link to this heading">¶</a></h1>
+          <section id="rad2deg">
+<h1>rad2deg<a class="headerlink" href="#rad2deg" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.create_diagonal">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">create_diagonal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.create_diagonal" title="Link to this definition">¶</a></dt>
-<dd><p>Construct a diagonal array.</p>
+<dt class="sig sig-object py" id="array_api_extra.rad2deg">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">rad2deg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.rad2deg" title="Link to this definition">¶</a></dt>
+<dd><p>Convert angles from radians to degrees.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>array</em>) – An array having shape <code class="docutils literal notranslate"><span class="pre">(*batch_dims,</span> <span class="pre">k)</span></code>.</p></li>
-<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Offset from the leading diagonal (default is <code class="docutils literal notranslate"><span class="pre">0</span></code>).
-Use positive ints for diagonals above the leading diagonal,
-and negative ints for diagonals below the leading diagonal.</p></li>
+<li><p><strong>x</strong> (<em>array</em>) – Input array in radians. Must have an integral or floating-point dtype.</p></li>
 <li><p><strong>xp</strong> (<em>array_namespace</em><em>, </em><em>optional</em>) – The standard-compatible namespace for <cite>x</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>An array having shape <code class="docutils literal notranslate"><span class="pre">(*batch_dims,</span> <span class="pre">k+abs(offset),</span> <span class="pre">k+abs(offset))</span></code> with <cite>x</cite>
-on the diagonal (offset by <cite>offset</cite>).</p>
+<dd class="field-even"><p>The corresponding angles in degrees. Integral inputs are converted to the
+default floating-point dtype.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
@@ -311,21 +308,8 @@ on the diagonal (offset by <cite>offset</cite>).</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_strict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xp</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">create_diagonal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
-<span class="go">Array([[2, 0, 0],</span>
-<span class="go">       [0, 4, 0],</span>
-<span class="go">       [0, 0, 8]], dtype=array_api_strict.int64)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">create_diagonal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">offset</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
-<span class="go">Array([[0, 0, 0, 0, 0],</span>
-<span class="go">       [0, 0, 0, 0, 0],</span>
-<span class="go">       [2, 0, 0, 0, 0],</span>
-<span class="go">       [0, 4, 0, 0, 0],</span>
-<span class="go">       [0, 0, 8, 0, 0]], dtype=array_api_strict.int64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">pi</span><span class="p">]),</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array([  0.,  90., 180.], dtype=array_api_strict.float64)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -337,23 +321,23 @@ on the diagonal (offset by <cite>offset</cite>).</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="array_api_extra.default_dtype.html">
+          <a class="next-page" href="array_api_extra.searchsorted.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">default_dtype</div>
+                <div class="title">searchsorted</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.cov.html">
+          <a class="prev-page" href="array_api_extra.partition.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">cov</div>
+                <div class="title">partition</div>
                 
               </div>
             </a>
@@ -394,8 +378,8 @@ on the diagonal (offset by <cite>offset</cite>).</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">create_diagonal</a><ul>
-<li><a class="reference internal" href="#array_api_extra.create_diagonal"><code class="docutils literal notranslate"><span class="pre">create_diagonal()</span></code></a></li>
+<li><a class="reference internal" href="#">rad2deg</a><ul>
+<li><a class="reference internal" href="#array_api_extra.rad2deg"><code class="docutils literal notranslate"><span class="pre">rad2deg()</span></code></a></li>
 </ul>
 </li>
 </ul>
