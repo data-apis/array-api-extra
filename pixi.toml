@@ -394,7 +394,7 @@ jaxlib = {
 [feature.nogil.dependencies]
 pytest-run-parallel = ">=0.9.1"
 numpy = ">=2.3.5"
-# pytorch = "*"  # Not available on Python 3.13t yet
 dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
-# sparse = "*"  # numba not available on Python 3.13t yet
-# jax = "*"  # ml_dtypes not available on Python 3.13t yet
+sparse = ">=0.19.1"
+# pytorch = "*"  # Not available on Python 3.14t yet
+# jax = "*"  # waiting for https://github.com/conda-forge/jaxlib-feedstock/pull/351
