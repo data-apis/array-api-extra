@@ -59,6 +59,7 @@ intersphinx_mapping = {
     "dask": ("https://docs.dask.org/en/stable", None),
     "numpy": ("https://numpy.org/doc/stable", None),
     "jax": ("https://docs.jax.dev/en/latest", None),
+    "pytest": ("https://docs.pytest.org/en/stable/", None),
 }
 
 nitpick_ignore = [
