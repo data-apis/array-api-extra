@@ -27,32 +27,66 @@ array-api-compat = "*"
 ### workspace environments ###
 
 [environments]
-default = { features = ["py314"], solve-group = "py314" }
-lint = { features = ["py311", "lint"], solve-group = "py311" }
-docs = { features = ["py314", "docs"], solve-group = "py314" }
-tests = { features = ["py314", "tests"], solve-group = "py314" }
-tests-py314 = { features = ["py314", "tests"], solve-group = "py314" } # alias of tests
-tests-run-deps = { features = ["py314", "tests-run-deps"], solve-group = "py314" }
+default = {
+  features = ["py314"],
+  solve-group = "py314",
+}
+lint = {
+  features = ["py311", "lint"],
+  solve-group = "py311",
+}
+docs = {
+  features = ["py314", "docs"],
+  solve-group = "py314",
+}
+
+tests = {
+  features = ["py314", "tests"],
+  solve-group = "py314",
+}
+tests-py314 = {  # alias of tests
+  features = ["py314", "tests"],
+  solve-group = "py314",
+}
+tests-py311 = {
+  features = ["py311", "tests"],
+  solve-group = "py311",
+}
+tests-run-deps = {
+  features = ["py314", "tests-run-deps"],
+  solve-group = "py314",
+}
 
 # Some backends may pin numpy; use separate solve-group
-dev = { features = ["py314", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
-tests-backends = { features = ["py314", "tests", "backends"], solve-group = "backends" }
-tests-backends-py311 = { features = ["py311", "tests", "backends"] }
+dev = {
+  features = ["py314", "lint", "tests", "docs", "dev", "backends"],
+  solve-group = "backends",
+}
+tests-backends = {
+  features = ["py314", "tests", "backends"],
+  solve-group = "backends",
+}
+tests-backends-py311.features = ["py311", "tests", "backends"]
 
 # CUDA not available on free github actions and on some developers' PCs
-dev-cuda = { features = ["py314", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda = { features = ["py314", "tests", "backends", "cuda-backends"], solve-group = "cuda" }
-tests-cuda-py311 = { features = ["py311", "tests", "backends", "cuda-backends"] }
+dev-cuda = {
+  features = ["py314", "lint", "tests", "docs", "dev", "backends", "cuda-backends"],
+  solve-group = "cuda",
+}
+tests-cuda = {
+  features = ["py314", "tests", "backends", "cuda-backends"],
+  solve-group = "cuda",
+}
+tests-cuda-py311.features = ["py311", "tests", "backends", "cuda-backends"]
 
 # Ungrouped environments
 tests-numpy1 = ["py311", "tests", "numpy1"]
-tests-py311 = ["py311", "tests"]
 tests-nogil = ["py314t", "nogil", "tests"]
 
 ### default feature definition ###
 
 [dev]
-# this pulls in array-api-extra's host and run dependencies
+# this pulls in array-api-extra's host dependencies
 array-api-extra.path = "."
 
 [dependencies]
@@ -70,7 +104,7 @@ numpydoc = ">=1.10.0,<2"
 array-api-strict = ">=2.6.1,<2.7"
 numpy = ">=2.1.3"
 hypothesis = ">=6.155.7"
-dask-core = ">=2026.7.1" # No distributed, tornado, etc.
+dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
 dprint = ">=0.50.0,<0.51"
 lefthook = ">=2.1.10,<3"
 ruff = ">=0.16.0,<0.17"
@@ -81,27 +115,104 @@ pytest = ">=9.1.1,<10"
 validate-pyproject = ">=0.25,<0.26"
 pyrefly = ">=1.1.1,<1.2"
 zizmor = ">=1.28.0,<1.29"
+tombi = ">=1.2.6,<1.3"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
 [feature.lint.tasks]
-lefthook = { cmd = "lefthook", description = "Run lefthook", default-environment = "lint" }
-hooks = { cmd = "lefthook install", description = "Install pre-commit hooks", default-environment = "lint" }
-pre-commit = { cmd = "lefthook run pre-commit", description = "Run pre-commit checks", default-environment = "lint" }
-pylint = { cmd = "pylint array_api_extra", cwd = "src", description = "Lint with pylint", default-environment = "lint" }
-mypy = { cmd = "mypy", description = "Type check with mypy", default-environment = "lint" }
-pyrefly = { cmd = "pyrefly check", description = "Type check with pyrefly", default-environment = "lint" }
-pyright = { cmd = "basedpyright", description = "Type check with basedpyright", default-environment = "lint" }
-ruff-check = { cmd = "ruff check --fix", description = "Lint with ruff", default-environment = "lint" }
-ruff-format = { cmd = "ruff format", description = "Format with ruff", default-environment = "lint" }
-dprint = { cmd = "dprint fmt", description = "Format with dprint", default-environment = "lint" }
-typos = { cmd = "typos --write-changes --force-exclude", description = "Fix typos", default-environment = "lint" }
-actionlint = { cmd = "actionlint", description = "Lint actions with actionlint", default-environment = "lint" }
-zizmor = { cmd = "zizmor .github -p", description = "GHA static analysis with zizmor", default-environment = "lint" }
-blacken-docs = { cmd = "blacken-docs", description = "Format Python markdown blocks with Black", default-environment = "lint" }
-validate-pyproject = { cmd = "validate-pyproject pyproject.toml", description = "Validate pyproject.toml", default-environment = "lint" }
-numpydoc = { cmd = "numpydoc lint", description = "Validate docstrings with numpydoc", default-environment = "lint" }
-lint = { cmd = "lefthook run pre-commit --all-files --force", description = "Run all linters", default-environment = "lint" }
+lefthook = {
+  description = "Run lefthook",
+  cmd = "lefthook",
+  default-environment = "lint",
+}
+hooks = {
+  description = "Install pre-commit hooks",
+  cmd = "lefthook install",
+  default-environment = "lint",
+}
+pre-commit = {
+  description = "Run pre-commit checks",
+  cmd = "lefthook run pre-commit",
+  default-environment = "lint",
+}
+
+pylint = {
+  description = "Lint with pylint",
+  cwd = "src",
+  cmd = "pylint array_api_extra",
+  default-environment = "lint",
+}
+mypy = {
+  description = "Type check with mypy",
+  cmd = "mypy",
+  default-environment = "lint",
+}
+pyrefly = {
+  description = "Type check with pyrefly",
+  cmd = "pyrefly check",
+  default-environment = "lint",
+}
+pyright = {
+  description = "Type check with basedpyright",
+  cmd = "basedpyright",
+  default-environment = "lint",
+}
+ruff-check = {
+  description = "Lint with ruff",
+  cmd = "ruff check --fix",
+  default-environment = "lint",
+}
+ruff-format = {
+  description = "Format with ruff",
+  cmd = "ruff format",
+  default-environment = "lint",
+}
+dprint = {
+  description = "Format with dprint",
+  cmd = "dprint fmt",
+  default-environment = "lint",
+}
+typos = {
+  description = "Fix typos",
+  cmd = "typos --write-changes --force-exclude",
+  default-environment = "lint",
+}
+actionlint = {
+  description = "Lint actions with actionlint",
+  cmd = "actionlint",
+  default-environment = "lint",
+}
+zizmor = {
+  description = "GHA static analysis with zizmor",
+  cmd = "zizmor .github -p",
+  default-environment = "lint",
+}
+blacken-docs = {
+  description = "Format Python markdown blocks with Black",
+  cmd = "blacken-docs",
+  default-environment = "lint",
+}
+validate-pyproject = {
+  description = "Validate pyproject.toml",
+  cmd = "validate-pyproject pyproject.toml",
+  default-environment = "lint",
+}
+numpydoc = {
+  description = "Validate docstrings with numpydoc",
+  cmd = "numpydoc lint",
+  default-environment = "lint",
+}
+tombi = {
+  description = "Format TOML with tombi",
+  cmd = "tombi format",
+  default-environment = "lint",
+}
+
+lint = {
+  description = "Run all linters",
+  cmd = "lefthook run pre-commit --all-files --force",
+  default-environment = "lint",
+}
 
 [feature.tests.dependencies]
 pytest = ">=9.1.1"
@@ -112,58 +223,126 @@ numpy = ">=1.22.0"
 scipy = ">=1.15.2,<2"
 
 [feature.tests.tasks]
-tests = { cmd = "pytest -v", description = "Run tests", default-environment = "tests" }
-tests-cov = { cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20", description = "Run tests with coverage", default-environment = "tests" }
+tests = {
+  description = "Run tests",
+  cmd = "pytest -v",
+  default-environment = "tests",
+}
+tests-cov = {
+  description = "Run tests with coverage",
+  cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20",
+  default-environment = "tests",
+}
 
-clean-vendor-compat = { cmd = "rm -rf vendor_tests/array_api_compat", description = "Delete the existing vendored version of array-api-compat", default-environment = "tests" }
-clean-vendor-extra = { cmd = "rm -rf vendor_tests/array_api_extra", description = "Delete the existing vendored version of array-api-extra", default-environment = "tests" }
-copy-vendor-compat = { cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/ && rm -rf vendor_tests/array_api_compat/vendor_tests && rm -rf vendor_tests/array_api_compat/tests", depends-on = ["clean-vendor-compat"], description = "Vendor a clean copy of array-api-compat", default-environment = "tests" }
-copy-vendor-extra = { cmd = "cp -r src/array_api_extra vendor_tests/", depends-on = ["clean-vendor-extra"], description = "Vendor a clean copy of array-api-extra", default-environment = "tests" }
-tests-vendor = { cmd = "pytest -v vendor_tests", depends-on = ["copy-vendor-compat", "copy-vendor-extra"], description = "Check that array-api-extra and array-api-compat can be vendored together", default-environment = "tests" }
+coverage = {
+  description = "Generate test coverage html report",
+  depends-on = ["tests-cov"],
+  cmd = "coverage html",
+  default-environment = "tests",
+}
+open-coverage = {
+  description = "Open test coverage report",
+  depends-on = ["coverage"],
+  cmd = "open htmlcov/index.html",
+  default-environment = "tests",
+}
 
-tests-ci = { depends-on = ["tests-cov", "tests-vendor"], description = "Run tests with coverage and vendor tests" }
-coverage = { cmd = "coverage html", depends-on = ["tests-cov"], description = "Generate test coverage html report", default-environment = "tests" }
-open-coverage = { cmd = "open htmlcov/index.html", depends-on = ["coverage"], description = "Open test coverage report", default-environment = "tests" }
+clean-vendor-compat = {
+  description = "Delete the existing vendored version of array-api-compat",
+  cmd = "rm -rf vendor_tests/array_api_compat",
+  default-environment = "tests",
+}
+clean-vendor-extra = {
+  description = "Delete the existing vendored version of array-api-extra",
+  cmd = "rm -rf vendor_tests/array_api_extra",
+  default-environment = "tests",
+}
+copy-vendor-compat = {
+  description = "Vendor a clean copy of array-api-compat",
+  depends-on = ["clean-vendor-compat"],
+  cmd = "cp -r $(python -c 'import site; print(site.getsitepackages()[0])')/array_api_compat vendor_tests/ && rm -rf vendor_tests/array_api_compat/vendor_tests && rm -rf vendor_tests/array_api_compat/tests",
+  default-environment = "tests",
+}
+copy-vendor-extra = {
+  description = "Vendor a clean copy of array-api-extra",
+  depends-on = ["clean-vendor-extra"],
+  cmd = "cp -r src/array_api_extra vendor_tests/",
+  default-environment = "tests",
+}
+tests-vendor = {
+  description = "Check that array-api-extra and array-api-compat can be vendored together",
+  depends-on = ["copy-vendor-compat", "copy-vendor-extra"],
+  cmd = "pytest -v vendor_tests",
+  default-environment = "tests",
+}
+
+tests-ci = {
+  description = "Run tests with coverage and vendor tests",
+  depends-on = ["tests-cov", "tests-vendor"],
+}
 
 # tests with only run dependencies
 [feature.tests-run-deps.dependencies]
 pytest = ">=9.1.1"
 pytest-cov = ">=7.1.0"
 
-[feature.tests-run-deps.tasks.tests-run-deps]
-cmd = "pytest -v run_deps_tests"
-description = "Run run-dependency tests"
-default-environment = "tests-run-deps"
-
-[feature.tests-run-deps.tasks.tests-run-deps-cov]
-cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20 run_deps_tests"
-description = "Run run-dependency tests with coverage"
-default-environment = "tests-run-deps"
+[feature.tests-run-deps.tasks]
+tests-run-deps = {
+  description = "Run run-dependency tests",
+  cmd = "pytest -v run_deps_tests",
+  default-environment = "tests-run-deps",
+}
+tests-run-deps-cov = {
+  description = "Run run-dependency tests with coverage",
+  cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20 run_deps_tests",
+  default-environment = "tests-run-deps",
+}
 
 [feature.docs.dependencies]
 sphinx = ">=7.4.7"
 furo = ">=2025.12.19"
 myst-parser = ">=5.1.0"
 sphinx-copybutton = ">=0.5.2"
-sphinx-autodoc-typehints = "==3.7.0" # pin due to https://github.com/tox-dev/sphinx-autodoc-typehints/issues/730
+sphinx-autodoc-typehints = "==3.7.0"  # pin due to https://github.com/tox-dev/sphinx-autodoc-typehints/issues/730
 # Needed to import parsed modules with autodoc
-dask-core = ">=2026.7.1" # No distributed, tornado, etc.
+dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
 pytest = ">=9.1.1"
 typing-extensions = ">=4.16.0"
 numpy = ">=2.1.3"
 
 [feature.docs.tasks]
-docs = { cmd = "sphinx-build -E -W . build/", cwd = "docs", description = "Build docs", default-environment = "docs" }
-open-docs = { cmd = "open build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs", default-environment = "docs" }
+docs = {
+  description = "Build docs",
+  cwd = "docs",
+  cmd = "sphinx-build -E -W . build/",
+  default-environment = "docs",
+}
+open-docs = {
+  description = "Open the generated docs",
+  depends-on = ["docs"],
+  cwd = "docs",
+  cmd = "open build/index.html",
+  default-environment = "docs",
+}
 
 [feature.docs.target.win.tasks]
-open-docs = { cmd = "cmd /c start build/index.html", cwd = "docs", depends-on = ["docs"], description = "Open the generated docs", default-environment = "docs" }
+open-docs = {
+  description = "Open the generated docs",
+  depends-on = ["docs"],
+  cwd = "docs",
+  cmd = "cmd /c start build/index.html",
+  default-environment = "docs",
+}
 
 [feature.dev.dependencies]
 ipython = ">=9.15.0"
 
 [feature.dev.tasks]
-ipython = { cmd = "ipython", description = "Launch ipython", default-environment = "dev" }
+ipython = {
+  description = "Launch ipython",
+  cmd = "ipython",
+  default-environment = "dev",
+}
 
 [feature.py311.dependencies]
 python = "~=3.11.0"
@@ -183,7 +362,7 @@ numpy = "=1.24.1"
 # Note: JAX and PyTorch will install CPU variants.
 [feature.backends.dependencies]
 pytorch = ">=2.12.0"
-dask-core = ">=2026.7.1" # No distributed, tornado, etc.
+dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
 sparse = ">=0.19.0"
 
 [feature.backends.target.unix.dependencies]
@@ -201,15 +380,21 @@ platforms = ["linux-64-cuda-12-9", "win-64-cuda-12-9"]
 [feature.cuda-backends.dependencies]
 cuda-version = "==12.9"
 cupy = ">=14.1.1"
-pytorch = { version = ">=2.12.0", build = "cuda12*" }
+pytorch = {
+  version = ">=2.12.0",
+  build = "cuda12*",
+}
 
 [feature.cuda-backends.target.linux.dependencies]
-jaxlib = { version = ">=0.10.2", build = "cuda12*" }
+jaxlib = {
+  version = ">=0.10.2",
+  build = "cuda12*",
+}
 
 [feature.nogil.dependencies]
 pytest-run-parallel = ">=0.9.1"
 numpy = ">=2.3.5"
 # pytorch = "*"  # Not available on Python 3.13t yet
-dask-core = ">=2026.7.1" # No distributed, tornado, etc.
+dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
 # sparse = "*"  # numba not available on Python 3.13t yet
 # jax = "*"  # ml_dtypes not available on Python 3.13t yet
