@@ -15,6 +15,7 @@
     cov
     create_diagonal
     default_dtype
+    deg2rad
     diag_indices
     expand_dims
     isclose
@@ -28,6 +29,7 @@
     one_hot
     pad
     partition
+    rad2deg
     searchsorted
     setdiff1d
     sinc

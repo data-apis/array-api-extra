@@ -31,6 +31,7 @@ __all__ = [
     "broadcast_shapes",
     "cov",
     "create_diagonal",
+    "deg2rad",
     "diag_indices",
     "expand_dims",
     "isclose",
@@ -44,6 +45,7 @@ __all__ = [
     "one_hot",
     "pad",
     "partition",
+    "rad2deg",
     "searchsorted",
     "setdiff1d",
     "sinc",
@@ -322,6 +324,98 @@ def create_diagonal(
         return xp.diag(x, k=offset)
 
     return _funcs.create_diagonal(x, offset=offset, xp=xp)
+
+
+def deg2rad(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
+    """
+    Convert angles from degrees to radians.
+
+    Parameters
+    ----------
+    x : array
+        Input array in degrees. Must have an integral or floating-point dtype.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array
+        The corresponding angles in radians. Integral inputs are converted to the
+        default floating-point dtype.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.deg2rad(xp.asarray([0, 90, 180]), xp=xp)
+    Array([0.        , 1.57079633, 3.14159265], dtype=array_api_strict.float64)
+    """
+    if xp is None:
+        xp = array_namespace(x)
+    if xp.isdtype(x.dtype, "integral"):
+        x = xp.astype(x, _funcs.default_dtype(xp, device=get_device(x)))
+    elif not xp.isdtype(x.dtype, ("real floating", "complex floating")):
+        msg = "`x` must have an integral, real floating, or complex floating dtype."
+        raise TypeError(msg)
+
+    if is_jax_namespace(xp) or (
+        not xp.isdtype(x.dtype, "complex floating")
+        and (
+            is_numpy_namespace(xp)
+            or is_cupy_namespace(xp)
+            or is_torch_namespace(xp)
+            or is_dask_namespace(xp)
+        )
+    ):
+        return xp.deg2rad(x)
+
+    return _funcs.deg2rad(x, xp=xp)
+
+
+def rad2deg(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
+    """
+    Convert angles from radians to degrees.
+
+    Parameters
+    ----------
+    x : array
+        Input array in radians. Must have an integral or floating-point dtype.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array
+        The corresponding angles in degrees. Integral inputs are converted to the
+        default floating-point dtype.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.rad2deg(xp.asarray([0.0, xp.pi / 2, xp.pi]), xp=xp)
+    Array([  0.,  90., 180.], dtype=array_api_strict.float64)
+    """
+    if xp is None:
+        xp = array_namespace(x)
+    if xp.isdtype(x.dtype, "integral"):
+        x = xp.astype(x, _funcs.default_dtype(xp, device=get_device(x)))
+    elif not xp.isdtype(x.dtype, ("real floating", "complex floating")):
+        msg = "`x` must have an integral, real floating, or complex floating dtype."
+        raise TypeError(msg)
+
+    if is_jax_namespace(xp) or (
+        not xp.isdtype(x.dtype, "complex floating")
+        and (
+            is_numpy_namespace(xp)
+            or is_cupy_namespace(xp)
+            or is_torch_namespace(xp)
+            or is_dask_namespace(xp)
+        )
+    ):
+        return xp.rad2deg(x)
+
+    return _funcs.rad2deg(x, xp=xp)
 
 
 def diag_indices(
