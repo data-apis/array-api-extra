@@ -14,15 +14,11 @@ exclude-newer = "7d"
 
 ### array-api-extra package definition ###
 
-[package.build.backend]
-name = "pixi-build-python"
-version = "*"
-
-[package.host-dependencies]
-meson-python = "*"
-
-[package.run-dependencies]
-array-api-compat = "*"
+[package]
+build = {
+  backend.name = "pixi-build-python",
+  config.ignore-pypi-mapping = false,
+}
 
 ### workspace environments ###
 
