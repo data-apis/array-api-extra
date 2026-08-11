@@ -244,7 +244,6 @@ def cov(m: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     >>> xpx.cov(stack)
     Array([[[ 11.71      ,  -4.286     ],
             [ -4.286     ,   2.14413333]],
-
            [[ 46.84      , -17.144     ],
             [-17.144     ,   8.57653333]]], dtype=array_api_strict.float64)
     """
