@@ -20,9 +20,13 @@ pre-commit:
   parallel: true
   jobs:
     - name: dprint
-      glob: "*.{json,jsonc,md,toml,yaml,yml}"
+      glob: "*.{json,jsonc,md,yaml,yml}"
       stage_fixed: true
       run: pixi {run} dprint
+    - name: tombi
+      glob: "*.toml"
+      stage_fixed: true
+      run: pixi {run} tombi
     - name: ruff
       glob: "*.{py,pyi}"
       stage_fixed: true
