@@ -23,6 +23,7 @@
     kron
     nan_to_num
     nanmax
+    nanmean
     nanmin
     nansum
     nunique

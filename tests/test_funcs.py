@@ -31,6 +31,7 @@ from array_api_extra import (
     kron,
     nan_to_num,
     nanmax,
+    nanmean,
     nanmin,
     nansum,
     nunique,
@@ -75,6 +76,7 @@ lazy_xp_function(isclose)
 lazy_xp_function(isin)
 lazy_xp_function(kron)
 lazy_xp_function(nan_to_num)
+lazy_xp_function(nanmean)
 lazy_xp_function(nansum)
 lazy_xp_function(nunique)
 lazy_xp_function(one_hot)
@@ -2529,5 +2531,68 @@ class TestNanSum:
     def test_xp(self, axis: int | None, expected_list: list[float], xp: ArrayNamespace):
         a = xp.asarray([[4.0, xp.nan, 1.0], [2.0, 3.0, xp.nan]])
         res = nansum(a, axis=axis, xp=xp)
+        expected = xp.asarray(expected_list)
+        assert_equal(res, expected)
+
+
+class TestNanMean:
+    def test_simple(self, xp: ArrayNamespace):
+        a = xp.asarray([[1.0, 2.0], [3.0, xp.nan]])
+
+        res = nanmean(a)
+        assert res == 2.0
+
+        res = nanmean(a, axis=0)
+        expected = xp.asarray([2.0, 2.0])
+        assert_equal(res, expected)
+
+        res = nanmean(a, axis=1)
+        expected = xp.asarray([1.5, 3.0])
+        assert_equal(res, expected)
+
+    def test_bigger(self, xp: ArrayNamespace):
+        a = xp.asarray(
+            [
+                [1.0, xp.nan, 4.0, 5.0],
+                [xp.nan, -2.0, xp.nan, -4.0],
+                [2.0, 1.0, 3.0, xp.nan],
+            ]
+        )
+
+        res = nanmean(a, axis=0)
+        expected = xp.asarray([1.5, -0.5, 3.5, 0.5])
+        assert_equal(res, expected)
+
+        res = nanmean(a, axis=1)
+        expected = xp.asarray([3.3333333, -3.0, 2.0])
+        assert_close(res, expected)
+
+    @pytest.mark.filterwarnings("ignore:.*Mean of empty slice.*:RuntimeWarning")
+    def test_all_nan_slice(self, xp: ArrayNamespace):
+        a = xp.asarray([[xp.nan, 1.0], [xp.nan, xp.nan]])
+
+        res = nanmean(a, axis=0, xp=xp)
+        expected = xp.asarray([xp.nan, 1.0])
+        assert_equal(res, expected)
+
+    def test_scalar(self, xp: ArrayNamespace):
+        a = xp.asarray(1.0)
+        assert nanmean(a) == 1.0
+
+    @pytest.mark.skip_xp_backend(
+        Backend.TORCH, reason="torch.nanmean does not support tensors on meta device"
+    )
+    @pytest.mark.parametrize("axis", [None, 0, 1])
+    def test_device(self, axis: int | None, xp: ArrayNamespace, device: Device):
+        a = xp.asarray([[4.0, xp.nan, 1.0], [2.0, 5.0, xp.nan]], device=device)
+        res = nanmean(a, axis=axis)
+        assert get_device(res) == device
+
+    @pytest.mark.parametrize(
+        ("axis", "expected_list"), [(0, [3.0, 5.0, 1.0]), (1, [2.5, 3.5])]
+    )
+    def test_xp(self, axis: int | None, expected_list: list[float], xp: ArrayNamespace):
+        a = xp.asarray([[4.0, xp.nan, 1.0], [2.0, 5.0, xp.nan]])
+        res = nanmean(a, axis=axis, xp=xp)
         expected = xp.asarray(expected_list)
         assert_equal(res, expected)
