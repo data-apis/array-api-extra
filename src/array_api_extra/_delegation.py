@@ -208,25 +208,26 @@ def cov(
     correction : int or float, optional
         Degrees of freedom correction: normalization divides by
         ``N - correction`` (for unweighted input). Default: ``1``, which
-        gives the unbiased estimate (matches ``numpy.cov`` default of
+        gives the unbiased estimate (matches :func:`numpy.cov` default of
         ``bias=False``). Set to ``0`` for the biased estimate (``N``
-        normalization). Corresponds to ``ddof`` in ``numpy.cov`` and to
-        ``correction`` in ``numpy.var``/``std`` and ``torch.cov``.
+        normalization). Corresponds to ``ddof`` in :func:`numpy.cov` and to
+        ``correction`` in :func:`numpy.var`/:func:`numpy.std` and
+        :func:`torch.cov`.
         Non-integer values are allowed for advanced use cases: the
         unbiased correction for weighted observations depends on the
         sum and dispersion of the weights and is generally not an
         integer, and autocorrelated data may also require a fractional
         correction. Non-integer ``correction`` routes through the
-        generic implementation because ``numpy.cov``'s ``ddof`` and
-        ``torch.cov``'s ``correction`` both require integers.
+        generic implementation because :func:`numpy.cov`'s ``ddof`` and
+        :func:`torch.cov`'s ``correction`` both require integers.
     fweights : array, optional
         1-D array of integer frequency weights: the number of times each
         observation is repeated. Same as ``fweights`` in
-        ``numpy.cov``/``torch.cov``.
+        :func:`numpy.cov`/:func:`torch.cov`.
     aweights : array, optional
         1-D array of observation-vector weights (analytic weights). Larger
         values mark more important observations. Same as ``aweights`` in
-        ``numpy.cov``/``torch.cov``.
+        :func:`numpy.cov`/:func:`torch.cov`.
     xp : array_namespace, optional
         The standard-compatible namespace for `m`. Default: infer.
 
@@ -238,7 +239,7 @@ def cov(
 
     Notes
     -----
-    Mapping from ``numpy.cov`` to this function::
+    Mapping from :func:`numpy.cov` to this function::
 
         numpy.cov(m, rowvar=True)           -> cov(m, axis=-1)   # default
         numpy.cov(m, rowvar=False)          -> cov(m, axis=-2)
@@ -300,6 +301,30 @@ def cov(
             [ -4.286     ,   2.14413333]],
            [[ 46.84      , -17.144     ],
             [-17.144     ,   8.57653333]]], dtype=array_api_strict.float64)
+
+    The normalization can be adjusted with `correction`, and observations
+    can be weighted with integer frequencies `fweights` or importance
+    weights `aweights`:
+
+    >>> x = xp.asarray([0., 1., 2., 3., 4.])
+    >>> xpx.cov(x, xp=xp)  # unbiased variance: divide by N - 1
+    Array(2.5, dtype=array_api_strict.float64)
+    >>> xpx.cov(x, correction=0, xp=xp)  # biased variance: divide by N
+    Array(2., dtype=array_api_strict.float64)
+
+    Giving the two extreme observations frequency 2 via `fweights` is
+    equivalent to repeating them in `x`:
+
+    >>> xpx.cov(x, fweights=xp.asarray([2, 1, 1, 1, 2]), xp=xp)
+    Array(3., dtype=array_api_strict.float64)
+    >>> xpx.cov(xp.asarray([0., 0., 1., 2., 3., 4., 4.]), xp=xp)
+    Array(3., dtype=array_api_strict.float64)
+
+    `aweights` instead adjusts the relative importance of observations,
+    here down-weighting the two extremes:
+
+    >>> xpx.cov(x, aweights=xp.asarray([0.5, 1., 1., 1., 0.5]), xp=xp)
+    Array(1.92, dtype=array_api_strict.float64)
     """
 
     if xp is None:
@@ -319,14 +344,17 @@ def cov(
     # `numpy.cov` (and cupy/dask/jax) require integer `ddof`; `torch.cov`
     # requires integer `correction`. For non-integer-valued `correction`,
     # fall through to the generic implementation.
-    integer_correction = isinstance(correction, int) or correction.is_integer()
+    integer_correction = float(correction).is_integer()
     has_weights = fweights is not None or aweights is not None
 
     if m.ndim <= 2 and integer_correction:
+        # Not just for static typing: `correction` may be an integer-valued
+        # float such as 1.0, which `torch.cov` rejects at runtime.
+        int_correction = int(correction)
         if is_torch_namespace(xp):
             fw = None if fweights is None else xp.asarray(fweights)
             aw = None if aweights is None else xp.asarray(aweights)
-            return xp.cov(m, correction=int(correction), fweights=fw, aweights=aw)
+            return xp.cov(m, correction=int_correction, fweights=fw, aweights=aw)
         # `dask.array.cov` forces `.compute()` whenever weights are given:
         # its internal `if fact <= 0` check on a lazy 0-D scalar triggers
         # materialization. Route to the generic impl, which is fully lazy
@@ -339,7 +367,7 @@ def cov(
         ):
             return xp.cov(
                 m,
-                ddof=int(correction),
+                ddof=int_correction,
                 fweights=fweights,
                 aweights=aweights,
             )

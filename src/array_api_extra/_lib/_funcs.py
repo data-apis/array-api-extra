@@ -293,6 +293,8 @@ def cov(
             msg = f"`{name}` must be 1-D, got ndim={w_in.ndim}"
             raise ValueError(msg)
         weight_length = w_in.shape[0]
+        # Unknown dims are `None` per the standard; Dask non-standardly
+        # reports them as NaN, hence the `isnan` checks below.
         if (
             weight_length is not None
             and n_obs is not None
