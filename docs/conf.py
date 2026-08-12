@@ -60,6 +60,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable", None),
     "jax": ("https://docs.jax.dev/en/latest", None),
     "pytest": ("https://docs.pytest.org/en/stable/", None),
+    "torch": ("https://docs.pytorch.org/docs/stable", None),
 }
 
 nitpick_ignore = [
