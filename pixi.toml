@@ -365,7 +365,7 @@ dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
 sparse = ">=0.19.0"
 
 [feature.backends.target.unix.dependencies]
-jax = ">=0.10.2"  # waiting for https://github.com/conda-forge/jaxlib-feedstock/pull/326
+jax = ">=0.10.2"  # waiting for conda-forge/jaxlib-feedstock#326
 
 # Backends that require a GPU host and a CUDA driver.
 [feature.cuda-backends]
@@ -383,6 +383,6 @@ jaxlib = ">=0.10.2"
 pytest-run-parallel = ">=0.9.1"
 numpy = ">=2.3.5"
 dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
-sparse = ">=0.19.1"
+# sparse = ">=0.19.1"  # flaky, see data-apis/array-api-extra#900
 # pytorch = "*"  # Not available on Python 3.14t yet
-# jax = "*"  # waiting for https://github.com/conda-forge/jaxlib-feedstock/pull/351
+# jax = "*"  # waiting for conda-forge/jaxlib-feedstock#351
