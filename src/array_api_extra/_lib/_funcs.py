@@ -267,7 +267,7 @@ def cov(
     m: Array,
     /,
     *,
-    correction: int | float = 1,
+    correction: float = 1,
     fweights: Array | None = None,
     aweights: Array | None = None,
     xp: ArrayNamespace,

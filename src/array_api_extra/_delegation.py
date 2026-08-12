@@ -174,7 +174,7 @@ def cov(
     /,
     *,
     axis: int = -1,
-    correction: int | float = 1,
+    correction: float = 1,
     fweights: Array | None = None,
     aweights: Array | None = None,
     xp: ArrayNamespace | None = None,
