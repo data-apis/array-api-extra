@@ -671,7 +671,9 @@ class TestCov:
         assert_close(cov(x), xp.asarray(11.71, dtype=xp.float64))
         assert_close(cov(y), xp.asarray(2.144133, dtype=xp.float64), rtol=1e-6)
 
-    @pytest.mark.xfail_xp_backend(Backend.TORCH, reason="array-api-extra#455")
+    @pytest.mark.xfail_xp_backend(
+        Backend.TORCH, reason="torch.cov does not support tensors on meta device"
+    )
     def test_device(self, xp: ArrayNamespace, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         assert get_device(cov(x)) == device
