@@ -66,7 +66,7 @@ jobs:
           - {environment: tests-backends, x64_runner: ubuntu-latest}
           - {environment: tests-backends-py311, x64_runner: ubuntu-latest}
           # Non-default pixi task (default: tests-ci)
-          - {environment: tests-nogil, task: "tests --parallel-threads=4", no-coverage: true}
+          - {environment: tests-nogil, task: "tests --parallel-threads=4", no-coverage: true, x64_runner: ubuntu-latest}
           - {environment: tests-run-deps, task: tests-run-deps-cov}
         exclude:
           - {environment: tests-nogil, platform: macos} # data-apis/array-api-extra#900
