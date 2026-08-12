@@ -185,11 +185,11 @@ def cov(
     Covariance indicates the level to which two variables vary together.
     If we examine *N*-dimensional samples, :math:`X = [x_1, x_2, ... x_N]^T`,
     each with *M* observations, then element :math:`C_{ij}` of the
-    :math:`N \times N` covariance matrix is the covariance of
+    :math:`N \\times N` covariance matrix is the covariance of
     :math:`x_i` and :math:`x_j`. The element :math:`C_{ii}` is the variance
     of :math:`x_i`.
 
-    Extends ``numpy.cov`` with support for batch input.
+    Extends :func:`numpy.cov` with support for batch input.
     Naming follows the array API conventions used elsewhere in
     this library (``axis``, ``correction``) rather than the NumPy spellings
     (``rowvar``, ``bias``, ``ddof``); see Notes for the mapping.
@@ -202,9 +202,9 @@ def cov(
         observations is controlled by `axis`.
     axis : int, optional
         Axis of `m` containing the observations. Default: ``-1`` (the last
-        axis), matching the array-api convention. Use ``axis=-2`` (or ``0``
+        axis), matching the array API convention. Use ``axis=-2`` (or ``0``
         for 2-D input) to treat each column as a variable, which
-        corresponds to ``rowvar=False`` in ``numpy.cov``.
+        corresponds to ``rowvar=False`` in :func:`numpy.cov`.
     correction : int or float, optional
         Degrees of freedom correction: normalization divides by
         ``N - correction`` (for unweighted input). Default: ``1``, which
@@ -233,7 +233,7 @@ def cov(
     Returns
     -------
     array
-        An array having shape (..., N, N) whose innermost two dimensions represent
+        An array having shape ``(..., N, N)`` whose innermost two dimensions represent
         the covariance matrix of the variables.
 
     Notes

@@ -284,10 +284,7 @@ def cov(
     # Preserve the historical no-alias guarantee even when the dtype already matches.
     m = xp.astype(m, dtype, copy=True)
 
-    # Validate weight shapes (eager metadata, lazy-safe). Native backends
-    # validate themselves; this covers the generic path (array-api-strict,
-    # sparse, and the dask+weights fallback where the native check is
-    # bypassed to preserve laziness).
+    # Validate weight shapes (eager metadata, lazy-safe).
     n_obs = m.shape[-1]
     for name, w_in in (("fweights", fweights), ("aweights", aweights)):
         if w_in is None:
