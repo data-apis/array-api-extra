@@ -67,9 +67,9 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
         You may use two alternate syntaxes::
 
-          >>> import array_api_extra as xpx
-          >>> xpx.at(x, idx).set(value)  # or add(value), etc.
-          >>> xpx.at(x)[idx].set(value)
+          import array_api_extra as xpx
+          xpx.at(x, idx).set(value)  # or add(value), etc.
+          xpx.at(x)[idx].set(value)
 
     copy : bool, optional
         None (default)
@@ -94,8 +94,8 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     (a) When you omit the ``copy`` parameter, you should never reuse the parameter
     array later on; ideally, you should reassign it immediately::
 
-        >>> import array_api_extra as xpx
-        >>> x = xpx.at(x, 0).set(2)
+        import array_api_extra as xpx
+        x = xpx.at(x, 0).set(2)
 
     The above best practice pattern ensures that the behaviour won't change depending
     on whether ``x`` is writeable or not, as the original ``x`` object is dereferenced
@@ -105,9 +105,9 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     On the reverse, the anti-pattern below must be avoided, as it will result in
     different behaviour on read-only versus writeable arrays::
 
-        >>> x = xp.asarray([0, 0, 0])
-        >>> y = xpx.at(x, 0).set(2)
-        >>> z = xpx.at(x, 1).set(3)
+        x = xp.asarray([0, 0, 0])
+        y = xpx.at(x, 0).set(2)
+        z = xpx.at(x, 1).set(3)
 
     In the above example, both calls to ``xpx.at`` update ``x`` in place *if possible*.
     This causes the behaviour to diverge depending on whether ``x`` is writeable or not:
@@ -120,22 +120,22 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     The correct pattern to use if you want diverging outputs from the same input is
     to enforce copies::
 
-        >>> x = xp.asarray([0, 0, 0])
-        >>> y = xpx.at(x, 0).set(2, copy=True)  # Never updates x
-        >>> z = xpx.at(x, 1).set(3)  # May or may not update x in place
-        >>> del x  # avoid accidental reuse of x as we don't know its state anymore
+        x = xp.asarray([0, 0, 0])
+        y = xpx.at(x, 0).set(2, copy=True)  # Never updates x
+        z = xpx.at(x, 1).set(3)  # May or may not update x in place
+        del x  # avoid accidental reuse of x as we don't know its state anymore
 
     (b) The array API standard does not support integer array indices.
     The behaviour of update methods when the index is an array of integers is
     undefined and will vary between backends; this is particularly true when the
     index contains multiple occurrences of the same index, e.g.::
 
-        >>> import numpy as np
-        >>> import jax.numpy as jnp
-        >>> import array_api_extra as xpx
-        >>> xpx.at(np.asarray([123]), np.asarray([0, 0])).add(1)
+        import numpy as np
+        import jax.numpy as jnp
+        import array_api_extra as xpx
+        xpx.at(np.asarray([123]), np.asarray([0, 0])).add(1)
         array([124])
-        >>> xpx.at(jnp.asarray([123]), jnp.asarray([0, 0])).add(1)
+        xpx.at(jnp.asarray([123]), jnp.asarray([0, 0])).add(1)
         Array([125], dtype=int32)
 
     See Also
@@ -155,38 +155,38 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
 
     This pattern::
 
-        >>> mask = m(x)
-        >>> x[mask] = f(x[mask])
+        mask = m(x)
+        x[mask] = f(x[mask])
 
     Can't be replaced by `at`, as it won't work on Dask and JAX inside jax.jit::
 
-        >>> mask = m(x)
-        >>> x = xpx.at(x, mask).set(f(x[mask])  # Crash on Dask and jax.jit
+        mask = m(x)
+        x = xpx.at(x, mask).set(f(x[mask]))  # Crash on Dask and jax.jit
 
     You should instead use::
 
-        >>> x = xp.where(m(x), f(x), x)
+        x = xp.where(m(x), f(x), x)
 
     Examples
     --------
     Given either of these equivalent expressions::
 
-      >>> import array_api_extra as xpx
-      >>> x = xpx.at(x)[1].add(2)
-      >>> x = xpx.at(x, 1).add(2)
+        import array_api_extra as xpx
+        x = xpx.at(x)[1].add(2)
+        x = xpx.at(x, 1).add(2)
 
     If x is a JAX array, they are the same as::
 
-      >>> x = x.at[1].add(2)
+        x = x.at[1].add(2)
 
     If x is a read-only NumPy array, they are the same as::
 
-      >>> x = x.copy()
-      >>> x[1] += 2
+        x = x.copy()
+        x[1] += 2
 
     For other known backends, they are the same as::
 
-      >>> x[1] += 2
+        x[1] += 2
     """
 
     _x: Array
