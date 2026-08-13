@@ -108,12 +108,12 @@ def apply_where(  # numpydoc ignore=PR01,PR02
     --------
     >>> import array_api_strict as xp
     >>> import array_api_extra as xpx
-    >>> a = xp.asarray([5, 4, 3])
-    >>> b = xp.asarray([0, 2, 2])
+    >>> a = xp.asarray([5.0, 4.0, 3.0])
+    >>> b = xp.asarray([0.0, 2.0, 2.0])
     >>> def f(a, b):
     ...     return a // b
     >>> xpx.apply_where(b != 0, (a, b), f, fill_value=xp.nan)
-    array([ nan,  2., 1.])
+    Array([nan,  2.,  1.], dtype=array_api_strict.float64)
     """
     # Parse and normalize arguments
     if (f2 is None) == (fill_value is None):

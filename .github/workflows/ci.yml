@@ -38,6 +38,23 @@ jobs:
       - name: Lint (if this step fails, please 'pixi run lint' locally and push the changes)
         run: pixi run -e lint lint
 
+  doctests:
+    name: Doctests
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: prefix-dev/setup-pixi@a09b6247153796b190642a2b53fac4241043cf6f # v0.10.0
+        with:
+          pixi-version: v0.76.2
+          cache: true
+          environments: tests
+
+      - name: Test public API examples
+        run: pixi run -e tests doctests
+
   checks:
     name: ${{ matrix.environment }} (${{ matrix.platform }})
     runs-on: >-
