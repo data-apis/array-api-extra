@@ -4,9 +4,7 @@
 :maxdepth: 2
 :hidden:
 self
-api-assorted.md
-api-testing.md
-api-lazy.md
+api-reference.md
 contributing.md
 contributors.md
 library-design.md
