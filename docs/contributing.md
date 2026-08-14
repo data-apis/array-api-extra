@@ -61,7 +61,7 @@ pixi shell --environment=dev
 - Add a test class for your function in `tests/test_funcs.py`.
   - Ensure that `lazy_xp_function` is called on the function if lazy backends
     are supposed to be tested.
-- Add your function to `docs/api-reference.md`.
+- Add your function to a suitable page under `docs/`.
 - Don't worry if you are not sure how to do some of the above steps or think you
   might have done something wrong -
   [make a PR!](https://github.com/data-apis/array-api-extra/pulls)
