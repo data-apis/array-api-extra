@@ -51,19 +51,19 @@ pixi shell --environment=dev
   propose the new function. You may want to wait for initial feedback on the
   issue before diving into an implementation.
   Skip this step if there is already an open issue for the function.
-- Add the implementation of your function to
-  `src/array_api_extra/_lib/_funcs.py`.
+- Add the implementation of your array-agnostic function to an appropriate file in
+  `src/array_api_extra/_agnostic/`.
   - Ensure that your function includes type annotations and a
     [numpydoc-style docstring](https://numpydoc.readthedocs.io/en/latest/format.html).
   - Add your function to `__all__` at the top of the file.
-- Import your function to `src/array_api_extra/__init__.py` and add it to
-  `__all__` there.
-- Add a test class for your function in `tests/test_funcs.py`.
+- Import your function to `src/array_api_extra/__init__.py`
+  and add it to`__all__` there.
+- Add a test class for your function in the corresponding file under `tests/`.
   - Ensure that `lazy_xp_function` is called on the function if lazy backends
     are supposed to be tested.
-- Add your function to a suitable page under `docs/`.
+- Add your function to the corresponding API page under `docs/`.
 - Don't worry if you are not sure how to do some of the above steps or think you
-  might have done something wrong -
+  might have done something wrong —
   [make a PR!](https://github.com/data-apis/array-api-extra/pulls)
 
 ### Delegation
@@ -72,17 +72,18 @@ Many new functions should also have 'delegation' to existing implementations in
 known array libraries added. This can happen in the same PR which adds the function,
 or in a follow-up PR.
 
-- Create a function in `src/array_api_extra/_delegation.py` with a signature
-  matching the function in `src/array_api_extra/_lib/_funcs.py`, and move the
-  docstring to the new function. Leave a one-line docstring in `_funcs.py`,
-  pointing to `_delegation.py` to see the full docstring.
-- Also move the initial `array_namespace` call and any input validation over to
-  the new function.
-- Add delegation to backends using the `if_*_namespace` functions. See
-  `src/array_api_extra/_lib/_backends.py` for the full list of backends we have
-  worked with so far.
-- After all delegation layers, return the result from the implementation in
-  `_funcs`.
-- Simplify the signature in `_funcs.py` to remove impossible arguments now that
-  it is only called internally via `_delegation`. For example, the `xp`
-  parameter can be changed from type `ArrayNamespace | None` to `ArrayNamespace`.
+- Create a function in the corresponding file under `src/array_api_extra/`
+  with a signature matching the function under `src/array_api_extra/_agnostic/`,
+  and move the docstring to the new function. Leave a one-line docstring in the
+  array-agnostic function, pointing to the new function.
+- Also move the initial `_compat.array_namespace` call
+  and any input validation over to the new function.
+- Add delegation to backends using the `_compat.if_*_namespace` functions.
+  See `src/array_api_extra/_lib/_backends.py` for the full list of backends
+  we have worked with so far.
+- After all delegation layers,
+  return the result from the implementation under `_agnostic/`
+- Simplify the signature of the function under `_agnostic/`
+  to remove impossible arguments now that it is only called internally.
+  For example, the `xp` parameter can be changed from type `ArrayNamespace | None`
+  to `ArrayNamespace`.

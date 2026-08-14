@@ -1,4 +1,4 @@
-# Manipulation functions
+# Manipulation Functions
 
 ```{eval-rst}
 .. currentmodule:: array_api_extra
