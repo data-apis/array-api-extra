@@ -39,6 +39,7 @@ __all__ = [
     "kron",
     "nan_to_num",
     "nanmax",
+    "nanmean",
     "nanmin",
     "nansum",
     "nunique",
@@ -941,3 +942,31 @@ def nansum(  # numpydoc ignore=PR01,RT01
     device_a = _compat.device(a)
     zero = xp.asarray(0, dtype=a.dtype, device=device_a)
     return xp.sum(xp.where(mask, zero, a), axis=axis)
+
+
+def nanmean(  # numpydoc ignore=PR01,RT01
+    a: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None,
+    xp: ArrayNamespace,
+) -> Array:
+    """See docstring in `array_api_extra._delegation.py`."""
+    mask = xp.isnan(a)
+    device_a = _compat.device(a)
+    zero = xp.asarray(0, dtype=a.dtype, device=device_a)
+    sum_ = xp.sum(xp.where(mask, zero, a), axis=axis)
+    count = xp.count_nonzero(~mask, axis=axis)
+    safe_count = xp.astype(
+        xp.where(count == 0, xp.asarray(1, dtype=count.dtype, device=device_a), count),
+        sum_.dtype,
+        copy=False,
+    )
+    result = sum_ / safe_count
+    if xp.any(count == 0):
+        result = xp.where(
+            count == 0,
+            xp.asarray(xp.nan, dtype=result.dtype, device=device_a),
+            result,
+        )
+    return result

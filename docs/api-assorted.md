@@ -127,6 +127,7 @@
 
     cov
     nanmax
+    nanmean
     nanmin
     nansum
 ```
