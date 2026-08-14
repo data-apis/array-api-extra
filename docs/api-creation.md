@@ -1,4 +1,4 @@
-# Creation functions
+# Creation Functions
 
 ```{eval-rst}
 .. currentmodule:: array_api_extra

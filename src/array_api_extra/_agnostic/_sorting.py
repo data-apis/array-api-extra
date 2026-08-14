@@ -13,7 +13,7 @@ def partition(  # numpydoc ignore=PR01,RT01
     *,
     xp: ArrayNamespace,
 ) -> Array:
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._sorting`."""
     return xp.sort(x, axis=axis, stable=False)
 
 
@@ -25,5 +25,5 @@ def argpartition(  # numpydoc ignore=PR01,RT01
     *,
     xp: ArrayNamespace,
 ) -> Array:
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._sorting`."""
     return xp.argsort(x, axis=axis, stable=False)

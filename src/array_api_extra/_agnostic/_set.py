@@ -1,9 +1,8 @@
 """Array-agnostic implementations for set functions."""
 
 from .._lib import _compat, _helpers
-from .._lib._helpers import asarrays, capabilities
 from .._lib._typing import Array, ArrayNamespace
-from ._inspection import default_dtype
+from . import _inspection
 
 __all__ = ["isin", "nunique", "setdiff1d", "union1d"]
 
@@ -17,7 +16,7 @@ def isin(  # numpydoc ignore=PR01,RT01
     invert: bool = False,
     xp: ArrayNamespace,
 ) -> Array:
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._set`."""
     original_a_shape = a.shape
     a = xp.reshape(a, (-1,))
     b = xp.reshape(b, (-1,))
@@ -28,13 +27,13 @@ def isin(  # numpydoc ignore=PR01,RT01
 
 
 def nunique(x: Array, /, *, xp: ArrayNamespace) -> Array:  # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._set`."""
     # There are 3 general use cases:
     # 1. backend has unique_counts and it returns an array with known shape
     # 2. backend has unique_counts and it returns a None-sized array;
     #    e.g. Dask, ndonnx
     # 3. backend does not have unique_counts; e.g. wrapped JAX
-    if capabilities(xp, device=_compat.device(x))["data-dependent shapes"]:
+    if _helpers.capabilities(xp, x)["data-dependent shapes"]:
         # xp has unique_counts; O(n) complexity
         _, counts = xp.unique_counts(x)
         n = _compat.size(counts)
@@ -46,7 +45,7 @@ def nunique(x: Array, /, *, xp: ArrayNamespace) -> Array:  # numpydoc ignore=PR0
     x = xp.reshape(x, (-1,))
     x = xp.sort(x, stable=False)
     mask = x != xp.roll(x, -1)
-    default_int = default_dtype(xp, "integral", device=_compat.device(x))
+    default_int = _inspection.default_dtype(xp, "integral", device=_compat.device(x))
     return xp.maximum(
         # Special cases:
         # - array is size 0
@@ -64,10 +63,10 @@ def setdiff1d(
     assume_unique: bool = False,
     xp: ArrayNamespace,
 ) -> Array:  # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._set`."""
 
     # https://github.com/microsoft/pyright/issues/10103
-    x1_, x2_ = asarrays(x1, x2, xp=xp)
+    x1_, x2_ = _helpers.asarrays(x1, x2, xp=xp)
 
     if assume_unique:
         x1_ = xp.reshape(x1_, (-1,))
@@ -81,7 +80,7 @@ def setdiff1d(
 
 def union1d(a: Array, b: Array, /, *, xp: ArrayNamespace) -> Array:
     # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._set`."""
     a = xp.reshape(a, (-1,))
     b = xp.reshape(b, (-1,))
     # XXX: `sparse` returns NumPy arrays from `unique_values`

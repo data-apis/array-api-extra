@@ -1,15 +1,7 @@
 """Delegation layer for creation functions."""
 
-from ._agnostic import _creation, _inspection
-from ._lib._compat import (
-    array_namespace,
-    is_cupy_namespace,
-    is_dask_namespace,
-    is_jax_namespace,
-    is_numpy_namespace,
-    is_torch_namespace,
-)
-from ._lib._compat import device as get_device
+from . import _agnostic
+from ._lib import _compat
 from ._lib._typing import Array, ArrayNamespace, DType
 
 __all__ = ["create_diagonal", "one_hot"]
@@ -57,24 +49,24 @@ def create_diagonal(
            [0, 0, 8, 0, 0]], dtype=array_api_strict.int64)
     """
     if xp is None:
-        xp = array_namespace(x)
+        xp = _compat.array_namespace(x)
 
     if x.ndim == 0:
         err_msg = "`x` must be at least 1-dimensional."
         raise ValueError(err_msg)
 
-    if is_torch_namespace(xp):
+    if _compat.is_torch_namespace(xp):
         return xp.diag_embed(x, offset=offset, dim1=-2, dim2=-1)
 
     if (
-        is_dask_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_numpy_namespace(xp)
-        or is_jax_namespace(xp)
+        _compat.is_dask_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_numpy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
     ) and (x.ndim < 2):
         return xp.diag(x, k=offset)
 
-    return _creation.create_diagonal(x, offset=offset, xp=xp)
+    return _agnostic._creation.create_diagonal(x, offset=offset, xp=xp)
 
 
 def one_hot(
@@ -127,18 +119,18 @@ def one_hot(
     """
     # Validate inputs.
     if xp is None:
-        xp = array_namespace(x)
+        xp = _compat.array_namespace(x)
     if not xp.isdtype(x.dtype, "integral"):
         msg = "x must have an integral dtype."
         raise TypeError(msg)
     if dtype is None:
-        dtype = _inspection.default_dtype(xp, device=get_device(x))
+        dtype = _agnostic._inspection.default_dtype(xp, device=_compat.device(x))
     # Delegate where possible.
-    if is_jax_namespace(xp):
+    if _compat.is_jax_namespace(xp):
         from jax.nn import one_hot as jax_one_hot
 
         return jax_one_hot(x, num_classes, dtype=dtype, axis=axis)
-    if is_torch_namespace(xp):
+    if _compat.is_torch_namespace(xp):
         from torch.nn.functional import one_hot as torch_one_hot
 
         x = xp.astype(x, xp.int64)  # PyTorch only supports int64 here.
@@ -147,7 +139,7 @@ def one_hot(
         except RuntimeError as e:
             raise IndexError from e
     else:
-        out = _creation.one_hot(x, num_classes, xp=xp)
+        out = _agnostic._creation.one_hot(x, num_classes, xp=xp)
     out = xp.astype(out, dtype, copy=False)
     if axis != -1:
         out = xp.moveaxis(out, -1, axis)

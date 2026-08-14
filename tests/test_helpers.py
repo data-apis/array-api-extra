@@ -223,20 +223,17 @@ class TestCapabilities:
         expect_keys = {"boolean indexing", "data-dependent shapes"}
         if xp.__array_api_version__ >= "2024.12":
             expect_keys.add("max dimensions")
-        assert capabilities(xp, device=device).keys() == expect_keys
+        x = xp.eye(1, device=device)
+        assert capabilities(xp, x).keys() == expect_keys
 
         if library.like(Backend.TORCH):
             # The output of capabilities is device-specific.
 
             # Test that device=None gets the current default device.
-            expect = capabilities(xp, device=device)
+            expect = capabilities(xp, x)
             with xp.device(device):
                 actual = capabilities(xp)
             assert actual == expect
-
-            # Test that we're accepting anything that is accepted by the
-            # device= parameter in other functions
-            actual = capabilities(xp, device=device.type)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
 
 class Wrapper(Generic[T]):  # noqa: PLW1641

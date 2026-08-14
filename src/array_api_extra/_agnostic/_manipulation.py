@@ -1,12 +1,11 @@
 """Array-agnostic implementations for manipulation functions."""
 
 import math
+import typing
 from collections.abc import Sequence
-from typing import cast
 
 from .._at import at
-from .._lib import _compat
-from .._lib._helpers import eager_shape, normalize_pad_width
+from .._lib import _compat, _helpers
 from .._lib._typing import Array, ArrayNamespace
 
 __all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad"]
@@ -14,7 +13,7 @@ __all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad"]
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ArrayNamespace) -> Array:
     # numpydoc ignore=PR01,RT01
-    """See docstring in array_api_extra._delegation."""
+    """See docstring in `array_api_extra._manipulation`."""
 
     if x.ndim < ndim:
         x = xp.expand_dims(x, axis=0)
@@ -27,7 +26,7 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ArrayNamespace) -> Array:
 def broadcast_shapes(  # numpydoc ignore=PR01,RT01
     *shapes: tuple[float | None, ...],
 ) -> tuple[int | None, ...]:
-    """See docstring in array_api_extra._delegation."""
+    """See docstring in `array_api_extra._manipulation`."""
     if not shapes:
         return ()  # Match NumPy output
 
@@ -44,7 +43,7 @@ def broadcast_shapes(  # numpydoc ignore=PR01,RT01
                 f"{shapes}."
             )
             raise ValueError(msg)
-        out.append(None if none_size else cast(int, sizes.pop()) if sizes else 1)
+        out.append(None if none_size else typing.cast(int, sizes.pop()) if sizes else 1)
 
     return tuple(out)
 
@@ -53,7 +52,7 @@ def expand_dims(
     a: Array, /, *, axis: tuple[int, ...] = (0,), xp: ArrayNamespace
 ) -> Array:
     # numpydoc ignore=PR01,RT01
-    """See docstring in array_api_extra._delegation."""
+    """See docstring in `array_api_extra._manipulation`."""
     for i in sorted(axis):
         a = xp.expand_dims(a, axis=i)
     return a
@@ -66,8 +65,8 @@ def pad(
     constant_values: complex = 0,
     xp: ArrayNamespace,
 ) -> Array:  # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
-    pad_width_seq = normalize_pad_width(pad_width, x.ndim)
+    """See docstring in `array_api_extra._manipulation`."""
+    pad_width_seq = _helpers.normalize_pad_width(pad_width, x.ndim)
 
     slices: list[slice] = []
     newshape: list[int] = []
@@ -76,7 +75,7 @@ def pad(
             msg = f"expect a 2-tuple (before, after), got {w_tpl}."
             raise ValueError(msg)
 
-        sh = eager_shape(x)[ax]
+        sh = _helpers.eager_shape(x)[ax]
 
         if w_tpl[0] == 0 and w_tpl[1] == 0:
             sl = slice(None, None, None)

@@ -1,14 +1,7 @@
 """Delegation layer for statistical functions."""
 
-from ._agnostic import _statistical
-from ._lib._compat import (
-    array_namespace,
-    is_cupy_namespace,
-    is_dask_namespace,
-    is_jax_namespace,
-    is_numpy_namespace,
-    is_torch_namespace,
-)
+from . import _agnostic
+from ._lib import _compat
 from ._lib._typing import Array, ArrayNamespace
 
 __all__ = ["cov", "nanmax", "nanmin", "nansum"]
@@ -173,7 +166,7 @@ def cov(
     """
 
     if xp is None:
-        xp = array_namespace(m, fweights, aweights)
+        xp = _compat.array_namespace(m, fweights, aweights)
 
     # Validate axis against m.ndim.
     ndim = max(m.ndim, 1)
@@ -196,7 +189,7 @@ def cov(
         # Not just for static typing: `correction` may be an integer-valued
         # float such as 1.0, which `torch.cov` rejects at runtime.
         int_correction = int(correction)
-        if is_torch_namespace(xp):
+        if _compat.is_torch_namespace(xp):
             fw = None if fweights is None else xp.asarray(fweights)
             aw = None if aweights is None else xp.asarray(aweights)
             return xp.cov(m, correction=int_correction, fweights=fw, aweights=aw)
@@ -205,10 +198,10 @@ def cov(
         # materialization. Route to the generic impl, which is fully lazy
         # because it only does sum/matmul and skips that scalar check.
         if (
-            is_numpy_namespace(xp)
-            or is_cupy_namespace(xp)
-            or is_jax_namespace(xp)
-            or (is_dask_namespace(xp) and not has_weights)
+            _compat.is_numpy_namespace(xp)
+            or _compat.is_cupy_namespace(xp)
+            or _compat.is_jax_namespace(xp)
+            or (_compat.is_dask_namespace(xp) and not has_weights)
         ):
             return xp.cov(
                 m,
@@ -217,7 +210,7 @@ def cov(
                 aweights=aweights,
             )
 
-    return _statistical.cov(
+    return _agnostic._statistical.cov(
         m,
         correction=correction,
         fweights=fweights,
@@ -264,17 +257,17 @@ def nanmin(
     Array([1., 2.], dtype=array_api_strict.float64)
     """
     if xp is None:
-        xp = array_namespace(a)
+        xp = _compat.array_namespace(a)
 
     if (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_dask_namespace(xp)
-        or is_jax_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
     ):
         return xp.nanmin(a, axis=axis)
 
-    return _statistical.nanmin(a, axis=axis, xp=xp)
+    return _agnostic._statistical.nanmin(a, axis=axis, xp=xp)
 
 
 def nanmax(
@@ -315,17 +308,17 @@ def nanmax(
     Array([6., 4.], dtype=array_api_strict.float64)
     """
     if xp is None:
-        xp = array_namespace(a)
+        xp = _compat.array_namespace(a)
 
     if (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_dask_namespace(xp)
-        or is_jax_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
     ):
         return xp.nanmax(a, axis=axis)
 
-    return _statistical.nanmax(a, axis=axis, xp=xp)
+    return _agnostic._statistical.nanmax(a, axis=axis, xp=xp)
 
 
 def nansum(
@@ -366,15 +359,15 @@ def nansum(
     Array([9., 6.], dtype=array_api_strict.float64)
     """
     if xp is None:
-        xp = array_namespace(a)
+        xp = _compat.array_namespace(a)
 
     if (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_dask_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_torch_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_torch_namespace(xp)
     ):
         return xp.nansum(a, axis=axis)
 
-    return _statistical.nansum(a, axis=axis, xp=xp)
+    return _agnostic._statistical.nansum(a, axis=axis, xp=xp)

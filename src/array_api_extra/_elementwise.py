@@ -1,16 +1,7 @@
 """Delegation layer for element-wise functions."""
 
-from ._agnostic import _elementwise, _inspection
-from ._lib._compat import (
-    array_namespace,
-    is_cupy_namespace,
-    is_dask_namespace,
-    is_jax_namespace,
-    is_numpy_namespace,
-    is_torch_namespace,
-)
-from ._lib._compat import device as get_device
-from ._lib._helpers import asarrays
+from . import _agnostic
+from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayNamespace
 
 __all__ = ["deg2rad", "isclose", "nan_to_num", "rad2deg", "sinc"]
@@ -41,25 +32,26 @@ def deg2rad(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     Array([0.        , 1.57079633, 3.14159265], dtype=array_api_strict.float64)
     """
     if xp is None:
-        xp = array_namespace(x)
+        xp = _compat.array_namespace(x)
     if xp.isdtype(x.dtype, "integral"):
-        x = xp.astype(x, _inspection.default_dtype(xp, device=get_device(x)))
+        dtype = _agnostic._inspection.default_dtype(xp, device=_compat.device(x))
+        x = xp.astype(x, dtype)
     elif not xp.isdtype(x.dtype, ("real floating", "complex floating")):
         msg = "`x` must have an integral, real floating, or complex floating dtype."
         raise TypeError(msg)
 
-    if is_jax_namespace(xp) or (
+    if _compat.is_jax_namespace(xp) or (
         not xp.isdtype(x.dtype, "complex floating")
         and (
-            is_numpy_namespace(xp)
-            or is_cupy_namespace(xp)
-            or is_torch_namespace(xp)
-            or is_dask_namespace(xp)
+            _compat.is_numpy_namespace(xp)
+            or _compat.is_cupy_namespace(xp)
+            or _compat.is_torch_namespace(xp)
+            or _compat.is_dask_namespace(xp)
         )
     ):
         return xp.deg2rad(x)
 
-    return _elementwise.deg2rad(x, xp=xp)
+    return _agnostic._elementwise.deg2rad(x, xp=xp)
 
 
 def rad2deg(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
@@ -87,25 +79,26 @@ def rad2deg(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     Array([  0.,  90., 180.], dtype=array_api_strict.float64)
     """
     if xp is None:
-        xp = array_namespace(x)
+        xp = _compat.array_namespace(x)
     if xp.isdtype(x.dtype, "integral"):
-        x = xp.astype(x, _inspection.default_dtype(xp, device=get_device(x)))
+        dtype = _agnostic._inspection.default_dtype(xp, device=_compat.device(x))
+        x = xp.astype(x, dtype)
     elif not xp.isdtype(x.dtype, ("real floating", "complex floating")):
         msg = "`x` must have an integral, real floating, or complex floating dtype."
         raise TypeError(msg)
 
-    if is_jax_namespace(xp) or (
+    if _compat.is_jax_namespace(xp) or (
         not xp.isdtype(x.dtype, "complex floating")
         and (
-            is_numpy_namespace(xp)
-            or is_cupy_namespace(xp)
-            or is_torch_namespace(xp)
-            or is_dask_namespace(xp)
+            _compat.is_numpy_namespace(xp)
+            or _compat.is_cupy_namespace(xp)
+            or _compat.is_torch_namespace(xp)
+            or _compat.is_dask_namespace(xp)
         )
     ):
         return xp.rad2deg(x)
 
-    return _elementwise.rad2deg(x, xp=xp)
+    return _agnostic._elementwise.rad2deg(x, xp=xp)
 
 
 def isclose(
@@ -183,21 +176,23 @@ def isclose(
     `isclose` is not defined for non-numeric data types.
     ``bool`` is considered a numeric data-type for this purpose.
     """
-    xp = array_namespace(a, b) if xp is None else xp
+    xp = _compat.array_namespace(a, b) if xp is None else xp
 
     if (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_dask_namespace(xp)
-        or is_jax_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
     ):
         return xp.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan)
 
-    if is_torch_namespace(xp):
-        a, b = asarrays(a, b, xp=xp)  # Array API 2024.12 support
+    if _compat.is_torch_namespace(xp):
+        a, b = _helpers.asarrays(a, b, xp=xp)  # Array API 2024.12 support
         return xp.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan)
 
-    return _elementwise.isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan, xp=xp)
+    return _agnostic._elementwise.isclose(
+        a, b, rtol=rtol, atol=atol, equal_nan=equal_nan, xp=xp
+    )
 
 
 def nan_to_num(
@@ -263,20 +258,20 @@ def nan_to_num(
         msg = "Complex fill values are not supported."
         raise TypeError(msg)
 
-    xp = array_namespace(x) if xp is None else xp
+    xp = _compat.array_namespace(x) if xp is None else xp
 
     # for scalars we want to output an array
     y = xp.asarray(x)
 
     if (
-        is_cupy_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_numpy_namespace(xp)
-        or is_torch_namespace(xp)
+        _compat.is_cupy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_numpy_namespace(xp)
+        or _compat.is_torch_namespace(xp)
     ):
         return xp.nan_to_num(y, nan=fill_value)
 
-    return _elementwise.nan_to_num(y, fill_value=fill_value, xp=xp)
+    return _agnostic._elementwise.nan_to_num(y, fill_value=fill_value, xp=xp)
 
 
 def sinc(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
@@ -355,19 +350,19 @@ def sinc(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     """
 
     if xp is None:
-        xp = array_namespace(x)
+        xp = _compat.array_namespace(x)
 
     if not xp.isdtype(x.dtype, "real floating"):
         err_msg = "`x` must have a real floating data type."
         raise ValueError(err_msg)
 
     if (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_torch_namespace(xp)
-        or is_dask_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_torch_namespace(xp)
+        or _compat.is_dask_namespace(xp)
     ):
         return xp.sinc(x)
 
-    return _elementwise.sinc(x, xp=xp)
+    return _agnostic._elementwise.sinc(x, xp=xp)

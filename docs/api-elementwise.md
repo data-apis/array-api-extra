@@ -1,4 +1,4 @@
-# Element-wise functions
+# Element-wise Functions
 
 ```{eval-rst}
 .. currentmodule:: array_api_extra

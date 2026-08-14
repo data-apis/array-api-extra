@@ -2,8 +2,8 @@
 
 from typing import Literal
 
-from ._agnostic import _inspection, _searching
-from ._lib._compat import array_namespace, is_torch_namespace
+from . import _agnostic, default_dtype
+from ._lib import _compat
 from ._lib._typing import Array, ArrayNamespace
 
 __all__ = ["searchsorted"]
@@ -70,19 +70,19 @@ def searchsorted(
            [2, 4]], dtype=array_api_strict.int64)
     """
     if xp is None:
-        xp = array_namespace(x1, x2)
+        xp = _compat.array_namespace(x1, x2)
 
     if side not in {"left", "right"}:
         message = "`side` must be either 'left' or 'right'."
         raise ValueError(message)
 
-    xp_default_int = _inspection.default_dtype(xp, kind="integral")
+    xp_default_int = default_dtype(xp, kind="integral")
     x2_0d = x2.ndim == 0
     x1_1d = x1.ndim <= 1
 
-    if x1_1d or is_torch_namespace(xp):
+    if x1_1d or _compat.is_torch_namespace(xp):
         x2 = xp.reshape(x2, ()) if (x2_0d and x1_1d) else x2
         out = xp.searchsorted(x1, x2, side=side)
         return xp.astype(out, xp_default_int, copy=False)
 
-    return _searching.searchsorted(x1, x2, side=side, xp=xp)
+    return _agnostic._searching.searchsorted(x1, x2, side=side, xp=xp)

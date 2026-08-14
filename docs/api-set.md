@@ -1,4 +1,4 @@
-# Set functions
+# Set Functions
 
 ```{eval-rst}
 .. currentmodule:: array_api_extra

@@ -1,14 +1,7 @@
 """Delegation layer for linear algebra functions."""
 
-from ._agnostic import _linalg
-from ._lib._compat import (
-    array_namespace,
-    is_cupy_namespace,
-    is_jax_namespace,
-    is_numpy_namespace,
-    is_torch_namespace,
-)
-from ._lib._helpers import asarrays
+from . import _agnostic
+from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayNamespace
 
 __all__ = ["kron"]
@@ -94,16 +87,16 @@ def kron(
     Array(True, dtype=array_api_strict.bool)
     """
     if xp is None:
-        xp = array_namespace(a, b)
+        xp = _compat.array_namespace(a, b)
 
-    a, b = asarrays(a, b, xp=xp)
+    a, b = _helpers.asarrays(a, b, xp=xp)
 
     if (
-        is_cupy_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_numpy_namespace(xp)
-        or is_torch_namespace(xp)
+        _compat.is_cupy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_numpy_namespace(xp)
+        or _compat.is_torch_namespace(xp)
     ):
         return xp.kron(a, b)
 
-    return _linalg.kron(a, b, xp=xp)
+    return _agnostic._linalg.kron(a, b, xp=xp)
