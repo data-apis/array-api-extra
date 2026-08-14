@@ -1,8 +1,8 @@
 """Private testing utilities."""
 
-from __future__ import annotations
-
 import pytest
+
+__all__ = ["xfail"]
 
 
 def xfail(
