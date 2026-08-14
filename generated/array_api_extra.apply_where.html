@@ -321,14 +321,6 @@
 <dt class="sig sig-object py" id="array_api_extra.apply_where">
 <span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">apply_where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cond</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.apply_where" title="Link to this definition">¶</a></dt>
 <dd><p>Run one of two elementwise functions depending on a condition.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Overloads<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cond</strong> (<span class="sphinx_autodoc_typehints-type">Array</span>), <strong>args</strong> (<span class="sphinx_autodoc_typehints-type">Array | tuple[Array, …]</span>), <strong>f1</strong> (<span class="sphinx_autodoc_typehints-type">Callable[…, Array]</span>), <strong>f2</strong> (<span class="sphinx_autodoc_typehints-type">Callable[…, Array]</span>), <strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type">dict[str, Array] | None</span>), <strong>xp</strong> (<span class="sphinx_autodoc_typehints-type">ArrayNamespace | None</span>) → <span class="sphinx_autodoc_typehints-type">Array</span></p></li>
-<li><p><strong>cond</strong> (<span class="sphinx_autodoc_typehints-type">Array</span>), <strong>args</strong> (<span class="sphinx_autodoc_typehints-type">Array | tuple[Array, …]</span>), <strong>f1</strong> (<span class="sphinx_autodoc_typehints-type">Callable[…, Array]</span>), <strong>fill_value</strong> (<span class="sphinx_autodoc_typehints-type">Array | complex</span>), <strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type">dict[str, Array] | None</span>), <strong>xp</strong> (<span class="sphinx_autodoc_typehints-type">ArrayNamespace | None</span>) → <span class="sphinx_autodoc_typehints-type">Array</span></p></li>
-</ul>
-</dd>
-</dl>
 <p>Equivalent to <code class="docutils literal notranslate"><span class="pre">f1(*args)</span> <span class="pre">if</span> <span class="pre">cond</span> <span class="pre">else</span> <span class="pre">fill_value</span></code> performed elementwise
 when <cite>fill_value</cite> is defined, otherwise to <code class="docutils literal notranslate"><span class="pre">f1(*args)</span> <span class="pre">if</span> <span class="pre">cond</span> <span class="pre">else</span> <span class="pre">f2(*args)</span></code>.</p>
 <dl class="field-list simple">
@@ -357,7 +349,7 @@ data type determined by type promotion rules between the output of <cite>f1</cit
 either <cite>fill_value</cite> or the output of <cite>f2</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Array</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
