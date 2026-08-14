@@ -1,5 +1,6 @@
+"""Static typing helpers."""
 # numpydoc ignore=GL08
-# pylint: disable=missing-module-docstring,duplicate-code
+# pylint: disable=duplicate-code
 
 from types import ModuleType
 

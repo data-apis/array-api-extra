@@ -4,7 +4,7 @@
 
 # pylint: disable=duplicate-code
 try:
-    from ...._array_api_compat_vendor import (
+    from ..._array_api_compat_vendor import (
         array_namespace,
         device,
         is_array_api_obj,

@@ -1,4 +1,4 @@
-"""Helper functions used by `array_api_extra/_funcs.py`."""
+"""Helper functions."""
 
 from __future__ import annotations
 

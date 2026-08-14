@@ -1,7 +1,7 @@
 import pytest
 
 from array_api_extra import broadcast_shapes, expand_dims
-from array_api_extra._lib._utils._typing import ArrayNamespace
+from array_api_extra._lib._typing import ArrayNamespace
 
 
 class TestDeprecatedFunctions:

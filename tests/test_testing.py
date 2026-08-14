@@ -8,14 +8,13 @@ import pytest
 from typing_extensions import override
 
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._utils._compat import (
+from array_api_extra._lib._compat import (
     array_namespace,
     is_dask_namespace,
     is_jax_namespace,
 )
-from array_api_extra._lib._utils._typing import Array, ArrayNamespace, Device
+from array_api_extra._lib._typing import Array, ArrayNamespace, Device
 from array_api_extra.testing import (
-    _as_numpy_array,
     assert_close,
     assert_close_nulp,
     assert_equal,
@@ -23,6 +22,7 @@ from array_api_extra.testing import (
     lazy_xp_function,
     patch_lazy_xp_functions,
 )
+from array_api_extra.testing._testing import _as_numpy_array
 
 # pyright: reportUnknownParameterType=false,reportMissingParameterType=false
 

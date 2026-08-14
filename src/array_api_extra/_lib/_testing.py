@@ -1,8 +1,4 @@
-"""
-Private testing utilities.
-
-See also ..testing for public testing utilities.
-"""
+"""Private testing utilities."""
 
 from __future__ import annotations
 
