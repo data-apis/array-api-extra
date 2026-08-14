@@ -7,20 +7,22 @@ from collections.abc import Callable
 from enum import Enum
 from typing import TYPE_CHECKING, ClassVar, cast
 
-from ._utils import _compat
-from ._utils._compat import (
+from ._lib import _compat
+from ._lib._compat import (
     array_namespace,
     is_dask_array,
     is_jax_array,
     is_torch_array,
     is_writeable_array,
 )
-from ._utils._helpers import meta_namespace
-from ._utils._typing import Array, ArrayNamespace, SetIndex
+from ._lib._helpers import meta_namespace
+from ._lib._typing import Array, ArrayNamespace, SetIndex
 
 if TYPE_CHECKING:  # pragma: no cover
     # TODO import from typing (requires Python >=3.11)
     from typing import Self
+
+__all__ = ["at"]
 
 
 class _AtOp(Enum):
@@ -48,13 +50,13 @@ class _AtOp(Enum):
         return self.value
 
 
-class Undef(Enum):
+class _Undef(Enum):
     """Sentinel for undefined values."""
 
     UNDEF = 0
 
 
-_undef = Undef.UNDEF
+_undef = _Undef.UNDEF
 
 
 class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
@@ -199,11 +201,11 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     """
 
     _x: Array
-    _idx: SetIndex | Undef
+    _idx: SetIndex | _Undef
     __slots__: ClassVar[tuple[str, ...]] = ("_idx", "_x")
 
     def __init__(
-        self, x: Array, idx: SetIndex | Undef = _undef, /
+        self, x: Array, idx: SetIndex | _Undef = _undef, /
     ) -> None:  # numpydoc ignore=GL08
         self._x = x
         self._idx = idx
@@ -268,12 +270,12 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         Array
             Updated `x`.
         """
-        from ._funcs import apply_where  # pylint: disable=cyclic-import
+        from ._agnostic._elementwise import apply_where  # pylint: disable=cyclic-import
 
         x, idx = self._x, self._idx
         xp = array_namespace(x, y) if xp is None else xp
 
-        if isinstance(idx, Undef):
+        if isinstance(idx, _Undef):
             msg = (
                 "Index has not been set.\n"
                 "Usage: either\n"

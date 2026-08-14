@@ -6,11 +6,11 @@ import pytest
 
 import array_api_extra as xpx  # Let some tests bypass lazy_xp_function
 from array_api_extra import lazy_apply
+from array_api_extra._lib import _compat
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._utils import _compat
-from array_api_extra._lib._utils._compat import array_namespace, is_dask_array
-from array_api_extra._lib._utils._helpers import eager_shape
-from array_api_extra._lib._utils._typing import Array, ArrayNamespace, Device
+from array_api_extra._lib._compat import array_namespace, is_dask_array
+from array_api_extra._lib._helpers import eager_shape
+from array_api_extra._lib._typing import Array, ArrayNamespace, Device
 from array_api_extra.testing import assert_equal, lazy_xp_function
 
 lazy_xp_function(lazy_apply)

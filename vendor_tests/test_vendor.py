@@ -79,7 +79,7 @@ def test_vendor_extra_testing():
 
 def test_vendor_extra_uses_vendor_compat():
     from ._array_api_compat_vendor import array_namespace as n1
-    from .array_api_extra._lib._utils._compat import (  # type: ignore[import-not-found]
+    from .array_api_extra._lib._compat import (  # type: ignore[import-not-found]
         array_namespace as n2,
     )
 

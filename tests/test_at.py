@@ -7,11 +7,11 @@ import numpy as np
 import pytest
 
 from array_api_extra import at
-from array_api_extra._lib._at import _AtOp
+from array_api_extra._at import _AtOp
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._utils._compat import array_namespace, is_writeable_array
-from array_api_extra._lib._utils._compat import device as get_device
-from array_api_extra._lib._utils._typing import (
+from array_api_extra._lib._compat import array_namespace, is_writeable_array
+from array_api_extra._lib._compat import device as get_device
+from array_api_extra._lib._typing import (
     Array,
     ArrayNamespace,
     Device,

@@ -1,4 +1,4 @@
-"""Public API Functions."""
+"""Tools for lazy backends."""
 
 from __future__ import annotations
 
@@ -7,15 +7,15 @@ from collections.abc import Callable, Sequence
 from functools import partial, wraps
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeAlias, cast, overload
 
-from ._funcs import broadcast_shapes
-from ._utils import _compat
-from ._utils._compat import (
+from ._agnostic._manipulation import broadcast_shapes
+from ._lib import _compat
+from ._lib._compat import (
     array_namespace,
     is_dask_namespace,
     is_jax_namespace,
 )
-from ._utils._helpers import is_python_scalar
-from ._utils._typing import Array, ArrayNamespace, DType
+from ._lib._helpers import is_python_scalar
+from ._lib._typing import Array, ArrayNamespace, DType
 
 if TYPE_CHECKING:  # pragma: no cover
     import numpy as np
@@ -27,6 +27,8 @@ else:
     NumPyObject = Any
 
 P = ParamSpec("P")
+
+__all__ = ["lazy_apply"]
 
 
 @overload  # pyrefly: ignore[invalid-param-spec]

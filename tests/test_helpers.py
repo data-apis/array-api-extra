@@ -5,9 +5,9 @@ import numpy as np
 import pytest
 
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._utils._compat import array_namespace
-from array_api_extra._lib._utils._compat import device as get_device
-from array_api_extra._lib._utils._helpers import (
+from array_api_extra._lib._compat import array_namespace
+from array_api_extra._lib._compat import device as get_device
+from array_api_extra._lib._helpers import (
     asarrays,
     capabilities,
     eager_shape,
@@ -18,7 +18,7 @@ from array_api_extra._lib._utils._helpers import (
     pickle_flatten,
     pickle_unflatten,
 )
-from array_api_extra._lib._utils._typing import Array, ArrayNamespace, Device, DType
+from array_api_extra._lib._typing import Array, ArrayNamespace, Device, DType
 from array_api_extra.testing import assert_equal, lazy_xp_function
 
 from .conftest import np_compat

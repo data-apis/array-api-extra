@@ -1,8 +1,4 @@
-"""
-Public testing utilities.
-
-See also _lib._testing for additional private testing utilities.
-"""
+"""Implementation of `array_api_extra.testing`."""
 
 from __future__ import annotations
 
@@ -16,7 +12,7 @@ from inspect import getattr_static
 from types import FunctionType, ModuleType
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar, cast
 
-from ._lib._utils._compat import (
+from .._lib._compat import (
     array_namespace,
     is_array_api_strict_namespace,
     is_cupy_namespace,
@@ -28,11 +24,11 @@ from ._lib._utils._compat import (
     is_torch_namespace,
     to_device,
 )
-from ._lib._utils._compat import (
+from .._lib._compat import (
     device as get_device,
 )
-from ._lib._utils._helpers import jax_autojit, pickle_flatten, pickle_unflatten
-from ._lib._utils._typing import Array, ArrayNamespace, Device
+from .._lib._helpers import jax_autojit, pickle_flatten, pickle_unflatten
+from .._lib._typing import Array, ArrayNamespace, Device
 
 __all__ = [
     "assert_close",
@@ -48,14 +44,24 @@ if TYPE_CHECKING:  # pragma: no cover
     import numpy as np
     import pytest
     from dask.typing import Graph, Key, SchedulerGetCallable
-    from typing_extensions import override
+    from typing_extensions import override as _override
 
 else:
     # Sphinx hacks
     SchedulerGetCallable = object
 
-    def override(func):
+    def _override(func):
         return func
+
+
+__all__ = [
+    "assert_close",
+    "assert_close_nulp",
+    "assert_equal",
+    "assert_less",
+    "lazy_xp_function",
+    "patch_lazy_xp_functions",
+]
 
 
 P = ParamSpec("P")
@@ -64,13 +70,13 @@ T = TypeVar("T")
 _ufuncs_tags: dict[object, dict[str, Any]] = {}
 
 
-class Deprecated(enum.Enum):
+class _Deprecated(enum.Enum):
     """Unique type for deprecated parameters."""
 
     DEPRECATED = 1
 
 
-DEPRECATED = Deprecated.DEPRECATED
+DEPRECATED = _Deprecated.DEPRECATED
 
 
 def _clone_function(  # numpydoc ignore=PR01,RT01
@@ -93,8 +99,8 @@ def lazy_xp_function(
     *,
     allow_dask_compute: bool | int = False,
     jax_jit: bool = True,
-    static_argnums: Deprecated = DEPRECATED,
-    static_argnames: Deprecated = DEPRECATED,
+    static_argnums: _Deprecated = DEPRECATED,
+    static_argnames: _Deprecated = DEPRECATED,
 ) -> None:  # numpydoc ignore=GL07
     """
     Tag a function to be tested on lazy backends.
@@ -501,7 +507,7 @@ class _CountingDaskScheduler(SchedulerGetCallable):
         self.max_count = max_count
         self.msg = msg
 
-    @override
+    @_override
     def __call__(
         self, dsk: Graph, keys: Sequence[Key] | Key, **kwargs: Any
     ) -> Any:  # numpydoc ignore=GL08
