@@ -1,15 +1,13 @@
 """Array-agnostic implementations for element-wise functions."""
 
+import typing
 from collections.abc import Callable
 from types import NoneType
-from typing import overload
 
 from .._at import at
-from .._lib import _compat
-from .._lib._compat import array_namespace, is_dask_namespace
-from .._lib._helpers import asarrays, capabilities, meta_namespace
+from .._lib import _compat, _helpers
 from .._lib._typing import Array, ArrayNamespace
-from ._inspection import default_dtype
+from . import _inspection
 
 __all__ = [
     "angle",
@@ -22,7 +20,7 @@ __all__ = [
 ]
 
 
-@overload
+@typing.overload
 def apply_where(  # numpydoc ignore=GL08
     cond: Array,
     args: Array | tuple[Array, ...],
@@ -35,7 +33,7 @@ def apply_where(  # numpydoc ignore=GL08
 ) -> Array: ...
 
 
-@overload
+@typing.overload
 def apply_where(  # numpydoc ignore=GL08
     cond: Array,
     args: Array | tuple[Array, ...],
@@ -129,15 +127,15 @@ def apply_where(  # numpydoc ignore=PR01,PR02
     args_ = [*args_, *kwargs_.values()]
     del kwargs
 
-    xp = array_namespace(cond, fill_value, *args_) if xp is None else xp
+    xp = _compat.array_namespace(cond, fill_value, *args_) if xp is None else xp
 
     if isinstance(fill_value, int | float | complex | NoneType):
         cond, *args_ = xp.broadcast_arrays(cond, *args_)
     else:
         cond, fill_value, *args_ = xp.broadcast_arrays(cond, fill_value, *args_)
 
-    if is_dask_namespace(xp):
-        meta_xp = meta_namespace(cond, fill_value, *args_, xp=xp)
+    if _compat.is_dask_namespace(xp):
+        meta_xp = _helpers.meta_namespace(cond, fill_value, *args_, xp=xp)
         # map_blocks doesn't descend into tuples of Arrays
         return xp.map_blocks(
             _apply_where, cond, f1, f2, fill_value, *args_, kwkeys=kwkeys, xp=meta_xp
@@ -161,7 +159,7 @@ def _apply_where(  # numpydoc ignore=PR01,RT01
     kwargs = dict(zip(kwkeys, args[nargs:], strict=True))
     args = args[:nargs]
 
-    if not capabilities(xp, device=_compat.device(cond))["boolean indexing"]:
+    if not _helpers.capabilities(xp, cond)["boolean indexing"]:
         # jax.jit does not support assignment by boolean mask
         return xp.where(
             cond,
@@ -201,14 +199,14 @@ def isclose(
     equal_nan: bool = False,
     xp: ArrayNamespace,
 ) -> Array:  # numpydoc ignore=PR01,RT01
-    """See docstring in array_api_extra._delegation."""
-    a, b = asarrays(a, b, xp=xp)
+    """See docstring in `array_api_extra._elementwise`."""
+    a, b = _helpers.asarrays(a, b, xp=xp)
 
     a_inexact = xp.isdtype(a.dtype, ("real floating", "complex floating"))
     b_inexact = xp.isdtype(b.dtype, ("real floating", "complex floating"))
     if a_inexact or b_inexact:
         # prevent warnings on NumPy and Dask on inf - inf
-        mxp = meta_namespace(a, b, xp=xp)
+        mxp = _helpers.meta_namespace(a, b, xp=xp)
         out = apply_where(
             xp.isinf(a) | xp.isinf(b),
             (a, b),
@@ -246,7 +244,7 @@ def nan_to_num(  # numpydoc ignore=PR01,RT01
     *,
     xp: ArrayNamespace,
 ) -> Array:
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._elementwise`."""
 
     def perform_replacements(  # numpydoc ignore=PR01,RT01
         x: Array,
@@ -282,7 +280,7 @@ def nan_to_num(  # numpydoc ignore=PR01,RT01
 
 def sinc(x: Array, /, *, xp: ArrayNamespace) -> Array:
     # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._elementwise`."""
 
     # no scalars in `where` - array-api#807
     y = xp.pi * xp.where(
@@ -326,13 +324,13 @@ def angle(z: Array, /, *, deg: bool = False, xp: ArrayNamespace | None = None) -
     Array([ 0., 90., 45.], dtype=array_api_strict.float64)
     """
     if xp is None:
-        xp = array_namespace(z)
+        xp = _compat.array_namespace(z)
     if xp.isdtype(z.dtype, "complex floating"):
         zimag = xp.imag(z)
         zreal = xp.real(z)
     else:
         if not xp.isdtype(z.dtype, "real floating"):
-            z = xp.astype(z, default_dtype(xp, device=_compat.device(z)))
+            z = xp.astype(z, _inspection.default_dtype(xp, device=_compat.device(z)))
         zimag = xp.zeros_like(z)
         zreal = z
     a = xp.atan2(zimag, zreal)
@@ -343,11 +341,11 @@ def angle(z: Array, /, *, deg: bool = False, xp: ArrayNamespace | None = None) -
 
 def deg2rad(x: Array, /, *, xp: ArrayNamespace) -> Array:
     # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._elementwise`."""
     return x * xp.pi / 180
 
 
 def rad2deg(x: Array, /, *, xp: ArrayNamespace) -> Array:
     # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._elementwise`."""
     return x * 180 / xp.pi

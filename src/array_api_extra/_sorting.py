@@ -1,15 +1,7 @@
 """Delegation layer for sorting functions."""
 
-from ._agnostic import _sorting
-from ._lib._compat import (
-    array_namespace,
-    is_cupy_namespace,
-    is_jax_namespace,
-    is_numpy_namespace,
-    is_pydata_sparse_namespace,
-    is_torch_namespace,
-)
-from ._lib._helpers import eager_shape
+from . import _agnostic
+from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayNamespace
 
 __all__ = ["argpartition", "partition"]
@@ -58,23 +50,27 @@ def partition(
     """
     # Validate inputs.
     if xp is None:
-        xp = array_namespace(a)
+        xp = _compat.array_namespace(a)
     if a.ndim < 1:
         msg = "`a` must be at least 1-dimensional"
         raise TypeError(msg)
     if axis is None:
         return partition(xp.reshape(a, (-1,)), kth, axis=0, xp=xp)
-    (size,) = eager_shape(a, axis)
+    (size,) = _helpers.eager_shape(a, axis)
     if not (0 <= kth < size):
         msg = f"kth(={kth}) out of bounds [0 {size})"
         raise ValueError(msg)
 
     # Delegate where possible.
-    if is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp):
+    if (
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+    ):
         return xp.partition(a, kth, axis=axis)
 
     # Use top-k when possible:
-    if is_torch_namespace(xp):
+    if _compat.is_torch_namespace(xp):
         if not (axis == -1 or axis == a.ndim - 1):
             a = xp.transpose(a, axis, -1)
 
@@ -109,7 +105,7 @@ def partition(
     # not much more efficient than sorting everything when
     # kth is not small compared to x.size
 
-    return _sorting.partition(a, kth, axis=axis, xp=xp)
+    return _agnostic._sorting.partition(a, kth, axis=axis, xp=xp)
 
 
 def argpartition(
@@ -151,8 +147,8 @@ def argpartition(
     """
     # Validate inputs.
     if xp is None:
-        xp = array_namespace(a)
-    if is_pydata_sparse_namespace(xp):
+        xp = _compat.array_namespace(a)
+    if _compat.is_pydata_sparse_namespace(xp):
         msg = "Not implemented for sparse backend: no argsort"
         raise NotImplementedError(msg)
     if a.ndim < 1:
@@ -160,17 +156,21 @@ def argpartition(
         raise TypeError(msg)
     if axis is None:
         return argpartition(xp.reshape(a, (-1,)), kth, axis=0, xp=xp)
-    (size,) = eager_shape(a, axis)
+    (size,) = _helpers.eager_shape(a, axis)
     if not (0 <= kth < size):
         msg = f"kth(={kth}) out of bounds [0 {size})"
         raise ValueError(msg)
 
     # Delegate where possible.
-    if is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp):
+    if (
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+    ):
         return xp.argpartition(a, kth, axis=axis)
 
     # Use top-k when possible:
-    if is_torch_namespace(xp):
+    if _compat.is_torch_namespace(xp):
         # see `partition` above for commented details of those steps:
         if not (axis == -1 or axis == a.ndim - 1):
             a = xp.transpose(a, axis, -1)
@@ -203,4 +203,4 @@ def argpartition(
     # not much more efficient than sorting everything when
     # kth is not small compared to x.size
 
-    return _sorting.argpartition(a, kth, axis=axis, xp=xp)
+    return _agnostic._sorting.argpartition(a, kth, axis=axis, xp=xp)

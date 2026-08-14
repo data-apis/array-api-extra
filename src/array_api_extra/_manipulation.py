@@ -3,17 +3,8 @@
 from collections.abc import Sequence
 from typing import Literal
 
-from ._agnostic import _manipulation
-from ._lib._compat import (
-    array_namespace,
-    is_cupy_namespace,
-    is_dask_namespace,
-    is_jax_namespace,
-    is_numpy_namespace,
-    is_pydata_sparse_namespace,
-    is_torch_namespace,
-)
-from ._lib._helpers import deprecated, normalize_pad_width
+from . import _agnostic
+from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayNamespace
 
 __all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad"]
@@ -54,21 +45,21 @@ def atleast_nd(x: Array, /, *, ndim: int, xp: ArrayNamespace | None = None) -> A
     True
     """
     if xp is None:
-        xp = array_namespace(x)
+        xp = _compat.array_namespace(x)
 
     if 1 <= ndim <= 2 and (
-        is_numpy_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_dask_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_torch_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_torch_namespace(xp)
     ):
         return getattr(xp, f"atleast_{ndim}d")(x)
 
-    return _manipulation.atleast_nd(x, ndim=ndim, xp=xp)
+    return _agnostic._manipulation.atleast_nd(x, ndim=ndim, xp=xp)
 
 
-@deprecated(
+@_helpers.deprecated(
     "`xpx.broadcast_shapes` is deprecated and will be removed in v1.0.0. "
     "`xp.broadcast_shapes` exists in the standard as of v2025.12."
 )
@@ -121,18 +112,18 @@ def broadcast_shapes(
         xp is not None
         and all(isinstance(size, int) for shape in shapes for size in shape)
         and (
-            is_numpy_namespace(xp)
-            or is_cupy_namespace(xp)
-            or is_jax_namespace(xp)
-            or is_torch_namespace(xp)
+            _compat.is_numpy_namespace(xp)
+            or _compat.is_cupy_namespace(xp)
+            or _compat.is_jax_namespace(xp)
+            or _compat.is_torch_namespace(xp)
         )
     ):
         return xp.broadcast_shapes(*shapes)
 
-    return _manipulation.broadcast_shapes(*shapes)
+    return _agnostic._manipulation.broadcast_shapes(*shapes)
 
 
-@deprecated(
+@_helpers.deprecated(
     "`xpx.expand_dims` is deprecated and will be removed in v1.0.0. "
     "`xp.expand_dims` with support for a tuple of ints in `axis` "
     "exists in the standard as of v2025.12."
@@ -206,7 +197,7 @@ def expand_dims(
             [2]]], dtype=array_api_strict.int64)
     """
     if xp is None:
-        xp = array_namespace(a)
+        xp = _compat.array_namespace(a)
 
     if not isinstance(axis, tuple):
         axis = (axis,)
@@ -221,10 +212,14 @@ def expand_dims(
         err_msg = "Duplicate dimensions specified in `axis`."
         raise ValueError(err_msg)
 
-    if is_numpy_namespace(xp) or is_dask_namespace(xp) or is_jax_namespace(xp):
+    if (
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+    ):
         return xp.expand_dims(a, axis=axis)
 
-    return _manipulation.expand_dims(a, axis=axis, xp=xp)
+    return _agnostic._manipulation.expand_dims(a, axis=axis, xp=xp)
 
 
 def pad(
@@ -262,26 +257,28 @@ def pad(
         The input array,
         padded with ``pad_width`` elements equal to ``constant_values``.
     """
-    xp = array_namespace(x) if xp is None else xp
+    xp = _compat.array_namespace(x) if xp is None else xp
 
     if mode != "constant":
         msg = "Only `'constant'` mode is currently supported"
         raise NotImplementedError(msg)
 
     if (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_pydata_sparse_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_pydata_sparse_namespace(xp)
     ):
         return xp.pad(x, pad_width, mode, constant_values=constant_values)
 
-    if is_torch_namespace(xp):
+    if _compat.is_torch_namespace(xp):
         # normalize `pad_width` on the host rather than through a tensor as done in
         # `torch/_numpy`'s implementation (avoids device transfers)
-        pad_width_seq = normalize_pad_width(pad_width, x.ndim)
+        pad_width_seq = _helpers.normalize_pad_width(pad_width, x.ndim)
         # torch.nn.functional.pad counts dimensions from the last one
         flat_pad_width = [w for pair in reversed(pad_width_seq) for w in pair]
         return xp.nn.functional.pad(x, tuple(flat_pad_width), value=constant_values)
 
-    return _manipulation.pad(x, pad_width, constant_values=constant_values, xp=xp)
+    return _agnostic._manipulation.pad(
+        x, pad_width, constant_values=constant_values, xp=xp
+    )

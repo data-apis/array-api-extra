@@ -1,8 +1,7 @@
 """Array-agnostic implementations for creation functions."""
 
 from .._at import at
-from .._lib import _compat
-from .._lib._helpers import eager_shape, ndindex
+from .._lib import _compat, _helpers
 from .._lib._typing import Array, ArrayNamespace
 
 __all__ = ["create_diagonal", "one_hot"]
@@ -11,8 +10,8 @@ __all__ = ["create_diagonal", "one_hot"]
 def create_diagonal(
     x: Array, /, *, offset: int = 0, xp: ArrayNamespace
 ) -> Array:  # numpydoc ignore=PR01,RT01
-    """See docstring in array_api_extra._delegation."""
-    x_shape = eager_shape(x)
+    """See docstring in `array_api_extra._creation`."""
+    x_shape = _helpers.eager_shape(x)
     batch_dims = x_shape[:-1]
     n = x_shape[-1] + abs(offset)
     diag = xp.zeros((*batch_dims, n**2), dtype=x.dtype, device=_compat.device(x))
@@ -22,7 +21,7 @@ def create_diagonal(
         min(n * (n - offset), diag.shape[-1]),
         n + 1,
     )
-    for index in ndindex(*batch_dims):
+    for index in _helpers.ndindex(*batch_dims):
         diag = at(diag)[(*index, target_slice)].set(x[(*index, slice(None))])
     return xp.reshape(diag, (*batch_dims, n, n))
 
@@ -34,7 +33,7 @@ def one_hot(
     *,
     xp: ArrayNamespace,
 ) -> Array:  # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._creation`."""
     # TODO: Benchmark whether this is faster on the NumPy backend:
     # if is_numpy_array(x):
     #     out = xp.zeros((x.size, num_classes), dtype=dtype)

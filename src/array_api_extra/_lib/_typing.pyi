@@ -1,7 +1,10 @@
 """Static typing helpers."""
 
 from types import EllipsisType, ModuleType
-from typing import Protocol, TypeAlias
+from typing import Any, Protocol, TypeAlias
+
+import numpy as np
+from numpy.typing import ArrayLike
 
 # TODO import from typing (requires Python >=3.12)
 from typing_extensions import override
@@ -100,5 +103,15 @@ SetIndex: TypeAlias = (
 GetIndex: TypeAlias = (
     SetIndex | tuple[int | slice | EllipsisType | Array | None, ...] | None
 )
+NumPyObject: TypeAlias = np.ndarray[Any, Any] | np.generic
 
-__all__ = ["Array", "ArrayNamespace", "DType", "Device", "GetIndex", "SetIndex"]
+__all__ = [
+    "Array",
+    "ArrayLike",
+    "ArrayNamespace",
+    "DType",
+    "Device",
+    "GetIndex",
+    "NumPyObject",
+    "SetIndex",
+]

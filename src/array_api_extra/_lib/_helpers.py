@@ -31,7 +31,7 @@ from ._compat import (
     is_numpy_array,
     is_torch_namespace,
 )
-from ._typing import Array, ArrayNamespace, Device
+from ._typing import Array, ArrayNamespace
 
 if TYPE_CHECKING:  # pragma: no cover
     # TODO import from typing (requires Python >=3.12 and >=3.13)
@@ -52,6 +52,7 @@ __all__ = [
     "deprecated",
     "eager_shape",
     "in1d",
+    "is_jax_jit_enabled",
     "is_python_scalar",
     "jax_autojit",
     "meta_namespace",
@@ -308,12 +309,11 @@ def meta_namespace(
     return array_namespace(*metas)
 
 
-def capabilities(
-    xp: ArrayNamespace, *, device: Device | None = None
-) -> dict[str, int | None]:
+def capabilities(xp: ArrayNamespace, x: Array | None = None) -> dict[str, int | None]:
     """
     Return patched ``xp.__array_namespace_info__().capabilities()``.
 
+    If an array `x` is provided, use its device.
     TODO this helper should be eventually removed once all the special cases
     it handles are fixed in the respective backends.
 
@@ -321,8 +321,8 @@ def capabilities(
     ----------
     xp : array_namespace
         The standard-compatible namespace.
-    device : Device, optional
-        The device to use.
+    x : Array, optional
+        If provided, the device of `x` is used.
 
     Returns
     -------
@@ -338,8 +338,8 @@ def capabilities(
             out["boolean indexing"] = False
     elif is_torch_namespace(xp):
         # FIXME https://github.com/data-apis/array-api/issues/945
-        device = xp.get_default_device() if device is None else xp.device(device)
-        if device.type == "meta":  # type: ignore[union-attr]  # pyright: ignore[reportAttributeAccessIssue,reportOptionalMemberAccess]
+        device = xp.get_default_device() if x is None else _compat.device(x)
+        if device.type == "meta":  # type: ignore[union-attr]  # pyright: ignore[reportAttributeAccessIssue]
             out = out.copy()
             out["boolean indexing"] = False
             out["data-dependent shapes"] = False
@@ -624,3 +624,14 @@ def normalize_pad_width(
     ):
         return [cast(tuple[int, int], pad_width)] * ndim
     return cast(list[tuple[int, int]], list(pad_width))
+
+
+def is_jax_jit_enabled(xp: ArrayNamespace) -> bool:  # numpydoc ignore=PR01,RT01
+    """Return True if this function is being called inside ``jax.jit``."""
+    import jax  # pylint: disable=import-outside-toplevel
+
+    x = xp.asarray(False)
+    try:
+        return bool(x)
+    except jax.errors.TracerBoolConversionError:
+        return True

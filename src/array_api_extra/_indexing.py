@@ -1,14 +1,7 @@
 """Delegation layer for indexing functions."""
 
-from ._agnostic import _indexing
-from ._lib._compat import (
-    array_namespace,
-    is_cupy_namespace,
-    is_dask_namespace,
-    is_jax_namespace,
-    is_numpy_namespace,
-    is_torch_namespace,
-)
+from . import _agnostic
+from ._lib import _compat
 from ._lib._typing import Array, ArrayNamespace, Device
 
 __all__ = ["diag_indices", "tril_indices", "triu_indices", "unravel_index"]
@@ -57,10 +50,12 @@ def diag_indices(
         msg = f"`ndim` must be >= 1, got {ndim}"
         raise ValueError(msg)
     if device is None and (
-        is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
     ):
         return xp.diag_indices(n, ndim=ndim)
-    return _indexing.diag_indices(n, ndim=ndim, device=device, xp=xp)
+    return _agnostic._indexing.diag_indices(n, ndim=ndim, device=device, xp=xp)
 
 
 def tril_indices(
@@ -120,19 +115,19 @@ def tril_indices(
         msg = f"`m` must be non-negative, got {m}"
         raise ValueError(msg)
     if device is None and (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_dask_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_dask_namespace(xp)
     ):
         return xp.tril_indices(n, k=offset, m=m)
-    if is_torch_namespace(xp):
+    if _compat.is_torch_namespace(xp):
         # `torch.tril_indices` returns a 2xN tensor, not a tuple, and
         # takes (row, col) rather than (n, *, m=None).
         cols = n if m is None else m
         idx = xp.tril_indices(n, cols, offset=offset, device=device)
         return (idx[0], idx[1])
-    return _indexing.tril_indices(n, offset=offset, m=m, device=device, xp=xp)
+    return _agnostic._indexing.tril_indices(n, offset=offset, m=m, device=device, xp=xp)
 
 
 def triu_indices(
@@ -192,17 +187,17 @@ def triu_indices(
         msg = f"`m` must be non-negative, got {m}"
         raise ValueError(msg)
     if device is None and (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_dask_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_dask_namespace(xp)
     ):
         return xp.triu_indices(n, k=offset, m=m)
-    if is_torch_namespace(xp):
+    if _compat.is_torch_namespace(xp):
         cols = n if m is None else m
         idx = xp.triu_indices(n, cols, offset=offset, device=device)
         return (idx[0], idx[1])
-    return _indexing.triu_indices(n, offset=offset, m=m, device=device, xp=xp)
+    return _agnostic._indexing.triu_indices(n, offset=offset, m=m, device=device, xp=xp)
 
 
 def unravel_index(
@@ -250,15 +245,15 @@ def unravel_index(
     [(0, 0), (0, 1), (1, 0), (1, 1), (0, 0), (0, 1)]
     """
     if xp is None:
-        xp = array_namespace(indices)
+        xp = _compat.array_namespace(indices)
 
     if (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_dask_namespace(xp)
-        or is_jax_namespace(xp)
-        or is_torch_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_torch_namespace(xp)
     ):
         return xp.unravel_index(indices, shape)
 
-    return _indexing.unravel_index(indices, shape)
+    return _agnostic._indexing.unravel_index(indices, shape)

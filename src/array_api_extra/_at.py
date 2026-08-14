@@ -3,24 +3,13 @@
 from __future__ import annotations
 
 import operator
+import typing
 from collections.abc import Callable
 from enum import Enum
-from typing import TYPE_CHECKING, ClassVar, cast
+from typing import ClassVar
 
-from ._lib import _compat
-from ._lib._compat import (
-    array_namespace,
-    is_dask_array,
-    is_jax_array,
-    is_torch_array,
-    is_writeable_array,
-)
-from ._lib._helpers import meta_namespace
+from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayNamespace, SetIndex
-
-if TYPE_CHECKING:  # pragma: no cover
-    # TODO import from typing (requires Python >=3.11)
-    from typing import Self
 
 __all__ = ["at"]
 
@@ -210,7 +199,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         self._x = x
         self._idx = idx
 
-    def __getitem__(self, idx: SetIndex, /) -> Self:  # numpydoc ignore=PR01,RT01
+    def __getitem__(self, idx: SetIndex, /) -> typing.Self:  # numpydoc ignore=PR01,RT01
         """
         Allow for the alternate syntax ``at(x)[start:stop:step]``.
 
@@ -273,7 +262,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         from ._agnostic._elementwise import apply_where  # pylint: disable=cyclic-import
 
         x, idx = self._x, self._idx
-        xp = array_namespace(x, y) if xp is None else xp
+        xp = _compat.array_namespace(x, y) if xp is None else xp
 
         if isinstance(idx, _Undef):
             msg = (
@@ -290,14 +279,14 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             msg = f"copy must be True, False, or None; got {copy!r}"
             raise ValueError(msg)
 
-        writeable = None if copy else is_writeable_array(x)
+        writeable = None if copy else _compat.is_writeable_array(x)
 
         # JAX inside jax.jit doesn't support in-place updates with boolean
         # masks; Dask exclusively supports __setitem__ but not iops.
         # We can handle the common special case of 0-dimensional y
         # with where(idx, y, x) instead.
         if (
-            (is_dask_array(idx) or is_jax_array(idx))
+            (_compat.is_dask_array(idx) or _compat.is_jax_array(idx))
             and idx.dtype == xp.bool
             and idx.shape == x.shape
         ):
@@ -321,9 +310,9 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             # else: this will work on eager JAX and crash on jax.jit and Dask
 
         if copy or (copy is None and not writeable):
-            if is_jax_array(x):
+            if _compat.is_jax_array(x):
                 # Use JAX's at[]
-                func = cast(
+                func = typing.cast(
                     Callable[[Array | complex], Array],
                     getattr(x.at[idx], at_op.value),  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownArgumentType]
                 )
@@ -341,7 +330,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
             writeable = None
 
         if writeable is None:
-            writeable = is_writeable_array(x)
+            writeable = _compat.is_writeable_array(x)
         if not writeable:
             # sparse crashes here
             msg = f"Can't update read-only array {x}"
@@ -350,7 +339,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         # Work around bug in PyTorch where __setitem__ doesn't
         # always support mismatched dtypes
         # https://github.com/pytorch/pytorch/issues/150017
-        if is_torch_array(y):
+        if _compat.is_torch_array(y):
             y = xp.astype(y, x.dtype, copy=False)
 
         # Backends without boolean indexing (other than JAX) crash here
@@ -459,8 +448,8 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
         # thanks to all these meta-namespaces implementing the __array_ufunc__
         # interface, but there's no guarantee that it will work for other
         # wrapped libraries in the future.
-        xp = array_namespace(self._x) if xp is None else xp
-        mxp = meta_namespace(self._x, xp=xp)
+        xp = _compat.array_namespace(self._x) if xp is None else xp
+        mxp = _helpers.meta_namespace(self._x, xp=xp)
         y = xp.asarray(y)
         return self._op(_AtOp.MIN, mxp.minimum, mxp.minimum, y, copy=copy, xp=xp)
 
@@ -473,7 +462,7 @@ class at:  # pylint: disable=invalid-name  # numpydoc ignore=PR02
     ) -> Array:  # numpydoc ignore=PR01,RT01
         """Apply ``x[idx] = maximum(x[idx], y)`` and return the updated array."""
         # See note on min()
-        xp = array_namespace(self._x) if xp is None else xp
-        mxp = meta_namespace(self._x, xp=xp)
+        xp = _compat.array_namespace(self._x) if xp is None else xp
+        mxp = _helpers.meta_namespace(self._x, xp=xp)
         y = xp.asarray(y)
         return self._op(_AtOp.MAX, mxp.maximum, mxp.maximum, y, copy=copy, xp=xp)

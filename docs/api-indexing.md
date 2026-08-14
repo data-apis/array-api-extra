@@ -1,4 +1,4 @@
-# Indexing functions
+# Indexing Functions
 
 ```{eval-rst}
 .. currentmodule:: array_api_extra

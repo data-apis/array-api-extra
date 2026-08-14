@@ -1,18 +1,7 @@
 """Delegation layer for set functions."""
 
-from ._agnostic import _set
-from ._lib._compat import (
-    array_namespace,
-    is_cupy_namespace,
-    is_dask_namespace,
-    is_jax_array,
-    is_jax_namespace,
-    is_numpy_namespace,
-    is_torch_namespace,
-    size,
-)
-from ._lib._compat import device as get_device
-from ._lib._helpers import asarrays, capabilities
+from . import _agnostic
+from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayNamespace
 
 __all__ = ["isin", "nunique", "setdiff1d", "union1d"]
@@ -63,18 +52,22 @@ def isin(
         that are in `b` and False otherwise.
     """
     if xp is None:
-        xp = array_namespace(a, b)
+        xp = _compat.array_namespace(a, b)
 
-    if is_numpy_namespace(xp):
+    if _compat.is_numpy_namespace(xp):
         return xp.isin(a, b, assume_unique=assume_unique, invert=invert, kind=kind)
-    if is_jax_namespace(xp):
+    if _compat.is_jax_namespace(xp):
         if kind is None:
             kind = "auto"
         return xp.isin(a, b, assume_unique=assume_unique, invert=invert, method=kind)
-    if is_cupy_namespace(xp) or is_torch_namespace(xp) or is_dask_namespace(xp):
+    if (
+        _compat.is_cupy_namespace(xp)
+        or _compat.is_torch_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+    ):
         return xp.isin(a, b, assume_unique=assume_unique, invert=invert)
 
-    return _set.isin(a, b, assume_unique=assume_unique, invert=invert, xp=xp)
+    return _agnostic._set.isin(a, b, assume_unique=assume_unique, invert=invert, xp=xp)
 
 
 def nunique(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
@@ -97,26 +90,26 @@ def nunique(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
         The number of unique elements in `x`. It can be lazy.
     """
     if xp is None:
-        xp = array_namespace(x)
+        xp = _compat.array_namespace(x)
 
-    if is_jax_array(x):
+    if _compat.is_jax_array(x):
         # size= is JAX-specific
         # https://github.com/data-apis/array-api/issues/883
-        _, counts = xp.unique_counts(x, size=size(x))
+        _, counts = xp.unique_counts(x, size=_compat.size(x))
         return (counts > 0).sum()
 
     if (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
         or (
-            is_torch_namespace(xp)
-            and capabilities(xp, device=get_device(x))["data-dependent shapes"]
+            _compat.is_torch_namespace(xp)
+            and _helpers.capabilities(xp, x)["data-dependent shapes"]
         )
     ):
         _, counts = xp.unique_counts(x)
-        return xp.asarray(size(counts), device=get_device(x))
+        return xp.asarray(_compat.size(counts), device=_compat.device(x))
 
-    return _set.nunique(x, xp=xp)
+    return _agnostic._set.nunique(x, xp=xp)
 
 
 def setdiff1d(
@@ -163,13 +156,17 @@ def setdiff1d(
     """
 
     if xp is None:
-        xp = array_namespace(x1, x2)
+        xp = _compat.array_namespace(x1, x2)
 
-    if is_numpy_namespace(xp) or is_cupy_namespace(xp) or is_jax_namespace(xp):
-        x1, x2 = asarrays(x1, x2, xp=xp)
+    if (
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+    ):
+        x1, x2 = _helpers.asarrays(x1, x2, xp=xp)
         return xp.setdiff1d(x1, x2, assume_unique=assume_unique)
 
-    return _set.setdiff1d(x1, x2, assume_unique=assume_unique, xp=xp)
+    return _agnostic._set.setdiff1d(x1, x2, assume_unique=assume_unique, xp=xp)
 
 
 def union1d(a: Array, b: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
@@ -202,14 +199,14 @@ def union1d(a: Array, b: Array, /, *, xp: ArrayNamespace | None = None) -> Array
     See the docstring of the corresponding JAX function for more information.
     """
     if xp is None:
-        xp = array_namespace(a, b)
+        xp = _compat.array_namespace(a, b)
 
     if (
-        is_numpy_namespace(xp)
-        or is_cupy_namespace(xp)
-        or is_dask_namespace(xp)
-        or is_jax_namespace(xp)
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
     ):
         return xp.union1d(a, b)
 
-    return _set.union1d(a, b, xp=xp)
+    return _agnostic._set.union1d(a, b, xp=xp)

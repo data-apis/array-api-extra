@@ -1,13 +1,12 @@
 """Array-agnostic implementations for statistical functions."""
 
 import math
+import typing
 import warnings
-from typing import cast
 
-from .._lib import _compat
-from .._lib._helpers import eager_shape
+from .._lib import _compat, _helpers
 from .._lib._typing import Array, ArrayNamespace
-from ._manipulation import atleast_nd
+from . import _manipulation
 
 __all__ = ["cov", "nanmax", "nanmin", "nansum"]
 
@@ -21,7 +20,7 @@ def cov(
     aweights: Array | None = None,
     xp: ArrayNamespace,
 ) -> Array:  # numpydoc ignore=PR01,RT01
-    """See docstring in array_api_extra._delegation."""
+    """See docstring in `array_api_extra._statistical`."""
     # NB: no `xp.asarray(m)` here. The delegation layer already guarantees `m`
     # is an array (it calls `array_namespace(m)` and reads `m.ndim`), and on
     # torch `xp.asarray` detaches gradients and mutates the caller's tensor.
@@ -29,7 +28,7 @@ def cov(
         xp.float64 if xp.isdtype(m.dtype, "integral") else xp.result_type(m, xp.float64)
     )
 
-    m = atleast_nd(m, ndim=2, xp=xp)
+    m = _manipulation.atleast_nd(m, ndim=2, xp=xp)
     # Preserve the historical no-alias guarantee even when the dtype already matches.
     m = xp.astype(m, dtype, copy=True)
 
@@ -73,7 +72,7 @@ def cov(
 
     if w is None:
         avg = xp.mean(m, axis=-1, keepdims=True)
-        fact = eager_shape(m, axis=-1)[0] - correction
+        fact = _helpers.eager_shape(m, axis=-1)[0] - correction
     else:
         v1 = xp.sum(w, axis=-1)
         avg = xp.sum(m * w, axis=-1, keepdims=True) / v1
@@ -87,7 +86,7 @@ def cov(
         # normalizer with a zero imaginary part. Complex ordering is undefined;
         # compare its real component instead.
         if w is not None:
-            fact_array = cast(Array, fact)
+            fact_array = typing.cast(Array, fact)
             fact_to_check = (
                 xp.real(fact_array)
                 if xp.isdtype(fact_array.dtype, "complex floating")
@@ -118,7 +117,7 @@ def nanmin(  # numpydoc ignore=PR01,RT01
     axis: int | tuple[int, ...] | None,
     xp: ArrayNamespace,
 ) -> Array:
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._statistical`."""
     mask = xp.isnan(a)
     device_a = _compat.device(a)
     x = xp.min(
@@ -139,7 +138,7 @@ def nanmax(  # numpydoc ignore=PR01,RT01
     axis: int | tuple[int, ...] | None,
     xp: ArrayNamespace,
 ) -> Array:
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._statistical`."""
     mask = xp.isnan(a)
     device_a = _compat.device(a)
     x = xp.max(
@@ -160,7 +159,7 @@ def nansum(  # numpydoc ignore=PR01,RT01
     axis: int | tuple[int, ...] | None,
     xp: ArrayNamespace,
 ) -> Array:
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._statistical`."""
     mask = xp.isnan(a)
     device_a = _compat.device(a)
     zero = xp.asarray(0, dtype=a.dtype, device=device_a)

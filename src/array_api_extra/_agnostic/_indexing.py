@@ -8,7 +8,7 @@ __all__ = ["diag_indices", "tril_indices", "triu_indices", "unravel_index"]
 def diag_indices(
     n: int, /, *, ndim: int, device: Device | None, xp: ArrayNamespace
 ) -> tuple[Array, ...]:  # numpydoc ignore=PR01,RT01
-    """See docstring in array_api_extra._delegation."""
+    """See docstring in `array_api_extra._indexing`."""
     idx = xp.arange(n, device=device)
     return (idx,) * ndim
 
@@ -41,7 +41,7 @@ def tril_indices(
     device: Device | None,
     xp: ArrayNamespace,
 ) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
-    """See docstring in array_api_extra._delegation."""
+    """See docstring in `array_api_extra._indexing`."""
     return _tri_indices(n, offset=offset, m=m, upper=False, device=device, xp=xp)
 
 
@@ -54,13 +54,13 @@ def triu_indices(
     device: Device | None,
     xp: ArrayNamespace,
 ) -> tuple[Array, Array]:  # numpydoc ignore=PR01,RT01
-    """See docstring in array_api_extra._delegation."""
+    """See docstring in `array_api_extra._indexing`."""
     return _tri_indices(n, offset=offset, m=m, upper=True, device=device, xp=xp)
 
 
 def unravel_index(indices: Array, shape: tuple[int, ...], /) -> tuple[Array, ...]:
     # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._indexing`."""
     coords: list[Array] = []
     for dim in reversed(shape):
         coords.append(indices % dim)

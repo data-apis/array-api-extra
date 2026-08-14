@@ -5,7 +5,7 @@ from typing import Literal
 
 from .._lib import _compat
 from .._lib._typing import Array, ArrayNamespace
-from ._inspection import default_dtype
+from . import _inspection
 
 __all__ = ["searchsorted"]
 
@@ -19,7 +19,7 @@ def searchsorted(
     xp: ArrayNamespace,
 ) -> Array:
     # numpydoc ignore=PR01,RT01
-    """See docstring in `array_api_extra._delegation.py`."""
+    """See docstring in `array_api_extra._searching`."""
     a = xp.full(x2.shape, 0, device=_compat.device(x1))
 
     if x1.shape[-1] == 0:
@@ -41,4 +41,4 @@ def searchsorted(
 
     out = xp.where(compare(x2, xp.min(x1, axis=-1, keepdims=True)), 0, b)
     out = xp.where(xp.isnan(x2), x1.shape[-1], out) if side == "right" else out
-    return xp.astype(out, default_dtype(xp, kind="integral"), copy=False)
+    return xp.astype(out, _inspection.default_dtype(xp, kind="integral"), copy=False)
