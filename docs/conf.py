@@ -71,3 +71,4 @@ nitpick_ignore = [
 templates_path = ["_templates"]
 
 always_document_param_types = True
+typehints_document_overloads = False
