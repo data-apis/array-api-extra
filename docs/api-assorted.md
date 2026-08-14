@@ -1,5 +1,30 @@
 # Assorted functions
 
+## Creation functions
+
+```{eval-rst}
+.. currentmodule:: array_api_extra
+.. autosummary::
+    :nosignatures:
+    :toctree: generated
+
+    create_diagonal
+    one_hot
+```
+
+## Inspection
+
+```{eval-rst}
+.. currentmodule:: array_api_extra
+.. autosummary::
+    :nosignatures:
+    :toctree: generated
+
+    default_dtype
+```
+
+## Element-wise functions
+
 ```{eval-rst}
 .. currentmodule:: array_api_extra
 .. autosummary::
@@ -8,33 +33,100 @@
 
     angle
     apply_where
-    argpartition
+    deg2rad
+    isclose
+    nan_to_num
+    rad2deg
+    sinc
+```
+
+## Indexing functions
+
+```{eval-rst}
+.. currentmodule:: array_api_extra
+.. autosummary::
+    :nosignatures:
+    :toctree: generated
+
     at
+    diag_indices
+    tril_indices
+    triu_indices
+    unravel_index
+```
+
+## Linear algebra functions
+
+```{eval-rst}
+.. currentmodule:: array_api_extra
+.. autosummary::
+    :nosignatures:
+    :toctree: generated
+
+    kron
+```
+
+## Manipulation functions
+
+```{eval-rst}
+.. currentmodule:: array_api_extra
+.. autosummary::
+    :nosignatures:
+    :toctree: generated
+
     atleast_nd
     broadcast_shapes
-    cov
-    create_diagonal
-    default_dtype
-    deg2rad
-    diag_indices
     expand_dims
-    isclose
+    pad
+```
+
+## Searching functions
+
+```{eval-rst}
+.. currentmodule:: array_api_extra
+.. autosummary::
+    :nosignatures:
+    :toctree: generated
+
+    searchsorted
+```
+
+## Set functions
+
+```{eval-rst}
+.. currentmodule:: array_api_extra
+.. autosummary::
+    :nosignatures:
+    :toctree: generated
+
     isin
-    kron
-    nan_to_num
+    nunique
+    setdiff1d
+    union1d
+```
+
+## Sorting functions
+
+```{eval-rst}
+.. currentmodule:: array_api_extra
+.. autosummary::
+    :nosignatures:
+    :toctree: generated
+
+    argpartition
+    partition
+```
+
+## Statistical functions
+
+```{eval-rst}
+.. currentmodule:: array_api_extra
+.. autosummary::
+    :nosignatures:
+    :toctree: generated
+
+    cov
     nanmax
     nanmin
     nansum
-    nunique
-    one_hot
-    pad
-    partition
-    rad2deg
-    searchsorted
-    setdiff1d
-    sinc
-    tril_indices
-    triu_indices
-    union1d
-    unravel_index
 ```
