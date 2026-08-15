@@ -4,10 +4,11 @@ from types import EllipsisType, ModuleType
 from typing import Any, Protocol, TypeAlias
 
 import numpy as np
+from dask.typing import Graph, Key, SchedulerGetCallable
 from numpy.typing import ArrayLike
 
-# TODO import from typing (requires Python >=3.12)
-from typing_extensions import override
+# TODO import from typing (requires Python >=3.12 and >=3.13)
+from typing_extensions import TypeIs, override
 
 # TODO: use array-api-typing once it is available
 
@@ -112,6 +113,11 @@ __all__ = [
     "DType",
     "Device",
     "GetIndex",
+    "Graph",
+    "Key",
     "NumPyObject",
+    "SchedulerGetCallable",
     "SetIndex",
+    "TypeIs",
+    "override",
 ]
