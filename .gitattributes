@@ -6,10 +6,8 @@
 
 .github/* export-ignore
 .git* export-ignore
-codecov.yml export-ignore
+.codecov.yml export-ignore
 pixi.lock export-ignore
-RELEASING.md export-ignore
-renovate.json export-ignore
 
 # GitHub syntax highlighting
 pixi.lock linguist-language=YAML linguist-generated=true

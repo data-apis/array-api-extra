@@ -5,7 +5,7 @@ from typing import Any, cast
 import array_api_strict as xp
 from numpy.testing import assert_array_equal
 
-from vendor_tests.array_api_compat.common._typing import (  # type: ignore[import-not-found]
+from tests.vendoring.array_api_compat.common._typing import (  # type: ignore[import-not-found]
     Array,
 )
 

@@ -57,4 +57,3 @@ foreach subdir, files : sources
 endforeach
 
 subdir('tests')
-subdir('vendor_tests')
