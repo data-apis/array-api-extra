@@ -11,7 +11,6 @@ import typing
 import warnings
 from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from typing import (
-    TYPE_CHECKING,
     Any,
     ClassVar,
     Generic,
@@ -22,16 +21,7 @@ from typing import (
 )
 
 from . import _compat
-from ._typing import Array, ArrayNamespace
-
-if TYPE_CHECKING:  # pragma: no cover
-    # TODO import from typing (requires Python >=3.12 and >=3.13)
-    from typing_extensions import TypeIs, override
-else:
-
-    def override(func):
-        return func
-
+from ._typing import Array, ArrayNamespace, TypeIs, override
 
 P = ParamSpec("P")
 T = TypeVar("T")

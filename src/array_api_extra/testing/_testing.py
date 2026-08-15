@@ -11,10 +11,22 @@ import typing
 import warnings
 from collections.abc import Callable, Generator, Iterator, Sequence
 from types import FunctionType, ModuleType
-from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar
+from typing import Any, ParamSpec, TypeVar
 
 from .._lib import _compat, _helpers
-from .._lib._typing import Array, ArrayNamespace, Device
+from .._lib._typing import (
+    Array,
+    ArrayNamespace,
+    Device,
+    Graph,
+    Key,
+    SchedulerGetCallable,
+    override,
+)
+
+if typing.TYPE_CHECKING:
+    import numpy as np
+    import pytest
 
 __all__ = [
     "assert_close",
@@ -24,20 +36,6 @@ __all__ = [
     "lazy_xp_function",
     "patch_lazy_xp_functions",
 ]
-
-if TYPE_CHECKING:  # pragma: no cover
-    # TODO import override from typing (requires Python >=3.12)
-    import numpy as np
-    import pytest
-    from dask.typing import Graph, Key, SchedulerGetCallable
-    from typing_extensions import override as _override
-
-else:
-    # Sphinx hacks
-    SchedulerGetCallable = object
-
-    def _override(func):
-        return func
 
 
 __all__ = [
@@ -493,7 +491,7 @@ class _CountingDaskScheduler(SchedulerGetCallable):
         self.max_count = max_count
         self.msg = msg
 
-    @_override
+    @override
     def __call__(
         self, dsk: Graph, keys: Sequence[Key] | Key, **kwargs: Any
     ) -> Any:  # numpydoc ignore=GL08

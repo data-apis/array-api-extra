@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from typing import TYPE_CHECKING, Generic, TypeVar, cast
+from typing import Generic, TypeVar, cast
 
 import numpy as np
 import pytest
@@ -18,19 +18,10 @@ from array_api_extra._lib._helpers import (
     pickle_flatten,
     pickle_unflatten,
 )
-from array_api_extra._lib._typing import Array, ArrayNamespace, Device, DType
+from array_api_extra._lib._typing import Array, ArrayNamespace, Device, DType, override
 from array_api_extra.testing import assert_equal, lazy_xp_function
 
 from .conftest import np_compat
-
-if TYPE_CHECKING:  # pragma: no cover
-    # TODO import from typing (requires Python >=3.12)
-    from typing_extensions import override
-else:
-
-    def override(func):
-        return func
-
 
 T = TypeVar("T")
 
