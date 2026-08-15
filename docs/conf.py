@@ -1,7 +1,17 @@
 """Sphinx config."""
 
+import importlib
 import importlib.metadata
+import inspect
+from pathlib import Path
 from typing import Any
+
+from sphinx import addnodes
+
+_SOURCE_REPOSITORY = "https://github.com/data-apis/array-api-extra"
+_SOURCE_BRANCH = "main"
+_REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
+_PACKAGE_SOURCE_ROOT = _REPOSITORY_ROOT / "src"
 
 project = "array-api-extra"
 copyright = "Consortium for Python Data API Standards"
@@ -44,8 +54,8 @@ html_theme_options: dict[str, Any] = {
             "class": "",
         },
     ],
-    "source_repository": "https://github.com/data-apis/array-api-extra",
-    "source_branch": "main",
+    "source_repository": _SOURCE_REPOSITORY,
+    "source_branch": _SOURCE_BRANCH,
     "source_directory": "docs/",
 }
 
@@ -72,3 +82,74 @@ templates_path = ["_templates"]
 
 always_document_param_types = True
 typehints_document_overloads = False
+
+
+def _documented_object(
+    doctree: Any,
+) -> object | None:  # numpydoc ignore=PR01,RT01
+    """Return the first Python object described by a generated page."""
+    for signature in doctree.findall(addnodes.desc_signature):
+        module_name = signature.get("module")
+        fullname = signature.get("fullname")
+        if not isinstance(module_name, str) or not isinstance(fullname, str):
+            continue
+
+        try:
+            obj: object = importlib.import_module(module_name)
+            for name in fullname.split("."):
+                obj = getattr(obj, name)
+        except (AttributeError, ImportError):
+            continue
+        return obj
+
+    return None
+
+
+def _repository_source_path(
+    obj: object,
+) -> Path | None:  # numpydoc ignore=PR01,RT01
+    """Return an object's source path when it belongs to this package."""
+    if not callable(obj):
+        return None
+
+    try:
+        filename = inspect.getsourcefile(inspect.unwrap(obj))
+        if filename is None:
+            return None
+        source_path = Path(filename).resolve(strict=True)
+        return Path("src") / source_path.relative_to(_PACKAGE_SOURCE_ROOT)
+    except (OSError, RuntimeError, TypeError, ValueError):
+        return None
+
+
+def _set_generated_source_links(
+    app: Any,
+    pagename: str,
+    templatename: str,
+    context: dict[str, Any],
+    doctree: Any,
+) -> None:  # numpydoc ignore=PR01
+    """Set source links for an autosummary-generated page."""
+    del app, templatename
+    if doctree is None or not pagename.startswith("generated/"):
+        return
+
+    obj = _documented_object(doctree)
+    source_path = _repository_source_path(obj) if obj is not None else None
+    if source_path is None:
+        context["page_source_suffix"] = ""
+        return
+
+    source_path_url = source_path.as_posix()
+    context["theme_source_view_link"] = (
+        f"{_SOURCE_REPOSITORY}/blob/{_SOURCE_BRANCH}/{source_path_url}?plain=true"
+    )
+    context["theme_source_edit_link"] = (
+        f"{_SOURCE_REPOSITORY}/edit/{_SOURCE_BRANCH}/{source_path_url}"
+    )
+
+
+def setup(app: Any) -> dict[str, bool]:  # numpydoc ignore=PR01,RT01
+    """Register the generated-page source link handler."""
+    app.connect("html-page-context", _set_generated_source_links, priority=900)
+    return {"parallel_read_safe": True, "parallel_write_safe": True}
