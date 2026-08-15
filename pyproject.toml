@@ -35,8 +35,8 @@ requires = ["meson-python"]
 build-backend = "mesonpy"
 
 [tool.basedpyright]
-include = ["src", "tests", "vendor_tests", "run_deps_tests"]
-exclude = ["vendor_tests/array_api_compat"]
+include = ["src", "tests"]
+exclude = ["tests/vendoring/array_api_compat"]
 pythonVersion = "3.11"
 pythonPlatform = "All"
 typeCheckingMode = "all"
@@ -63,9 +63,7 @@ reportUnknownLambdaType = false
 reportImplicitStringConcatenation = false
 
 executionEnvironments = [
-  { root = "tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
-  { root = "vendor_tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
-  { root = "run_deps_tests", reportPrivateUsage = false, reportUnknownArgumentType = false },
+  { root = "tests/", reportPrivateUsage = false, reportUnknownArgumentType = false },
   { root = "src" },
 ]
 
@@ -73,7 +71,7 @@ executionEnvironments = [
 run.source = ["array_api_extra"]
 
 [tool.mypy]
-files = ["src", "tests", "vendor_tests", "run_deps_tests"]
+files = ["src", "tests"]
 python_version = "3.11"
 warn_unused_configs = true
 strict = true
@@ -90,16 +88,8 @@ module = ["tests/*"]
 disable_error_code = ["no-untyped-def"]  # test(...) without -> None
 
 [[tool.mypy.overrides]]
-module = ["vendor_tests/*"]
-disable_error_code = ["no-untyped-def"]  # test(...) without -> None
-
-[[tool.mypy.overrides]]
-module = ["vendor_tests/array_api_compat/*"]
+module = ["tests/vendoring/array_api_compat/*"]
 ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["run_deps_tests/*"]
-disable_error_code = ["no-untyped-def"]  # test(...) without -> None
 
 [tool.numpydoc_validation]
 checks = [
@@ -110,7 +100,6 @@ checks = [
 ]
 exclude_files = [
   "^tests/.*",
-  "^vendor_tests/.*",
 ]
 
 [tool.pylint]
@@ -148,7 +137,7 @@ matches = "tests/*.py"
 errors = { unannotated-return = false }
 
 [[tool.pyrefly.sub-config]]
-matches = "vendor_tests/*.py"
+matches = "tests/vendoring/*.py"
 errors = { unannotated-return = false }
 
 [[tool.pyrefly.sub-config]]
@@ -209,3 +198,17 @@ ignore = [
   "N806",  # Variable in function should be lowercase
   "PLC0415",  # `import` should be at the top-level of a file
 ]
+
+[tool.tombi]
+toml-version = "v1.1.0"
+format.rules.line-width = 100
+
+[tool.typos.files]
+extend-exclude = [".git/", ".pixi/"]
+ignore-hidden = false
+
+[tool.typos.default.extend-words]
+nd = "nd"
+typ = "typ"
+cardinalis = "cardinalis"
+writeable = "writeable"

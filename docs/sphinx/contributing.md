@@ -58,10 +58,10 @@ pixi shell --environment=dev
   - Add your function to `__all__` at the top of the file.
 - Import your function to `src/array_api_extra/__init__.py`
   and add it to`__all__` there.
-- Add a test class for your function in the corresponding file under `tests/`.
+- Add a test class for your function in the corresponding file under `tests/main/`.
   - Ensure that `lazy_xp_function` is called on the function if lazy backends
     are supposed to be tested.
-- Add your function to the corresponding API page under `docs/`.
+- Add your function to the corresponding API page under `docs/sphinx/`.
 - Don't worry if you are not sure how to do some of the above steps or think you
   might have done something wrong —
   [make a PR!](https://github.com/data-apis/array-api-extra/pulls)

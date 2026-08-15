@@ -10,7 +10,7 @@ from sphinx import addnodes
 
 _SOURCE_REPOSITORY = "https://github.com/data-apis/array-api-extra"
 _SOURCE_BRANCH = "main"
-_REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
+_REPOSITORY_ROOT = Path(__file__).resolve().parent.parent.parent
 _PACKAGE_SOURCE_ROOT = _REPOSITORY_ROOT / "src"
 
 project = "array-api-extra"
@@ -56,7 +56,7 @@ html_theme_options: dict[str, Any] = {
     ],
     "source_repository": _SOURCE_REPOSITORY,
     "source_branch": _SOURCE_BRANCH,
-    "source_directory": "docs/",
+    "source_directory": "docs/sphinx/",
 }
 
 myst_enable_extensions = [

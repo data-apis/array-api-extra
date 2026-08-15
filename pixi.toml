@@ -224,12 +224,12 @@ scipy = ">=1.15.2"
 [feature.tests.tasks]
 tests = {
   description = "Run tests",
-  cmd = "pytest -v",
+  cmd = "pytest -v tests/main",
   default-environment = "tests",
 }
 tests-cov = {
   description = "Run tests with coverage",
-  cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20",
+  cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20 tests/main",
   default-environment = "tests",
 }
 
@@ -248,36 +248,36 @@ open-coverage = {
 
 clean-vendor-compat = {
   description = "Delete the existing vendored version of array-api-compat",
-  cmd = "rm -rf vendor_tests/array_api_compat",
+  cmd = "rm -rf tests/vendoring/array_api_compat",
   default-environment = "tests",
 }
 clean-vendor-extra = {
   description = "Delete the existing vendored version of array-api-extra",
-  cmd = "rm -rf vendor_tests/array_api_extra",
+  cmd = "rm -rf tests/vendoring/array_api_extra",
   default-environment = "tests",
 }
 copy-vendor-compat = {
   description = "Vendor a clean copy of array-api-compat",
   depends-on = ["clean-vendor-compat"],
-  cmd = "cp -r $(python -c 'import array_api_compat, pathlib; print(pathlib.Path(array_api_compat.__file__).parent)') vendor_tests/ && rm -rf vendor_tests/array_api_compat/vendor_tests && rm -rf vendor_tests/array_api_compat/tests",
+  cmd = "cp -r $(python -c 'import array_api_compat, pathlib; print(pathlib.Path(array_api_compat.__file__).parent)') tests/vendoring/ && rm -rf tests/vendoring/array_api_compat/vendor_tests && rm -rf tests/vendoring/array_api_compat/tests",
   default-environment = "tests",
 }
 copy-vendor-extra = {
   description = "Vendor a clean copy of array-api-extra",
   depends-on = ["clean-vendor-extra"],
-  cmd = "cp -r src/array_api_extra vendor_tests/",
+  cmd = "cp -r src/array_api_extra tests/vendoring/",
   default-environment = "tests",
 }
-tests-vendor = {
+tests-vendoring = {
   description = "Check that array-api-extra and array-api-compat can be vendored together",
   depends-on = ["copy-vendor-compat", "copy-vendor-extra"],
-  cmd = "pytest -v vendor_tests",
+  cmd = "pytest -v tests/vendoring",
   default-environment = "tests",
 }
 
 tests-ci = {
   description = "Run tests with coverage and vendor tests",
-  depends-on = ["tests-cov", "tests-vendor"],
+  depends-on = ["tests-cov", "tests-vendoring"],
 }
 
 # tests with only run dependencies
@@ -288,12 +288,12 @@ pytest-cov = ">=7.1.0"
 [feature.tests-run-deps.tasks]
 tests-run-deps = {
   description = "Run run-dependency tests",
-  cmd = "pytest -v run_deps_tests",
+  cmd = "pytest -v tests/run_deps",
   default-environment = "tests-run-deps",
 }
 tests-run-deps-cov = {
   description = "Run run-dependency tests with coverage",
-  cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20 run_deps_tests",
+  cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20 tests/run_deps",
   default-environment = "tests-run-deps",
 }
 
@@ -312,14 +312,14 @@ numpy = ">=2.1.3"
 [feature.docs.tasks]
 docs = {
   description = "Build docs",
-  cwd = "docs",
+  cwd = "docs/sphinx/",
   cmd = "sphinx-build -E -W . build/",
   default-environment = "docs",
 }
 open-docs = {
   description = "Open the generated docs",
   depends-on = ["docs"],
-  cwd = "docs",
+  cwd = "docs/sphinx/",
   cmd = "open build/index.html",
   default-environment = "docs",
 }
@@ -328,7 +328,7 @@ open-docs = {
 open-docs = {
   description = "Open the generated docs",
   depends-on = ["docs"],
-  cwd = "docs",
+  cwd = "docs/sphinx/",
   cmd = "cmd /c start build/index.html",
   default-environment = "docs",
 }

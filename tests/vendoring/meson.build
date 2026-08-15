@@ -3,6 +3,6 @@ py.install_sources([
     '_array_api_compat_vendor.py',
     'test_vendor.py',
   ],
-  subdir: 'array_api_extra/vendor_tests',
+  subdir: 'array_api_extra/tests/vendoring',
   install_tag: 'tests',
 )
