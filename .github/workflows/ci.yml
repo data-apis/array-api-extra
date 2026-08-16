@@ -85,7 +85,7 @@ jobs:
           # Non-default pixi task (default: tests-ci)
           - {
               environment: tests-nogil,
-              task: "tests --parallel-threads=4",
+              task: tests "--parallel-threads=4 tests/main",
               no-coverage: true,
               x64_runner: ubuntu-latest,
             }
@@ -110,7 +110,7 @@ jobs:
           environments: ${{ matrix.environment }}
 
       - name: Test
-        run: pixi run -e "${TASK_ENV}" ${TASK}
+        run: pixi run -e "${TASK_ENV}" "${TASK}"
         env:
           TASK_ENV: ${{ matrix.environment }}
           TASK: ${{ matrix.task || 'tests-ci' }}
