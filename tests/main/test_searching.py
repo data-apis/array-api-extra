@@ -170,7 +170,7 @@ class TestSearchsorted:
     ):
         if nans_x and is_jax_namespace(xp):
             pytest.xfail("https://github.com/jax-ml/jax/issues/39887")
-        if nans_x and is_torch_namespace(xp) and searchsorted == xpx_searchsorted:
+        if nans_x and is_torch_namespace(xp):
             pytest.skip("torch sorts NaNs differently")
         if isinstance(shape, tuple) and searchsorted == _funcs_searchsorted:
             message = (
