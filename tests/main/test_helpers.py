@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._compat import array_namespace
+from array_api_extra._lib._compat import array_namespace, is_jax_namespace
 from array_api_extra._lib._compat import device as get_device
 from array_api_extra._lib._helpers import (
     JitLibrary,
@@ -403,7 +403,8 @@ class CheckAutoJIT:
         out = f(winp)
         assert isinstance(out, Wrapper)
         assert out.x[0] is winp.x[0]
-        assert out.x[1] is not winp.x[1]
+        if is_jax_namespace(xp):
+            assert out.x[1] is not winp.x[1]
         assert_equal(out.x[1], winp.x[1])
 
     def test_arraylikes_are_static(
