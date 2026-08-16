@@ -230,7 +230,8 @@ tests = {
 }
 tests-cov = {
   description = "Run tests with coverage",
-  cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20 tests/main",
+  args = [{ arg = "pytest_args", default = "tests/main" }],
+  cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20 {{ pytest_args }}",
   default-environment = "tests",
 }
 
