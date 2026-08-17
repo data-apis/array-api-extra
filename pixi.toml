@@ -372,6 +372,7 @@ numpy = "=1.24.1"
 # Note: JAX and PyTorch will install CPU variants.
 [feature.backends.dependencies]
 pytorch = ">=2.12.0"
+cxx-compiler = ">=1.11.0,<2"  # for torch.compile
 dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
 sparse = ">=0.19.1"
 
