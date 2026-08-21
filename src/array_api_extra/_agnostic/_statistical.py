@@ -119,15 +119,11 @@ def nanmin(  # numpydoc ignore=PR01,RT01
 ) -> Array:
     """See docstring in `array_api_extra._statistical`."""
     mask = xp.isnan(a)
-    device_a = _compat.device(a)
-    x = xp.min(
-        xp.where(mask, xp.asarray(+xp.inf, dtype=a.dtype, device=device_a), a),
-        axis=axis,
-    )
+    x = xp.min(xp.where(mask, xp.full_like(a, +xp.inf), a), axis=axis)
     # Replace Infs from all NaN slices with NaN again
     mask = xp.all(mask, axis=axis)
     if xp.any(mask):
-        x = xp.where(mask, xp.asarray(xp.nan, dtype=x.dtype, device=device_a), x)
+        x = xp.where(mask, xp.full_like(x, xp.nan), x)
     return x
 
 
@@ -140,15 +136,11 @@ def nanmax(  # numpydoc ignore=PR01,RT01
 ) -> Array:
     """See docstring in `array_api_extra._statistical`."""
     mask = xp.isnan(a)
-    device_a = _compat.device(a)
-    x = xp.max(
-        xp.where(mask, xp.asarray(-xp.inf, dtype=a.dtype, device=device_a), a),
-        axis=axis,
-    )
+    x = xp.max(xp.where(mask, xp.full_like(a, -xp.inf), a), axis=axis)
     # Replace Infs from all NaN slices with NaN again
     mask = xp.all(mask, axis=axis)
     if xp.any(mask):
-        x = xp.where(mask, xp.asarray(xp.nan, dtype=x.dtype, device=device_a), x)
+        x = xp.where(mask, xp.full_like(x, xp.nan), x)
     return x
 
 
@@ -161,6 +153,4 @@ def nansum(  # numpydoc ignore=PR01,RT01
 ) -> Array:
     """See docstring in `array_api_extra._statistical`."""
     mask = xp.isnan(a)
-    device_a = _compat.device(a)
-    zero = xp.asarray(0, dtype=a.dtype, device=device_a)
-    return xp.sum(xp.where(mask, zero, a), axis=axis)
+    return xp.sum(xp.where(mask, xp.zeros_like(a), a), axis=axis)
