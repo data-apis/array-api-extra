@@ -16,6 +16,7 @@ All development tasks are then available via `pixi run`:
 ```bash
 pixi run tests      # run the tests
 pixi run open-docs  # build and preview the docs
+pixi run doctests   # run the doctests in the docs
 pixi run lint       # run the full lint suite
 pixi run ipython    # spawn an ipython prompt with array-api-extra installed
 pixi run hooks      # install pre-commit hooks

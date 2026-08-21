@@ -220,11 +220,17 @@ hypothesis = ">=6.155.7"
 array-api-strict = ">=2.6.1"
 numpy = ">=1.22.0"
 scipy = ">=1.15.2"
+scipy-doctest = ">=2,<3"
 
 [feature.tests.tasks]
 tests = {
   description = "Run tests",
   cmd = "pytest -v tests/main",
+  default-environment = "tests",
+}
+doctests = {
+  description = "Run public API doctests",
+  cmd = "pytest --pyargs array_api_extra --doctest-modules --doctest-collect=api --doctest-only-doctests=true",
   default-environment = "tests",
 }
 tests-cov = {
@@ -288,12 +294,12 @@ pytest-cov = ">=7.1.0"
 [feature.tests-run-deps.tasks]
 tests-run-deps = {
   description = "Run run-dependency tests",
-  cmd = "pytest -v tests/run_deps",
+  cmd = "pytest --confcutdir=tests/run_deps -v tests/run_deps",
   default-environment = "tests-run-deps",
 }
 tests-run-deps-cov = {
   description = "Run run-dependency tests with coverage",
-  cmd = "pytest -v -ra --cov --cov-report=xml --cov-report=term --durations=20 tests/run_deps",
+  cmd = "pytest --confcutdir=tests/run_deps -v -ra --cov --cov-report=xml --cov-report=term --durations=20 tests/run_deps",
   default-environment = "tests-run-deps",
 }
 
