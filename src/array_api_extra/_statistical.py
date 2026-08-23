@@ -4,7 +4,7 @@ from . import _agnostic
 from ._lib import _compat
 from ._lib._typing import Array, ArrayNamespace
 
-__all__ = ["cov", "nanmax", "nanmin", "nansum"]
+__all__ = ["cov", "nanmax", "nanmean", "nanmin", "nansum"]
 
 
 def cov(
@@ -319,6 +319,58 @@ def nanmax(
         return xp.nanmax(a, axis=axis)
 
     return _agnostic._statistical.nanmax(a, axis=axis, xp=xp)
+
+
+def nanmean(
+    a: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    xp: ArrayNamespace | None = None,
+) -> Array:
+    """
+    Return the mean of the array elements along a given axis, ignoring NaNs.
+
+    Parameters
+    ----------
+    a : Array
+        Input array.
+    axis : int or tuple of ints or None, optional
+        Axis or axes along which the mean is computed. The default is to compute
+        the mean of the flattened array.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a`. Default: infer.
+
+    Returns
+    -------
+    array
+        An array of mean values along the given axis, ignoring NaNs.
+
+    Examples
+    --------
+    >>> import array_api_extra as xpx
+    >>> import array_api_strict as xp
+    >>> a = xp.asarray([[5, 3, xp.nan, 1], [4, xp.nan, 2, xp.nan]])
+    >>> xpx.nanmean(a)
+    Array(3., dtype=array_api_strict.float64)
+    >>> xpx.nanmean(a, axis=0)
+    Array([4.5, 3., 2., 1.], dtype=array_api_strict.float64)
+    >>> xpx.nanmean(a, axis=1)
+    Array([3., 3.], dtype=array_api_strict.float64)
+    """
+    if xp is None:
+        xp = _compat.array_namespace(a)
+
+    if (
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_torch_namespace(xp)
+    ):
+        return xp.nanmean(a, axis=axis)
+
+    return _agnostic._statistical.nanmean(a, axis=axis, xp=xp)
 
 
 def nansum(
