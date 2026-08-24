@@ -1,4 +1,4 @@
-"""Configure public API doctests."""
+"""Configure pytest."""
 
 import warnings
 from collections.abc import Iterator

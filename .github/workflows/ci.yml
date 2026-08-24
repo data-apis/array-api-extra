@@ -53,7 +53,7 @@ jobs:
           environments: tests
 
       - name: Test public API examples
-        run: pixi run -e tests doctests
+        run: pixi run doctests
 
   checks:
     name: ${{ matrix.environment }} (${{ matrix.platform }})
