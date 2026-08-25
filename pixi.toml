@@ -223,7 +223,7 @@ hypothesis = ">=6.155.7"
 array-api-strict = ">=2.6.1"
 numpy = ">=1.22.0"
 scipy = ">=1.15.2"
-scipy-doctest = ">=2,<3"
+scipy-doctest = ">=2.2.0,<3"
 
 [feature.tests.tasks]
 tests = {
