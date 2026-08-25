@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="setdiff1d" href="array_api_extra.setdiff1d.html"><link rel="prev" title="isin" href="array_api_extra.isin.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="nanmin" href="array_api_extra.nanmin.html"><link rel="prev" title="nanmax" href="array_api_extra.nanmax.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>nunique - array-api-extra 0.11.2.dev0 documentation</title>
+        <title>nanmean - array-api-extra 0.11.2.dev0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -236,9 +236,9 @@
 <li class="toctree-l3"><a class="reference internal" href="array_api_extra.searchsorted.html">searchsorted</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current has-children"><a class="reference internal" href="../api-set.html">Set Functions</a><input aria-label="Toggle navigation of Set Functions" checked="" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api-set.html">Set Functions</a><input aria-label="Toggle navigation of Set Functions" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="array_api_extra.isin.html">isin</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">nunique</a></li>
+<li class="toctree-l3"><a class="reference internal" href="array_api_extra.nunique.html">nunique</a></li>
 <li class="toctree-l3"><a class="reference internal" href="array_api_extra.setdiff1d.html">setdiff1d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="array_api_extra.union1d.html">union1d</a></li>
 </ul>
@@ -248,10 +248,10 @@
 <li class="toctree-l3"><a class="reference internal" href="array_api_extra.partition.html">partition</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../api-statistical.html">Statistical Functions</a><input aria-label="Toggle navigation of Statistical Functions" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../api-statistical.html">Statistical Functions</a><input aria-label="Toggle navigation of Statistical Functions" checked="" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="array_api_extra.cov.html">cov</a></li>
 <li class="toctree-l3"><a class="reference internal" href="array_api_extra.nanmax.html">nanmax</a></li>
-<li class="toctree-l3"><a class="reference internal" href="array_api_extra.nanmean.html">nanmean</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">nanmean</a></li>
 <li class="toctree-l3"><a class="reference internal" href="array_api_extra.nanmin.html">nanmin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="array_api_extra.nansum.html">nansum</a></li>
 </ul>
@@ -294,12 +294,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/src/array_api_extra/_set.py?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/blob/main/src/array_api_extra/_statistical.py?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/src/array_api_extra/_set.py" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/data-apis/array-api-extra/edit/main/src/array_api_extra/_statistical.py" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -316,28 +316,40 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="nunique">
-<h1>nunique<a class="headerlink" href="#nunique" title="Link to this heading">¶</a></h1>
+          <section id="nanmean">
+<h1>nanmean<a class="headerlink" href="#nanmean" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="array_api_extra.nunique">
-<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">nunique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.nunique" title="Link to this definition">¶</a></dt>
-<dd><p>Count the number of unique elements in an array.</p>
-<p>Compatible with JAX and Dask, whose laziness would be otherwise
-problematic.</p>
+<dt class="sig sig-object py" id="array_api_extra.nanmean">
+<span class="sig-prename descclassname"><span class="pre">array_api_extra.</span></span><span class="sig-name descname"><span class="pre">nanmean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#array_api_extra.nanmean" title="Link to this definition">¶</a></dt>
+<dd><p>Return the mean of the array elements along a given axis, ignoring NaNs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – Input array.</p></li>
-<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The standard-compatible namespace for <cite>x</cite>. Default: infer.</p></li>
+<li><p><strong>a</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span>) – Input array.</p></li>
+<li><p><strong>axis</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Axis or axes along which the mean is computed. The default is to compute
+the mean of the flattened array.</p></li>
+<li><p><strong>xp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The standard-compatible namespace for <cite>a</cite>. Default: infer.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>array</strong> – The number of unique elements in <cite>x</cite>. It can be lazy.</p>
+<dd class="field-even"><p>An array of mean values along the given axis, ignoring NaNs.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></span></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_strict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">Array(3., dtype=array_api_strict.float64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">Array([4.5, 3. , 2. , 1. ], dtype=array_api_strict.float64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">Array([3., 3.], dtype=array_api_strict.float64)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -347,23 +359,23 @@ problematic.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="array_api_extra.setdiff1d.html">
+          <a class="next-page" href="array_api_extra.nanmin.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">setdiff1d</div>
+                <div class="title">nanmin</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="array_api_extra.isin.html">
+          <a class="prev-page" href="array_api_extra.nanmax.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">isin</div>
+                <div class="title">nanmax</div>
                 
               </div>
             </a>
@@ -404,8 +416,8 @@ problematic.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">nunique</a><ul>
-<li><a class="reference internal" href="#array_api_extra.nunique"><code class="docutils literal notranslate"><span class="pre">nunique()</span></code></a></li>
+<li><a class="reference internal" href="#">nanmean</a><ul>
+<li><a class="reference internal" href="#array_api_extra.nanmean"><code class="docutils literal notranslate"><span class="pre">nanmean()</span></code></a></li>
 </ul>
 </li>
 </ul>
