@@ -1,4 +1,4 @@
-"""Configure pytest."""
+"""Configure tests."""
 
 import warnings
 from collections.abc import Iterator
