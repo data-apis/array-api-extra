@@ -361,12 +361,12 @@ from the namespace of the chunks.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_strict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xp</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">a</span> <span class="o">//</span> <span class="n">b</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">apply_where</span><span class="p">(</span><span class="n">b</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">f</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-<span class="go">array([ nan,  2., 1.])</span>
+<span class="go">Array([nan,  2.,  1.], dtype=array_api_strict.float64)</span>
 </pre></div>
 </div>
 </dd></dl>

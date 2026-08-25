@@ -353,23 +353,23 @@ then NaN values will be replaced with 0.0.</p></li>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_extra</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xpx</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">array_api_strict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xp</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-<span class="go">1.7976931348623157e+308</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="o">-</span><span class="n">xp</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-<span class="go">-1.7976931348623157e+308</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array(1.79769313e+308, dtype=array_api_strict.float64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="o">-</span><span class="n">xp</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array(-1.79769313e+308, dtype=array_api_strict.float64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">xp</span><span class="p">)</span>
+<span class="go">Array(0., dtype=array_api_strict.float64)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">xp</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">xp</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="o">-</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="go">array([ 1.79769313e+308, -1.79769313e+308,  0.00000000e+000, # may vary</span>
-<span class="go">       -1.28000000e+002,  1.28000000e+002])</span>
+<span class="go">Array([ 1.79769313e+308, -1.79769313e+308,  0.00000000e+000,</span>
+<span class="go">       -1.28000000e+002,  1.28000000e+002],</span>
+<span class="go">      dtype=array_api_strict.float64)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="nb">complex</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">xp</span><span class="o">.</span><span class="n">inf</span><span class="p">)])</span>
-<span class="go">array([  1.79769313e+308,  -1.79769313e+308,   0.00000000e+000, # may vary</span>
-<span class="go">     -1.28000000e+002,   1.28000000e+002])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">xpx</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-<span class="go">array([  1.79769313e+308 +0.00000000e+000j, # may vary</span>
-<span class="go">         0.00000000e+000 +0.00000000e+000j,</span>
-<span class="go">         0.00000000e+000 +1.79769313e+308j])</span>
+<span class="go">Array([1.79769313e+308+0.00000000e+000j,</span>
+<span class="go">       0.00000000e+000+0.00000000e+000j,</span>
+<span class="go">       0.00000000e+000+1.79769313e+308j],</span>
+<span class="go">      dtype=array_api_strict.complex128)</span>
 </pre></div>
 </div>
 </dd></dl>

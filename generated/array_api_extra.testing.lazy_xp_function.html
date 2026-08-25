@@ -361,11 +361,11 @@ won’t wrap the function directly with <code class="docutils literal notranslat
 within their own code, which is itself then wrapped by <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>, and
 internally consume the function’s outputs.</p>
 <p>In other words, the pattern that is being tested is:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
-<span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">user_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">y</span> <span class="o">=</span> <span class="n">user_prepares_inputs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="gp">... </span>    <span class="n">z</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">some_static_arg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">... </span>    <span class="k">return</span> <span class="n">user_consumes</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">user_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">user_prepares_inputs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">some_static_arg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">user_consumes</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Default: True.</p>
