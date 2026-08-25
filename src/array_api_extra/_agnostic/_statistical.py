@@ -173,10 +173,9 @@ def nanmean(  # numpydoc ignore=PR01,RT01
         copy=False,
     )
     result = sum_ / safe_count
-    if xp.any(count == 0):
-        result = xp.where(
-            count == 0,
-            xp.full_like(result, xp.nan),
-            result,
-        )
+    result = xp.where(
+        count == 0,
+        xp.full_like(result, xp.nan),
+        result,
+    )
     return result
