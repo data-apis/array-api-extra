@@ -543,10 +543,10 @@ class TestNanMean:
 
     @pytest.mark.filterwarnings("ignore:.*Mean of empty slice.*:RuntimeWarning")
     def test_all_nan_slice(self, xp: ArrayNamespace):
-        a = xp.asarray([[xp.nan, 1.0], [xp.nan, xp.nan]])
+        a = xp.asarray([[xp.nan, 1.0], [xp.nan, 3.0], [xp.nan, xp.nan]])
 
         res = nanmean(a, axis=0, xp=xp)
-        expected = xp.asarray([xp.nan, 1.0])
+        expected = xp.asarray([xp.nan, 2.0])
         assert_equal(res, expected)
 
     def test_scalar(self, xp: ArrayNamespace):
