@@ -117,7 +117,7 @@ pytest = ">=9.1.1"
 validate-pyproject = ">=0.25"
 pyrefly = ">=1.2.0"
 zizmor = ">=1.29.0"
-tombi = ">=1.2.8"
+tombi = ">=1.2.10"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
