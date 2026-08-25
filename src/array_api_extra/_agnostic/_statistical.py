@@ -8,7 +8,7 @@ from .._lib import _compat, _helpers
 from .._lib._typing import Array, ArrayNamespace
 from . import _manipulation
 
-__all__ = ["cov", "nanmax", "nanmin", "nansum"]
+__all__ = ["cov", "nanmax", "nanmean", "nanmin", "nansum"]
 
 
 def cov(
@@ -154,3 +154,27 @@ def nansum(  # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._statistical`."""
     mask = xp.isnan(a)
     return xp.sum(xp.where(mask, xp.zeros_like(a), a), axis=axis)
+
+
+def nanmean(  # numpydoc ignore=PR01,RT01
+    a: Array,
+    /,
+    *,
+    axis: int | tuple[int, ...] | None,
+    xp: ArrayNamespace,
+) -> Array:
+    """See docstring in `array_api_extra._statistical`."""
+    mask = xp.isnan(a)
+    sum_ = nansum(a, axis=axis, xp=xp)
+    count = xp.sum(xp.where(mask, xp.zeros_like(a), xp.ones_like(a)), axis=axis)
+    safe_count = xp.astype(
+        xp.where(count == 0, xp.ones_like(count), count),
+        sum_.dtype,
+        copy=False,
+    )
+    result = sum_ / safe_count
+    return xp.where(
+        count == 0,
+        xp.full_like(result, xp.nan),
+        result,
+    )

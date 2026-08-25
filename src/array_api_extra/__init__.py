@@ -13,7 +13,7 @@ from ._manipulation import atleast_nd, broadcast_shapes, expand_dims, pad
 from ._searching import searchsorted
 from ._set import isin, nunique, setdiff1d, union1d
 from ._sorting import argpartition, partition
-from ._statistical import cov, nanmax, nanmin, nansum
+from ._statistical import cov, nanmax, nanmean, nanmin, nansum
 
 __version__ = "0.11.2.dev0"
 
@@ -37,6 +37,7 @@ __all__ = [
     "lazy_apply",
     "nan_to_num",
     "nanmax",
+    "nanmean",
     "nanmin",
     "nansum",
     "nunique",
