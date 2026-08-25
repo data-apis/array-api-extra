@@ -236,23 +236,23 @@ def nan_to_num(
     --------
     >>> import array_api_extra as xpx
     >>> import array_api_strict as xp
-    >>> xpx.nan_to_num(xp.inf)
-    1.7976931348623157e+308
-    >>> xpx.nan_to_num(-xp.inf)
-    -1.7976931348623157e+308
-    >>> xpx.nan_to_num(xp.nan)
-    0.0
+    >>> xpx.nan_to_num(xp.inf, xp=xp)
+    Array(1.79769313e+308, dtype=array_api_strict.float64)
+    >>> xpx.nan_to_num(-xp.inf, xp=xp)
+    Array(-1.79769313e+308, dtype=array_api_strict.float64)
+    >>> xpx.nan_to_num(xp.nan, xp=xp)
+    Array(0., dtype=array_api_strict.float64)
     >>> x = xp.asarray([xp.inf, -xp.inf, xp.nan, -128, 128])
     >>> xpx.nan_to_num(x)
-    array([ 1.79769313e+308, -1.79769313e+308,  0.00000000e+000, # may vary
-           -1.28000000e+002,  1.28000000e+002])
+    Array([ 1.79769313e+308, -1.79769313e+308,  0.00000000e+000,
+           -1.28000000e+002,  1.28000000e+002],
+          dtype=array_api_strict.float64)
     >>> y = xp.asarray([complex(xp.inf, xp.nan), xp.nan, complex(xp.nan, xp.inf)])
-    array([  1.79769313e+308,  -1.79769313e+308,   0.00000000e+000, # may vary
-         -1.28000000e+002,   1.28000000e+002])
     >>> xpx.nan_to_num(y)
-    array([  1.79769313e+308 +0.00000000e+000j, # may vary
-             0.00000000e+000 +0.00000000e+000j,
-             0.00000000e+000 +1.79769313e+308j])
+    Array([1.79769313e+308+0.00000000e+000j,
+           0.00000000e+000+0.00000000e+000j,
+           0.00000000e+000+1.79769313e+308j],
+          dtype=array_api_strict.complex128)
     """
     if isinstance(fill_value, complex):
         msg = "Complex fill values are not supported."

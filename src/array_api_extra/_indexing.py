@@ -233,11 +233,10 @@ def unravel_index(
     >>> import array_api_extra as xpx
     >>> import array_api_strict as xp
     >>> xs, ys = xpx.unravel_index(xp.asarray([1, 2, 4, 5, 6, 8]), (4, 3))
-    >>> xs, ys
-    (
-        Array([0, 0, 1, 1, 2, 2], dtype=array_api_strict.int64),
-        Array([1, 2, 1, 2, 0, 2], dtype=array_api_strict.int64),
-    )
+    >>> xs
+    Array([0, 0, 1, 1, 2, 2], dtype=array_api_strict.int64)
+    >>> ys
+    Array([1, 2, 1, 2, 0, 2], dtype=array_api_strict.int64)
     >>> [(int(x), int(y)) for x, y in zip(xs, ys)]
     [(0, 1), (0, 2), (1, 1), (1, 2), (2, 0), (2, 2)]
     >>> xs, ys = xpx.unravel_index(xp.arange(6), (2, 2))

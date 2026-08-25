@@ -139,11 +139,11 @@ def lazy_xp_function(
 
         In other words, the pattern that is being tested is::
 
-            >>> @jax.jit
-            ... def user_func(x):
-            ...     y = user_prepares_inputs(x)
-            ...     z = func(y, some_static_arg=True)
-            ...     return user_consumes(z)
+            @jax.jit
+            def user_func(x):
+                y = user_prepares_inputs(x)
+                z = func(y, some_static_arg=True)
+                return user_consumes(z)
 
         Default: True.
     static_argnums : Deprecated
