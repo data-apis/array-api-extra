@@ -354,7 +354,7 @@ def nanmean(
     >>> xpx.nanmean(a)
     Array(3., dtype=array_api_strict.float64)
     >>> xpx.nanmean(a, axis=0)
-    Array([4.5, 3., 2., 1.], dtype=array_api_strict.float64)
+    Array([4.5, 3. , 2. , 1. ], dtype=array_api_strict.float64)
     >>> xpx.nanmean(a, axis=1)
     Array([3., 3.], dtype=array_api_strict.float64)
     """
