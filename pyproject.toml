@@ -146,7 +146,11 @@ errors = { unannotated-return = false }
 
 [tool.pytest.ini_options]
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  "ignore:.*torch.jit.script_method.*",
+  "ignore:.*dynamo.*functools.lru_cache.*",
+]
 log_cli_level = "INFO"
 markers = [
   "skip_xp_backend(library, /, *, reason=None): Skip test for a specific backend",
