@@ -662,6 +662,7 @@ class TestAngle:
             atol=1e-11,
         )
 
+    @pytest.mark.skip_xp_backend(Backend.MPARRAY, reason="negative zero not supported")
     def test_real(self, xp: ArrayNamespace):
         x = xp.asarray([0.0, -0.0, 1.0, -1.0])
         expected = xp.asarray([0.0, xp.pi, 0.0, xp.pi], dtype=x.dtype)

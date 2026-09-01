@@ -144,6 +144,7 @@ def xp_searchsorted(
 
 @pytest.mark.skip_xp_backend(Backend.DASK, reason="no take_along_axis")
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="no searchsorted")
+@pytest.mark.skip_xp_backend(Backend.MPARRAY, reason="see mdhaber/mparray#20")
 class TestSearchsorted:
     def test_input_validation(self, xp: ArrayNamespace):
         message = "`side` must be either 'left' or 'right'."

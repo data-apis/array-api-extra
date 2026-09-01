@@ -246,7 +246,7 @@ def test_incompatible_dtype(
             with pytest.warns(FutureWarning, match="cannot safely cast"):
                 z = at_op(x, idx, op, 1.1, copy=copy)
 
-    elif library.like(Backend.DASK):
+    elif library.like(Backend.DASK) or (library == Backend.MPARRAY):
         z = at_op(x, idx, op, 1.1, copy=copy)
 
     elif library.like(Backend.ARRAY_API_STRICT):
