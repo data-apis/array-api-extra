@@ -373,7 +373,7 @@ numpy = "=1.24.1"
 pytorch = ">=2.12.0"
 dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
 sparse = ">=0.19.2"
-mparray = ">=0.1.0"
+mparray = ">=0.2.2"
 
 [feature.backends.target.unix.dependencies]
 jax = ">=0.10.2"  # waiting for conda-forge/jaxlib-feedstock#326

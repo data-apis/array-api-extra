@@ -695,7 +695,7 @@ def _as_numpy_array(  # numpydoc ignore=PR01,RT01
         cpu = typing.cast(Device, jax.devices("cpu")[0])
         array = _compat.to_device(array, cpu)
 
-    if xp.__name__ == "mparray":
+    if _helpers.is_mparray_namespace(xp):
         return np.asarray(array._data, dtype=array.dtype)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
     if hasattr(array, "__dlpack__"):
