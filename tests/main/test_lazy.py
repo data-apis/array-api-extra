@@ -27,6 +27,7 @@ as_numpy = pytest.mark.parametrize(
                     Backend.TORCH_GPU, reason="device->host copy"
                 ),
                 pytest.mark.skip_xp_backend(Backend.SPARSE, reason="densification"),
+                pytest.mark.skip_xp_backend(Backend.MPARRAY, reason="precision loss"),
             ],
         ),
     ],

@@ -101,6 +101,7 @@ def nunique(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     if (
         _compat.is_numpy_namespace(xp)
         or _compat.is_cupy_namespace(xp)
+        or _helpers.is_mparray_namespace(xp)
         or (
             _compat.is_torch_namespace(xp)
             and _helpers.capabilities(xp, x)["data-dependent shapes"]

@@ -34,6 +34,7 @@ __all__ = [
     "eager_shape",
     "in1d",
     "is_jax_jit_enabled",
+    "is_mparray_namespace",
     "is_python_scalar",
     "jax_autojit",
     "meta_namespace",
@@ -616,3 +617,8 @@ def is_jax_jit_enabled(xp: ArrayNamespace) -> bool:  # numpydoc ignore=PR01,RT01
         return bool(x)
     except jax.errors.TracerBoolConversionError:
         return True
+
+
+def is_mparray_namespace(xp: ArrayNamespace) -> bool:  # numpydoc ignore=PR01,RT01
+    """Return True if the argument is the MPArray namespace."""
+    return xp.__name__ == "mparray"

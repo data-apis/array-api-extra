@@ -362,6 +362,7 @@ except ImportError:
 
 
 @pytest.mark.skip_xp_backend(Backend.TORCH_GPU, reason="device->host copy")
+@pytest.mark.skip_xp_backend(Backend.MPARRAY, reason="mparray lacks __array_ufunc__")
 @pytest.mark.filterwarnings("ignore:__array_wrap__:DeprecationWarning")  # PyTorch
 def test_lazy_xp_function_cython_ufuncs(xp: ArrayNamespace, library: Backend):
     pytest.importorskip("scipy")

@@ -28,6 +28,7 @@ class Backend(Enum):  # numpydoc ignore=PR02
     ARRAY_API_STRICTEST = "array_api_strict:strictest"
     NUMPY = "numpy"
     NUMPY_READONLY = "numpy:readonly"
+    MPARRAY = "mparray"
     CUPY = "cupy"
     TORCH = "torch"
     TORCH_GPU = "torch:gpu"
