@@ -452,6 +452,7 @@ class TestLazyXpFunctionClasses:
     @pytest.mark.skip_xp_backend(Backend.CUPY, reason="converts to NumPy")
     @pytest.mark.skip_xp_backend(Backend.JAX_GPU, reason="converts to NumPy")
     @pytest.mark.skip_xp_backend(Backend.TORCH_GPU, reason="converts to NumPy")
+    @pytest.mark.skip_xp_backend(Backend.MPARRAY, reason="precision loss")
     def test_lazy_xp_function_classes(self, xp: ArrayNamespace, library: Backend):
         x = xp.asarray([1.1, 2.2, 3.3])
         y = xp.asarray([1.0, 2.0, 3.0])

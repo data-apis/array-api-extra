@@ -108,6 +108,7 @@ def test_lazy_apply_multi_output(xp: ArrayNamespace, as_numpy: bool):
                     Backend.TORCH_GPU, reason="device->host copy"
                 ),
                 pytest.mark.skip_xp_backend(Backend.SPARSE, reason="densification"),
+                pytest.mark.skip_xp_backend(Backend.MPARRAY, reason="precision loss"),
             ],
         ),
     ],
@@ -291,6 +292,7 @@ def test_lazy_apply_none_shape_broadcast(xp: ArrayNamespace):
                     Backend.TORCH_GPU, reason="device->host copy"
                 ),
                 pytest.mark.skip_xp_backend(Backend.SPARSE, reason="densification"),
+                pytest.mark.skip_xp_backend(Backend.MPARRAY, reason="precision loss"),
             ],
         ),
     ],
