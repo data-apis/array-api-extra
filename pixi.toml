@@ -16,8 +16,7 @@ requires-pixi = ">=0.73.0"  # for TOML 1.1 support
 exclude-newer = "7d"
 
 [exclude-newer]
-pixi-build-python = "5d"  # for compatibility with pixi-build-api-version 7
-mparray = "0d"
+mparray = "5d"
 
 ### array-api-extra package definition ###
 
