@@ -234,7 +234,8 @@ tests = {
 }
 doctests = {
   description = "Run public API doctests",
-  cmd = "pytest --pyargs array_api_extra --doctest-modules --doctest-collect=api --doctest-only-doctests=true",
+  cmd = "pytest -c ../pyproject.toml --pyargs array_api_extra --doctest-modules --doctest-collect=api --doctest-only-doctests=true",
+  cwd = "docs",  # to use `docs/conftest.py`
   default-environment = "tests",
 }
 tests-cov = {
