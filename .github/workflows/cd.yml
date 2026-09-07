@@ -21,15 +21,18 @@ jobs:
   dist:
     name: Create dist
     runs-on: ubuntu-slim
+    outputs:
+      version: ${{ steps.build-inspect.outputs.package_version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: hynek/build-and-inspect-python-package@2abe76da66d0a6a4a227101f9348ee855797cfa5 # v3.0.1
+      - id: build-inspect
+        uses: hynek/build-and-inspect-python-package@2abe76da66d0a6a4a227101f9348ee855797cfa5 # v3.0.1
 
-  publish:
+  publish-pypi:
     name: Publish
     needs: [dist]
     environment: pypi
@@ -52,3 +55,18 @@ jobs:
           subject-path: "dist/*"
 
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+  conda-forge:
+    name: Update conda-forge feedstock
+    needs: [dist, publish-pypi]
+    environment: cf
+    runs-on: ubuntu-slim
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - name: Update conda-forge feedstock
+        uses: beckermr/update-feedstock-version@ed22f75e867861aed79d4e8cd0a41d65af6ccc40 # v4
+        with:
+          feedstock: array-api-extra-feedstock
+          version: ${{ needs.dist.outputs.version }}
+          github-token: ${{ secrets.XPX_CF_TOKEN }}
+          automerge: false
