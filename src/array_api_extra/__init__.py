@@ -15,7 +15,7 @@ from ._set import isin, nunique, setdiff1d, union1d
 from ._sorting import argpartition, partition
 from ._statistical import cov, nanmax, nanmean, nanmin, nansum
 
-__version__ = "0.11.4"
+__version__ = "0.11.5.dev0"
 
 __all__ = [
     "__version__",
