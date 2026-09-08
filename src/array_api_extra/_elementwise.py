@@ -38,6 +38,24 @@ def angle(z: Array, /, *, deg: bool = False, xp: ArrayNamespace | None = None) -
     if xp is None:
         xp = _compat.array_namespace(z)
 
+    if not xp.isdtype(z.dtype, ("real floating", "complex floating")):
+        z = xp.astype(
+            z, _agnostic._inspection.default_dtype(xp, device=_compat.device(z))
+        )
+
+    if (
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+    ):
+        return xp.angle(z, deg=deg)
+
+    # Torch treats real negative zero as positive zero, unlike atan2(0, z).
+    if _compat.is_torch_namespace(xp) and xp.isdtype(z.dtype, "complex floating"):
+        result = xp.angle(z)
+        return result * 180 / xp.pi if deg else result
+
     return _agnostic._elementwise.angle(z, deg=deg, xp=xp)
 
 
