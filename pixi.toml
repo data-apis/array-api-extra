@@ -106,7 +106,7 @@ numpydoc = ">=1.10.0"
 array-api-strict = ">=2.6.1"
 numpy = ">=2.1.3"
 hypothesis = ">=6.165.10"
-dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
+dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
 dprint = ">=0.50.0"
 lefthook = ">=2.1.11"
 ruff = ">=0.16.3"
@@ -314,7 +314,7 @@ myst-parser = ">=5.1.0"
 sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=3.11.1"
 # Needed to import parsed modules with autodoc
-dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
+dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
 pytest = ">=9.1.1"
 typing-extensions = ">=4.16.0"
 numpy = ">=2.1.3"
@@ -371,7 +371,7 @@ numpy = "=1.24.1"
 # Note: JAX and PyTorch will install CPU variants.
 [feature.backends.dependencies]
 pytorch = ">=2.12.0"
-dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
+dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
 sparse = ">=0.19.2"
 mparray = ">=0.2.2"
 
@@ -393,7 +393,7 @@ jaxlib = ">=0.10.2"
 [feature.nogil.dependencies]
 pytest-run-parallel = ">=0.10.0"
 numpy = ">=2.3.5"
-dask-core = ">=2026.7.1"  # No distributed, tornado, etc.
+dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
 # sparse = ">=0.19.1"  # flaky, see data-apis/array-api-extra#900
 # pytorch = "*"  # Not available on Python 3.14t yet
 # jax = "*"  # waiting for conda-forge/jaxlib-feedstock#351
