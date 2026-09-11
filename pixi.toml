@@ -344,7 +344,7 @@ open-docs = {
 }
 
 [feature.dev.dependencies]
-ipython = ">=9.16.1"
+ipython = ">=9.17.0"
 
 [feature.dev.tasks]
 ipython = {
