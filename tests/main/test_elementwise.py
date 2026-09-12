@@ -23,6 +23,7 @@ from array_api_extra._lib._compat import device as get_device
 from array_api_extra._lib._typing import Array, ArrayNamespace, Device
 from array_api_extra.testing import assert_close, assert_equal, lazy_xp_function
 
+lazy_xp_function(angle)
 lazy_xp_function(apply_where)
 lazy_xp_function(deg2rad)
 lazy_xp_function(isclose)
