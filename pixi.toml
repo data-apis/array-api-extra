@@ -116,7 +116,7 @@ blacken-docs = ">=1.20.0"
 pytest = ">=9.1.1"
 validate-pyproject = ">=0.25"
 pyrefly = ">=1.2.0"
-zizmor = ">=1.30.0"
+zizmor = ">=1.30.1"
 tombi = ">=1.5.2"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
