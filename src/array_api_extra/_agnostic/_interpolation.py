@@ -59,6 +59,39 @@ def _safe_divide(
     return xp.where(overflow & ~positive_overflow, -infinity, out)
 
 
+def _safe_multiply(
+    x1: Array, x2: Array, /, *, zero_times_infinity: float, xp: ArrayNamespace
+) -> Array:
+    """Multiply arrays without warnings from overflow or zero times infinity."""
+    zero = xp.zeros_like(x1)
+    one = xp.ones_like(x2)
+    maximum = xp.asarray(
+        xp.finfo(x1.dtype).max, dtype=x1.dtype, device=_compat.device(x1)
+    )
+    absolute_x1 = xp.abs(x1)
+    absolute_x2 = xp.abs(x2)
+    large_x2 = absolute_x2 > 1
+    overflow_threshold = maximum / xp.where(large_x2, absolute_x2, one)
+    overflow = (
+        xp.isfinite(x1)
+        & xp.isfinite(x2)
+        & large_x2
+        & (absolute_x1 > overflow_threshold)
+    )
+    zero_inf = ((x1 == 0) & xp.isinf(x2)) | (xp.isinf(x1) & (x2 == 0))
+    suppressed = overflow | zero_inf
+
+    out = xp.where(suppressed, zero, x1) * xp.where(suppressed, zero, x2)
+    infinity = xp.asarray(math.inf, dtype=x1.dtype, device=_compat.device(x1))
+    positive_overflow = overflow & ((x1 > 0) == (x2 > 0))
+    out = xp.where(positive_overflow, infinity, out)
+    out = xp.where(overflow & ~positive_overflow, -infinity, out)
+    zero_inf_value = xp.asarray(
+        zero_times_infinity, dtype=x1.dtype, device=_compat.device(x1)
+    )
+    return xp.where(zero_inf, zero_inf_value, out)
+
+
 def _interp_component(
     x: Array,
     x_lo: Array,
@@ -68,6 +101,7 @@ def _interp_component(
     /,
     *,
     inactive: Array,
+    reciprocal_first: bool = False,
     xp: ArrayNamespace,
 ) -> Array:
     """Interpolate one real component without invalid arithmetic."""
@@ -87,17 +121,28 @@ def _interp_component(
     coordinate_difference = _safe_difference(safe_x_hi, safe_x_lo, xp=xp)
     value_difference = _safe_difference(safe_y_hi, safe_y_lo, xp=xp)
     indeterminate_slope = xp.isinf(coordinate_difference) & xp.isinf(value_difference)
-    slope = _safe_divide(
-        xp.where(
-            indeterminate_slope, xp.zeros_like(value_difference), value_difference
-        ),
-        xp.where(
-            indeterminate_slope,
-            xp.ones_like(coordinate_difference),
-            coordinate_difference,
-        ),
-        xp=xp,
+    safe_value_difference = xp.where(
+        indeterminate_slope, xp.zeros_like(value_difference), value_difference
     )
+    safe_coordinate_difference = xp.where(
+        indeterminate_slope,
+        xp.ones_like(coordinate_difference),
+        coordinate_difference,
+    )
+    if reciprocal_first:
+        inverse_coordinate_difference = _safe_divide(
+            xp.ones_like(safe_coordinate_difference),
+            safe_coordinate_difference,
+            xp=xp,
+        )
+        slope = _safe_multiply(
+            safe_value_difference,
+            inverse_coordinate_difference,
+            zero_times_infinity=math.nan,
+            xp=xp,
+        )
+    else:
+        slope = _safe_divide(safe_value_difference, safe_coordinate_difference, xp=xp)
     slope = xp.where(indeterminate_slope, nan, slope)
 
     left_delta = _safe_difference(safe_x, safe_x_lo, xp=xp)
@@ -131,13 +176,22 @@ def _interp_component(
 
     only_lo_coordinate_infinite = xp.isinf(x_lo) & ~xp.isinf(x_hi)
     only_hi_coordinate_infinite = ~xp.isinf(x_lo) & xp.isinf(x_hi)
+    finite_y_lo = xp.where(values_finite, y_lo, xp.zeros_like(y_lo))
+    finite_y_hi = xp.where(values_finite, y_hi, xp.zeros_like(y_hi))
+    infinite_coordinate_value_overflow = values_finite & xp.isinf(
+        _safe_difference(finite_y_hi, finite_y_lo, xp=xp)
+    )
     infinite_coordinate_out = xp.where(
-        values_finite & only_lo_coordinate_infinite,
-        y_hi,
+        infinite_coordinate_value_overflow,
+        nan,
         xp.where(
-            values_finite & only_hi_coordinate_infinite,
-            y_lo,
-            xp.where(equal_values, y_lo, nan),
+            values_finite & only_lo_coordinate_infinite,
+            y_hi,
+            xp.where(
+                values_finite & only_hi_coordinate_infinite,
+                y_lo,
+                xp.where(equal_values, y_lo, nan),
+            ),
         ),
     )
     return xp.where(coordinate_infinite, infinite_coordinate_out, out)
@@ -234,6 +288,7 @@ def interp(
             y_lo_real,
             y_hi_real,
             inactive=inactive,
+            reciprocal_first=True,
             xp=xp,
         )
         out_imag = _interp_component(
@@ -243,6 +298,7 @@ def interp(
             y_lo_imag,
             y_hi_imag,
             inactive=inactive,
+            reciprocal_first=True,
             xp=xp,
         )
         left_array = values[0] if left is None else left

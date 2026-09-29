@@ -148,10 +148,10 @@ def interp(
         the last element of `values` is used. Ignored, without validation, when
         `period` is provided.
     period : real scalar, optional
-        Finite period for the sample and query coordinates. A negative value is
-        treated as its absolute value and zero is invalid. When provided,
-        coordinates are normalized to the period and samples are sorted by
-        normalized coordinate.
+        Period for the sample and query coordinates. It must remain finite and
+        nonzero when converted to ``float64``. A negative value is treated as its
+        absolute value. When provided, coordinates are normalized to the period
+        and samples are sorted by normalized coordinate.
     xp : array_namespace, optional
         The standard-compatible namespace for the array arguments. Default: infer.
 
@@ -197,13 +197,17 @@ def interp(
         if not _is_real_scalar(period):
             msg = "`period` must be a finite real scalar or None."
             raise TypeError(msg)
+        try:
+            period = float(abs(period))
+        except (OverflowError, ValueError) as error:
+            msg = "`period` must be representable as a finite float."
+            raise ValueError(msg) from error
         if not math.isfinite(period):
-            msg = "`period` must be finite."
+            msg = "`period` must be finite after conversion to float."
             raise ValueError(msg)
         if period == 0:
-            msg = "`period` must be nonzero."
+            msg = "`period` must be nonzero after conversion to float."
             raise ValueError(msg)
-        period = float(abs(period))
 
     namespace_args: list[Array] = [x_points, values]
     if _compat.is_array_api_obj(x):
