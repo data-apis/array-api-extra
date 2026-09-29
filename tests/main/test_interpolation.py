@@ -1,3 +1,4 @@
+from fractions import Fraction
 from typing import Any, Literal
 
 import numpy as np
@@ -151,13 +152,16 @@ class TestInterp:
         )
         assert_equal(actual, xp.asarray(expected, dtype=xp.float64))
 
+    @pytest.mark.parametrize("values", [[0.0, 1.0], [0.0, 1e-320]])
     @implementations
     def test_reference_subnormal_interval(
-        self, xp: ArrayNamespace, implementation: Implementation
+        self,
+        xp: ArrayNamespace,
+        implementation: Implementation,
+        values: list[float],
     ):
         x_points = np.asarray([0.0, 1e-320])
         x = np.asarray([5e-321])
-        values = np.asarray([0.0, 1.0])
         expected = np.interp(x, x_points, values)
 
         actual = _interp(
@@ -168,6 +172,67 @@ class TestInterp:
             xp=xp,
         )
         assert_equal(actual, xp.asarray(expected, dtype=xp.float64))
+
+    @pytest.mark.parametrize(
+        "end_value", [complex(1e-320, 1e-320), complex(1e-320, 0.0)]
+    )
+    @implementations
+    def test_reference_subnormal_complex_slope(
+        self,
+        xp: ArrayNamespace,
+        implementation: Implementation,
+        end_value: complex,
+    ):
+        x_points = np.asarray([0.0, 1e-320])
+        x = np.asarray([5e-321])
+        values = np.asarray([0j, end_value])
+        expected = np.interp(x, x_points, values)
+
+        actual = _interp(
+            implementation,
+            xp.asarray(x, dtype=xp.float64),
+            xp.asarray(x_points, dtype=xp.float64),
+            xp.asarray(values, dtype=xp.complex128),
+            left=0,
+            xp=xp,
+        )
+        assert_equal(xp.real(actual), xp.asarray(expected.real, dtype=xp.float64))
+        assert_equal(xp.imag(actual), xp.asarray(expected.imag, dtype=xp.float64))
+
+    @pytest.mark.parametrize(
+        ("x_points", "x"),
+        [([-np.inf, 0.0], [-1.0]), ([0.0, np.inf], [1.0])],
+        ids=["left", "right"],
+    )
+    @pytest.mark.parametrize("complex_values", [False, True], ids=["real", "complex"])
+    @implementations
+    def test_reference_infinite_coordinate_value_overflow(
+        self,
+        xp: ArrayNamespace,
+        implementation: Implementation,
+        x_points: list[float],
+        x: list[float],
+        complex_values: bool,
+    ):
+        values = np.asarray([-1e308, 1e308])
+        dtype = xp.float64
+        if complex_values:
+            values = values + values * 1j
+            dtype = xp.complex128
+        expected = np.interp(x, x_points, values)
+
+        actual = _interp(
+            implementation,
+            xp.asarray(x, dtype=xp.float64),
+            xp.asarray(x_points, dtype=xp.float64),
+            xp.asarray(values, dtype=dtype),
+            xp=xp,
+        )
+        if complex_values:
+            assert_equal(xp.real(actual), xp.asarray(expected.real, dtype=xp.float64))
+            assert_equal(xp.imag(actual), xp.asarray(expected.imag, dtype=xp.float64))
+        else:
+            assert_equal(actual, xp.asarray(expected, dtype=xp.float64))
 
     # NumPy recommends strictly increasing sample coordinates. array-api-extra
     # deliberately defines these repeated-knot cases, including which value wins at
@@ -239,7 +304,10 @@ class TestInterp:
             xp.asarray(values, dtype=xp.complex128),
             xp=xp,
         )
-        assert_equal(actual, xp.asarray(expected, dtype=xp.complex128))
+        assert_equal(xp.real(actual), xp.asarray(expected.real, dtype=xp.float64))
+        assert_equal(xp.imag(actual), xp.asarray(expected.imag, dtype=xp.float64))
+        with pytest.raises(AssertionError):
+            assert_equal(xp.imag(actual), xp.asarray([123.0], dtype=xp.float64))
 
     @implementations
     def test_left_right_and_complex_values(
@@ -426,9 +494,11 @@ class TestInterp:
         with pytest.raises(TypeError):
             _ = xpx_interp(x, x_points, values, left=1j)
 
-        for period in (0.0, np.inf, -np.inf, np.nan):
+        for period in (0.0, np.inf, -np.inf, np.nan, Fraction(1, 10**400)):
             with pytest.raises(ValueError, match=r"must be (finite|nonzero)"):
                 _ = xpx_interp(x, x_points, values, period=period)
+        with pytest.raises(ValueError, match="representable as a finite float"):
+            _ = xpx_interp(x, x_points, values, period=Fraction(10**400, 1))
         with pytest.raises(TypeError):
             _ = xpx_interp(x, x_points, values, period=True)
         with pytest.raises(TypeError):
