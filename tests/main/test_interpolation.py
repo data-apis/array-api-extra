@@ -6,18 +6,14 @@ import pytest
 from array_api_extra import interp as xpx_interp
 from array_api_extra._agnostic._interpolation import interp as agnostic_interp
 from array_api_extra._lib._backends import Backend
-from array_api_extra._lib._compat import array_namespace
+from array_api_extra._lib._compat import array_namespace, is_array_api_obj
 from array_api_extra._lib._compat import device as get_device
-from array_api_extra._lib._compat import is_array_api_obj
 from array_api_extra._lib._typing import Array, ArrayNamespace, Device
 from array_api_extra.testing import assert_close, assert_equal
 
-
 Implementation = Literal["public", "agnostic"]
 
-implementations = pytest.mark.parametrize(
-    "implementation", ["public", "agnostic"]
-)
+implementations = pytest.mark.parametrize("implementation", ["public", "agnostic"])
 
 
 def _interp(
@@ -33,9 +29,7 @@ def _interp(
     period: Any = None,
 ) -> Array:
     if implementation == "public":
-        return xpx_interp(
-            x, x_points, values, left=left, right=right, period=period
-        )
+        return xpx_interp(x, x_points, values, left=left, right=right, period=period)
 
     coordinate_device = get_device(x_points)
     if is_array_api_obj(x):
@@ -45,13 +39,11 @@ def _interp(
     x_points = xp.astype(x_points, xp.float64, copy=False)
 
     value_dtype = (
-        xp.complex128
-        if xp.isdtype(values.dtype, "complex floating")
-        else xp.float64
+        xp.complex128 if xp.isdtype(values.dtype, "complex floating") else xp.float64
     )
     values = xp.astype(values, value_dtype, copy=False)
     if period is not None:
-        period = abs(period)
+        period = float(abs(period))
         left = right = None
     else:
         if left is not None:
@@ -99,11 +91,7 @@ class TestInterp:
         assert array_namespace(actual) == array_namespace(x_points)
 
         array_scalar = xp.asarray(0.5, dtype=xp.float64)
-        queries = (
-            (0.5, array_scalar)
-            if implementation == "public"
-            else (array_scalar,)
-        )
+        queries = (0.5, array_scalar) if implementation == "public" else (array_scalar,)
         for x in queries:
             actual = _interp(implementation, x, x_points, values, xp=xp)
             assert actual.shape == ()
@@ -124,7 +112,7 @@ class TestInterp:
         ids=["real", "complex"],
     )
     @implementations
-    def test_numpy_oracle_narrow_interval(
+    def test_reference_narrow_interval(
         self,
         xp: ArrayNamespace,
         implementation: Implementation,
@@ -145,7 +133,7 @@ class TestInterp:
         assert_close(actual, xp.asarray(expected, dtype=dtype))
 
     @implementations
-    def test_numpy_oracle_extreme_finite_coordinates(
+    def test_reference_extreme_finite_coordinates(
         self, xp: ArrayNamespace, implementation: Implementation
     ):
         x_points = np.asarray([-1e308, 1e308])
@@ -153,6 +141,24 @@ class TestInterp:
         values = np.asarray([0.0, 1.0])
         with np.errstate(over="ignore", invalid="ignore"):
             expected = np.interp(x, x_points, values)
+
+        actual = _interp(
+            implementation,
+            xp.asarray(x, dtype=xp.float64),
+            xp.asarray(x_points, dtype=xp.float64),
+            xp.asarray(values, dtype=xp.float64),
+            xp=xp,
+        )
+        assert_equal(actual, xp.asarray(expected, dtype=xp.float64))
+
+    @implementations
+    def test_reference_subnormal_interval(
+        self, xp: ArrayNamespace, implementation: Implementation
+    ):
+        x_points = np.asarray([0.0, 1e-320])
+        x = np.asarray([5e-321])
+        values = np.asarray([0.0, 1.0])
+        expected = np.interp(x, x_points, values)
 
         actual = _interp(
             implementation,
@@ -198,7 +204,7 @@ class TestInterp:
     def test_singleton_and_nan_query(
         self, xp: ArrayNamespace, implementation: Implementation
     ):
-        x = xp.asarray([xp.nan, -3, 99], dtype=xp.float64)
+        x = xp.asarray([np.nan, -3, 99], dtype=xp.float64)
         actual = _interp(
             implementation,
             x,
@@ -210,12 +216,30 @@ class TestInterp:
 
         actual = _interp(
             implementation,
-            xp.asarray([xp.nan], dtype=xp.float64),
+            xp.asarray([np.nan], dtype=xp.float64),
             xp.asarray([0, 1], dtype=xp.float64),
             xp.asarray([1, 2], dtype=xp.float64),
             xp=xp,
         )
-        assert_equal(actual, xp.asarray([xp.nan], dtype=xp.float64))
+        assert_equal(actual, xp.asarray([np.nan], dtype=xp.float64))
+
+    @implementations
+    def test_complex_nan_query(
+        self, xp: ArrayNamespace, implementation: Implementation
+    ):
+        x = np.asarray([np.nan])
+        x_points = np.asarray([0.0, 1.0])
+        values = np.asarray([1 + 2j, 3 + 4j])
+        expected = np.interp(x, x_points, values)
+
+        actual = _interp(
+            implementation,
+            xp.asarray(x, dtype=xp.float64),
+            xp.asarray(x_points, dtype=xp.float64),
+            xp.asarray(values, dtype=xp.complex128),
+            xp=xp,
+        )
+        assert_equal(actual, xp.asarray(expected, dtype=xp.complex128))
 
     @implementations
     def test_left_right_and_complex_values(
@@ -232,9 +256,7 @@ class TestInterp:
             right=5 + 2j,
             xp=xp,
         )
-        expected = xp.asarray(
-            [1 - 1j, 1 + 2j, 3 + 2j, 5 + 2j], dtype=xp.complex128
-        )
+        expected = xp.asarray([1 - 1j, 1 + 2j, 3 + 2j, 5 + 2j], dtype=xp.complex128)
         assert_close(actual, expected)
 
     @implementations
@@ -252,7 +274,7 @@ class TestInterp:
             values,
             left="ignored",
             right=False,
-            period=-4.0,
+            period=np.float64(-4.0),
             xp=xp,
         )
         expected = xp.asarray([30, 20, 10, 20, 30, 20, 10], dtype=xp.float64)
@@ -289,27 +311,25 @@ class TestInterp:
         assert_close(actual, xp.asarray([0, 5, 10, 15, 20], dtype=xp.float64))
 
     @implementations
-    def test_nonfinite_values(
-        self, xp: ArrayNamespace, implementation: Implementation
-    ):
+    def test_nonfinite_values(self, xp: ArrayNamespace, implementation: Implementation):
         x_points = xp.asarray([0, 1, 2], dtype=xp.float64)
         actual = _interp(
             implementation,
             x_points,
             x_points,
-            xp.asarray([-xp.inf, 2, xp.inf], dtype=xp.float64),
+            xp.asarray([-np.inf, 2, np.inf], dtype=xp.float64),
             xp=xp,
         )
-        assert_equal(actual, xp.asarray([-xp.inf, 2, xp.inf], dtype=xp.float64))
+        assert_equal(actual, xp.asarray([-np.inf, 2, np.inf], dtype=xp.float64))
 
         actual = _interp(
             implementation,
             xp.asarray([0.5], dtype=xp.float64),
             xp.asarray([0, 1], dtype=xp.float64),
-            xp.asarray([xp.inf, xp.inf], dtype=xp.float64),
+            xp.asarray([np.inf, np.inf], dtype=xp.float64),
             xp=xp,
         )
-        assert_equal(actual, xp.asarray([xp.inf], dtype=xp.float64))
+        assert_equal(actual, xp.asarray([np.inf], dtype=xp.float64))
 
         actual = _interp(
             implementation,
@@ -318,20 +338,16 @@ class TestInterp:
             xp.asarray([np.nan, 2], dtype=xp.float64),
             xp=xp,
         )
-        assert_equal(actual, xp.asarray([xp.nan, xp.nan, 2], dtype=xp.float64))
+        assert_equal(actual, xp.asarray([np.nan, np.nan, 2], dtype=xp.float64))
 
         actual = _interp(
             implementation,
             xp.asarray([0.5], dtype=xp.float64),
             xp.asarray([0, 1], dtype=xp.float64),
-            xp.asarray(
-                [complex(np.inf, 0), complex(np.inf, 2)], dtype=xp.complex128
-            ),
+            xp.asarray([complex(np.inf, 0), complex(np.inf, 2)], dtype=xp.complex128),
             xp=xp,
         )
-        assert_equal(
-            actual, xp.asarray([complex(np.inf, 1)], dtype=xp.complex128)
-        )
+        assert_equal(actual, xp.asarray([complex(np.inf, 1)], dtype=xp.complex128))
 
     @implementations
     @pytest.mark.skip_xp_backend(
@@ -367,14 +383,14 @@ class TestInterp:
         x_points = xp.asarray([0, 1], dtype=xp.float64)
         values = xp.asarray([0, 1], dtype=xp.float64)
 
-        with pytest.raises(ValueError):
-            xpx_interp(x, xp.reshape(x_points, (1, 2)), values)
-        with pytest.raises(ValueError):
-            xpx_interp(x, x_points, xp.reshape(values, (1, 2)))
-        with pytest.raises(ValueError):
-            xpx_interp(x, x_points, values[:1])
-        with pytest.raises(ValueError):
-            xpx_interp(x, x_points[:0], values[:0])
+        with pytest.raises(ValueError, match="one-dimensional"):
+            _ = xpx_interp(x, xp.reshape(x_points, (1, 2)), values)
+        with pytest.raises(ValueError, match="one-dimensional"):
+            _ = xpx_interp(x, x_points, xp.reshape(values, (1, 2)))
+        with pytest.raises(ValueError, match="same length"):
+            _ = xpx_interp(x, x_points, values[:1])
+        with pytest.raises(ValueError, match="nonempty"):
+            _ = xpx_interp(x, x_points[:0], values[:0])
 
     def test_type_validation(self, xp: ArrayNamespace):
         x = xp.asarray([0.5], dtype=xp.float64)
@@ -382,38 +398,38 @@ class TestInterp:
         values = xp.asarray([0, 1], dtype=xp.float64)
 
         with pytest.raises(TypeError):
-            xpx_interp([0.5], x_points, values)  # type: ignore[arg-type]
+            _ = xpx_interp([0.5], x_points, values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
         with pytest.raises(TypeError):
-            xpx_interp(x, [0, 1], values)  # type: ignore[arg-type]
+            _ = xpx_interp(x, [0, 1], values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
         with pytest.raises(TypeError):
-            xpx_interp(x, x_points, [0, 1])  # type: ignore[arg-type]
+            _ = xpx_interp(x, x_points, [0, 1])  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
         with pytest.raises(TypeError):
-            xpx_interp(xp.asarray([True]), x_points, values)
+            _ = xpx_interp(xp.asarray([True]), x_points, values)
         with pytest.raises(TypeError):
-            xpx_interp(x, xp.asarray([False, True]), values)
+            _ = xpx_interp(x, xp.asarray([False, True]), values)
         with pytest.raises(TypeError):
-            xpx_interp(x, x_points, xp.asarray([False, True]))
+            _ = xpx_interp(x, x_points, xp.asarray([False, True]))
         with pytest.raises(TypeError):
-            xpx_interp(True, x_points, values)  # type: ignore[arg-type]
+            _ = xpx_interp(True, x_points, values)
         with pytest.raises(TypeError):
-            xpx_interp(1j, x_points, values)  # type: ignore[arg-type]
+            _ = xpx_interp(1j, x_points, values)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     def test_bound_and_period_validation(self, xp: ArrayNamespace):
         x = xp.asarray([0.5], dtype=xp.float64)
         x_points = xp.asarray([0, 1], dtype=xp.float64)
         values = xp.asarray([0, 1], dtype=xp.float64)
 
-        with pytest.raises(ValueError):
-            xpx_interp(x, x_points, values, left=xp.asarray([0]))
+        with pytest.raises(ValueError, match="numerical scalar"):
+            _ = xpx_interp(x, x_points, values, left=xp.asarray([0]))
         with pytest.raises(TypeError):
-            xpx_interp(x, x_points, values, right="bad")  # type: ignore[arg-type]
+            _ = xpx_interp(x, x_points, values, right="bad")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
         with pytest.raises(TypeError):
-            xpx_interp(x, x_points, values, left=1j)
+            _ = xpx_interp(x, x_points, values, left=1j)
 
         for period in (0.0, np.inf, -np.inf, np.nan):
-            with pytest.raises(ValueError):
-                xpx_interp(x, x_points, values, period=period)
+            with pytest.raises(ValueError, match=r"must be (finite|nonzero)"):
+                _ = xpx_interp(x, x_points, values, period=period)
         with pytest.raises(TypeError):
-            xpx_interp(x, x_points, values, period=True)  # type: ignore[arg-type]
+            _ = xpx_interp(x, x_points, values, period=True)
         with pytest.raises(TypeError):
-            xpx_interp(x, x_points, values, period=xp.asarray(4.0))  # type: ignore[arg-type]
+            _ = xpx_interp(x, x_points, values, period=xp.asarray(4.0))

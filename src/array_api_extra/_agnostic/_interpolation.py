@@ -9,6 +9,56 @@ from .._lib._typing import Array, ArrayNamespace, DType
 __all__ = ["interp"]
 
 
+def _safe_difference(x1: Array, x2: Array, /, *, xp: ArrayNamespace) -> Array:
+    """Subtract finite arrays with IEEE overflow results but without warnings."""
+    zero = xp.zeros_like(x1)
+    maximum = xp.asarray(
+        xp.finfo(x1.dtype).max, dtype=x1.dtype, device=_compat.device(x1)
+    )
+    negative_x2 = xp.where(x2 < 0, x2, zero)
+    positive_x2 = xp.where(x2 > 0, x2, zero)
+    positive_overflow = (x1 > 0) & (x2 < 0) & (x1 > maximum + negative_x2)
+    negative_overflow = (x1 < 0) & (x2 > 0) & (x1 < -maximum + positive_x2)
+    overflow = positive_overflow | negative_overflow
+
+    out = xp.where(overflow, zero, x1) - xp.where(overflow, zero, x2)
+    infinity = xp.asarray(math.inf, dtype=x1.dtype, device=_compat.device(x1))
+    out = xp.where(positive_overflow, infinity, out)
+    return xp.where(negative_overflow, -infinity, out)
+
+
+def _safe_divide(
+    numerator: Array, denominator: Array, /, *, xp: ArrayNamespace
+) -> Array:
+    """Divide finite arrays with IEEE overflow results but without warnings."""
+    zero = xp.zeros_like(numerator)
+    one = xp.ones_like(denominator)
+    maximum = xp.asarray(
+        xp.finfo(numerator.dtype).max,
+        dtype=numerator.dtype,
+        device=_compat.device(numerator),
+    )
+    absolute_denominator = xp.abs(denominator)
+    small_denominator = absolute_denominator < 1
+    overflow_threshold = maximum * xp.where(
+        small_denominator, absolute_denominator, zero
+    )
+    overflow = (
+        (numerator != 0)
+        & (denominator != 0)
+        & small_denominator
+        & (xp.abs(numerator) > overflow_threshold)
+    )
+
+    out = xp.where(overflow, zero, numerator) / xp.where(overflow, one, denominator)
+    infinity = xp.asarray(
+        math.inf, dtype=numerator.dtype, device=_compat.device(numerator)
+    )
+    positive_overflow = overflow & ((numerator > 0) == (denominator > 0))
+    out = xp.where(positive_overflow, infinity, out)
+    return xp.where(overflow & ~positive_overflow, -infinity, out)
+
+
 def _interp_component(
     x: Array,
     x_lo: Array,
@@ -30,13 +80,27 @@ def _interp_component(
     safe_x_hi = xp.where(regular, x_hi, xp.ones_like(x_hi))
     safe_y_lo = xp.where(regular, y_lo, xp.zeros_like(y_lo))
     safe_y_hi = xp.where(regular, y_hi, xp.zeros_like(y_hi))
-    slope = (safe_y_hi - safe_y_lo) / (safe_x_hi - safe_x_lo)
-
     device = _compat.device(y_lo)
-    nan = xp.asarray(xp.nan, dtype=y_lo.dtype, device=device)
+    nan = xp.asarray(math.nan, dtype=y_lo.dtype, device=device)
     equal_values = y_lo == y_hi
 
-    left_delta = safe_x - safe_x_lo
+    coordinate_difference = _safe_difference(safe_x_hi, safe_x_lo, xp=xp)
+    value_difference = _safe_difference(safe_y_hi, safe_y_lo, xp=xp)
+    indeterminate_slope = xp.isinf(coordinate_difference) & xp.isinf(value_difference)
+    slope = _safe_divide(
+        xp.where(
+            indeterminate_slope, xp.zeros_like(value_difference), value_difference
+        ),
+        xp.where(
+            indeterminate_slope,
+            xp.ones_like(coordinate_difference),
+            coordinate_difference,
+        ),
+        xp=xp,
+    )
+    slope = xp.where(indeterminate_slope, nan, slope)
+
+    left_delta = _safe_difference(safe_x, safe_x_lo, xp=xp)
     left_invalid = (slope == 0) & xp.isinf(left_delta)
     left_out = (
         xp.where(left_invalid, xp.zeros_like(slope), slope)
@@ -45,7 +109,7 @@ def _interp_component(
     )
     retry = left_invalid | xp.isnan(left_out)
 
-    right_delta = safe_x - safe_x_hi
+    right_delta = _safe_difference(safe_x, safe_x_hi, xp=xp)
     right_invalid = (slope == 0) & xp.isinf(right_delta)
     right_out = (
         xp.where(right_invalid, xp.zeros_like(slope), slope)
@@ -104,7 +168,7 @@ def interp(
     *,
     left: Array | None,
     right: Array | None,
-    period: int | float | None,
+    period: float | None,
     xp: ArrayNamespace,
 ) -> Array:
     # numpydoc ignore=PR01,RT01
@@ -114,7 +178,15 @@ def interp(
         x_points = x_points % period
         order = xp.argsort(x_points, stable=True)
         x_points = xp.take(x_points, order, axis=0)
-        values = xp.take(values, order, axis=0)
+        if xp.isdtype(values.dtype, "complex floating"):
+            values = _combine_complex(
+                xp.take(xp.real(values), order, axis=0),
+                xp.take(xp.imag(values), order, axis=0),
+                dtype=values.dtype,
+                xp=xp,
+            )
+        else:
+            values = xp.take(values, order, axis=0)
         x_points = xp.concat(
             (x_points[-1:] - period, x_points, x_points[:1] + period), axis=0
         )
@@ -135,14 +207,11 @@ def interp(
     right_indices = xp.searchsorted(x_points, x_flat, side="right")
     exact_indices = xp.clip(right_indices - 1, 0, n_points - 1)
     exact_x = xp.take(x_points, exact_indices, axis=0)
-    exact_y = xp.take(values, exact_indices, axis=0)
     exact = x_flat == exact_x
 
     interval_indices = xp.clip(right_indices - 1, 0, n_points - 2)
     x_lo = xp.take(x_points, interval_indices, axis=0)
     x_hi = xp.take(x_points, interval_indices + 1, axis=0)
-    y_lo = xp.take(values, interval_indices, axis=0)
-    y_hi = xp.take(values, interval_indices + 1, axis=0)
 
     below = x_flat < x_points[0]
     above = x_flat > x_points[-1]
@@ -150,12 +219,20 @@ def interp(
     inactive = exact | below | above | query_nan | (x_lo == x_hi)
 
     if xp.isdtype(values.dtype, "complex floating"):
+        values_real = xp.real(values)
+        values_imag = xp.imag(values)
+        exact_real = xp.take(values_real, exact_indices, axis=0)
+        exact_imag = xp.take(values_imag, exact_indices, axis=0)
+        y_lo_real = xp.take(values_real, interval_indices, axis=0)
+        y_hi_real = xp.take(values_real, interval_indices + 1, axis=0)
+        y_lo_imag = xp.take(values_imag, interval_indices, axis=0)
+        y_hi_imag = xp.take(values_imag, interval_indices + 1, axis=0)
         out_real = _interp_component(
             x_flat,
             x_lo,
             x_hi,
-            xp.real(y_lo),
-            xp.real(y_hi),
+            y_lo_real,
+            y_hi_real,
             inactive=inactive,
             xp=xp,
         )
@@ -163,13 +240,11 @@ def interp(
             x_flat,
             x_lo,
             x_hi,
-            xp.imag(y_lo),
-            xp.imag(y_hi),
+            y_lo_imag,
+            y_hi_imag,
             inactive=inactive,
             xp=xp,
         )
-        exact_real = xp.real(exact_y)
-        exact_imag = xp.imag(exact_y)
         left_array = values[0] if left is None else left
         right_array = values[-1] if right is None else right
         out_real = xp.where(exact, exact_real, out_real)
@@ -178,13 +253,14 @@ def interp(
         out_imag = xp.where(below, xp.imag(left_array), out_imag)
         out_real = xp.where(above, xp.real(right_array), out_real)
         out_imag = xp.where(above, xp.imag(right_array), out_imag)
-        nan = xp.asarray(
-            xp.nan, dtype=out_real.dtype, device=_compat.device(values)
-        )
+        nan = xp.asarray(math.nan, dtype=out_real.dtype, device=_compat.device(values))
         out_real = xp.where(query_nan, nan, out_real)
-        out_imag = xp.where(query_nan, nan, out_imag)
+        out_imag = xp.where(query_nan, xp.zeros_like(out_imag), out_imag)
         out = _combine_complex(out_real, out_imag, dtype=values.dtype, xp=xp)
     else:
+        exact_y = xp.take(values, exact_indices, axis=0)
+        y_lo = xp.take(values, interval_indices, axis=0)
+        y_hi = xp.take(values, interval_indices + 1, axis=0)
         out = _interp_component(
             x_flat, x_lo, x_hi, y_lo, y_hi, inactive=inactive, xp=xp
         )
@@ -193,7 +269,7 @@ def interp(
         right_array = values[-1] if right is None else right
         out = xp.where(below, left_array, out)
         out = xp.where(above, right_array, out)
-        nan = xp.asarray(xp.nan, dtype=values.dtype, device=_compat.device(values))
+        nan = xp.asarray(math.nan, dtype=values.dtype, device=_compat.device(values))
         out = xp.where(query_nan, nan, out)
 
     return xp.reshape(out, x_shape)
