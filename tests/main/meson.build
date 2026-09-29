@@ -8,6 +8,7 @@ py.install_sources([
     'test_helpers.py',
     'test_indexing.py',
     'test_inspection.py',
+    'test_interpolation.py',
     'test_lazy.py',
     'test_linalg.py',
     'test_manipulation.py',
