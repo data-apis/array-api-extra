@@ -5,17 +5,21 @@ from numbers import Number, Real
 
 from . import _agnostic
 from ._lib import _compat, _helpers
-from ._lib._typing import Array, ArrayNamespace, DType, Device
+from ._lib._typing import Array, ArrayNamespace, Device, DType
 
 __all__ = ["interp"]
 
 
 def _is_python_real_scalar(x: object, /) -> bool:
-    return (
-        _helpers.is_python_scalar(x)
-        and isinstance(x, Real)
-        and not isinstance(x, bool)
-    )
+    if x is True or x is False:
+        return False
+    return _helpers.is_python_scalar(x) and isinstance(x, Real)
+
+
+def _is_real_scalar(x: object, /) -> bool:
+    if x is True or x is False:
+        return False
+    return isinstance(x, Real)
 
 
 def _same_namespace(xp1: ArrayNamespace, xp2: ArrayNamespace, /) -> bool:
@@ -33,9 +37,7 @@ def _same_namespace(xp1: ArrayNamespace, xp2: ArrayNamespace, /) -> bool:
     )
 
 
-def _require_dtype(
-    xp: ArrayNamespace, name: str, /, *, device: Device
-) -> DType:
+def _require_dtype(xp: ArrayNamespace, name: str, /, *, device: Device) -> DType:
     try:
         dtype = xp.__array_namespace_info__().dtypes(device=device)[name]
     except (AttributeError, KeyError, TypeError) as error:
@@ -76,7 +78,7 @@ def _validate_bound(
             raise TypeError(msg)
         bound_is_complex = xp.isdtype(bound.dtype, "complex floating")
     else:
-        if not isinstance(bound, Number) or isinstance(bound, bool):
+        if bound is True or bound is False or not isinstance(bound, Number):
             msg = f"`{name}` must be a numerical scalar or a 0-dimensional array."
             raise TypeError(msg)
         bound_is_complex = isinstance(bound, complex) and not isinstance(bound, Real)
@@ -107,14 +109,14 @@ def _as_bound_array(
 
 
 def interp(
-    x: Array | int | float,
+    x: Array | float,
     x_points: Array,
     values: Array,
     /,
     *,
     left: Array | complex | None = None,
     right: Array | complex | None = None,
-    period: int | float | None = None,
+    period: float | Real | None = None,
     xp: ArrayNamespace | None = None,
 ) -> Array:
     """
@@ -192,8 +194,8 @@ def interp(
         raise TypeError(msg)
 
     if period is not None:
-        if not _is_python_real_scalar(period):
-            msg = "`period` must be a finite Python real scalar or None."
+        if not _is_real_scalar(period):
+            msg = "`period` must be a finite real scalar or None."
             raise TypeError(msg)
         if not math.isfinite(period):
             msg = "`period` must be finite."
@@ -201,7 +203,7 @@ def interp(
         if period == 0:
             msg = "`period` must be nonzero."
             raise ValueError(msg)
-        period = abs(period)
+        period = float(abs(period))
 
     namespace_args: list[Array] = [x_points, values]
     if _compat.is_array_api_obj(x):
@@ -241,17 +243,13 @@ def interp(
     ):
         msg = "`x` must have an integral or real floating-point dtype."
         raise TypeError(msg)
-    if not xp.isdtype(
-        values.dtype, ("integral", "real floating", "complex floating")
-    ):
+    if not xp.isdtype(values.dtype, ("integral", "real floating", "complex floating")):
         msg = "`values` must have a real or complex numeric dtype."
         raise TypeError(msg)
 
     values_are_complex = xp.isdtype(values.dtype, "complex floating")
     if period is None:
-        _validate_bound(
-            left, name="left", values_are_complex=values_are_complex, xp=xp
-        )
+        _validate_bound(left, name="left", values_are_complex=values_are_complex, xp=xp)
         _validate_bound(
             right, name="right", values_are_complex=values_are_complex, xp=xp
         )
@@ -273,14 +271,12 @@ def interp(
     value_dtype = _require_dtype(
         xp, "complex128" if values_are_complex else "float64", device=device
     )
-    x_points = _astype_required(
-        x_points, coordinate_dtype, name="x_points", xp=xp
-    )
+    x_points = _astype_required(x_points, coordinate_dtype, name="x_points", xp=xp)
     if _compat.is_array_api_obj(x):
-        x = _astype_required(x, coordinate_dtype, name="x", xp=xp)
+        x_array = _astype_required(x, coordinate_dtype, name="x", xp=xp)
     else:
-        x = xp.asarray(x, dtype=coordinate_dtype, device=device)
-        if x.dtype != coordinate_dtype:
+        x_array = xp.asarray(x, dtype=coordinate_dtype, device=device)
+        if x_array.dtype != coordinate_dtype:
             msg = "`interp` requires float64 support for `x`."
             raise TypeError(msg)
     values = _astype_required(values, value_dtype, name="values", xp=xp)
@@ -295,21 +291,28 @@ def interp(
     else:
         left_array = right_array = None
 
-    if _compat.is_numpy_namespace(xp) or _compat.is_cupy_namespace(xp):
+    native_complex_bounds_unsupported = (
+        _compat.is_numpy_namespace(xp)
+        and values_are_complex
+        and (left_array is not None or right_array is not None)
+    )
+    if (
+        _compat.is_numpy_namespace(xp) or _compat.is_cupy_namespace(xp)
+    ) and not native_complex_bounds_unsupported:
         out = xp.interp(
-            x,
+            x_array,
             x_points,
             values,
             left=left_array,
             right=right_array,
             period=period,
         )
-        if x.ndim == 0:
+        if x_array.ndim == 0:
             out = xp.asarray(out, dtype=value_dtype, device=device)
         return out
 
     return _agnostic._interpolation.interp(
-        x,
+        x_array,
         x_points,
         values,
         left=left_array,
