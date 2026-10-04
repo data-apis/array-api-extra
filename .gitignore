@@ -69,8 +69,8 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
-docs/generated/
+docs/sphinx/_build/
+docs/sphinx/generated/
 
 # PyBuilder
 .pybuilder/
@@ -163,9 +163,9 @@ Thumbs.db
 .pixi
 *.egg-info
 
-# Vendor tests
-vendor_tests/array_api_compat/
-vendor_tests/array_api_extra/
+# Vendoring tests
+tests/vendoring/array_api_compat/
+tests/vendoring/array_api_extra/
 
 # all-contributors
 node_modules

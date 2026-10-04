@@ -5,7 +5,7 @@
   "repoHost": "https://github.com",
   "files": [
     "README.md",
-    "CONTRIBUTORS.md"
+    "docs/CONTRIBUTORS.md"
   ],
   "imageSize": 100,
   "commitType": "docs",
@@ -72,7 +72,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/1448859?v=4",
       "profile": "https://github.com/betatim",
       "contributions": [
-        "ideas"
+        "ideas",
+        "review"
       ]
     },
     {
@@ -166,7 +167,9 @@
         "code",
         "doc",
         "bug",
-        "test"
+        "test",
+        "review",
+        "mentoring"
       ]
     },
     {
@@ -196,7 +199,8 @@
       "profile": "https://github.com/ev-br",
       "contributions": [
         "code",
-        "doc"
+        "doc",
+        "review"
       ]
     },
     {
@@ -359,7 +363,8 @@
       "contributions": [
         "code",
         "test",
-        "doc"
+        "doc",
+        "example"
       ]
     },
     {
@@ -368,7 +373,30 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/5346669?v=4",
       "profile": "http://scholar.google.com/citations?user=97OQs9IAAAAJ",
       "contributions": [
-        "review"
+        "review",
+        "code"
+      ]
+    },
+    {
+      "login": "fbourgey",
+      "name": "Florian Bourgey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10298716?v=4",
+      "profile": "https://fbourgey.github.io/",
+      "contributions": [
+        "doc",
+        "code",
+        "test",
+        "tool"
+      ]
+    },
+    {
+      "login": "ushnah",
+      "name": "ushnah",
+      "avatar_url": "https://avatars.githubusercontent.com/u/138783519?v=4",
+      "profile": "https://github.com/ushnah",
+      "contributions": [
+        "code",
+        "test"
       ]
     }
   ]

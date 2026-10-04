@@ -1,0 +1,14 @@
+# Statistical Functions
+
+```{eval-rst}
+.. currentmodule:: array_api_extra
+.. autosummary::
+    :nosignatures:
+    :toctree: generated
+
+    cov
+    nanmax
+    nanmean
+    nanmin
+    nansum
+```

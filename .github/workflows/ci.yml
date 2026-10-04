@@ -24,77 +24,102 @@ jobs:
     name: Lint
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: prefix-dev/setup-pixi@a09b6247153796b190642a2b53fac4241043cf6f # v0.10.0
+      - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
         with:
-          pixi-version: v0.71.2
+          pixi-version: v0.76.2
           cache: true
           environments: lint
 
       - name: Lint (if this step fails, please 'pixi run lint' locally and push the changes)
         run: pixi run -e lint lint
 
+  doctests:
+    name: Doctests
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
+        with:
+          pixi-version: v0.76.2
+          cache: true
+          environments: tests
+
+      - name: Test public API examples
+        run: pixi run doctests
+
   checks:
-    name: Test ${{ matrix.environment }}
-    runs-on: ${{ matrix.runs-on }}
+    name: ${{ matrix.environment }} (${{ matrix.platform }})
+    runs-on: >-
+      ${{ matrix.platform == 'macos' && 'macos-latest'
+       || matrix.platform == 'windows' && 'windows-latest'
+       || matrix.platform == 'linux-arm' && 'ubuntu-24.04-arm'
+       || matrix.x64_runner || 'ubuntu-slim' }}
+    defaults:
+      run:
+        shell: bash # Windows defaults to pwsh, where ${VAR} isn't expansion
     strategy:
       fail-fast: false
       matrix:
+        platform: [linux-x64, linux-arm, macos, windows]
+        environment:
+          - tests-py311
+          - tests-py314
+          - tests-numpy1
+          - tests-nogil
+          - tests-backends
+          - tests-backends-py311
+          - tests-run-deps
         include:
-          - environment: tests-py311
-            runs-on: ubuntu-latest
-          - environment: tests-py314
-            runs-on: ubuntu-slim
-          - environment: tests-numpy1
-            runs-on: ubuntu-slim
-          - environment: tests-nogil
-            runs-on: ubuntu-slim
-          - environment: tests-backends
-            runs-on: ubuntu-latest
-          - environment: tests-backends-py311
-            runs-on: ubuntu-latest
+          # Full x64 image is faster than ubuntu-slim for the slowest jobs
+          - {environment: tests-py311, x64_runner: ubuntu-latest}
+          - {environment: tests-backends, x64_runner: ubuntu-latest}
+          - {environment: tests-backends-py311, x64_runner: ubuntu-latest}
+          # Non-default pixi task (default: tests-ci)
+          - {
+              environment: tests-nogil,
+              task: "tests --parallel-threads=4",
+              no-coverage: true,
+              x64_runner: ubuntu-latest,
+            }
           - environment: tests-mlx
             runs-on: macos-15
-          - environment: tests-run-deps
-            runs-on: ubuntu-slim
+          - {environment: tests-run-deps, task: tests-run-deps-cov}
+        exclude:
+          - {environment: tests-numpy1, platform: windows} # data-apis/array-api-extra#901
 
     environment:
       name: ci-checks
       deployment: false
 
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: prefix-dev/setup-pixi@a09b6247153796b190642a2b53fac4241043cf6f # v0.10.0
+      - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
         with:
-          pixi-version: v0.71.2
+          pixi-version: v0.76.2
           cache: true
           environments: ${{ matrix.environment }}
 
-      - name: Test package
-        # Save some time; also at the moment of writing coverage crashes on python 3.13t
-        if: ${{ matrix.environment != 'tests-nogil' && matrix.environment != 'tests-run-deps' }}
-        run: pixi run -e "${TASK_ENV}" tests-ci
+      - name: Test
+        run: pixi run -e "${TASK_ENV}" ${TASK}
         env:
           TASK_ENV: ${{ matrix.environment }}
-
-      - name: Test free-threading
-        if: ${{ matrix.environment == 'tests-nogil' }}
-        run: pixi run -e tests-nogil tests --parallel-threads=4
-
-      - name: Run dependency tests
-        if: ${{ matrix.environment == 'tests-run-deps' }}
-        run: pixi run tests-run-deps-cov
+          TASK: ${{ matrix.task || 'tests-ci' }}
 
       - name: Upload coverage report
-        if: ${{ matrix.environment != 'tests-nogil' }}
+        if: ${{ !matrix.no-coverage }}
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: ${{ matrix.platform }}
