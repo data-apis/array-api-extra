@@ -214,6 +214,7 @@ def test_dask_key(da: ArrayNamespace):
     assert "helloworld" in prefixes
 
 
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="no unique_values or unique_counts")
 def test_lazy_apply_none_shape_in_args(xp: ArrayNamespace, library: Backend):
     x = xp.asarray([1, 1, 2, 2, 2])
 
@@ -265,6 +266,7 @@ lazy_xp_function(check_lazy_apply_none_shape_broadcast)
 @pytest.mark.skip_xp_backend(Backend.JAX, reason="boolean indexing")
 @pytest.mark.skip_xp_backend(Backend.JAX_GPU, reason="boolean indexing")
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="boolean indexing is unsupported")
 def test_lazy_apply_none_shape_broadcast(xp: ArrayNamespace):
     """Broadcast from input array with unknown shape"""
     x = xp.asarray([1, 2, 2])

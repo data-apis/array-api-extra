@@ -65,7 +65,7 @@ disable_error_code = ["no-any-return"]
 
 [[tool.mypy.overrides]]
 # slow or unavailable on Windows; do not add to the lint env
-module = ["cupy.*", "jax.*", "sparse.*", "torch.*"]
+module = ["cupy.*", "jax.*", "mlx.*", "sparse.*", "torch.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

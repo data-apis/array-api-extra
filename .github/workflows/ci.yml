@@ -57,6 +57,8 @@ jobs:
             runs-on: ubuntu-latest
           - environment: tests-backends-py311
             runs-on: ubuntu-latest
+          - environment: tests-mlx
+            runs-on: macos-15
           - environment: tests-run-deps
             runs-on: ubuntu-slim
 

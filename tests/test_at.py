@@ -121,6 +121,7 @@ def assert_copy(
 )
 def test_update_ops(
     xp: ArrayNamespace,
+    library: Backend,
     copy: bool | None,
     op: _AtOp,
     y: float,
@@ -129,6 +130,8 @@ def test_update_ops(
     x_ndim: int,
     y_ndim: int,
 ):
+    if bool_mask and library is Backend.MLX:
+        pytest.skip("MLX does not support boolean indexing")
     if x_ndim == 1:
         x = xp.asarray([10.0, 20.0, 30.0])
         idx = xp.asarray([False, True, True]) if bool_mask else slice(1, None)
@@ -153,6 +156,7 @@ def test_update_ops(
 
 
 @pytest.mark.parametrize("op", list(_AtOp))
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="boolean indexing is unsupported")
 def test_copy_default(xp: ArrayNamespace, library: Backend, op: _AtOp):
     """
     Test that the default copy behaviour is False for writeable arrays
@@ -235,6 +239,8 @@ def test_incompatible_dtype(
     UFuncTypeError: Cannot cast ufunc 'divide' output from dtype('float64')
     to dtype('int64') with casting rule 'same_kind'
     """
+    if bool_mask and library is Backend.MLX:
+        pytest.skip("MLX does not support boolean indexing")
     x = xp.asarray([2, 4])
     idx = xp.asarray([True, False]) if bool_mask else slice(None)
     z = None
@@ -252,6 +258,13 @@ def test_incompatible_dtype(
     elif library.like(Backend.ARRAY_API_STRICT):
         with pytest.raises(Exception, match=r"cast|promote|dtype"):
             _ = at_op(x, idx, op, 1.1, copy=copy)
+
+    elif library is Backend.MLX:
+        if op is _AtOp.DIVIDE:
+            with pytest.raises(Exception, match="cast"):
+                _ = at_op(x, idx, op, 1.1, copy=copy)
+        else:
+            z = at_op(x, idx, op, 1.1, copy=copy)
 
     elif op in (_AtOp.SET, _AtOp.MIN, _AtOp.MAX):
         # There is no __i<op>__ version of min/max.
@@ -276,7 +289,9 @@ def test_bool_mask_nd(xp: ArrayNamespace):
 
 
 @pytest.mark.parametrize("bool_mask", [False, True])
-def test_no_inf_warnings(xp: ArrayNamespace, bool_mask: bool):
+def test_no_inf_warnings(xp: ArrayNamespace, library: Backend, bool_mask: bool):
+    if bool_mask and library is Backend.MLX:
+        pytest.skip("MLX does not support boolean indexing")
     x = xp.asarray([math.inf, 1.0, 2.0])
     idx = ~xp.isinf(x) if bool_mask else slice(1, None)
     # inf - inf -> nan with a warning

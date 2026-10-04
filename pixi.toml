@@ -4,6 +4,7 @@ platforms = [
   "linux-64",
   "osx-64",
   "osx-arm64",
+  { name = "osx-arm64-macos14", platform = "osx-arm64", macos = "14.5" },
   "win-64",
   { platform = "linux-64", cuda = "12.9" },
   { platform = "win-64", cuda = "12.9" },
@@ -37,6 +38,7 @@ tests-run-deps = { features = ["py314", "tests-run-deps"], solve-group = "py314"
 dev = { features = ["py314", "lint", "tests", "docs", "dev", "backends"], solve-group = "backends" }
 tests-backends = { features = ["py314", "tests", "backends"], solve-group = "backends" }
 tests-backends-py311 = { features = ["py311", "tests", "backends"] }
+tests-mlx = { features = ["py314", "tests", "mlx"], solve-group = "mlx" }
 
 # CUDA not available on free github actions and on some developers' PCs
 dev-cuda = { features = ["py314", "lint", "tests", "docs", "dev", "backends", "cuda-backends"], solve-group = "cuda" }
@@ -184,6 +186,12 @@ sparse = ">=0.19.0"
 
 [feature.backends.target.unix.dependencies]
 jax = ">=0.10.2"
+
+[feature.mlx.target.osx-arm64.pypi-dependencies]
+mlx = ">=0.32.3"
+
+[feature.mlx]
+platforms = ["osx-arm64-macos14"]
 
 # Backends that require a GPU host and a CUDA driver.
 # Note that JAX and PyTorch automatically prefer CUDA variants

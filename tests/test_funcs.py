@@ -612,6 +612,7 @@ class TestCov:
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
 
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="MLX does not support complex128")
     def test_complex(self, xp: ArrayNamespace):
         actual = cov(xp.asarray([[1, 2, 3], [1j, 2j, 3j]], dtype=xp.complex128))
         expect = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]], dtype=xp.complex128)
@@ -706,6 +707,7 @@ class TestOneHot:
     @pytest.mark.skip_xp_backend(
         Backend.ARRAY_API_STRICTEST, reason="backend doesn't support Boolean indexing"
     )
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="boolean indexing is unsupported")
     def test_abstract_size(self, xp: ArrayNamespace):
         x = xp.arange(5)
         x = x[x > 2]
@@ -835,11 +837,12 @@ class TestDefaultDType:
     def test_basic(self, xp: ArrayNamespace):
         assert default_dtype(xp) == xp.empty(0).dtype
 
-    def test_kind(self, xp: ArrayNamespace):
+    def test_kind(self, xp: ArrayNamespace, library: Backend):
         assert default_dtype(xp, "real floating") == xp.empty(0).dtype
         assert default_dtype(xp, "complex floating") == (xp.empty(0) * 1j).dtype
-        assert default_dtype(xp, "integral") == xp.int64
-        assert default_dtype(xp, "indexing") == xp.int64
+        integer_dtype = xp.int32 if library is Backend.MLX else xp.int64
+        assert default_dtype(xp, "integral") == integer_dtype
+        assert default_dtype(xp, "indexing") == integer_dtype
 
         with pytest.raises(ValueError, match="Unknown kind"):
             _ = default_dtype(xp, "foo")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
@@ -868,8 +871,8 @@ class TestDiagIndices:
     def test_basic(self, xp: ArrayNamespace):
         rows, cols = diag_indices(5, xp=xp)
         ref_rows, ref_cols = np.diag_indices(5)
-        assert_equal(rows, xp.asarray(ref_rows))
-        assert_equal(cols, xp.asarray(ref_cols))
+        assert_equal(rows, xp.asarray(ref_rows, dtype=rows.dtype))
+        assert_equal(cols, xp.asarray(ref_cols, dtype=cols.dtype))
 
     @pytest.mark.parametrize("n", [2, 4, 7])
     @pytest.mark.parametrize("ndim", [1, 2, 3, 4])
@@ -878,7 +881,7 @@ class TestDiagIndices:
         assert len(idx) == ndim
         ref = np.diag_indices(n, ndim=ndim)
         for got, expected in zip(idx, ref, strict=True):
-            assert_equal(got, xp.asarray(expected))
+            assert_equal(got, xp.asarray(expected, dtype=got.dtype))
 
     def test_empty(self, xp: ArrayNamespace):
         rows, cols = diag_indices(0, xp=xp)
@@ -907,6 +910,7 @@ class TestDiagIndices:
     reason="generic path uses nonzero (data-dependent)",
     strict=False,
 )
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="no tril_indices or triu_indices")
 @pytest.mark.parametrize(
     ("xpx_fn", "np_fn"),
     [(tril_indices, np.tril_indices), (triu_indices, np.triu_indices)],
@@ -1165,6 +1169,7 @@ class TestIsClose:
 
     @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="boolean indexing is unsupported")
     def test_none_shape(self, xp: ArrayNamespace):
         a = xp.asarray([1, 5, 0])
         b = xp.asarray([1, 4, 2])
@@ -1174,6 +1179,7 @@ class TestIsClose:
 
     @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="boolean indexing is unsupported")
     def test_none_shape_bool(self, xp: ArrayNamespace):
         a = xp.asarray([True, True, False])
         b = xp.asarray([True, False, True])
@@ -1449,6 +1455,7 @@ class TestNUnique:
     )
     @pytest.mark.skip_xp_backend(Backend.DASK, reason="array-agnostic fallback")
     @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="array-agnostic fallback")
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="no unique_values")
     def test_delegates(
         self,
         xp: ArrayNamespace,
@@ -1565,6 +1572,7 @@ assume_unique = pytest.mark.parametrize(
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no argsort")
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="no unique_values")
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="no unique_values")
 class TestSetDiff1D:
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="NaN-shaped arrays")
     @pytest.mark.xfail_xp_backend(
@@ -1668,13 +1676,14 @@ class TestSinc:
         with pytest.raises(ValueError, match="real floating data type"):
             _ = sinc(xp.asarray(x))
 
-    def test_3d(self, xp: ArrayNamespace):
+    def test_3d(self, xp: ArrayNamespace, library: Backend):
         x = np.arange(18, dtype=np.float64).reshape((3, 3, 2))
         expected = np.zeros_like(x)
         expected[0, 0, 0] = 1
         x = xp.asarray(x)
         expected = xp.asarray(expected)
-        assert_close(sinc(x), expected, atol=1e-15)
+        atol = 1e-7 if library is Backend.MLX else 1e-15
+        assert_close(sinc(x), expected, atol=atol)
 
     def test_device(self, xp: ArrayNamespace, device: Device):
         x = xp.asarray(0.0, device=device)
@@ -1827,6 +1836,7 @@ class TestArgpartition(TestPartition):
 
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no unique_inverse")
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="no unique_values or unique_inverse")
 class TestIsIn:
     def test_simple(self, xp: ArrayNamespace, library: Backend):
         if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
@@ -2068,6 +2078,7 @@ class TestSearchsorted:
     Backend.ARRAY_API_STRICTEST,
     reason="data_dependent_shapes flag for unique_values is disabled",
 )
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="no unique_values")
 class TestUnion1d:
     def test_simple(self, xp: ArrayNamespace):
         a = xp.asarray([-1, 1, 0])
@@ -2104,6 +2115,7 @@ class TestAngle:
         expected = xp.asarray([0.0, 0.0], dtype=res.dtype)
         assert_equal(res, expected)
 
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="MLX does not support complex128")
     def test_basic(self, xp: ArrayNamespace):
         x = xp.asarray(
             [
