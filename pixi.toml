@@ -381,7 +381,7 @@ mparray = ">=0.2.2"
 jax = ">=0.10.2"  # waiting for conda-forge/jaxlib-feedstock#326
 
 [feature.mlx.target.osx-arm64.pypi-dependencies]
-mlx = ">=0.32.3"
+mlx = ">=0.32.2"
 
 [feature.mlx]
 platforms = ["osx-arm64-macos14"]
