@@ -7,6 +7,7 @@ platforms = [
   "linux-aarch64",
   "osx-64",
   "osx-arm64",
+  { name = "osx-arm64-macos14", platform = "osx-arm64", macos = "14.5" },
   "win-64",
   { platform = "linux-64", cuda = "12.9" },
   { platform = "win-64", cuda = "12.9" },
@@ -69,6 +70,7 @@ tests-backends = {
   solve-group = "backends",
 }
 tests-backends-py311.features = ["py311", "tests", "backends"]
+tests-mlx = { features = ["py314", "tests", "mlx"], solve-group = "mlx" }
 
 # CUDA not available on free github actions and on some developers' PCs
 dev-cuda = {
@@ -377,6 +379,12 @@ mparray = ">=0.2.2"
 
 [feature.backends.target.unix.dependencies]
 jax = ">=0.10.2"  # waiting for conda-forge/jaxlib-feedstock#326
+
+[feature.mlx.target.osx-arm64.pypi-dependencies]
+mlx = ">=0.32.2"
+
+[feature.mlx]
+platforms = ["osx-arm64-macos14"]
 
 # Backends that require a GPU host and a CUDA driver.
 [feature.cuda-backends]

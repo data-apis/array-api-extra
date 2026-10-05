@@ -31,13 +31,13 @@ class TestAsNumPyArray:
     def test_basic(self, xp: ArrayNamespace):
         x = xp.asarray([1, 2, 3])
         y = _as_numpy_array(x, xp=xp)
-        assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        assert_equal(y, np.asarray([1, 2, 3], dtype=y.dtype))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
     @pytest.mark.skip_xp_backend(Backend.TORCH, reason="materialize 'meta' device")
     def test_device(self, xp: ArrayNamespace, device: Device):
         x = xp.asarray([1, 2, 3], device=device)
         y = _as_numpy_array(x, xp=xp)
-        assert_equal(y, np.asarray([1, 2, 3]))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        assert_equal(y, np.asarray([1, 2, 3], dtype=y.dtype))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
 
 class TestAssertEqualCloseLess:
@@ -172,6 +172,7 @@ class TestAssertEqualCloseLess:
     )
     @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="boolean indexing is unsupported")
     def test_none_shape(self, xp: ArrayNamespace, func: Callable[..., None]):
         """On Dask and other lazy backends, test that a shape with NaN's or None's
         can be compared to a real shape.
@@ -362,6 +363,9 @@ except ImportError:
 
 
 @pytest.mark.skip_xp_backend(Backend.TORCH_GPU, reason="device->host copy")
+@pytest.mark.skip_xp_backend(
+    Backend.MLX, reason="SciPy Cython ufunc returns NumPy arrays"
+)
 @pytest.mark.skip_xp_backend(Backend.MPARRAY, reason="mparray lacks __array_ufunc__")
 @pytest.mark.filterwarnings("ignore:__array_wrap__:DeprecationWarning")  # PyTorch
 def test_lazy_xp_function_cython_ufuncs(xp: ArrayNamespace, library: Backend):

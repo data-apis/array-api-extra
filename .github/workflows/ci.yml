@@ -89,6 +89,8 @@ jobs:
               no-coverage: true,
               x64_runner: ubuntu-latest,
             }
+          - environment: tests-mlx
+            runs-on: macos-15
           - {environment: tests-run-deps, task: tests-run-deps-cov}
         exclude:
           - {environment: tests-numpy1, platform: windows} # data-apis/array-api-extra#901

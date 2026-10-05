@@ -18,6 +18,9 @@ class TestNUnique:
         Backend.ARRAY_API_STRICT, reason="array-agnostic fallback"
     )
     @pytest.mark.skip_xp_backend(
+        Backend.MLX, reason="backend does not provide unique_counts"
+    )
+    @pytest.mark.skip_xp_backend(
         Backend.ARRAY_API_STRICTEST, reason="array-agnostic fallback"
     )
     @pytest.mark.skip_xp_backend(Backend.DASK, reason="array-agnostic fallback")
@@ -86,6 +89,9 @@ assume_unique = pytest.mark.parametrize(
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no argsort")
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="no unique_values")
+@pytest.mark.skip_xp_backend(
+    Backend.MLX, reason="backend does not provide unique_values or Boolean indexing"
+)
 class TestSetDiff1D:
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="NaN-shaped arrays")
     @pytest.mark.xfail_xp_backend(
@@ -232,6 +238,7 @@ class TestIsIn:
     Backend.ARRAY_API_STRICTEST,
     reason="data_dependent_shapes flag for unique_values is disabled",
 )
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="backend does not provide unique_values")
 class TestUnion1d:
     def test_simple(self, xp: ArrayNamespace):
         a = xp.asarray([-1, 1, 0])
