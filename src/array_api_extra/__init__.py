@@ -1,11 +1,11 @@
 """Extra array functions built on top of the array API standard."""
 
 from . import testing
-from ._agnostic._elementwise import angle, apply_where
+from ._agnostic._elementwise import apply_where
 from ._agnostic._inspection import default_dtype
 from ._at import at
 from ._creation import create_diagonal, one_hot
-from ._elementwise import deg2rad, isclose, nan_to_num, rad2deg, sinc
+from ._elementwise import angle, deg2rad, isclose, nan_to_num, rad2deg, sinc
 from ._indexing import diag_indices, tril_indices, triu_indices, unravel_index
 from ._lazy import lazy_apply
 from ._linalg import kron

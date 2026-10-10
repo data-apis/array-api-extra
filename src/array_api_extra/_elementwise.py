@@ -4,7 +4,59 @@ from . import _agnostic
 from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayNamespace
 
-__all__ = ["deg2rad", "isclose", "nan_to_num", "rad2deg", "sinc"]
+__all__ = ["angle", "deg2rad", "isclose", "nan_to_num", "rad2deg", "sinc"]
+
+
+def angle(z: Array, /, *, deg: bool = False, xp: ArrayNamespace | None = None) -> Array:
+    """
+    Return the angle of the complex argument.
+
+    Parameters
+    ----------
+    z : array
+        Input array. Real input is interpreted as having zero imaginary part.
+    deg : bool, optional
+        Return angle in degrees if True, radians if False (default).
+    xp : array_namespace, optional
+        The standard-compatible namespace for `z`. Default: infer.
+
+    Returns
+    -------
+    array
+        The counterclockwise angle from the positive real axis on the complex
+        plane in the range ``(-pi, pi]``.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.angle(xp.asarray([1.0, 1.0j, 1 + 1j]), xp=xp)
+    Array([0.        , 1.57079633, 0.78539816], dtype=array_api_strict.float64)
+    >>> xpx.angle(xp.asarray([1.0, 1.0j, 1 + 1j]), deg=True, xp=xp)
+    Array([ 0., 90., 45.], dtype=array_api_strict.float64)
+    """
+    if xp is None:
+        xp = _compat.array_namespace(z)
+
+    if not xp.isdtype(z.dtype, ("real floating", "complex floating")):
+        z = xp.astype(
+            z, _agnostic._inspection.default_dtype(xp, device=_compat.device(z))
+        )
+
+    if (
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+    ):
+        return xp.angle(z, deg=deg)
+
+    # Torch treats real negative zero as positive zero, unlike atan2(0, z).
+    if _compat.is_torch_namespace(xp) and xp.isdtype(z.dtype, "complex floating"):
+        result = xp.angle(z)
+        return result * 180 / xp.pi if deg else result
+
+    return _agnostic._elementwise.angle(z, deg=deg, xp=xp)
 
 
 def deg2rad(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
