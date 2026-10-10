@@ -7,6 +7,7 @@ from ._at import at
 from ._creation import create_diagonal, one_hot
 from ._elementwise import deg2rad, isclose, nan_to_num, rad2deg, sinc
 from ._indexing import diag_indices, tril_indices, triu_indices, unravel_index
+from ._interpolation import interp
 from ._lazy import lazy_apply
 from ._linalg import kron
 from ._manipulation import atleast_nd, broadcast_shapes, expand_dims, pad
@@ -31,6 +32,7 @@ __all__ = [
     "deg2rad",
     "diag_indices",
     "expand_dims",
+    "interp",
     "isclose",
     "isin",
     "kron",
