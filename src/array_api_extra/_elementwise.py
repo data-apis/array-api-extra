@@ -76,6 +76,10 @@ def deg2rad(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
         The corresponding angles in radians. Integral inputs are converted to the
         default floating-point dtype.
 
+    See Also
+    --------
+    numpy.deg2rad : NumPy equivalent.
+
     Examples
     --------
     >>> import array_api_strict as xp
@@ -122,6 +126,10 @@ def rad2deg(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     array
         The corresponding angles in degrees. Integral inputs are converted to the
         default floating-point dtype.
+
+    See Also
+    --------
+    numpy.rad2deg : NumPy equivalent.
 
     Examples
     --------
@@ -201,6 +209,7 @@ def isclose(
     See Also
     --------
     math.isclose : Similar function in stdlib for Python scalars.
+    numpy.isclose : NumPy equivalent.
 
     Notes
     -----
@@ -283,6 +292,7 @@ def nan_to_num(
     See Also
     --------
     array_api.isnan : Shows which elements are Not a Number (NaN).
+    numpy.nan_to_num : NumPy equivalent.
 
     Examples
     --------
@@ -353,6 +363,10 @@ def sinc(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
     -------
     array
         ``sinc(x)`` calculated elementwise, which has the same shape as the input.
+
+    See Also
+    --------
+    numpy.sinc : NumPy equivalent.
 
     Notes
     -----
