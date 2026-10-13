@@ -34,8 +34,8 @@ def searchsorted(
         Input array. Should have a real-valued data type. Must be sorted in ascending
         order along the last axis.
     x2 : Array
-        Array containing search values. Should have a real-valued data type. Must have
-        the same shape as ``x1`` except along the last axis.
+        Array containing search values. Should have a real-valued data type. Its batch
+        dimensions must be broadcast-compatible with those of ``x1``.
     side : {'left', 'right'}, optional
         Argument controlling which index is returned if an element of ``x2`` is equal to
         one or more elements of ``x1``: ``'left'`` returns the index of the first of
@@ -79,6 +79,10 @@ def searchsorted(
     xp_default_int = default_dtype(xp, kind="integral")
     x2_0d = x2.ndim == 0
     x1_1d = x1.ndim <= 1
+
+    if _compat.is_torch_namespace(xp) and not x1_1d and x1.shape[:-1] != x2.shape[:-1]:
+        x1, x2 = _agnostic._searching._broadcast_batch_shapes(x1, x2, xp=xp)
+        x1, x2 = xp.asarray(x1, copy=True), xp.asarray(x2, copy=True)
 
     if x1_1d or _compat.is_torch_namespace(xp):
         x2 = xp.reshape(x2, ()) if (x2_0d and x1_1d) else x2

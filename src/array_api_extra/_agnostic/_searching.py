@@ -1,13 +1,25 @@
 """Array-agnostic implementations for searching functions."""
 
 import math
-from typing import Literal
+from typing import Literal, cast
 
 from .._lib import _compat
 from .._lib._typing import Array, ArrayNamespace
-from . import _inspection
+from . import _inspection, _manipulation
 
 __all__ = ["searchsorted"]
+
+
+def _broadcast_batch_shapes(
+    x1: Array, x2: Array, /, *, xp: ArrayNamespace
+) -> tuple[Array, Array]:
+    batch_shape = cast(
+        tuple[int, ...],
+        _manipulation.broadcast_shapes(x1.shape[:-1], x2.shape[:-1]),
+    )
+    x1 = xp.broadcast_to(x1, (*batch_shape, x1.shape[-1]))
+    x2 = xp.broadcast_to(x2, (*batch_shape, x2.shape[-1]))
+    return x1, x2
 
 
 def searchsorted(
@@ -20,6 +32,7 @@ def searchsorted(
 ) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._searching`."""
+    x1, x2 = _broadcast_batch_shapes(x1, x2, xp=xp)
     a = xp.full(x2.shape, 0, device=_compat.device(x1))
 
     if x1.shape[-1] == 0:
