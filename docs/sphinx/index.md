@@ -55,7 +55,7 @@ pixi add array-api-extra
 ```{note}
 This library depends on `array-api-compat`. We aim for compatibility with
 the latest released versions of the standard and array-api-compat,
-and your mileage may vary with older versions.
+and your mileage may vary with older versions. JAX support requires JAX 0.6.0 or newer.
 ```
 
 ## Versioning
