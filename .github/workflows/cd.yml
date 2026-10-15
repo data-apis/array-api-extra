@@ -64,7 +64,7 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
       - name: Update conda-forge feedstock
-        uses: beckermr/update-feedstock-version@afbac79908156f5078a557a9fd6f9ef1d59ddfde # v5
+        uses: beckermr/update-feedstock-version@92ddc557e5594b083546ec118084f6406a626ff5 # v11
         with:
           feedstock: array-api-extra-feedstock
           version: ${{ needs.dist.outputs.version }}
