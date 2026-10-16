@@ -23,6 +23,9 @@ def _doctest_context(  # numpydoc ignore=PR01
         yield
 
 
+# Use this instead of `--doctest-only-doctests=true`, which ignores every path
+# containing "tests", including installs in the `tests` pixi environment.
+dt_config.pytest_extra_ignore.append("array_api_extra/tests")
 dt_config.rtol = 1e-7
 dt_config.strict_check = True
 dt_config.user_context_mgr = _doctest_context
