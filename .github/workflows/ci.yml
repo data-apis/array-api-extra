@@ -18,6 +18,7 @@ env:
   # Many color libraries just need this to be set to any value, but at least
   # one distinguishes color depth, where "3" -> "256-bit color".
   FORCE_COLOR: 3
+  BUILD_EDITABLE_PYTHON: false
 
 jobs:
   lint:
