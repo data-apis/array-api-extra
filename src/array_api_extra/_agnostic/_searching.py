@@ -1,7 +1,7 @@
 """Array-agnostic implementations for searching functions."""
 
 import math
-from typing import Literal, cast
+from typing import Literal
 
 from .._lib import _compat
 from .._lib._typing import Array, ArrayNamespace
@@ -13,10 +13,9 @@ __all__ = ["searchsorted"]
 def _broadcast_batch_shapes(
     x1: Array, x2: Array, /, *, xp: ArrayNamespace
 ) -> tuple[Array, Array]:
-    batch_shape = cast(
-        tuple[int, ...],
-        _manipulation.broadcast_shapes(x1.shape[:-1], x2.shape[:-1]),
-    )
+    # numpydoc ignore=PR01,RT01
+    """Broadcast `x1` and `x2` to their batch-broadcasted shapes."""
+    batch_shape = _manipulation.broadcast_shapes(x1.shape[:-1], x2.shape[:-1])
     x1 = xp.broadcast_to(x1, (*batch_shape, x1.shape[-1]))
     x2 = xp.broadcast_to(x2, (*batch_shape, x2.shape[-1]))
     return x1, x2

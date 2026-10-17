@@ -80,11 +80,8 @@ def searchsorted(
     x2_0d = x2.ndim == 0
     x1_1d = x1.ndim <= 1
 
-    if _compat.is_torch_namespace(xp) and not x1_1d and x1.shape[:-1] != x2.shape[:-1]:
-        x1, x2 = _agnostic._searching._broadcast_batch_shapes(x1, x2, xp=xp)
-        x1, x2 = xp.asarray(x1, copy=True), xp.asarray(x2, copy=True)
-
-    if x1_1d or _compat.is_torch_namespace(xp):
+    # torch.searchsorted does not broadcast batch dimensions
+    if x1_1d or (_compat.is_torch_namespace(xp) and x1.shape[:-1] == x2.shape[:-1]):
         x2 = xp.reshape(x2, ()) if (x2_0d and x1_1d) else x2
         out = xp.searchsorted(x1, x2, side=side)
         return xp.astype(out, xp_default_int, copy=False)
