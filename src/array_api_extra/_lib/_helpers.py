@@ -312,13 +312,7 @@ def capabilities(xp: ArrayNamespace, x: Array | None = None) -> dict[str, int | 
         Capabilities of the namespace.
     """
     out = xp.__array_namespace_info__().capabilities()
-    if _compat.is_jax_namespace(xp):
-        if out["boolean indexing"]:  # pragma: no cover
-            # Backwards compatibility with jax <0.6.0
-            # https://github.com/jax-ml/jax/issues/27418
-            out = out.copy()
-            out["boolean indexing"] = False
-    elif _compat.is_torch_namespace(xp):
+    if _compat.is_torch_namespace(xp):
         # FIXME https://github.com/data-apis/array-api/issues/945
         device = xp.get_default_device() if x is None else _compat.device(x)
         if device.type == "meta":  # type: ignore[union-attr]  # pyright: ignore[reportAttributeAccessIssue]
