@@ -7,7 +7,6 @@ from types import NoneType
 from .._at import at
 from .._lib import _compat, _helpers
 from .._lib._typing import Array, ArrayNamespace
-from . import _inspection
 
 __all__ = [
     "angle",
@@ -291,46 +290,13 @@ def sinc(x: Array, /, *, xp: ArrayNamespace) -> Array:
     return xp.sin(y) / y
 
 
-def angle(z: Array, /, *, deg: bool = False, xp: ArrayNamespace | None = None) -> Array:
-    """
-    Return the angle of the complex argument.
-
-    Parameters
-    ----------
-    z : Array
-        Input array.
-    deg : bool, optional
-        Return angle in degrees if True, radians if False (default).
-    xp : array_namespace, optional
-        The standard-compatible namespace for `z`. Default: infer.
-
-    Returns
-    -------
-    array
-        The counterclockwise angle from the positive real axis on the complex
-        plane in the range ``(-pi, pi]``.
-
-    Notes
-    -----
-    Real input ``x`` is interpreted as ``x + 0j``.
-
-    Examples
-    --------
-    >>> import array_api_strict as xp
-    >>> import array_api_extra as xpx
-    >>> xpx.angle(xp.asarray([1.0, 1.0j, 1 + 1j]), xp=xp)
-    Array([0.        , 1.57079633, 0.78539816], dtype=array_api_strict.float64)
-    >>> xpx.angle(xp.asarray([1.0, 1.0j, 1 + 1j]), deg=True, xp=xp)
-    Array([ 0., 90., 45.], dtype=array_api_strict.float64)
-    """
-    if xp is None:
-        xp = _compat.array_namespace(z)
+def angle(z: Array, /, *, deg: bool = False, xp: ArrayNamespace) -> Array:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._elementwise`."""
     if xp.isdtype(z.dtype, "complex floating"):
         zimag = xp.imag(z)
         zreal = xp.real(z)
     else:
-        if not xp.isdtype(z.dtype, "real floating"):
-            z = xp.astype(z, _inspection.default_dtype(xp, device=_compat.device(z)))
         zimag = xp.zeros_like(z)
         zreal = z
     a = xp.atan2(zimag, zreal)
