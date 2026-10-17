@@ -26,6 +26,10 @@ def angle(z: Array, /, *, deg: bool = False, xp: ArrayNamespace | None = None) -
         The counterclockwise angle from the positive real axis on the complex
         plane in the range ``(-pi, pi]``.
 
+    See Also
+    --------
+    numpy.angle : NumPy equivalent.
+
     Examples
     --------
     >>> import array_api_strict as xp
