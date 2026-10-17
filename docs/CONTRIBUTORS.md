@@ -1,7 +1,7 @@
 # Contributors
 
 This project exists thanks to the following contributors
-([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+([emoji key](https://allcontributors.org/docs/en/reference/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
