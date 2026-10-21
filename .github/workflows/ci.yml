@@ -71,18 +71,18 @@ jobs:
       matrix:
         platform: [linux-x64, linux-arm, macos, windows]
         environment:
-          - tests-py311
+          - tests-py312
           - tests-py314
           - tests-numpy1
           - tests-nogil
           - tests-backends
-          - tests-backends-py311
+          - tests-backends-py312
           - tests-run-deps
         include:
           # Full x64 image is faster than ubuntu-slim for the slowest jobs
-          - {environment: tests-py311, x64_runner: ubuntu-latest}
+          - {environment: tests-py312, x64_runner: ubuntu-latest}
           - {environment: tests-backends, x64_runner: ubuntu-latest}
-          - {environment: tests-backends-py311, x64_runner: ubuntu-latest}
+          - {environment: tests-backends-py312, x64_runner: ubuntu-latest}
           # Non-default pixi task (default: tests-ci)
           - {
               environment: tests-nogil,
