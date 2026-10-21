@@ -18,6 +18,7 @@ env:
   # Many color libraries just need this to be set to any value, but at least
   # one distinguishes color depth, where "3" -> "256-bit color".
   FORCE_COLOR: 3
+  BUILD_EDITABLE_PYTHON: false
 
 jobs:
   lint:
@@ -31,7 +32,7 @@ jobs:
 
       - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
         with:
-          pixi-version: v0.76.2
+          pixi-version: v0.81.0
           cache: true
           environments: lint
 
@@ -48,7 +49,7 @@ jobs:
 
       - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
         with:
-          pixi-version: v0.76.2
+          pixi-version: v0.81.0
           cache: true
           environments: tests
 
@@ -108,7 +109,7 @@ jobs:
 
       - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
         with:
-          pixi-version: v0.76.2
+          pixi-version: v0.81.0
           cache: true
           environments: ${{ matrix.environment }}
 
@@ -120,7 +121,7 @@ jobs:
 
       - name: Upload coverage report
         if: ${{ !matrix.no-coverage }}
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: ${{ matrix.platform }}

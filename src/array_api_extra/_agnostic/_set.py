@@ -32,7 +32,8 @@ def nunique(x: Array, /, *, xp: ArrayNamespace) -> Array:  # numpydoc ignore=PR0
     # 1. backend has unique_counts and it returns an array with known shape
     # 2. backend has unique_counts and it returns a None-sized array;
     #    e.g. Dask, ndonnx
-    # 3. backend does not have unique_counts; e.g. wrapped JAX
+    # 3. backend lacks data-dependent shapes, so unique_counts is unusable;
+    #    e.g. JAX, whose output shape cannot be known under jax.jit
     if _helpers.capabilities(xp, x)["data-dependent shapes"]:
         # xp has unique_counts; O(n) complexity
         _, counts = xp.unique_counts(x)
@@ -41,7 +42,7 @@ def nunique(x: Array, /, *, xp: ArrayNamespace) -> Array:  # numpydoc ignore=PR0
             return xp.sum(xp.ones_like(counts))
         return xp.asarray(n, device=_compat.device(x))
 
-    # xp does not have unique_counts; O(n*logn) complexity
+    # xp lacks data-dependent shapes; O(n*logn) complexity
     x = xp.reshape(x, (-1,))
     x = xp.sort(x, stable=False)
     mask = x != xp.roll(x, -1)

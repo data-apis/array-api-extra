@@ -62,7 +62,7 @@ This project uses [EffVer](https://jacobtomlinson.dev/effver/). TL;DR:
 ## Contributors
 
 This project exists thanks to the following contributors
-([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+([emoji key](https://allcontributors.org/docs/en/reference/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
@@ -116,6 +116,7 @@ This project exists thanks to the following contributors
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ushnah"><img src="https://avatars.githubusercontent.com/u/138783519?v=4?s=100" width="100px;" alt="ushnah"/><br /><sub><b>ushnah</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=ushnah" title="Code">💻</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=ushnah" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nightcityblade"><img src="https://avatars.githubusercontent.com/u/260356847?v=4?s=100" width="100px;" alt="nightcityblade"/><br /><sub><b>nightcityblade</b></sub></a><br /><a href="https://github.com/data-apis/array-api-extra/commits?author=nightcityblade" title="Code">💻</a> <a href="https://github.com/data-apis/array-api-extra/commits?author=nightcityblade" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>

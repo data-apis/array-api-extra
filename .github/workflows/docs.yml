@@ -7,6 +7,9 @@ on:
 
 permissions: {}
 
+env:
+  BUILD_EDITABLE_PYTHON: false
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -26,7 +29,7 @@ jobs:
 
       - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
         with:
-          pixi-version: v0.76.2
+          pixi-version: v0.81.0
           cache: true
           environments: docs
 

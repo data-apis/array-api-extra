@@ -100,26 +100,26 @@ array-api-extra.path = "."
 
 [feature.lint.dependencies]
 typing-extensions = ">=4.16.0"
-pylint = ">=4.0.8"
-mypy = ">=2.3.1"
-basedpyright = ">=1.40.1"
+pylint = ">=4.1.2"
+mypy = ">=2.4.0"
+basedpyright = ">=1.40.2"
 numpydoc = ">=1.11.0"
 # import dependencies for mypy:
 array-api-strict = ">=2.6.1"
 numpy = ">=2.1.3"
-hypothesis = ">=6.165.10"
+hypothesis = ">=6.168.1"
 dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
 dprint = ">=0.50.0"
-lefthook = ">=2.1.12"
-ruff = ">=0.16.7"
-typos = ">=1.50.2"
+lefthook = ">=2.1.17"
+ruff = ">=0.16.10"
+typos = ">=1.51.1"
 actionlint-with-all = ">=1.7.12"
 blacken-docs = ">=1.20.0"
 pytest = ">=9.1.1"
 validate-pyproject = ">=0.25"
-pyrefly = ">=1.3.1"
+pyrefly = ">=1.3.2"
 zizmor = ">=1.30.1"
-tombi = ">=1.5.5"
+tombi = ">=1.7.3"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down mypy and are not portable across target OSs
 
@@ -221,7 +221,7 @@ lint = {
 [feature.tests.dependencies]
 pytest = ">=9.1.1"
 pytest-cov = ">=7.1.0"
-hypothesis = ">=6.165.10"
+hypothesis = ">=6.168.1"
 array-api-strict = ">=2.6.1"
 numpy = ">=1.22.0"
 scipy = ">=1.15.2"
@@ -235,7 +235,7 @@ tests = {
 }
 doctests = {
   description = "Run public API doctests",
-  cmd = "pytest -c ../pyproject.toml --pyargs array_api_extra --doctest-modules --doctest-collect=api --doctest-only-doctests=true",
+  cmd = "pytest -c ../pyproject.toml --pyargs array_api_extra --doctest-modules --doctest-collect=api",
   cwd = "docs",  # to use `docs/conftest.py`
   default-environment = "tests",
 }
@@ -380,11 +380,11 @@ mparray = ">=0.2.2"
 [feature.backends.target.unix.dependencies]
 jax = ">=0.10.2"  # waiting for conda-forge/jaxlib-feedstock#326
 
-[feature.mlx.target.osx-arm64.pypi-dependencies]
-mlx = ">=0.32.2"
-
 [feature.mlx]
 platforms = ["osx-arm64-macos14"]
+
+[feature.mlx.target.osx-arm64.pypi-dependencies]
+mlx = ">=0.32.2"
 
 # Backends that require a GPU host and a CUDA driver.
 [feature.cuda-backends]
