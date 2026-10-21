@@ -239,7 +239,7 @@ class TestCov:
     def test_weights_unknown_length(self, da: ArrayNamespace):
         m_np = np.asarray([[1.0, 2.0, 3.0], [4.0, 6.0, 8.0]])
         weights_np = np.asarray([1.0, 2.0, 3.0])
-        keep_np = np.asarray([True, False, True])
+        keep_np = [True, False, True]
 
         keep = da.asarray(keep_np)
         m = da.asarray(m_np)[:, keep]

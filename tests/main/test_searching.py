@@ -196,7 +196,7 @@ class TestSearchsorted:
             x[mask] = -np.inf
             mask = rng.random(shape) > 0.9
             x[mask] = np.inf
-        x = np.sort(x, axis=-1)  # type:ignore[assignment]
+        x = np.sort(x, axis=-1)
         x, y = np.asarray(x, dtype=np.float64), np.asarray(y, dtype=np.float64)
         xp_default_int = default_dtype(xp, kind="integral")
         if x.size == 0 and x.ndim > 0 and x.shape[-1] != 0:

@@ -11,7 +11,7 @@ import typing
 import warnings
 from collections.abc import Callable, Generator, Iterator, Sequence
 from types import FunctionType, ModuleType
-from typing import Any, ParamSpec, TypeVar
+from typing import Any
 
 from .._lib import _compat, _helpers
 from .._lib._typing import (
@@ -37,9 +37,6 @@ __all__ = [
     "patch_lazy_xp_functions",
 ]
 
-
-P = ParamSpec("P")
-T = TypeVar("T")
 
 _ufuncs_tags: dict[object, dict[str, Any]] = {}
 
@@ -495,7 +492,7 @@ class _CountingDaskScheduler(SchedulerGetCallable):
         return dask.get(dsk, keys, **kwargs)  # type: ignore[attr-defined]  # pyright: ignore[reportPrivateImportUsage]
 
 
-def _dask_wrap(
+def _dask_wrap[**P, T](
     func: Callable[P, T], n: int
 ) -> Callable[P, T]:  # numpydoc ignore=PR01,RT01
     """

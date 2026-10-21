@@ -4,19 +4,17 @@ import functools
 import math
 import typing
 from collections.abc import Callable, Sequence
-from typing import Any, ParamSpec
+from typing import Any
 
 from . import _agnostic
 from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayLike, ArrayNamespace, DType
 
-P = ParamSpec("P")
-
 __all__ = ["lazy_apply"]
 
 
 @typing.overload  # pyrefly: ignore[invalid-param-spec]
-def lazy_apply(  # type: ignore[valid-type]
+def lazy_apply[**P](  # type: ignore[valid-type]
     func: Callable[P, Array | ArrayLike],
     *args: Array | complex | None,
     shape: tuple[int | None, ...] | None = None,
@@ -28,7 +26,7 @@ def lazy_apply(  # type: ignore[valid-type]
 
 
 @typing.overload  # pyrefly: ignore[invalid-param-spec]
-def lazy_apply(  # type: ignore[valid-type]
+def lazy_apply[**P](  # type: ignore[valid-type]
     func: Callable[P, Sequence[Array | ArrayLike]],
     *args: Array | complex | None,
     shape: Sequence[tuple[int | None, ...]],
@@ -39,7 +37,7 @@ def lazy_apply(  # type: ignore[valid-type]
 ) -> tuple[Array, ...]: ...  # numpydoc ignore=GL08
 
 
-def lazy_apply(  # type: ignore[valid-type]  # pyrefly: ignore[invalid-param-spec]  # numpydoc ignore=GL07,SA04
+def lazy_apply[**P](  # type: ignore[valid-type]  # pyrefly: ignore[invalid-param-spec]  # numpydoc ignore=GL07,SA04
     func: Callable[P, Array | ArrayLike | Sequence[Array | ArrayLike]],
     *args: Array | complex | None,
     shape: tuple[int | None, ...] | Sequence[tuple[int | None, ...]] | None = None,

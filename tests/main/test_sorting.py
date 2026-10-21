@@ -1,6 +1,7 @@
+from typing import override
+
 import numpy as np
 import pytest
-from typing_extensions import override
 
 from array_api_extra import argpartition, partition
 from array_api_extra._lib._backends import Backend

@@ -13,10 +13,8 @@ from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from typing import (
     Any,
     ClassVar,
-    Generic,
     Literal,
     ParamSpec,
-    TypeAlias,
     TypeVar,
 )
 
@@ -332,10 +330,10 @@ _BASIC_REST_TYPES = frozenset((
     type, types.BuiltinFunctionType, types.FunctionType, types.ModuleType
 ))  # fmt: skip
 
-FlattenRest: TypeAlias = tuple[object, ...]
+type FlattenRest = tuple[object, ...]
 
 
-def pickle_flatten(
+def pickle_flatten[T](
     obj: object, cls: type[T] | tuple[type[T], ...]
 ) -> tuple[list[T], FlattenRest]:
     """
@@ -480,7 +478,7 @@ def pickle_unflatten(instances: Iterable[object], rest: FlattenRest) -> Any:
     return Unpickler(f).load()
 
 
-class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
+class _AutoJITWrapper[T]:  # numpydoc ignore=PR01
     """
     Helper of :func:`jax_autojit`.
 
@@ -524,7 +522,7 @@ class _AutoJITWrapper(Generic[T]):  # numpydoc ignore=PR01
             cls._registered = True
 
 
-def jax_autojit(
+def jax_autojit[**P, T](
     func: Callable[P, T],
 ) -> Callable[P, T]:  # numpydoc ignore=PR01,RT01,SS03
     """

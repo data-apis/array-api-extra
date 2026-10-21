@@ -1,11 +1,10 @@
 import sys
 from collections.abc import Callable, Iterator
 from types import ModuleType
-from typing import Any, cast, final
+from typing import Any, cast, final, override
 
 import numpy as np
 import pytest
-from typing_extensions import override
 
 from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._compat import (

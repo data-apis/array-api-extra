@@ -1,18 +1,18 @@
 """Static typing helpers."""
 
 from types import EllipsisType, ModuleType
-from typing import Any, Protocol, TypeAlias
+from typing import Any, Protocol, override
 
 import numpy as np
 from dask.typing import Graph, Key, SchedulerGetCallable
 from numpy.typing import ArrayLike
 
 # TODO import from typing (requires Python >=3.12 and >=3.13)
-from typing_extensions import TypeIs, override
+from typing_extensions import TypeIs
 
 # TODO: use array-api-typing once it is available
 
-ArrayNamespace: TypeAlias = ModuleType
+type ArrayNamespace = ModuleType
 
 class Array(Protocol):  # pylint: disable=missing-class-docstring
     # Unary operations
@@ -98,13 +98,11 @@ class DType(Protocol):  # pylint: disable=missing-class-docstring
 class Device(Protocol):  # pylint: disable=missing-class-docstring
     ...
 
-SetIndex: TypeAlias = (
+type SetIndex = (
     int | slice | EllipsisType | Array | tuple[int | slice | EllipsisType | Array, ...]
 )
-GetIndex: TypeAlias = (
-    SetIndex | tuple[int | slice | EllipsisType | Array | None, ...] | None
-)
-NumPyObject: TypeAlias = np.ndarray[Any, Any] | np.generic
+type GetIndex = SetIndex | tuple[int | slice | EllipsisType | Array | None, ...] | None
+type NumPyObject = np.ndarray[Any, Any] | np.generic
 
 __all__ = [
     "Array",
