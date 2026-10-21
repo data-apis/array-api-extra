@@ -238,7 +238,9 @@ class TestIsIn:
     Backend.ARRAY_API_STRICTEST,
     reason="data_dependent_shapes flag for unique_values is disabled",
 )
-@pytest.mark.skip_xp_backend(Backend.MLX, reason="backend does not provide unique_values")
+@pytest.mark.skip_xp_backend(
+    Backend.MLX, reason="backend does not provide unique_values"
+)
 class TestUnion1d:
     def test_simple(self, xp: ArrayNamespace):
         a = xp.asarray([-1, 1, 0])
