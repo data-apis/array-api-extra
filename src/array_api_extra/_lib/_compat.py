@@ -2,9 +2,10 @@
 # Allow packages that vendor both `array-api-extra` and
 # `array-api-compat` to override the import location
 
+from collections.abc import Callable
 from functools import cache
 from types import ModuleType
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, Protocol, cast
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing_extensions import override
@@ -75,19 +76,27 @@ except ImportError:
     )
 
 
-class _MLXNamespaceInfo:
-    def __init__(self, info: object) -> None:
+class _NamespaceInfo(Protocol):  # numpydoc ignore=GL08
+    def default_dtypes(self) -> object: ...  # numpydoc ignore=GL08
+
+
+class _MLXNamespaceInfo:  # numpydoc ignore=GL08
+    _info: _NamespaceInfo
+
+    def __init__(self, info: _NamespaceInfo) -> None:  # numpydoc ignore=GL08
         self._info = info
 
-    def __getattr__(self, name: str) -> object:
+    def __getattr__(self, name: str) -> object:  # numpydoc ignore=GL08
         return getattr(self._info, name)
 
-    def default_dtypes(self, *, device: object = None) -> object:
+    def default_dtypes(
+        self, *, device: object = None
+    ) -> object:  # numpydoc ignore=GL08
         _ = device
-        return self._info.default_dtypes()  # type: ignore[attr-defined]
+        return self._info.default_dtypes()
 
 
-class _MLXNamespace(ModuleType):
+class _MLXNamespace(ModuleType):  # numpydoc ignore=GL08
     _device_functions: ClassVar[set[str]] = {
         "arange",
         "asarray",
@@ -99,19 +108,23 @@ class _MLXNamespace(ModuleType):
         "zeros",
     }
 
-    def __init__(self, namespace: ModuleType) -> None:
+    _namespace: ModuleType
+
+    def __init__(self, namespace: ModuleType) -> None:  # numpydoc ignore=GL08
         super().__init__(namespace.__name__)
         self._namespace = namespace
 
     @override
-    def __getattr__(self, name: str) -> object:
+    def __getattr__(self, name: str) -> object:  # numpydoc ignore=GL08
         if name == "__array_api_version__":
             return "2024.12"
         if name == "bool":
             return self._namespace.bool_
         if name == "__array_namespace_info__":
-            info = getattr(self._namespace, name)
-            return lambda: _MLXNamespaceInfo(info())
+            get_info = cast(
+                Callable[[], _NamespaceInfo], getattr(self._namespace, name)
+            )
+            return lambda: _MLXNamespaceInfo(get_info())
         if name == "signbit":
             return lambda x: x < 0
         function = getattr(self._namespace, name)
@@ -120,7 +133,7 @@ class _MLXNamespace(ModuleType):
         ):
             return function
 
-        def compatible_call(
+        def compatible_call(  # numpydoc ignore=GL08
             *args: object,
             device: object = None,
             copy: bool | None = None,
@@ -140,16 +153,17 @@ class _MLXNamespace(ModuleType):
                 _ = copy
                 return function(*args, **kwargs)
             if name in {"argsort", "sort"}:
-                kwargs.pop("stable", None)
+                _ = kwargs.pop("stable", None)
             if name == "result_type":
                 import mlx.core as mx
 
-                args = tuple(
-                    mx.asarray(value)
-                    if isinstance(value, int | float | complex | bool)
-                    else value
-                    for value in args
-                )
+                converted_args: list[object] = []
+                for value in args:
+                    if isinstance(value, int | float | complex | bool):
+                        converted_args.append(cast(object, mx.asarray(value)))
+                    else:
+                        converted_args.append(value)
+                args = tuple(converted_args)
             if device is None:
                 return function(*args, **kwargs)
             import mlx.core as mx
@@ -161,20 +175,23 @@ class _MLXNamespace(ModuleType):
 
 
 @cache
-def _wrap_mlx_namespace(namespace: ModuleType) -> ModuleType:
+def _wrap_mlx_namespace(namespace: ModuleType) -> ModuleType:  # numpydoc ignore=GL08
     return _MLXNamespace(namespace)
 
 
-def array_namespace(
+def array_namespace(  # numpydoc ignore=GL08
     *xs: object, api_version: str | None = None, use_compat: bool | None = None
 ) -> ModuleType:
-    namespace = _array_namespace(*xs, api_version=api_version, use_compat=use_compat)
+    namespace = cast(
+        ModuleType,
+        _array_namespace(*xs, api_version=api_version, use_compat=use_compat),
+    )
     if namespace.__name__ == "mlx.core":
         return _wrap_mlx_namespace(namespace)
     return namespace
 
 
-def device(x: object, /) -> object:
+def device(x: object, /) -> object:  # numpydoc ignore=GL08
     if type(x).__module__.startswith("mlx."):
         import mlx.core as mx
 
@@ -182,7 +199,9 @@ def device(x: object, /) -> object:
     return _device(x)
 
 
-def to_device(x: object, device: object, /, *, stream: object = None) -> object:
+def to_device(  # numpydoc ignore=GL08
+    x: object, device: object, /, *, stream: object = None
+) -> object:
     if type(x).__module__.startswith("mlx."):
         import mlx.core as mx
 
