@@ -31,6 +31,7 @@ lazy_xp_function(in1d, jax_jit=False)
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no unique_inverse")
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="no unique_inverse")
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="no unique_values or unique_inverse")
 class TestIn1D:
     # cover both code paths
     @pytest.mark.parametrize(
@@ -96,8 +97,15 @@ class TestAsArrays:
         ],
     )
     def test_array_vs_scalar(
-        self, dtype: str, b: complex, defined: bool, xp: ArrayNamespace
+        self,
+        dtype: str,
+        b: complex,
+        defined: bool,
+        xp: ArrayNamespace,
+        library: Backend,
     ):
+        if library is Backend.MLX and dtype == "complex128":
+            pytest.skip("MLX does not support complex128")
         a = xp.asarray(1, dtype=getattr(xp, dtype))
 
         xa, xb = asarrays(a, b, xp)
@@ -134,11 +142,15 @@ class TestAsArrays:
 
     @pytest.mark.parametrize("a_type", ALL_TYPES)
     @pytest.mark.parametrize("b_type", ALL_TYPES)
-    def test_array_vs_array(self, a_type: str, b_type: str, xp: ArrayNamespace):
+    def test_array_vs_array(
+        self, a_type: str, b_type: str, xp: ArrayNamespace, library: Backend
+    ):
         """
         Test that when both inputs of asarray are already Array API objects,
         they are returned unchanged.
         """
+        if library is Backend.MLX and "complex128" in (a_type, b_type):
+            pytest.skip("MLX does not support complex128")
         a = xp.asarray(1, dtype=getattr(xp, a_type))
         b = xp.asarray(1, dtype=getattr(xp, b_type))
         xa, xb = asarrays(a, b, xp)
@@ -166,6 +178,7 @@ def test_ndindex(shape: tuple[int, ...]):
 
 @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="boolean indexing")
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="boolean indexing is unsupported")
 def test_eager_shape(xp: ArrayNamespace, library: Backend):
     a = xp.asarray([1, 2, 3])
     # Lazy arrays, like Dask, have an eager shape until you slice them with

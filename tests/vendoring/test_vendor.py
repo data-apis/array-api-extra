@@ -79,8 +79,6 @@ def test_vendor_extra_testing():
 
 def test_vendor_extra_uses_vendor_compat():
     from ._array_api_compat_vendor import array_namespace as n1
-    from .array_api_extra._lib._compat import (  # type: ignore[import-not-found]
-        array_namespace as n2,
-    )
+    from .array_api_extra._lib import _compat  # type: ignore[import-not-found]
 
-    assert n1 is n2
+    assert n1 is _compat.array_namespace.__globals__["_array_namespace"]

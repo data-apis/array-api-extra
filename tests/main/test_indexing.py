@@ -16,6 +16,9 @@ lazy_xp_function(triu_indices)
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no arange", strict=False)
 class TestDiagIndices:
+    @pytest.mark.skip_xp_backend(
+        Backend.MLX, reason="backend uses int32 for generated indices"
+    )
     def test_basic(self, xp: ArrayNamespace):
         rows, cols = diag_indices(5, xp=xp)
         ref_rows, ref_cols = np.diag_indices(5)
@@ -24,6 +27,9 @@ class TestDiagIndices:
 
     @pytest.mark.parametrize("n", [2, 4, 7])
     @pytest.mark.parametrize("ndim", [1, 2, 3, 4])
+    @pytest.mark.skip_xp_backend(
+        Backend.MLX, reason="backend uses int32 for generated indices"
+    )
     def test_ndim(self, xp: ArrayNamespace, n: int, ndim: int):
         idx = diag_indices(n, ndim=ndim, xp=xp)
         assert len(idx) == ndim
@@ -58,6 +64,7 @@ class TestDiagIndices:
     reason="generic path uses nonzero (data-dependent)",
     strict=False,
 )
+@pytest.mark.skip_xp_backend(Backend.MLX, reason="backend does not provide nonzero")
 @pytest.mark.parametrize(
     ("xpx_fn", "np_fn"),
     [(tril_indices, np.tril_indices), (triu_indices, np.triu_indices)],

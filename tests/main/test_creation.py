@@ -49,6 +49,9 @@ class TestOneHot:
     @pytest.mark.skip_xp_backend(
         Backend.ARRAY_API_STRICTEST, reason="backend doesn't support Boolean indexing"
     )
+    @pytest.mark.skip_xp_backend(
+        Backend.MLX, reason="backend doesn't support Boolean indexing"
+    )
     def test_abstract_size(self, xp: ArrayNamespace):
         x = xp.arange(5)
         x = x[x > 2]

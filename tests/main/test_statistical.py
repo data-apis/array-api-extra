@@ -24,6 +24,7 @@ class TestCov:
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
 
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="backend has no complex128 dtype")
     def test_complex(self, xp: ArrayNamespace):
         actual = cov(xp.asarray([[1, 2, 3], [1j, 2j, 3j]], dtype=xp.complex128))
         expect = xp.asarray([[1.0, -1.0j], [1.0j, 1.0]], dtype=xp.complex128)
@@ -93,6 +94,7 @@ class TestCov:
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
 
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="batched matmul is unsupported")
     def test_batch(self, xp: ArrayNamespace):
         rng = np.random.default_rng(8847643423)
         batch_shape = (3, 4)
@@ -117,6 +119,7 @@ class TestCov:
         )
 
     @pytest.mark.parametrize("bias", [True, False, 0, 1])
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="batched matmul is unsupported")
     def test_bias_batch(self, xp: ArrayNamespace, bias: bool):
         rng = np.random.default_rng(8847643423)
         batch_shape = (3, 4)
@@ -186,6 +189,7 @@ class TestCov:
             )
             assert_close(res, xp.asarray(ref))
 
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="batched matmul is unsupported")
     def test_batch_with_weights(self, xp: ArrayNamespace):
         rng = np.random.default_rng(20260417)
         batch_shape = (2, 3)

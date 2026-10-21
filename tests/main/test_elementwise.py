@@ -399,6 +399,9 @@ class TestIsClose:
 
     @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
+    @pytest.mark.skip_xp_backend(
+        Backend.MLX, reason="backend doesn't support Boolean indexing"
+    )
     def test_none_shape(self, xp: ArrayNamespace):
         a = xp.asarray([1, 5, 0])
         b = xp.asarray([1, 4, 2])
@@ -408,6 +411,9 @@ class TestIsClose:
 
     @pytest.mark.skip_xp_backend(Backend.SPARSE, reason="index by sparse array")
     @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="unknown shape")
+    @pytest.mark.skip_xp_backend(
+        Backend.MLX, reason="backend doesn't support Boolean indexing"
+    )
     def test_none_shape_bool(self, xp: ArrayNamespace):
         a = xp.asarray([True, True, False])
         b = xp.asarray([True, False, True])
@@ -605,6 +611,9 @@ class TestSinc:
         with pytest.raises(ValueError, match="real floating data type"):
             _ = sinc(xp.asarray(x))
 
+    @pytest.mark.skip_xp_backend(
+        Backend.MLX, reason="float32 precision is insufficient for this assertion"
+    )
     def test_3d(self, xp: ArrayNamespace):
         x = np.arange(18, dtype=np.float64).reshape((3, 3, 2))
         expected = np.zeros_like(x)
@@ -628,6 +637,7 @@ class TestAngle:
         expected = xp.asarray([0.0, 0.0], dtype=res.dtype)
         assert_equal(res, expected)
 
+    @pytest.mark.skip_xp_backend(Backend.MLX, reason="backend has no complex128 dtype")
     def test_basic(self, xp: ArrayNamespace):
         x = xp.asarray(
             [

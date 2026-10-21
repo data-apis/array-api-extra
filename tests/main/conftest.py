@@ -148,6 +148,14 @@ def xp(
         _setup_jax(library)
     elif library.like(Backend.TORCH):
         _setup_torch(library)
+    elif library is Backend.MLX:
+        _setup_mlx()
+
+        import mlx.core as mx
+
+        with mx.stream(mx.cpu), patch_lazy_xp_functions(request, xp=xp):
+            yield xp
+        return
 
     # On Dask and JAX, monkey-patch all functions tagged by `lazy_xp_function`
     # in the global scope of the module containing the test function.
@@ -187,6 +195,12 @@ def _setup_torch(library: Backend) -> None:
     else:
         assert library == Backend.TORCH
         torch.set_default_device("cpu")
+
+
+def _setup_mlx() -> None:
+    import mlx.core as mx
+
+    mx.set_default_device(mx.cpu)
 
 
 # Can select the test with `pytest -k dask`
@@ -244,6 +258,6 @@ def device(
 @pytest.fixture
 def infinity(library: Backend) -> float:
     """Retrieve the positive infinity value for the given backend."""
-    if library in (Backend.TORCH, Backend.TORCH_GPU):
+    if library in (Backend.MLX, Backend.TORCH, Backend.TORCH_GPU):
         return 3.4028235e38
     return 1.7976931348623157e308

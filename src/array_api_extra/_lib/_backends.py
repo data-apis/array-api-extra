@@ -30,6 +30,7 @@ class Backend(Enum):  # numpydoc ignore=PR02
     NUMPY_READONLY = "numpy:readonly"
     MPARRAY = "mparray"
     CUPY = "cupy"
+    MLX = "mlx.core"
     TORCH = "torch"
     TORCH_GPU = "torch:gpu"
     DASK = "dask.array"

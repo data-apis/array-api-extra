@@ -1,6 +1,7 @@
 import pytest
 
 from array_api_extra import default_dtype
+from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._typing import ArrayNamespace, Device
 from array_api_extra.testing import lazy_xp_function
 
@@ -11,6 +12,10 @@ class TestDefaultDType:
     def test_basic(self, xp: ArrayNamespace):
         assert default_dtype(xp) == xp.empty(0).dtype
 
+    @pytest.mark.skip_xp_backend(
+        Backend.MLX,
+        reason="backend's default indexing dtype is int32",
+    )
     def test_kind(self, xp: ArrayNamespace):
         assert default_dtype(xp, "real floating") == xp.empty(0).dtype
         assert default_dtype(xp, "complex floating") == (xp.empty(0) * 1j).dtype
