@@ -19,10 +19,10 @@ try:
     from ..._array_api_compat_vendor import (
         array_namespace as _array_namespace,
     )
-    from ...._array_api_compat_vendor import (
+    from ..._array_api_compat_vendor import (
         device as _device,
     )
-    from ...._array_api_compat_vendor import (
+    from ..._array_api_compat_vendor import (
         is_array_api_obj,
         is_array_api_strict_namespace,
         is_cupy_array,
@@ -41,7 +41,7 @@ try:
         is_writeable_array,
         size,
     )
-    from ...._array_api_compat_vendor import (
+    from ..._array_api_compat_vendor import (
         to_device as _to_device,
     )
 except ImportError:
