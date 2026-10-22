@@ -4,7 +4,15 @@ from . import _agnostic
 from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayNamespace
 
-__all__ = ["angle", "deg2rad", "isclose", "nan_to_num", "rad2deg", "sinc"]
+__all__ = [
+    "angle",
+    "deg2rad",
+    "isclose",
+    "nan_to_num",
+    "one_minus_square",
+    "rad2deg",
+    "sinc",
+]
 
 
 def angle(z: Array, /, *, deg: bool = False, xp: ArrayNamespace | None = None) -> Array:
@@ -338,6 +346,63 @@ def nan_to_num(
         return xp.nan_to_num(y, nan=fill_value)
 
     return _agnostic._elementwise.nan_to_num(y, fill_value=fill_value, xp=xp)
+
+
+def one_minus_square(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
+    r"""
+    Compute :math:`1 - x^2` element-wise.
+
+    The result is evaluated as :math:`(1 + x)(1 - x)`, which avoids the
+    catastrophic cancellation of the naive formula when :math:`|x|` is close to
+    1.
+
+    Parameters
+    ----------
+    x : array
+        Input array. Must have a numeric dtype.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
+
+    Returns
+    -------
+    array
+        ``1 - x**2`` calculated element-wise, with the same shape and dtype as `x`.
+
+    See Also
+    --------
+    jax.lax.one_minus_square : JAX equivalent, which additionally defines its
+        derivative as :math:`-2x` for accurate gradients near zero.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> xpx.one_minus_square(xp.asarray([0.0, 0.5, 1.0, 2.0]), xp=xp)
+    Array([ 1.  ,  0.75,  0.  , -3.  ], dtype=array_api_strict.float64)
+
+    Near 1, the result keeps full relative precision:
+
+    >>> x = xp.asarray(1 - 2.0**-30)
+    >>> float(xpx.one_minus_square(x, xp=xp)) == 2.0**-29 - 2.0**-60
+    True
+    >>> float(1 - x**2) == 2.0**-29 - 2.0**-60
+    False
+    """
+    if xp is None:
+        xp = _compat.array_namespace(x)
+
+    if not xp.isdtype(x.dtype, "numeric"):
+        msg = "`x` must have a numeric dtype."
+        raise TypeError(msg)
+
+    if _compat.is_jax_namespace(xp):
+        import jax
+
+        # Added in JAX 0.11.2.
+        if hasattr(jax.lax, "one_minus_square"):
+            return jax.lax.one_minus_square(x)
+
+    return _agnostic._elementwise.one_minus_square(x)
 
 
 def sinc(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
