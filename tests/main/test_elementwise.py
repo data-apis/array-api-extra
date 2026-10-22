@@ -15,6 +15,7 @@ from array_api_extra import (
     deg2rad,
     isclose,
     nan_to_num,
+    one_minus_square,
     rad2deg,
     sinc,
 )
@@ -28,6 +29,7 @@ lazy_xp_function(apply_where)
 lazy_xp_function(deg2rad)
 lazy_xp_function(isclose)
 lazy_xp_function(nan_to_num)
+lazy_xp_function(one_minus_square)
 lazy_xp_function(rad2deg)
 lazy_xp_function(sinc)
 
@@ -695,6 +697,45 @@ class TestAngle:
     def test_device(self, xp: ArrayNamespace, device: Device):
         a = xp.asarray([1 + 1j], device=device)
         assert get_device(angle(a)) == device
+
+
+class TestOneMinusSquare:
+    def test_basic(self, xp: ArrayNamespace):
+        x = xp.asarray([-2.0, -1.0, 0.0, 0.5, 1.0, 3.0])
+        expected = xp.asarray([-3.0, 0.0, 1.0, 0.75, 0.0, -8.0])
+        assert_equal(one_minus_square(x), expected)
+
+    def test_near_one(self, xp: ArrayNamespace):
+        x = xp.asarray([1 - 2.0**-30, -(1 - 2.0**-30)], dtype=xp.float64)
+        expected = xp.asarray([2.0**-29 - 2.0**-60] * 2, dtype=xp.float64)
+        assert_equal(one_minus_square(x), expected)
+
+    @pytest.mark.parametrize("dtype_name", ["float32", "float64"])
+    def test_dtype(self, xp: ArrayNamespace, dtype_name: str):
+        dtype = getattr(xp, dtype_name)
+        x = xp.asarray([0.5], dtype=dtype)
+        actual = one_minus_square(x, xp=xp)
+        assert actual.dtype == dtype
+        assert_equal(actual, xp.asarray([0.75], dtype=dtype))
+
+    def test_integral(self, xp: ArrayNamespace):
+        x = xp.asarray([0, 1, 2, -3], dtype=xp.int32)
+        actual = one_minus_square(x, xp=xp)
+        assert_equal(actual, xp.asarray([1, 0, -3, -8], dtype=xp.int32))
+
+    def test_complex(self, xp: ArrayNamespace):
+        x = xp.asarray([0.5 + 1j], dtype=xp.complex128)
+        actual = one_minus_square(x, xp=xp)
+        assert_close(actual, xp.asarray([1.75 - 1j], dtype=xp.complex128))
+
+    def test_bool(self, xp: ArrayNamespace):
+        x = xp.asarray([True])
+        with pytest.raises(TypeError, match="numeric dtype"):
+            _ = one_minus_square(x, xp=xp)
+
+    def test_device(self, xp: ArrayNamespace, device: Device):
+        x = xp.asarray([0.5], device=device)
+        assert get_device(one_minus_square(x)) == device
 
 
 class TestDeg2Rad:
