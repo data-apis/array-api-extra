@@ -157,7 +157,7 @@ testpaths = ["tests"]
 xfail_strict = true
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 extend-select = [
