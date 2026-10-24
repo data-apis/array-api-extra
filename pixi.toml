@@ -16,7 +16,9 @@ requires-pixi = ">=0.82.1"  # security update
 exclude-newer = "7d"
 
 [exclude-newer]
-mparray = "5d"
+certifi = "0d"
+ca-certificates = "0d"
+brotli-python = "2d"
 
 ### array-api-extra package definition ###
 
@@ -397,3 +399,7 @@ dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
 # sparse = ">=0.19.1"  # flaky, see data-apis/array-api-extra#900
 # pytorch = "*"  # Not available on Python 3.14t yet
 # jax = "*"  # waiting for conda-forge/jaxlib-feedstock#351
+
+[tool.pixi-audit]
+# TODO: remove these ignores — they were added to let admit autofixes
+ignore = [{ package = "python" }, { package = "pytorch" }]
