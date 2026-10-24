@@ -16,7 +16,9 @@ requires-pixi = ">=0.82.1"  # security update
 exclude-newer = "7d"
 
 [exclude-newer]
-mparray = "5d"
+certifi = "0d"
+ca-certificates = "0d"
+brotli-python = "2d"
 
 ### array-api-extra package definition ###
 
