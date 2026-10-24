@@ -88,14 +88,6 @@ assume_unique = pytest.mark.parametrize(
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="no unique_values")
 class TestSetDiff1D:
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="NaN-shaped arrays")
-    @pytest.mark.xfail_xp_backend(
-        Backend.TORCH,
-        reason="index_select not implemented for uint32",
-        strict=False,
-    )
-    @pytest.mark.xfail_xp_backend(
-        Backend.TORCH_GPU, reason="index_select not implemented for uint32"
-    )
     def test_setdiff1d(self, xp: ArrayNamespace):
         x1 = xp.asarray([6, 5, 4, 7, 1, 2, 7, 4])
         x2 = xp.asarray([2, 4, 3, 3, 2, 1, 5])
