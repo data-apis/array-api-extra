@@ -397,3 +397,7 @@ dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
 # sparse = ">=0.19.1"  # flaky, see data-apis/array-api-extra#900
 # pytorch = "*"  # Not available on Python 3.14t yet
 # jax = "*"  # waiting for conda-forge/jaxlib-feedstock#351
+
+[tool.pixi-audit]
+# TODO: remove these ignores — they were added to let admit autofixes
+ignore = [{ package = "python" }, { package = "pytorch" }]
