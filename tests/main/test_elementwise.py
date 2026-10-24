@@ -18,7 +18,7 @@ from array_api_extra import (
     rad2deg,
     sinc,
 )
-from array_api_extra._lib._backends import NUMPY_VERSION, Backend
+from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._compat import device as get_device
 from array_api_extra._lib._typing import Array, ArrayNamespace, Device
 from array_api_extra.testing import assert_close, assert_equal, lazy_xp_function
@@ -206,7 +206,7 @@ class TestApplyWhere:
     ):
         if (
             library.like(Backend.NUMPY)
-            and NUMPY_VERSION < (2, 0)
+            and np.lib.NumpyVersion(np.__version__) < "2.0.0"
             and dtype.type is np.float32
         ):
             pytest.xfail(reason="NumPy 1.x dtype promotion for scalars")
