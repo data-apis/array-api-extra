@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from typing import Generic, TypeVar, cast
+from typing import cast
 
 import numpy as np
 import pytest
@@ -22,8 +22,6 @@ from array_api_extra._lib._typing import Array, ArrayNamespace, Device, DType, o
 from array_api_extra.testing import assert_equal, lazy_xp_function
 
 from .conftest import np_compat
-
-T = TypeVar("T")
 
 # FIXME calls xp.unique_values without size
 lazy_xp_function(in1d, jax_jit=False)
@@ -227,7 +225,7 @@ class TestCapabilities:
             assert actual == expect
 
 
-class Wrapper(Generic[T]):  # noqa: PLW1641
+class Wrapper[T]:  # noqa: PLW1641
     """Trivial opaque wrapper. Must be pickleable."""
 
     x: T

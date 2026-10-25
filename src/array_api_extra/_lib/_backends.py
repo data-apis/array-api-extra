@@ -8,9 +8,7 @@ from typing import Any
 import numpy as np
 import pytest
 
-__all__ = ["NUMPY_VERSION", "Backend"]
-
-NUMPY_VERSION = tuple(int(v) for v in np.__version__.split(".")[:3])
+__all__ = ["Backend"]
 
 
 class Backend(Enum):  # numpydoc ignore=PR02
@@ -63,8 +61,8 @@ class Backend(Enum):  # numpydoc ignore=PR02
         if self.like(Backend.ARRAY_API_STRICT):
             marks.append(
                 pytest.mark.skipif(
-                    NUMPY_VERSION < (1, 26),
-                    reason="array_api_strict is untested on NumPy <1.26",
+                    np.lib.NumpyVersion(np.__version__) < "2.0.0",
+                    reason="array_api_strict is untested on NumPy <2.0",
                 )
             )
         if self.like(Backend.DASK, Backend.JAX):

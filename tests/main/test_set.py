@@ -1,7 +1,7 @@
 import pytest
 
 from array_api_extra import _agnostic, isin, nunique, setdiff1d, union1d
-from array_api_extra._lib._backends import NUMPY_VERSION, Backend
+from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._compat import device as get_device
 from array_api_extra._lib._typing import Array, ArrayNamespace, Device
 from array_api_extra.testing import assert_equal, lazy_xp_function
@@ -52,10 +52,7 @@ class TestNUnique:
         assert_equal(nunique(a), xp.asarray(1))
 
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="No equal_nan kwarg in unique")
-    def test_nan(self, xp: ArrayNamespace, library: Backend):
-        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
-            pytest.xfail("NumPy <1.24 has no equal_nan kwarg in unique")
-
+    def test_nan(self, xp: ArrayNamespace):
         # Each NaN is counted separately
         a = xp.asarray([xp.nan, 123.0, xp.nan])
         assert_equal(nunique(a), xp.asarray(3))
@@ -88,14 +85,6 @@ assume_unique = pytest.mark.parametrize(
 @pytest.mark.skip_xp_backend(Backend.ARRAY_API_STRICTEST, reason="no unique_values")
 class TestSetDiff1D:
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="NaN-shaped arrays")
-    @pytest.mark.xfail_xp_backend(
-        Backend.TORCH,
-        reason="index_select not implemented for uint32",
-        strict=False,
-    )
-    @pytest.mark.xfail_xp_backend(
-        Backend.TORCH_GPU, reason="index_select not implemented for uint32"
-    )
     def test_setdiff1d(self, xp: ArrayNamespace):
         x1 = xp.asarray([6, 5, 4, 7, 1, 2, 7, 4])
         x2 = xp.asarray([2, 4, 3, 3, 2, 1, 5])
@@ -180,10 +169,7 @@ class TestSetDiff1D:
 
 @pytest.mark.xfail_xp_backend(Backend.SPARSE, reason="no unique_inverse")
 class TestIsIn:
-    def test_simple(self, xp: ArrayNamespace, library: Backend):
-        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
-            pytest.xfail("NumPy <1.24 has no kind kwarg in isin")
-
+    def test_simple(self, xp: ArrayNamespace):
         b = xp.asarray([1, 2, 3, 4])
 
         # `a` with 1 dimension
@@ -198,20 +184,12 @@ class TestIsIn:
         res = isin(a, b)
         assert_equal(res, expected)
 
-    def test_device(self, xp: ArrayNamespace, device: Device, library: Backend):
-        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
-            pytest.xfail("NumPy <1.24 has no kind kwarg in isin")
-
+    def test_device(self, xp: ArrayNamespace, device: Device):
         a = xp.asarray([1, 3, 6], device=device)
         b = xp.asarray([1, 2, 3], device=device)
         assert get_device(isin(a, b)) == device
 
-    def test_assume_unique_and_invert(
-        self, xp: ArrayNamespace, device: Device, library: Backend
-    ):
-        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
-            pytest.xfail("NumPy <1.24 has no kind kwarg in isin")
-
+    def test_assume_unique_and_invert(self, xp: ArrayNamespace, device: Device):
         a = xp.asarray([0, 3, 6, 10], device=device)
         b = xp.asarray([1, 2, 3, 10], device=device)
         expected = xp.asarray([True, False, True, False], device=device)
@@ -219,10 +197,7 @@ class TestIsIn:
         assert get_device(res) == device
         assert_equal(res, expected)
 
-    def test_kind(self, xp: ArrayNamespace, library: Backend):
-        if library.like(Backend.NUMPY) and NUMPY_VERSION < (1, 24):
-            pytest.xfail("NumPy <1.24 has no kind kwarg in isin")
-
+    def test_kind(self, xp: ArrayNamespace):
         a = xp.asarray([0, 3, 6, 10])
         b = xp.asarray([1, 2, 3, 10])
         expected = xp.asarray([False, True, False, True])
