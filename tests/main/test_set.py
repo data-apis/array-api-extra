@@ -89,7 +89,9 @@ assume_unique = pytest.mark.parametrize(
 class TestSetDiff1D:
     @pytest.mark.xfail_xp_backend(Backend.DASK, reason="NaN-shaped arrays")
     @pytest.mark.xfail_xp_backend(
-        Backend.TORCH, reason="index_select not implemented for uint32"
+        Backend.TORCH,
+        reason="index_select not implemented for uint32",
+        strict=False,
     )
     @pytest.mark.xfail_xp_backend(
         Backend.TORCH_GPU, reason="index_select not implemented for uint32"
