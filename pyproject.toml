@@ -145,7 +145,10 @@ errors = { unannotated-return = false }
 
 [tool.pytest.ini_options]
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  "ignore:assertions not in test modules or plugins:pytest.PytestConfigWarning",
+]
 log_cli_level = "INFO"
 markers = [
   "skip_xp_backend(library, /, *, reason=None): Skip test for a specific backend",
