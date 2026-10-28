@@ -50,6 +50,30 @@ class _Deprecated(enum.Enum):
 DEPRECATED = _Deprecated.DEPRECATED
 
 
+def _assert(val: object, msg: str | Callable[[], str] = "") -> None:
+    """Assert that works in release mode.
+
+    Parameters
+    ----------
+    val : object
+        Condition to assert.
+    msg : str | callable, optional
+        Associated message. Can either be string or a callable without
+        arguments that returns a sting to defer evaluation until failure.
+
+    Notes
+    -----
+    The Python built-in ``assert`` does not work when executing code in
+    optimized mode (the ``-O`` flag) - no byte-code is generated for it.
+    For documentation on usage, refer to the Python documentation.
+
+    Adapted from https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_.html
+    """
+    __tracebackhide__ = True  # Hide traceback for py.test
+    if not val:
+        raise AssertionError(msg() if callable(msg) else msg)
+
+
 def _clone_function(  # numpydoc ignore=PR01,RT01
     f: Callable[..., Any],
 ) -> Callable[..., Any]:
@@ -355,7 +379,7 @@ def patch_lazy_xp_functions(
         Variant of monkeypatch.setattr, which allows monkey-patching only selected
         parameters of a test so that pytest-run-parallel can run on the remainder.
         """
-        assert hasattr(target, name)
+        _assert(hasattr(target, name))
         # Need inspect.getattr_static because the attr could be a staticmethod or other
         # descriptor and we don't want that to be stripped away.
         original = inspect.getattr_static(target, name)
@@ -487,7 +511,7 @@ class _CountingDaskScheduler(SchedulerGetCallable):
         self.count += 1
         # This should yield a nice traceback to the
         # offending line in the user's code
-        assert self.count <= self.max_count, self.msg
+        _assert(self.count <= self.max_count, self.msg)
 
         return dask.get(dsk, keys, **kwargs)  # type: ignore[attr-defined]  # pyright: ignore[reportPrivateImportUsage]
 
@@ -588,7 +612,7 @@ def _check_ns_shape_dtype_device(
             f"Actual array's namespace: {actual_xp.__name__}\n"
             f"Expected namespace: {xp.__name__}."
         )
-        assert actual_xp == xp, _msg
+        _assert(actual_xp == xp, _msg)
         desired_xp = xp
     else:
         desired_xp = _compat.array_namespace(desired)
@@ -597,7 +621,7 @@ def _check_ns_shape_dtype_device(
             f"Actual: {actual_xp.__name__}\n"
             f"Desired: {desired_xp.__name__}."
         )
-        assert actual_xp == desired_xp, _msg
+        _assert(actual_xp == desired_xp, _msg)
 
     if _compat.is_numpy_namespace(actual_xp) and check_scalar:
         # only NumPy distinguishes between scalars and arrays; we do if check_scalar.
@@ -605,13 +629,13 @@ def _check_ns_shape_dtype_device(
             "array-ness does not match:\n Actual: "
             f"{type(actual)}\n Desired: {type(desired)}"
         )
-        assert np.isscalar(actual) == np.isscalar(desired), _msg
+        _assert(np.isscalar(actual) == np.isscalar(desired), _msg)
 
     # Dask uses nan instead of None for unknown shapes
+    _assert(None not in actual.shape)  # Requires explicit support
+    _assert(None not in desired.shape)
     actual_shape = typing.cast(tuple[float, ...], actual.shape)
     desired_shape = typing.cast(tuple[float, ...], desired.shape)
-    assert None not in actual_shape  # Requires explicit support
-    assert None not in desired_shape
 
     if _compat.is_dask_namespace(desired_xp):
         if any(math.isnan(i) for i in actual_shape):
@@ -623,7 +647,7 @@ def _check_ns_shape_dtype_device(
 
     if check_shape:
         msg = f"shapes do not match: {actual_shape} != {desired_shape}"
-        assert actual_shape == desired_shape, msg
+        _assert(actual_shape == desired_shape, msg)
     elif desired.ndim > 0:
         # Ignore shape, but check flattened size. This is normally done by
         # np.testing.assert_array_equal etc even when strict=False, but not for
@@ -632,18 +656,18 @@ def _check_ns_shape_dtype_device(
         actual_size = math.prod(actual_shape)
         desired_size = math.prod(desired_shape)
         msg = f"sizes do not match: {actual_size} != {desired_size}"
-        assert actual_size == desired_size, msg
+        _assert(actual_size == desired_size, msg)
 
     desired = desired_xp.asarray(desired)
     if check_dtype:
         msg = f"dtypes do not match: {actual.dtype} != {desired.dtype}"
-        assert actual.dtype == desired.dtype, msg
+        _assert(actual.dtype == desired.dtype, msg)
     if check_device:
         msg = (
             f"Devices do not match.\nActual: {_compat.device(actual)}\n"
             f"Desired: {_compat.device(desired)}"
         )
-        assert _compat.device(actual) == _compat.device(desired), msg
+        _assert(_compat.device(actual) == _compat.device(desired), msg)
     desired = desired_xp.broadcast_to(desired, actual_shape)
     return actual, desired, desired_xp, np
 
