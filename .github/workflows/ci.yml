@@ -78,6 +78,7 @@ jobs:
           - tests-backends
           - tests-backends-py312
           - tests-run-deps
+          - tests-asserts-removed
         include:
           # Full x64 image is faster than ubuntu-slim for the slowest jobs
           - {environment: tests-py312, x64_runner: ubuntu-latest}
@@ -122,28 +123,3 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: ${{ matrix.platform }}
-
-  linux-x64-pythonoptimize:
-    name: Linux x64 PYTHONOPTIMIZE=1
-    runs-on: ubuntu-latest
-
-    environment:
-      name: ci-checks
-      deployment: false
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
-        with:
-          pixi-version: v0.82.1
-          cache: true
-          environments: tests-backends
-
-      - name: Test with assertions removed
-        run: pixi run -e tests-backends tests
-        env:
-          PYTHONOPTIMIZE: "1"
