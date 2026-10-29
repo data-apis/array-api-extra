@@ -9,7 +9,7 @@ from ._elementwise import angle, deg2rad, isclose, nan_to_num, rad2deg, sinc
 from ._indexing import diag_indices, tril_indices, triu_indices, unravel_index
 from ._lazy import lazy_apply
 from ._linalg import kron
-from ._manipulation import atleast_nd, broadcast_shapes, expand_dims, pad
+from ._manipulation import atleast_nd, broadcast_shapes, expand_dims, pad, replace
 from ._searching import searchsorted
 from ._set import isin, nunique, setdiff1d, union1d
 from ._sorting import argpartition, partition
@@ -45,6 +45,7 @@ __all__ = [
     "pad",
     "partition",
     "rad2deg",
+    "replace",
     "searchsorted",
     "setdiff1d",
     "sinc",
