@@ -7,7 +7,7 @@ from . import _agnostic
 from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayNamespace
 
-__all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad"]
+__all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad", "replace"]
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ArrayNamespace | None = None) -> Array:
@@ -283,51 +283,71 @@ def pad(
         x, pad_width, constant_values=constant_values, xp=xp
     )
 
+
 def replace(
-    x: array,
-    old: Union[bool, int, float, complex],
-    new: Union[bool, int, float, complex],
+    x: Array,
+    old: complex,
+    new: complex,
     /,
-) -> array:
+    *,
+    xp: ArrayNamespace | None = None,
+) -> Array:
     """
-    Replaces each element of an input array ``x`` which is equal to a scalar value ``old`` with a scalar value ``new``.
+    Replace each element of an array equal to a scalar with another scalar.
 
     Parameters
     ----------
-    x: array
-        input array.
-    old: Union[bool, int, float, complex]
-        scalar value to replace. **Should** have a type and value compatible with the data type of ``x`` (see :ref:`mixing-scalars-and-arrays`).
-    new: Union[bool, int, float, complex]
-        replacement scalar value. **Should** have a type and value compatible with the data type of ``x`` (see :ref:`mixing-scalars-and-arrays`).
-    copy: Union[bool, None]
-        return whether the operation should return a copy
+    x : array
+        Input array.
+    old : python scalar
+        Value to replace. If NaN, every NaN element of `x` is replaced.
+    new : python scalar
+        Replacement value.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `x`. Default: infer.
 
     Returns
     -------
-    out: array
-        an array in which each element ``x_i`` equal to ``old`` is replaced by ``new`` and all other elements are equal to the corresponding elements in ``x``. The returned array **must** have the same shape and data type as ``x``.
+    array
+        An array with the same shape and data type as `x`, in which each element
+        equal to `old` is replaced by `new` and all other elements are equal to the
+        corresponding elements of `x`. `x` is not modified.
 
     Notes
     -----
+    `old` and `new` should have types and values compatible with the data type of
+    `x` (see :ref:`array-api:mixing-scalars-and-arrays`). Otherwise, the behaviour
+    depends on the backend.
 
-    -   An element ``x_i`` **must** be replaced if ``x_i`` is equal to ``old`` (see :func:`~array_api.equal`) or if both ``x_i`` and ``old`` are ``NaN`` (see :func:`~array_api.isnan`).
-    -   The function **must** consider every element of ``x``, including elements which are not explicitly stored (e.g., implicit fill values in a sparse array representation).
-    -   The function **must not** modify ``x``.
-    -   If ``old`` or ``new`` does not have a type and value compatible with the data type of ``x``, behavior is unspecified and thus implementation-defined.
+    For sparse arrays, elements which are not explicitly stored are replaced too:
+    if `old` equals the fill value, the fill value of the result is `new`.
+    The result keeps the sparse format of `x` and is never densified.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> x = xp.asarray([1, 2, 1, 3])
+    >>> xpx.replace(x, 1, 0)
+    Array([0, 2, 0, 3], dtype=array_api_strict.int64)
+
+    NaN elements are replaced when `old` is NaN:
+
+    >>> x = xp.asarray([1.0, xp.nan, 3.0])
+    >>> xpx.replace(x, xp.nan, 0.0)
+    Array([1., 0., 3.], dtype=array_api_strict.float64)
     """
+    xp = _compat.array_namespace(x) if xp is None else xp
+
     if _compat.is_pydata_sparse_namespace(xp):
-        if isinstance(arr, sp.DOK):
-            if copy == False:
-                throw(ArgumentError("cannot zero-copy change fill value of DOK format"))
-            arr = arr.asformat("coo")
-        if copy == True:
-            arr = copy(arr)
-        if arr.fill_value != old:
-            throw(densification warning)
-            replace(arr.val, copy=false)
-            return arr.to_dense
-        else:
-            replace(arr.val, copy=false)
-            arr.fill_value = new
-    return _agnostic.where(_agnostic.isnan(arr) if old != old else arr == old, new, arr)
+        # `elemwise` applies the replacement to both the stored elements and the
+        # fill value, so implicit elements are replaced without densifying
+        def replace_dense(data: Array) -> Array:  # numpydoc ignore=PR01,RT01
+            """Replace in the dense arrays underlying a sparse array."""
+            return _agnostic._manipulation.replace(
+                data, old, new, xp=_compat.array_namespace(data)
+            )
+
+        return xp.elemwise(replace_dense, x)
+
+    return _agnostic._manipulation.replace(x, old, new, xp=xp)

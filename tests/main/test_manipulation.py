@@ -1,9 +1,10 @@
 import math
+from typing import Any, cast
 
 import numpy as np
 import pytest
 
-from array_api_extra import atleast_nd, broadcast_shapes, expand_dims, pad
+from array_api_extra import atleast_nd, broadcast_shapes, expand_dims, pad, replace
 from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._compat import device as get_device
 from array_api_extra._lib._typing import ArrayNamespace, Device
@@ -13,6 +14,7 @@ lazy_xp_function(atleast_nd)
 lazy_xp_function(broadcast_shapes)
 lazy_xp_function(expand_dims)
 lazy_xp_function(pad)
+lazy_xp_function(replace)
 
 
 class TestAtLeastND:
@@ -371,3 +373,86 @@ class TestPad:
         assert padded.shape == (4, 6)
         padded = pad(a, ((1, 0), (0, 0)))
         assert padded.shape == (4, 4)
+
+
+class TestReplace:
+    def test_simple(self, xp: ArrayNamespace):
+        x = xp.asarray([1, 2, 1, 3])
+        assert_equal(replace(x, 1, 5), xp.asarray([5, 2, 5, 3]))
+
+    def test_no_match(self, xp: ArrayNamespace):
+        x = xp.asarray([1, 2, 3])
+        assert_equal(replace(x, 4, 5), x)
+
+    def test_zero(self, xp: ArrayNamespace):
+        # Zero is the fill value of sparse arrays
+        x = xp.asarray([0, 1, 0, 2])
+        assert_equal(replace(x, 0, 5), xp.asarray([5, 1, 5, 2]))
+        assert_equal(replace(x, 1, 0), xp.asarray([0, 0, 0, 2]))
+
+    def test_nan(self, xp: ArrayNamespace):
+        x = xp.asarray([1.0, xp.nan, 2.0, xp.nan])
+        assert_equal(replace(x, xp.nan, 0.0), xp.asarray([1.0, 0.0, 2.0, 0.0]))
+        assert_equal(replace(x, 1.0, xp.nan), xp.asarray([xp.nan, xp.nan, 2.0, xp.nan]))
+
+    def test_complex(self, xp: ArrayNamespace):
+        x = xp.asarray([1 + 1j, 2 + 0j, complex(xp.nan, 1)])
+        expect = xp.asarray([0j, 2 + 0j, complex(xp.nan, 1)])
+        assert_equal(replace(x, 1 + 1j, 0j), expect)
+        # Complex elements with a NaN component are NaN
+        expect = xp.asarray([1 + 1j, 2 + 0j, 3j])
+        assert_equal(replace(x, complex(xp.nan, 0), 3j), expect)
+
+    def test_bool(self, xp: ArrayNamespace):
+        x = xp.asarray([True, False, True])
+        assert_equal(replace(x, True, False), xp.asarray([False, False, False]))
+
+    @pytest.mark.parametrize("dtype", ["int8", "uint8", "int32", "float32", "float64"])
+    def test_dtype(self, xp: ArrayNamespace, dtype: str):
+        x = xp.asarray([1, 2, 1], dtype=getattr(xp, dtype))
+        expect = xp.asarray([3, 2, 3], dtype=getattr(xp, dtype))
+        assert_equal(replace(x, 1, 3), expect)
+
+    def test_0d(self, xp: ArrayNamespace):
+        assert_equal(replace(xp.asarray(1.0), 1.0, 2.0), xp.asarray(2.0))
+        assert_equal(replace(xp.asarray(1.0), 3.0, 2.0), xp.asarray(1.0))
+
+    def test_ndim(self, xp: ArrayNamespace):
+        x = xp.asarray(np.reshape(np.arange(2 * 3 * 4) % 3, (2, 3, 4)))
+        expect = xp.asarray(np.reshape(np.arange(2 * 3 * 4) % 3 * 4 % 5, (2, 3, 4)))
+        actual = replace(x, 1, 4)
+        assert_equal(replace(actual, 2, 3), expect)
+
+    def test_input_not_modified(self, xp: ArrayNamespace):
+        x = xp.asarray([1, 2, 1])
+        _ = replace(x, 1, 5)
+        assert_equal(x, xp.asarray([1, 2, 1]))
+
+    def test_device(self, xp: ArrayNamespace, device: Device):
+        x = xp.asarray([1.0, 2.0], device=device)
+        assert get_device(replace(x, 1.0, 3.0)) == device
+
+    def test_xp(self, xp: ArrayNamespace):
+        x = xp.asarray([1, 2])
+        assert_equal(replace(x, 1, 3, xp=xp), xp.asarray([3, 2]))
+
+    @pytest.mark.parametrize("fmt", ["coo", "gcxs", "dok"])
+    def test_sparse(self, fmt: str):
+        sparse = pytest.importorskip("sparse")
+        x: Any = sparse.asarray(np.asarray([0.0, 1.0, 0.0, np.nan]), format=fmt)
+
+        # Replacing the fill value changes the fill value, without densifying
+        actual = cast(Any, replace(x, 0.0, 5.0))
+        assert type(actual) is type(x)
+        assert actual.fill_value == 5.0
+        assert actual.nnz == x.nnz
+        np.testing.assert_array_equal(actual.todense(), [5.0, 1.0, 5.0, np.nan])
+
+        actual = cast(Any, replace(x, np.nan, 2.0))
+        assert type(actual) is type(x)
+        assert actual.fill_value == 0.0
+        np.testing.assert_array_equal(actual.todense(), [0.0, 1.0, 0.0, 2.0])
+
+        # Input is not modified
+        assert x.fill_value == 0.0
+        np.testing.assert_array_equal(x.todense(), [0.0, 1.0, 0.0, np.nan])
