@@ -78,7 +78,7 @@ jobs:
           - tests-backends
           - tests-backends-py312
           - tests-run-deps
-          - tests-asserts-removed
+          - tests-python-optimized
         include:
           # Full x64 image is faster than ubuntu-slim for the slowest jobs
           - {environment: tests-py312, x64_runner: ubuntu-latest}
