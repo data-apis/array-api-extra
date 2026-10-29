@@ -62,8 +62,8 @@ tests-run-deps = {
   features = ["py314", "tests-run-deps"],
   solve-group = "py314",
 }
-tests-asserts-removed = {
-  features = ["py314", "tests", "asserts-removed"],
+tests-python-optimized = {
+  features = ["py314", "tests", "python-optimized"],
   solve-group = "py314",
 }
 
@@ -407,7 +407,7 @@ dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
 # pytorch = "*"  # Not available on Python 3.14t yet
 # jax = "*"  # waiting for conda-forge/jaxlib-feedstock#351
 
-[feature.asserts-removed.activation.env]
+[feature.python-optimized.activation.env]
 PYTHONOPTIMIZE = "1"  # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONOPTIMIZE
 
 [tool.pixi-audit]
