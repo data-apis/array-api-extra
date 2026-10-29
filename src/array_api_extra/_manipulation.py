@@ -282,3 +282,52 @@ def pad(
     return _agnostic._manipulation.pad(
         x, pad_width, constant_values=constant_values, xp=xp
     )
+
+def replace(
+    x: array,
+    old: Union[bool, int, float, complex],
+    new: Union[bool, int, float, complex],
+    /,
+) -> array:
+    """
+    Replaces each element of an input array ``x`` which is equal to a scalar value ``old`` with a scalar value ``new``.
+
+    Parameters
+    ----------
+    x: array
+        input array.
+    old: Union[bool, int, float, complex]
+        scalar value to replace. **Should** have a type and value compatible with the data type of ``x`` (see :ref:`mixing-scalars-and-arrays`).
+    new: Union[bool, int, float, complex]
+        replacement scalar value. **Should** have a type and value compatible with the data type of ``x`` (see :ref:`mixing-scalars-and-arrays`).
+    copy: Union[bool, None]
+        return whether the operation should return a copy
+
+    Returns
+    -------
+    out: array
+        an array in which each element ``x_i`` equal to ``old`` is replaced by ``new`` and all other elements are equal to the corresponding elements in ``x``. The returned array **must** have the same shape and data type as ``x``.
+
+    Notes
+    -----
+
+    -   An element ``x_i`` **must** be replaced if ``x_i`` is equal to ``old`` (see :func:`~array_api.equal`) or if both ``x_i`` and ``old`` are ``NaN`` (see :func:`~array_api.isnan`).
+    -   The function **must** consider every element of ``x``, including elements which are not explicitly stored (e.g., implicit fill values in a sparse array representation).
+    -   The function **must not** modify ``x``.
+    -   If ``old`` or ``new`` does not have a type and value compatible with the data type of ``x``, behavior is unspecified and thus implementation-defined.
+    """
+    if _compat.is_pydata_sparse_namespace(xp):
+        if isinstance(arr, sp.DOK):
+            if copy == False:
+                throw(ArgumentError("cannot zero-copy change fill value of DOK format"))
+            arr = arr.asformat("coo")
+        if copy == True:
+            arr = copy(arr)
+        if arr.fill_value != old:
+            throw(densification warning)
+            replace(arr.val, copy=false)
+            return arr.to_dense
+        else:
+            replace(arr.val, copy=false)
+            arr.fill_value = new
+    return _agnostic.where(_agnostic.isnan(arr) if old != old else arr == old, new, arr)
