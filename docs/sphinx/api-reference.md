@@ -7,6 +7,7 @@ api-creation.md
 api-elementwise.md
 api-indexing.md
 api-inspection.md
+api-interpolation.md
 api-linalg.md
 api-manipulation.md
 api-searching.md
