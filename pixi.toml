@@ -15,6 +15,9 @@ preview = ["pixi-build"]
 requires-pixi = ">=0.82.1"  # security update
 exclude-newer = "7d"
 
+[workspace.build-variants]
+python = ["3.12.*", "3.14.* *_cp314", "3.14.* *_cp314t"]
+
 [exclude-newer]
 certifi = "0d"
 ca-certificates = "0d"
@@ -28,7 +31,15 @@ jaxlib = "1d"
 build = {
   backend.name = "pixi-build-python",
   config.ignore-pypi-mapping = false,
+  # While non-editable builds are indeed noarch (and python-version-independent),
+  # editable builds are assumed to be specific to the host env,
+  # so set `noarch` here and `workspace.build-variants.python` above
+  # to enforce that as a blanket workaround.
+  config.noarch = false,
 }
+
+[package.host-dependencies]
+python = "*"
 
 ### workspace environments ###
 
@@ -91,12 +102,10 @@ tests-nogil = ["py314t", "nogil", "tests"]
 
 ### default feature definition ###
 
-# this pulls in array-api-extra's host dependencies
-[dev]
-array-api-extra.path = "."
-
+# TODO: use `[dev]` once https://github.com/prefix-dev/pixi/issues/7400 is resolved
 [dependencies]
 array-api-extra.path = "."
+meson-python = "*"
 
 ### non-default feature definitions ###
 
