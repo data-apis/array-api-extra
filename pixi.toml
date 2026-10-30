@@ -31,6 +31,10 @@ jaxlib = "1d"
 build = {
   backend.name = "pixi-build-python",
   config.ignore-pypi-mapping = false,
+  # While non-editable builds are indeed noarch (and python-version-independent),
+  # editable builds are assumed to be specific to the host env,
+  # so set `noarch` here and `workspace.build-variants.python` above
+  # to enforce that as a blanket workaround.
   config.noarch = false,
 }
 
