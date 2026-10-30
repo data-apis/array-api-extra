@@ -62,6 +62,10 @@ tests-run-deps = {
   features = ["py314", "tests-run-deps"],
   solve-group = "py314",
 }
+tests-python-optimized = {
+  features = ["py314", "tests", "python-optimized"],
+  solve-group = "py314",
+}
 
 # Some backends may pin numpy; use separate solve-group
 dev = {
@@ -402,6 +406,9 @@ dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
 # sparse = ">=0.19.1"  # flaky, see data-apis/array-api-extra#900
 # pytorch = "*"  # Not available on Python 3.14t yet
 # jax = "*"  # waiting for conda-forge/jaxlib-feedstock#351
+
+[feature.python-optimized.activation.env]
+PYTHONOPTIMIZE = "1"  # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONOPTIMIZE
 
 [tool.pixi-audit]
 # TODO: remove these ignores — they were added to let admit autofixes
