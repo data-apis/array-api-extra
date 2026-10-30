@@ -7,6 +7,8 @@ from ._testing import (
     assert_less,
     lazy_xp_function,
     patch_lazy_xp_functions,
+    yield_namespace_device_dtype_combinations,
+    yield_namespaces,
 )
 
 __all__ = [
@@ -16,4 +18,6 @@ __all__ = [
     "assert_less",
     "lazy_xp_function",
     "patch_lazy_xp_functions",
+    "yield_namespace_device_dtype_combinations",
+    "yield_namespaces",
 ]

@@ -6,6 +6,7 @@ import contextlib
 import enum
 import functools
 import inspect
+import itertools
 import math
 import typing
 import warnings
@@ -35,6 +36,8 @@ __all__ = [
     "assert_less",
     "lazy_xp_function",
     "patch_lazy_xp_functions",
+    "yield_namespace_device_dtype_combinations",
+    "yield_namespaces",
 ]
 
 
@@ -1008,3 +1011,89 @@ def assert_close_nulp(
     actual_np = _as_numpy_array(actual, xp=xp)
     desired_np = _as_numpy_array(desired, xp=xp)
     np.testing.assert_array_almost_equal_nulp(actual_np, desired_np, nulp=nulp)
+
+
+def yield_namespaces(include_numpy_namespaces: bool = True) -> Generator[str]:
+    """Yield supported namespace.
+
+    This is meant to be used for testing purposes only.
+
+    Parameters
+    ----------
+    include_numpy_namespaces : bool, default=True
+        If True, also yield numpy namespaces.
+
+    Returns
+    -------
+    str
+        The name of the Array API namespace.
+    """
+    _NUMPY_NAMESPACE_NAMES = {"numpy", "sklearn.externals.array_api_compat.numpy"}
+    for array_namespace in [
+        # The following is used to test the array_api_compat wrapper when
+        # array_api_dispatch is enabled: in particular, the arrays used in the
+        # tests are regular numpy arrays without any "device" attribute.
+        "numpy",
+        # Stricter NumPy-based Array API implementation. The
+        # array_api_strict.Array instances always have a dummy "device" attribute.
+        "array_api_strict",
+        "cupy",
+        "torch",
+        "dpnp",
+    ]:
+        if not include_numpy_namespaces and array_namespace in _NUMPY_NAMESPACE_NAMES:
+            continue
+        yield array_namespace
+
+
+def yield_namespace_device_dtype_combinations(
+    include_numpy_namespaces: bool = True,
+) -> Generator[Any]:
+    """Yield supported namespace, device_name, dtype_name tuples for testing.
+
+    Use this to test that an estimator works with all combinations.
+    Pass the yielded values to `_array_api_for_tests` which returns (xp, device)
+    for array allocation.
+
+    Parameters
+    ----------
+    include_numpy_namespaces : bool, default=True
+        If True, also yield numpy namespaces.
+
+    Returns
+    -------
+    array_namespace : str
+        The name of the Array API namespace.
+
+    device_name : str or None
+        The name of the device on which to allocate the arrays. Can be None to
+        indicate that the default value should be used.
+
+    dtype_name : str
+        The name of the data type to use for arrays. Can be None to indicate
+        that the default value should be used.
+    """
+    for array_namespace in yield_namespaces(
+        include_numpy_namespaces=include_numpy_namespaces
+    ):
+        if array_namespace == "torch":
+            for device_name, dtype in itertools.product(
+                ("cpu", "cuda", "xpu"), ("float64", "float32")
+            ):
+                yield array_namespace, device_name, dtype
+            yield array_namespace, "mps", "float32"
+
+        elif array_namespace == "dpnp":  # pragma: nocover
+            # XXX: add "accelerator" device type?
+            for device_name, dtype in itertools.product(
+                ("cpu", "gpu"), ("float64", "float32")
+            ):
+                yield array_namespace, device_name, dtype
+
+        elif array_namespace == "array_api_strict":
+            # Always yield strings for consistent parametrization; _array_api_for_tests
+            # creates Device objects when needed.
+            yield array_namespace, "CPU_DEVICE", "float64"
+            yield array_namespace, "device1", "float32"
+        else:
+            yield array_namespace, None, None
