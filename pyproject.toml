@@ -22,7 +22,7 @@ classifiers = [
   "Programming Language :: Python :: Free Threading :: 3 - Stable",
   "Typing :: Typed",
 ]
-dependencies = ["array-api-compat>=1.15.0,<2"]
+dependencies = ["array-api-compat>=1.16.0,<2"]
 
 [project.urls]
 "Bug Tracker" = "https://github.com/data-apis/array-api-extra/issues"
