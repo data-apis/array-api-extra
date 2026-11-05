@@ -151,6 +151,18 @@ class TestSearchsorted:
         with pytest.raises(ValueError, match=message):
             _ = xpx_searchsorted(xp.asarray([1, 2]), xp.asarray([1, 2]), side="center")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 
+    @pytest.mark.parametrize("searchsorted", [xpx_searchsorted, _funcs_searchsorted])
+    def test_broadcast_batch_shapes(
+        self, xp: ArrayNamespace, searchsorted: Callable[..., Array]
+    ):
+        x1 = np.asarray([[1, 2, 3], [2, 3, 4]], dtype=np.float64)
+        x2 = np.asarray([1.5, 3.5])
+        ref = xp.asarray(xp_searchsorted(x1, x2, side="left", xp=np))
+
+        out = searchsorted(xp.asarray(x1), xp.asarray(x2), xp=xp)
+
+        assert_equal(out, ref)
+
     @pytest.mark.parametrize("side", ["left", "right"])
     @pytest.mark.parametrize("ties", [False, True])
     @pytest.mark.parametrize(
