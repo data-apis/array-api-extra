@@ -14,6 +14,7 @@ __all__ = [
     "deg2rad",
     "isclose",
     "nan_to_num",
+    "one_minus_square",
     "rad2deg",
     "sinc",
 ]
@@ -315,3 +316,9 @@ def rad2deg(x: Array, /, *, xp: ArrayNamespace) -> Array:
     # numpydoc ignore=PR01,RT01
     """See docstring in `array_api_extra._elementwise`."""
     return x * 180 / xp.pi
+
+
+def one_minus_square(x: Array, /) -> Array:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._elementwise`."""
+    return (1 + x) * (1 - x)
