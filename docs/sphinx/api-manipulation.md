@@ -10,4 +10,5 @@
     broadcast_shapes
     expand_dims
     pad
+    replace
 ```
