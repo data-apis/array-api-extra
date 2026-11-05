@@ -381,7 +381,7 @@ sparse = ">=0.19.2"
 mparray = ">=0.2.2"
 
 [feature.backends.target.unix.dependencies]
-jax = ">=0.11.2"
+jax = ">=0.12.0.1"
 
 # Backends that require a GPU host and a CUDA driver.
 [feature.cuda-backends]
@@ -393,7 +393,7 @@ cupy = ">=14.2.0"
 pytorch = ">=2.14.1"
 
 [feature.cuda-backends.target.linux.dependencies]
-jaxlib = ">=0.11.2"
+jaxlib = ">=0.12.0"
 
 [feature.nogil.dependencies]
 pytest-run-parallel = ">=0.10.0"
