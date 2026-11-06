@@ -39,5 +39,9 @@ def one_hot(
     #     out = xp.zeros((x.size, num_classes), dtype=dtype)
     #     out[xp.arange(x.size), xp.reshape(x, (-1,))] = 1
     #     return xp.reshape(out, (*x.shape, num_classes))
-    range_num_classes = xp.arange(num_classes, dtype=x.dtype, device=_compat.device(x))
+    # The class range can exceed the input dtype even when every index is valid.
+    dtype = x.dtype
+    if num_classes - 1 > xp.iinfo(dtype).max:
+        dtype = xp.int32 if num_classes - 1 <= xp.iinfo(xp.int32).max else xp.int64
+    range_num_classes = xp.arange(num_classes, dtype=dtype, device=_compat.device(x))
     return x[..., xp.newaxis] == range_num_classes
