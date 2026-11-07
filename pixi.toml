@@ -393,7 +393,7 @@ cupy = ">=14.2.0"
 pytorch = ">=2.14.1"
 
 [feature.cuda-backends.target.linux.dependencies]
-jaxlib = ">=0.12.0"
+jaxlib = ">=0.12.0.1"
 
 [feature.nogil.dependencies]
 pytest-run-parallel = ">=0.10.0"
