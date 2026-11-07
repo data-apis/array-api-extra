@@ -129,6 +129,13 @@ def one_hot(
     if _compat.is_jax_namespace(xp):
         from jax.nn import one_hot as jax_one_hot
 
+        if num_classes - 1 > xp.iinfo(x.dtype).max:
+            # JAX builds its class range in the input dtype. Prefer int32 so this
+            # also works with JAX's default x64-disabled configuration.
+            index_dtype = (
+                xp.int32 if num_classes - 1 <= xp.iinfo(xp.int32).max else xp.int64
+            )
+            x = xp.astype(x, index_dtype)
         return jax_one_hot(x, num_classes, dtype=dtype, axis=axis)
     if _compat.is_torch_namespace(xp):
         from torch.nn.functional import one_hot as torch_one_hot

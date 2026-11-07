@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 import pytest
 
@@ -72,12 +74,98 @@ class TestOneHot:
         "int_dtype",
         ["int8", "int16", "int32", "int64", "uint8", "uint16", "uint32", "uint64"],
     )
-    def test_int_types(self, xp: ArrayNamespace, int_dtype: str):
+    @pytest.mark.parametrize("num_classes", [3, 257])
+    def test_int_types(self, xp: ArrayNamespace, int_dtype: str, num_classes: int):
         dtype = getattr(xp, int_dtype)
         x = xp.asarray([0, 1, 2], dtype=dtype)
-        actual = one_hot(x, 3)
-        expected = xp.asarray([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+        actual = one_hot(x, num_classes)
+        expected = xp.asarray(
+            [[float(i == j) for j in range(num_classes)] for i in range(3)]
+        )
         assert_equal(actual, expected)
+
+    @pytest.mark.parametrize("int_dtype", ["int8", "uint8"])
+    @pytest.mark.parametrize("num_classes", [128, 129, 256, 257])
+    @pytest.mark.parametrize("shape", [(), (2,), (2, 1), (0,)])
+    def test_narrow_indices(
+        self,
+        xp: ArrayNamespace,
+        int_dtype: str,
+        num_classes: int,
+        shape: tuple[int, ...],
+    ):
+        dtype = getattr(xp, int_dtype)
+        index = min(xp.iinfo(dtype).max, num_classes - 1)
+        x = xp.full(shape, index, dtype=dtype)
+        actual = one_hot(x, num_classes, dtype=xp.bool, axis=0)
+        expected = np.zeros((num_classes, *shape), dtype=np.bool_)
+        expected[index, ...] = True
+        assert_equal(actual, xp.asarray(expected))
+
+    @pytest.mark.parametrize("enable_x64", [False, True])
+    @pytest.mark.parametrize(
+        ("int_dtype", "num_classes"),
+        [("int8", 257), ("uint8", 257), ("int16", 65537), ("uint16", 65537)],
+    )
+    @pytest.mark.parametrize("output_dtype", ["bool", "float32"])
+    @pytest.mark.parametrize("axis", [-1, 0])
+    @pytest.mark.parametrize("use_jit", [False, True])
+    def test_jax_narrow_indices(
+        self,
+        enable_x64: bool,
+        int_dtype: str,
+        num_classes: int,
+        output_dtype: str,
+        axis: int,
+        use_jit: bool,
+    ):
+        jax = pytest.importorskip("jax")
+        jnp = pytest.importorskip("jax.numpy")
+        from array_api_extra import one_hot as public_one_hot
+
+        with jax.enable_x64(enable_x64):
+            indices = np.asarray([[0, 1], [2, 3]])
+            x = jnp.asarray(indices, dtype=getattr(jnp, int_dtype))
+            dtype = getattr(jnp, output_dtype)
+            encode = partial(
+                public_one_hot, num_classes=num_classes, dtype=dtype, axis=axis
+            )
+            if use_jit:
+                encode = jax.jit(encode)
+            actual = encode(x)
+            expected = indices[..., None] == np.arange(num_classes)
+            expected = jnp.asarray(np.moveaxis(expected, -1, axis), dtype=dtype)
+            assert_equal(actual, expected)
+            assert get_device(actual) == get_device(x)
+            assert jax.config.x64_enabled == enable_x64
+
+    @pytest.mark.parametrize(
+        ("int_dtype", "num_classes"), [("int8", 129), ("int16", 32769)]
+    )
+    @pytest.mark.parametrize("shape", [(), (2, 2), (0,)])
+    @pytest.mark.parametrize("output_dtype", [None, "bool", "float32"])
+    @pytest.mark.parametrize("axis", [0, -1])
+    def test_no_x64_device(
+        self,
+        int_dtype: str,
+        num_classes: int,
+        shape: tuple[int, ...],
+        output_dtype: str | None,
+        axis: int,
+    ):
+        xp = pytest.importorskip("array_api_strict")
+        device = xp.Device("no_x64")
+        x = xp.zeros(shape, dtype=getattr(xp, int_dtype), device=device)
+        dtype = None if output_dtype is None else getattr(xp, output_dtype)
+        actual = one_hot(x, num_classes, dtype=dtype, axis=axis)
+        expected = np.zeros((*shape, num_classes), dtype=np.bool_)
+        expected[..., 0] = True
+        expected = np.moveaxis(expected, -1, axis)
+        assert get_device(actual) == device
+        assert actual.dtype == (xp.float32 if dtype is None else dtype)
+        assert actual.shape == expected.shape
+        expected_on_device = xp.asarray(expected, dtype=actual.dtype, device=device)
+        assert bool(xp.all(actual == expected_on_device))
 
     def test_custom_dtype(self, xp: ArrayNamespace):
         actual = one_hot(xp.asarray([0, 1, 2], dtype=xp.int32), 3, dtype=xp.bool)
