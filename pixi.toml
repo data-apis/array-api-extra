@@ -377,7 +377,7 @@ scipy = "1.16.*"  # compatible ith the pinned numpy version
 [feature.backends.dependencies]
 pytorch = ">=2.14.1"
 dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
-sparse = ">=0.19.2"
+sparse = ">=0.19.3"
 mparray = ">=0.2.2"
 
 [feature.backends.target.unix.dependencies]
