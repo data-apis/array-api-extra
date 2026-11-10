@@ -508,6 +508,23 @@ class TestNanSum:
         expected = xp.asarray(expected_list)
         assert_equal(res, expected)
 
+    def test_complex(self, xp: ArrayNamespace):
+        a = xp.asarray(
+            [
+                [1 + 2j, complex(float("nan"), 0.0), 4 + 1j, 5 - 1j],
+                [complex(float("nan"), 0.0), -2 + 1j, 3 - 2j, -4 + 2j],
+                [2 - 1j, 1 + 3j, 3 + 2j, complex(float("nan"), 0.0)],
+            ],
+            dtype=xp.complex128,
+        )
+
+        res = nansum(a, axis=0)
+        expected = xp.asarray(
+            [3 + 1j, -1 + 4j, 10 + 1j, 1 + 1j],
+            dtype=xp.complex128,
+        )
+        assert_equal(res, expected)
+
 
 class TestNanMean:
     def test_simple(self, xp: ArrayNamespace):
@@ -570,3 +587,20 @@ class TestNanMean:
         res = nanmean(a, axis=axis, xp=xp)
         expected = xp.asarray(expected_list)
         assert_equal(res, expected)
+
+    def test_complex(self, xp: ArrayNamespace):
+        a = xp.asarray(
+            [
+                [1 + 2j, complex(float("nan"), 0.0), 4 + 1j, 5 - 1j],
+                [complex(float("nan"), 0.0), -2 + 1j, 3 - 2j, -4 + 2j],
+                [2 - 1j, 1 + 3j, 3 + 2j, complex(float("nan"), 0.0)],
+            ],
+            dtype=xp.complex128,
+        )
+
+        res = nanmean(a, axis=0)
+        expected = xp.asarray(
+            [1.5 + 0.5j, -0.5 + 2j, 10 / 3 + 1 / 3j, 0.5 + 0.5j],
+            dtype=xp.complex128,
+        )
+        assert_close(res, expected)
