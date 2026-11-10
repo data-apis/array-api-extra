@@ -366,7 +366,9 @@ def nanmean(
         or _compat.is_cupy_namespace(xp)
         or _compat.is_dask_namespace(xp)
         or _compat.is_jax_namespace(xp)
-        or _compat.is_torch_namespace(xp)
+        or (_compat.is_torch_namespace(xp) and
+            (xp.isdtype(a.dtype, "real floating") or _compat.device(a).type != "cpu")
+        )
     ):
         return xp.nanmean(a, axis=axis)
 
@@ -418,7 +420,9 @@ def nansum(
         or _compat.is_cupy_namespace(xp)
         or _compat.is_dask_namespace(xp)
         or _compat.is_jax_namespace(xp)
-        or _compat.is_torch_namespace(xp)
+        or (_compat.is_torch_namespace(xp) and
+            (xp.isdtype(a.dtype, "real floating") or _compat.device(a).type != "cpu")
+        )
     ):
         return xp.nansum(a, axis=axis)
 
