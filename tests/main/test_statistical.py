@@ -600,7 +600,7 @@ class TestNanMean:
 
         res = nanmean(a, axis=0)
         expected = xp.asarray(
-            [1.5 + 0.5j, -0.5 + 2j, 10 / 3 + 1 / 3j, 0.5 + 0.5j],
+            [1.5 + 0.5j, -0.5 + 2j, 10 / 3 + 1j / 3, 0.5 + 0.5j],
             dtype=xp.complex128,
         )
         assert_close(res, expected)
