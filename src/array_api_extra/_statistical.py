@@ -323,7 +323,7 @@ def nanmax(
 
 def _is_torch_and_realarray_or_notcpu(
     a: Array,
-    xp: ArrayNamespace | None = None
+    xp: ArrayNamespace,
 ) -> bool:
     if not _compat.is_torch_namespace(xp):
         return False
