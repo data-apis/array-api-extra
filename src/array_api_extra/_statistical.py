@@ -325,10 +325,13 @@ def _is_torch_and_realarray_or_notcpu(
     a: Array,
     xp: ArrayNamespace,
 ) -> bool:
+    """Test if Torch namespace and if real array or not CPU"""
     if not _compat.is_torch_namespace(xp):
         return False
-    device = _compat.device(a)
-    return xp.isdtype(a.dtype, "real floating") or getattr(device, "type", None) != "cpu"
+    return (
+        xp.isdtype(a.dtype, "real floating")
+        or getattr(_compat.device(a), "type", None) != "cpu"
+    )
 
 
 def nanmean(
