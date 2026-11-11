@@ -321,6 +321,16 @@ def nanmax(
     return _agnostic._statistical.nanmax(a, axis=axis, xp=xp)
 
 
+def _is_torch_and_realarray_or_notcpu(
+    a: Array,
+    xp: ArrayNamespace | None = None
+) -> bool:
+    if not _compat.is_torch_namespace(xp):
+        return False
+    device = _compat.device(a)
+    return xp.isdtype(a.dtype, "real floating") or getattr(device, "type", None) != "cpu"
+
+
 def nanmean(
     a: Array,
     /,
@@ -366,9 +376,7 @@ def nanmean(
         or _compat.is_cupy_namespace(xp)
         or _compat.is_dask_namespace(xp)
         or _compat.is_jax_namespace(xp)
-        or (_compat.is_torch_namespace(xp) and
-            (xp.isdtype(a.dtype, "real floating") or _compat.device(a).type != "cpu")
-        )
+        or _is_torch_and_realarray_or_notcpu(a, xp)
     ):
         return xp.nanmean(a, axis=axis)
 
@@ -420,9 +428,7 @@ def nansum(
         or _compat.is_cupy_namespace(xp)
         or _compat.is_dask_namespace(xp)
         or _compat.is_jax_namespace(xp)
-        or (_compat.is_torch_namespace(xp) and
-            (xp.isdtype(a.dtype, "real floating") or _compat.device(a).type != "cpu")
-        )
+        or _is_torch_and_realarray_or_notcpu(a, xp)
     ):
         return xp.nansum(a, axis=axis)
 
