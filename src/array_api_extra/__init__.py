@@ -5,7 +5,15 @@ from ._agnostic._elementwise import apply_where
 from ._agnostic._inspection import default_dtype
 from ._at import at
 from ._creation import create_diagonal, one_hot
-from ._elementwise import angle, deg2rad, isclose, nan_to_num, rad2deg, sinc
+from ._elementwise import (
+    angle,
+    deg2rad,
+    isclose,
+    nan_to_num,
+    one_minus_square,
+    rad2deg,
+    sinc,
+)
 from ._indexing import diag_indices, tril_indices, triu_indices, unravel_index
 from ._lazy import lazy_apply
 from ._linalg import kron
@@ -42,6 +50,7 @@ __all__ = [
     "nansum",
     "nunique",
     "one_hot",
+    "one_minus_square",
     "pad",
     "partition",
     "rad2deg",
