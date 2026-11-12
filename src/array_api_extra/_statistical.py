@@ -325,7 +325,22 @@ def _is_torch_and_realarray_or_notcpu(
     a: Array,
     xp: ArrayNamespace,
 ) -> bool:
-    """Test if Torch namespace and if real array or not CPU"""
+    """
+    Return whether `xp` is Torch and `a` is real or not on the CPU.
+
+    Parameters
+    ----------
+    a : Array
+        Input array.
+    xp : ArrayNamespace
+        Namespace used to process `a`.
+
+    Returns
+    -------
+    bool
+        Whether `xp` is Torch and either `a` has a real floating-point dtype
+        or is located on a non-CPU device.
+    """
     if not _compat.is_torch_namespace(xp):
         return False
     return (
