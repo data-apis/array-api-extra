@@ -117,7 +117,7 @@ ruff = ">=0.17.3"
 typos = ">=1.51.1"
 actionlint-with-all = ">=1.7.12"
 blacken-docs = ">=1.20.0"
-pytest = ">=9.1.1"
+pytest = ">=9.2.0"
 validate-pyproject = ">=0.25"
 pyrefly = ">=1.4.0"
 zizmor = ">=1.31.1"
@@ -221,7 +221,7 @@ lint = {
 }
 
 [feature.tests.dependencies]
-pytest = ">=9.1.1"
+pytest = ">=9.2.0"
 pytest-cov = ">=7.1.0"
 hypothesis = ">=6.170.12"
 array-api-strict = ">=2.6.1"
@@ -296,7 +296,7 @@ tests-ci = {
 
 # tests with only run dependencies
 [feature.tests-run-deps.dependencies]
-pytest = ">=9.1.1"
+pytest = ">=9.2.0"
 pytest-cov = ">=7.1.0"
 
 [feature.tests-run-deps.tasks]
@@ -319,7 +319,7 @@ sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=3.11.1"
 # Needed to import parsed modules with autodoc
 dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
-pytest = ">=9.1.1"
+pytest = ">=9.2.0"
 typing-extensions = ">=4.16.0"
 numpy = ">=2.1.3"
 
