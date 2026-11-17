@@ -68,6 +68,8 @@ executionEnvironments = [
 
 [tool.coverage]
 run.source = ["array_api_extra"]
+# the installed package ships a copy of the test suite; don't measure it
+run.omit = ["*/array_api_extra/tests/*"]
 
 [tool.mypy]
 files = ["src", "tests"]
