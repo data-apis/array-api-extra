@@ -403,6 +403,19 @@ class TestReplace:
         expect = xp.asarray([1 + 1j, 2 + 0j, 3j])
         assert_equal(replace(x, complex(xp.nan, 0), 3j), expect)
 
+    def test_complex_nan_imag(self, xp: ArrayNamespace):
+        x = xp.asarray([complex(xp.nan, 0), complex(0, xp.nan), 1j])
+        expect = xp.asarray([5 + 0j, 5 + 0j, 1j])
+        assert_equal(replace(x, complex(0, xp.nan), 5 + 0j), expect)
+
+    def test_inf(self, xp: ArrayNamespace):
+        x = xp.asarray([xp.inf, -xp.inf, 1.0])
+        assert_equal(replace(x, xp.inf, 0.0), xp.asarray([0.0, -xp.inf, 1.0]))
+
+    def test_empty(self, xp: ArrayNamespace):
+        x = xp.zeros((3, 0))
+        assert_equal(replace(x, 0.0, 1.0), x)
+
     def test_bool(self, xp: ArrayNamespace):
         x = xp.asarray([True, False, True])
         assert_equal(replace(x, True, False), xp.asarray([False, False, False]))
@@ -456,3 +469,16 @@ class TestReplace:
         # Input is not modified
         assert x.fill_value == 0.0
         np.testing.assert_array_equal(x.todense(), [0.0, 1.0, 0.0, np.nan])
+
+    @pytest.mark.parametrize("fmt", ["coo", "gcxs", "dok"])
+    @pytest.mark.parametrize("fill", [math.nan, 7.0])
+    def test_sparse_fill_value(self, fmt: str, fill: float):
+        sparse = pytest.importorskip("sparse")
+        x: Any = sparse.COO.from_numpy(
+            np.asarray([fill, 1.0, fill]), fill_value=fill
+        ).asformat(fmt)
+        actual = cast(Any, replace(x, fill, 42.0))
+        assert type(actual) is type(x)
+        assert actual.fill_value == 42.0
+        assert actual.nnz == x.nnz
+        np.testing.assert_array_equal(actual.todense(), [42.0, 1.0, 42.0])
