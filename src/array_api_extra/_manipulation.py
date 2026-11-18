@@ -301,6 +301,7 @@ def replace(
         Input array.
     old : python scalar
         Value to replace. If NaN, every NaN element of `x` is replaced.
+        Must be a Python scalar, not an array or a traced value.
     new : python scalar
         Replacement value.
     xp : array_namespace, optional
@@ -309,9 +310,10 @@ def replace(
     Returns
     -------
     array
-        An array with the same shape and data type as `x`, in which each element
-        equal to `old` is replaced by `new` and all other elements are equal to the
-        corresponding elements of `x`. `x` is not modified.
+        An array with the same shape as `x`, in which each element equal to `old`
+        is replaced by `new` and all other elements are equal to the corresponding
+        elements of `x`. `x` is not modified. If `old` and `new` are compatible
+        with the data type of `x`, the result has the same data type as `x`.
 
     Notes
     -----
