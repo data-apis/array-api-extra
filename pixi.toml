@@ -100,7 +100,7 @@ tests-nogil = ["py314t", "nogil", "tests"]
 # TODO: use `[dev]` once https://github.com/prefix-dev/pixi/issues/7400 is resolved
 [dependencies]
 array-api-extra.path = "."
-meson-python = "*"
+meson-python = ">=0.22.1"
 
 ### non-default feature definitions ###
 
