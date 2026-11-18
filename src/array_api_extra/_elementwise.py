@@ -399,7 +399,7 @@ def one_minus_square(x: Array, /, *, xp: ArrayNamespace | None = None) -> Array:
         import jax
 
         # Added in JAX 0.11.2.
-        if hasattr(jax.lax, "one_minus_square"):
+        if hasattr(jax.lax, "one_minus_square"):  # pyright: ignore[reportUnknownArgumentType]
             return jax.lax.one_minus_square(x)
 
     return _agnostic._elementwise.one_minus_square(x)
