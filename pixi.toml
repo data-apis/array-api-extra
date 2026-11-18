@@ -12,18 +12,13 @@ platforms = [
   { platform = "win-64", cuda = "12.9" },
 ]
 preview = ["pixi-build"]
-requires-pixi = ">=0.82.1"  # security update
-exclude-newer = "7d"
+requires-pixi = ">=0.84.0"
+
+[workspace.exclude-newer]
+cutoff = "7d"
 
 [workspace.build-variants]
 python = ["3.12.*", "3.14.* *_cp314", "3.14.* *_cp314t"]
-
-[exclude-newer]
-certifi = "0d"
-ca-certificates = "0d"
-brotli-python = "2d"
-jax = "1d"
-jaxlib = "1d"
 
 ### array-api-extra package definition ###
 
