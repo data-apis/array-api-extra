@@ -413,7 +413,7 @@ dask-core = ">=2026.8.0"  # No distributed, tornado, etc.
 
 [feature.python-optimized.activation.env]
 PYTHONOPTIMIZE = "1"  # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONOPTIMIZE
-PYTEST_ADDOPTS = '-W "ignore:assertions not in test modules or plugins:pytest.PytestConfigWarning"'
+PYTEST_ADDOPTS = "-W ignore:assertions:pytest.PytestConfigWarning"
 
 [tool.pixi-audit]
 # TODO: remove these ignores — they were added to let admit autofixes
