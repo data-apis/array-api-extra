@@ -321,34 +321,6 @@ def nanmax(
     return _agnostic._statistical.nanmax(a, axis=axis, xp=xp)
 
 
-def _is_torch_and_realarray_or_notcpu(
-    a: Array,
-    xp: ArrayNamespace,
-) -> bool:
-    """
-    Return whether `xp` is Torch and `a` is real or not on the CPU.
-
-    Parameters
-    ----------
-    a : Array
-        Input array.
-    xp : ArrayNamespace
-        Namespace used to process `a`.
-
-    Returns
-    -------
-    bool
-        Whether `xp` is Torch and either `a` has a real floating-point dtype
-        or is located on a non-CPU device.
-    """
-    if not _compat.is_torch_namespace(xp):
-        return False
-    return (
-        xp.isdtype(a.dtype, "real floating")
-        or getattr(_compat.device(a), "type", None) != "cpu"
-    )
-
-
 def nanmean(
     a: Array,
     /,
@@ -394,7 +366,13 @@ def nanmean(
         or _compat.is_cupy_namespace(xp)
         or _compat.is_dask_namespace(xp)
         or _compat.is_jax_namespace(xp)
-        or _is_torch_and_realarray_or_notcpu(a, xp)
+        or (
+            _compat.is_torch_namespace(xp)
+            and (  # https://github.com/pytorch/pytorch/issues/71472
+                xp.isdtype(a.dtype, "real floating")
+                or getattr(_compat.device(a), "type", None) != "cpu"
+            )
+        )
     ):
         return xp.nanmean(a, axis=axis)
 
@@ -446,7 +424,13 @@ def nansum(
         or _compat.is_cupy_namespace(xp)
         or _compat.is_dask_namespace(xp)
         or _compat.is_jax_namespace(xp)
-        or _is_torch_and_realarray_or_notcpu(a, xp)
+        or (
+            _compat.is_torch_namespace(xp)
+            and (  # https://github.com/pytorch/pytorch/issues/139349
+                xp.isdtype(a.dtype, "real floating")
+                or getattr(_compat.device(a), "type", None) != "cpu"
+            )
+        )
     ):
         return xp.nansum(a, axis=axis)
 
