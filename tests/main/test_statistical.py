@@ -93,14 +93,16 @@ class TestCov:
             xp.asarray([[1.0, -1.0], [-1.0, 1.0]], dtype=xp.float64),
         )
 
-    def test_batch(self, xp: ArrayNamespace):
+    @pytest.mark.parametrize("batch_shape", [(3, 4), (1,), (2, 1), (1, 2, 1)])
+    @pytest.mark.parametrize("n_var", [1, 3])
+    def test_batch(self, batch_shape: tuple[int, ...], n_var: int, xp: ArrayNamespace):
         rng = np.random.default_rng(8847643423)
-        batch_shape = (3, 4)
-        n_var, n_obs = 3, 20
+        n_obs = 20
         m = rng.random((*batch_shape, n_var, n_obs))
         res = cov(xp.asarray(m))
         ref_list = [np.cov(m_) for m_ in np.reshape(m, (-1, n_var, n_obs))]
-        ref = np.reshape(np.stack(ref_list), (*batch_shape, n_var, n_var))
+        output_shape = batch_shape if n_var == 1 else (*batch_shape, n_var, n_var)
+        ref = np.reshape(np.stack(ref_list), output_shape)
         assert_close(res, xp.asarray(ref))
 
     @pytest.mark.parametrize("bias", [True, False, 0, 1])
