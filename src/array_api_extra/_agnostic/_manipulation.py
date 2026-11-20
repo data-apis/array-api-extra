@@ -1,5 +1,6 @@
 """Array-agnostic implementations for manipulation functions."""
 
+import cmath
 import math
 import typing
 from collections.abc import Sequence
@@ -8,7 +9,7 @@ from .._at import at
 from .._lib import _compat, _helpers
 from .._lib._typing import Array, ArrayNamespace
 
-__all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad"]
+__all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad", "replace"]
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ArrayNamespace) -> Array:
@@ -97,3 +98,11 @@ def pad(
         device=_compat.device(x),
     )
     return at(padded, tuple(slices)).set(x)
+
+
+def replace(  # numpydoc ignore=PR01,RT01
+    x: Array, old: complex, new: complex, /, *, xp: ArrayNamespace
+) -> Array:
+    """See docstring in `array_api_extra._manipulation`."""
+    mask = xp.isnan(x) if cmath.isnan(old) else x == old
+    return xp.where(mask, new, x)
