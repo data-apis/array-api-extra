@@ -8,7 +8,7 @@ from .._at import at
 from .._lib import _compat, _helpers
 from .._lib._typing import Array, ArrayNamespace
 
-__all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad"]
+__all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad", "swapaxes"]
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ArrayNamespace) -> Array:
@@ -97,3 +97,16 @@ def pad(
         device=_compat.device(x),
     )
     return at(padded, tuple(slices)).set(x)
+
+
+def swapaxes(a: Array, axis1: int, axis2: int, /, *, xp: ArrayNamespace) -> Array:
+    # numpydoc ignore=PR01,RT01
+    """See docstring in `array_api_extra._manipulation`."""
+    ndim = a.ndim
+    axis1 %= ndim
+    axis2 %= ndim
+    if axis1 == axis2:
+        # `moveaxis` rejects repeated axes
+        # https://github.com/data-apis/array-api/issues/1020
+        return a
+    return xp.moveaxis(a, (axis1, axis2), (axis2, axis1))

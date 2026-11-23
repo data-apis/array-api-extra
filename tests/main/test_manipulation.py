@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-from array_api_extra import atleast_nd, broadcast_shapes, expand_dims, pad
+from array_api_extra import atleast_nd, broadcast_shapes, expand_dims, pad, swapaxes
 from array_api_extra._lib._backends import Backend
 from array_api_extra._lib._compat import device as get_device
 from array_api_extra._lib._typing import ArrayNamespace, Device
@@ -13,6 +13,7 @@ lazy_xp_function(atleast_nd)
 lazy_xp_function(broadcast_shapes)
 lazy_xp_function(expand_dims)
 lazy_xp_function(pad)
+lazy_xp_function(swapaxes)
 
 
 class TestAtLeastND:
@@ -371,3 +372,34 @@ class TestPad:
         assert padded.shape == (4, 6)
         padded = pad(a, ((1, 0), (0, 0)))
         assert padded.shape == (4, 4)
+
+
+class TestSwapaxes:
+    @pytest.mark.parametrize(("axis1", "axis2"), [(0, 1), (0, 2), (2, 0), (-1, 0)])
+    def test_basic(self, axis1: int, axis2: int, xp: ArrayNamespace):
+        a = np.reshape(np.arange(2 * 3 * 4), (2, 3, 4))
+        actual = swapaxes(xp.asarray(a), axis1, axis2)
+        assert_equal(actual, xp.asarray(np.swapaxes(a, axis1, axis2)))
+
+    @pytest.mark.parametrize(("axis1", "axis2"), [(0, 0), (1, -1), (-2, 0)])
+    def test_same_axis(self, axis1: int, axis2: int, xp: ArrayNamespace):
+        # https://github.com/data-apis/array-api/issues/1020
+        a = xp.asarray([[1, 2, 3], [4, 5, 6]])
+        assert_equal(swapaxes(a, axis1, axis2), a)
+
+    def test_axis_out_of_range(self, xp: ArrayNamespace):
+        a = xp.empty((2, 3))
+        with pytest.raises(IndexError, match="out of bounds"):
+            _ = swapaxes(a, 0, 2)
+        with pytest.raises(IndexError, match="out of bounds"):
+            _ = swapaxes(a, -3, 0)
+        with pytest.raises(IndexError, match="out of bounds"):
+            _ = swapaxes(xp.asarray(0), 0, 0)
+
+    def test_device(self, xp: ArrayNamespace, device: Device):
+        a = xp.empty((2, 3), device=device)
+        assert get_device(swapaxes(a, 0, 1)) == device
+
+    def test_xp(self, xp: ArrayNamespace):
+        a = xp.empty((2, 3))
+        assert swapaxes(a, 0, 1, xp=xp).shape == (3, 2)

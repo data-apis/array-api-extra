@@ -7,7 +7,7 @@ from . import _agnostic
 from ._lib import _compat, _helpers
 from ._lib._typing import Array, ArrayNamespace
 
-__all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad"]
+__all__ = ["atleast_nd", "broadcast_shapes", "expand_dims", "pad", "swapaxes"]
 
 
 def atleast_nd(x: Array, /, *, ndim: int, xp: ArrayNamespace | None = None) -> Array:
@@ -282,3 +282,67 @@ def pad(
     return _agnostic._manipulation.pad(
         x, pad_width, constant_values=constant_values, xp=xp
     )
+
+
+def swapaxes(
+    a: Array, axis1: int, axis2: int, /, *, xp: ArrayNamespace | None = None
+) -> Array:
+    """
+    Interchange two axes of an array.
+
+    Equivalent to :func:`numpy.swapaxes`.
+
+    Parameters
+    ----------
+    a : array
+        Input array.
+    axis1 : int
+        First axis.
+    axis2 : int
+        Second axis.
+    xp : array_namespace, optional
+        The standard-compatible namespace for `a`. Default: infer.
+
+    Returns
+    -------
+    array
+        `a` with `axis1` and `axis2` interchanged.
+
+    See Also
+    --------
+    array_api.moveaxis : Move array axes to new positions.
+    array_api.permute_dims : Permute the axes of an array.
+
+    Examples
+    --------
+    >>> import array_api_strict as xp
+    >>> import array_api_extra as xpx
+    >>> x = xp.asarray([[1, 2, 3]])
+    >>> xpx.swapaxes(x, 0, 1, xp=xp)
+    Array([[1],
+           [2],
+           [3]], dtype=array_api_strict.int64)
+
+    >>> x = xp.zeros((2, 3, 4))
+    >>> xpx.swapaxes(x, 0, -1, xp=xp).shape
+    (4, 3, 2)
+    """
+    if xp is None:
+        xp = _compat.array_namespace(a)
+
+    ndim = a.ndim
+    for axis in (axis1, axis2):
+        if not -ndim <= axis < ndim:
+            msg = f"axis {axis} is out of bounds for array of dimension {ndim}"
+            raise IndexError(msg)
+
+    if (
+        _compat.is_numpy_namespace(xp)
+        or _compat.is_cupy_namespace(xp)
+        or _compat.is_dask_namespace(xp)
+        or _compat.is_jax_namespace(xp)
+        or _compat.is_torch_namespace(xp)
+    ):
+        return xp.swapaxes(a, axis1, axis2)
+
+    return _agnostic._manipulation.swapaxes(a, axis1, axis2, xp=xp)
