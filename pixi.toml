@@ -322,7 +322,7 @@ tests-run-deps-cov = {
 [feature.docs.dependencies]
 sphinx = ">=7.4.7"
 furo = ">=2025.12.19"
-myst-parser = ">=5.1.0"
+myst-parser = ">=5.2.0"
 sphinx-copybutton = ">=0.5.2"
 sphinx-autodoc-typehints = ">=3.11.1"
 # Needed to import parsed modules with autodoc
