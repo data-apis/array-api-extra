@@ -129,7 +129,7 @@ pytest = ">=9.2.0"
 validate-pyproject = ">=0.25"
 pyrefly = ">=1.4.1"
 zizmor = ">=1.32.0"
-tombi = ">=1.11.1"
+tombi = ">=1.11.2"
 # NOTE: don't add cupy, jax, pytorch, or sparse here,
 # as they slow down typechecking and are not portable across target OSs
 
