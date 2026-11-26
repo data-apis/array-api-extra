@@ -366,7 +366,13 @@ def nanmean(
         or _compat.is_cupy_namespace(xp)
         or _compat.is_dask_namespace(xp)
         or _compat.is_jax_namespace(xp)
-        or _compat.is_torch_namespace(xp)
+        or (
+            _compat.is_torch_namespace(xp)
+            and (  # https://github.com/pytorch/pytorch/issues/71472
+                xp.isdtype(a.dtype, "real floating")
+                or getattr(_compat.device(a), "type", None) != "cpu"
+            )
+        )
     ):
         return xp.nanmean(a, axis=axis)
 
@@ -418,7 +424,13 @@ def nansum(
         or _compat.is_cupy_namespace(xp)
         or _compat.is_dask_namespace(xp)
         or _compat.is_jax_namespace(xp)
-        or _compat.is_torch_namespace(xp)
+        or (
+            _compat.is_torch_namespace(xp)
+            and (  # https://github.com/pytorch/pytorch/issues/139349
+                xp.isdtype(a.dtype, "real floating")
+                or getattr(_compat.device(a), "type", None) != "cpu"
+            )
+        )
     ):
         return xp.nansum(a, axis=axis)
 
