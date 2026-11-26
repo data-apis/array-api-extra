@@ -73,7 +73,8 @@ def cov(
     -------
     array
         An array having shape ``(..., N, N)`` whose innermost two dimensions represent
-        the covariance matrix of the variables.
+        the covariance matrix of the variables. For a single variable, each covariance
+        matrix is returned as a scalar variance, retaining any batch dimensions.
 
     Notes
     -----

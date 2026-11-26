@@ -106,7 +106,8 @@ def cov(
     if xp.isdtype(m_cT.dtype, "complex floating"):
         m_cT = xp.conj(m_cT)
     c = m_w @ m_cT / fact
-    axes = tuple(axis for axis, length in enumerate(c.shape) if length == 1)
+    # Match NumPy's scalar variance for one variable while retaining batch axes.
+    axes = tuple(axis for axis in (-2, -1) if c.shape[axis] == 1)
     return xp.squeeze(c, axis=axes)
 
 
